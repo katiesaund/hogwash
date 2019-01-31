@@ -55,3 +55,13 @@ save_treewas_hits <- function(result_list, type, fname){
               row.names = TRUE,
               quote = FALSE)
 }
+
+remove_nonexistant_genotypes <- function(geno_mat, prefix){
+  geno_to_drop <- rep(FALSE, ncol(geno_mat))
+  geno_to_drop[colSums(geno_mat) < 1] <- TRUE
+  dropped_genotype_names <- colnames(geno_mat)[geno_to_drop]
+  filename <- paste(prefix, "_genotypes_dropped_because_vars_not_in_samples.txt", sep = "")
+  writeLines(dropped_genotype_names, con = filename, sep = "\n")
+  geno_mat <- geno_mat[ , !geno_to_drop, drop = FALSE]
+  return(geno_mat)
+} # end remove_nonexistant_genotypes

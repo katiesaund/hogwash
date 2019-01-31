@@ -18,14 +18,12 @@ temp <- unlist(pheno)
 names(temp) <- row.names(pheno)
 pheno <- temp
 
-# added is.rooted if statement on 2018-09-25 to deal with odd midpoint rooting issue for PSM dataset. 
 if (!is.rooted(tree)){
   tree <- midpoint(tree)
 }
-# End of section added on 2018-09-25
 
 pdf_fname <- paste(fname, ".pdf", sep = "")
-
+geno <- remove_nonexistant_genotypes(geno)
 results <- run_treeWAS(tree, geno, pheno, recon, test_corr, pdf_fname, alpha)
 save(results, file = paste(fname, "_results.rda", sep = ""))
 save_treewas_hits(results$terminal$sig.snps, "terminal", fname)
