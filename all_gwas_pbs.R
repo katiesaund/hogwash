@@ -74,10 +74,17 @@ username <- args[10]
 # 6. Number of permutations 
 # 7. Alpha
 # 8. Boostrap confidence threshold 
-# 9. Annotation for heatmap # if you have no annotation, make this NULL
+# 9. Optional: Annotation for heatmap
 
 for (p in 1:length(phenotypes)){
   for (g in 1:length(genotypes)){
+    if (file.exists(paste(path, phenotypes[p], "_annotation.tsv", sep = ""))){
+      annotation <- paste(path, phenotypes[p], "_annotation.tsv", sep = "")
+    } else {
+      annotation <- ""
+    }
+
+    
     command <- paste("Rscript",
                      run_phyC,
                      paste(path, phenotypes[p], "_pheno.tsv", sep = ""), 
@@ -88,7 +95,7 @@ for (p in 1:length(phenotypes)){
                      num_perm, 
                      alpha,
                      boot_conf, 
-                     paste(path, phenotypes[p], "_annotation.tsv", sep = ""),
+                     annotation,
                      sep = " ")
     fname <- paste(getwd(), "/", "phyc_", phenotypes[p], genotypes[g], ".pbs", sep = "")
     writeLines(c("#!/bin/sh","####  PBS preamble",
