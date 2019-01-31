@@ -1,11 +1,9 @@
 # Katie Saund
 
-# LOAD LIBRARIES -----------------------------------------------------------------------------------------
-library(ape)
-library(phangorn)
-source("/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-08-24_treewas/lib/2018-08-24_treewas_lib.R")
+# LOAD LIBRARIES --------------------------------------------------------------#
+source("/nfs/esnitkin/bin_group/pipeline/Github/gwas/treewas_lib.R")
 
-# READ IN ARGUMENTS --------------------------------------------------------------------------------------
+# READ IN ARGUMENTS -----------------------------------------------------------#
 args <- commandArgs(trailingOnly = TRUE) #arguments from the PBS script
 pheno <- read.csv(args[1], row.names = 1, sep = "\t")
 tree <- read.tree(args[2])
@@ -14,7 +12,7 @@ recon <- args[4]
 test_corr <- args[5]
 fname <- args[6]
 
-# RUN TREEWAS --------------------------------------------------------------------------------------------
+# RUN TREEWAS -----------------------------------------------------------------#
 temp <- unlist(pheno)
 names(temp) <- row.names(pheno)
 pheno <- temp
@@ -34,7 +32,7 @@ save_treewas_hits(results$simultaneous$sig.snps, "simultaneous", fname)
 save_treewas_hits(results$subsequent$sig.snps, "subsequent", fname)
 save_treewas_hits(results$treeWAS.combined$treeWAS.combined, "combined", fname)
 
-# SAVE SESSION INFO
+# SAVE SESSION INFO -----------------------------------------------------------#
 writeLines(capture.output(sessionInfo()), paste(fname, "_sessionInfo_", format(Sys.Date(), "%Y-%m-%d"), ".txt", sep = ""))
 
-# END OF SCRIPT ------------------------------------------------------------------------------------------
+# END OF SCRIPT ---------------------------------------------------------------#
