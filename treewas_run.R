@@ -5,12 +5,13 @@ source("/nfs/esnitkin/bin_group/pipeline/Github/gwas/treewas_lib.R")
 
 # READ IN ARGUMENTS -----------------------------------------------------------#
 args <- commandArgs(trailingOnly = TRUE) #arguments from the PBS script
-pheno <- read.csv(args[1], row.names = 1, sep = "\t")
-tree <- read.tree(args[2])
-geno <- read.csv(args[3], header = TRUE, row.names = 1, sep = "\t")
-recon <- args[4]
+pheno     <- read.csv(args[1], row.names = 1, sep = "\t")
+tree      <- read.tree(args[2])
+geno      <- read.csv(args[3], header = TRUE, row.names = 1, sep = "\t")
+recon     <- args[4]
 test_corr <- args[5]
-fname <- args[6]
+fname     <- args[6]
+alpha     <- args[7]
 
 # RUN TREEWAS -----------------------------------------------------------------#
 temp <- unlist(pheno)
@@ -25,7 +26,7 @@ if (!is.rooted(tree)){
 
 pdf_fname <- paste(fname, ".pdf", sep = "")
 
-results <- run_treeWAS(tree, geno, pheno, recon, test_corr, pdf_fname)
+results <- run_treeWAS(tree, geno, pheno, recon, test_corr, pdf_fname, alpha)
 save(results, file = paste(fname, "_results.rda", sep = ""))
 save_treewas_hits(results$terminal$sig.snps, "terminal", fname)
 save_treewas_hits(results$simultaneous$sig.snps, "simultaneous", fname)

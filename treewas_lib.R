@@ -4,7 +4,7 @@ library(treeWAS)
 library(ape)
 library(phangorn)
 
-run_treeWAS <- function(tree, variant_matrix, phenotype, reconstruction_type, multiple_test_correction, filename){
+run_treeWAS <- function(tree, variant_matrix, phenotype, reconstruction_type, multiple_test_correction, filename, alpha_value){
   # tree is a rooted phylogenetic object
   # variant_matrix is a matrix of variants (what is proper orientation?)
   # phenotype is a vector??
@@ -33,7 +33,7 @@ run_treeWAS <- function(tree, variant_matrix, phenotype, reconstruction_type, mu
                      phen.reconstruction = reconstruction_type, 
                      phen.type = NULL,
                      na.rm = TRUE, 
-                     p.value = 0.01, 
+                     p.value = alpha_value, 
                      p.value.correct = multiple_test_correction, 
                      p.value.by = "count", 
                      dist.dna.model = "JC69", 

@@ -39,11 +39,12 @@ args <- commandArgs(trailingOnly = TRUE) # Grab arguments from the PBS script
 # args[5] is path to script that runs treewas ex: /nfs/esnitkin/bin_group/pipeline/Github/gwas/treewas_run.R
 # args[6] is type of multiple test correction ex: "fdr" or "bonf"
 # args[7] is type of ancestral reconstruction method ex: "ML" or "parsimony" 
+# args[8] is the alpha value for treewas
 
-# args[8] is path to formatted data on which you want to run GWAS ex: /nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/
+# args[9] is path to formatted data on which you want to run GWAS ex: /nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/
 #           phenotypes and genotype nomenclature will need to be dealt with still at a later time
 
-# args[9] is your umich email address 
+# args[10] is your umich email address 
 
 # PHYC SPECIFIC
 run_phyC  <- args[1]
@@ -55,13 +56,14 @@ boot_conf <- args[4]
 run_treewas <- args[5]
 test_corr   <- args[6]
 recon       <- args[7]
+alpha_val   <- args[8]
 
 # FOR BOTH: 
-path <- args[8]
+path <- args[9]
 phenotypes <- c("log_cfe", "log_germ_tc", "log_germ_tc_and_gly", "log_growth", "log_sporulation", "log_toxin", "fqR", "severity") 
 genotypes  <- c("_snp_stop", "_snp_ns", "_snp_del", "_snp_high", "_gene_stop", "_gene_ns", "_gene_del", "_gene_high", "_pilon_sv", "_roary_pan_genome")
 
-username <- args[9]
+username <- args[10]
 
 # PHYC COMMAND LINE INPUTS
 # 1. Phenotype
@@ -113,6 +115,7 @@ for (p in 1:length(phenotypes)){
 # 4. Reconstruction method
 # 5. Multiple test correction method
 # 6. Output name
+# 7. Alpha value
 
 for (p in 1:length(phenotypes)){
   for (g in 1:length(genotypes)){
@@ -124,6 +127,7 @@ for (p in 1:length(phenotypes)){
                      recon,
                      test_corr,
                      paste("treewas_", phenotypes[p], genotypes[g], sep = ""),
+                     alpha_val, 
                      sep = " ")
     fname <- paste(getwd(), "/", "treewas_", phenotypes[p], genotypes[g], ".pbs", sep = "")
     writeLines(c("#!/bin/sh","####  PBS preamble",
