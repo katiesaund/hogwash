@@ -1,8 +1,6 @@
 # Katie Saund
-# 2018-09-07
 
-# Script will gather the pvalue for each genotype-phenotype results after 
-# running GEE, treeWAS, and phyC. 
+# Script will gather the pvalue for each genotype-phenotype results after treeWAS and phyC. 
 
 library(ComplexHeatmap)
 
@@ -79,13 +77,6 @@ load_rda <- function(file_name){
   get(ls()[ls() != "file_name"])
 } # end load_rda
 
-
-get_gee_pvals <- function(path, pheno, geno){
-  file_name <- paste(path, "gee_", pheno, geno, "_all_pval.tsv", sep = "")
-  pvals <- read_in_tsv_matrix(file_name)
-  return(pvals)
-} # end get_gee_pvals()
-
 get_phyc_trans_pvals <- function(path, pheno, geno){
   if (pheno %in% c("fqR", "severity")){ # binary phenotypes
     file_name_trans <- paste(path, "phyc_", pheno, geno, "_transition_pvals_for_all_hits.tsv", sep = "")
@@ -159,57 +150,51 @@ get_expected_gene_subset <- function(pval_mat, gene_list){
 
 
 
-subset_all_gwas_types <- function(gee_results, phyc_results, ter_results, sim_results, sub_results, gene_list){
-  gee_pos_ctrl  <- get_expected_gene_subset(gee_results, gene_list)
+subset_all_gwas_types <- function(phyc_results, ter_results, sim_results, sub_results, gene_list){
   phyc_pos_ctrl <- get_expected_gene_subset(phyc_results, gene_list)
   ter_pos_ctrl  <- get_expected_gene_subset(ter_results, gene_list)
   sim_pos_ctrl  <- get_expected_gene_subset(sim_results, gene_list)
   sub_pos_ctrl  <- get_expected_gene_subset(sub_results, gene_list)
-  return(list("gee_pos_ctrl" = gee_pos_ctrl, "phyc_pos_ctrl" = phyc_pos_ctrl, 
-              "ter_pos_ctrl" = ter_pos_ctrl, "sim_pos_ctrl" = sim_pos_ctrl, 
+  return(list("phyc_pos_ctrl" = phyc_pos_ctrl, 
+              "ter_pos_ctrl" = ter_pos_ctrl, 
+              "sim_pos_ctrl" = sim_pos_ctrl, 
               "sub_pos_ctrl" = sub_pos_ctrl))
 }
 
 
-collect_pvals_for_found_genes <- function(gee_pc, phyc_pc, ter_pc, sim_pc, sub_pc){
-  found_genes <- unique(c(row.names(gee_pc), 
-                          row.names(phyc_pc), 
+collect_pvals_for_found_genes <- function(phyc_pc, ter_pc, sim_pc, sub_pc){
+  found_genes <- unique(c(row.names(phyc_pc), 
                           row.names(ter_pc), 
                           row.names(sim_pc), 
                           row.names(sub_pc)))
   
-  found_genes_with_pvals <- matrix(NA, nrow = length(found_genes), ncol = 5)
+  found_genes_with_pvals <- matrix(NA, nrow = length(found_genes), ncol = 4)
   print(found_genes)
   if (length(found_genes) == 0){
     stop("no found genes")
   }
-  colnames(found_genes_with_pvals) <- c("gee", "phyc", "ter", "sim", "sub")
+  colnames(found_genes_with_pvals) <- c("phyc", "ter", "sim", "sub")
   row.names(found_genes_with_pvals) <- found_genes
   
   for (i in 1:nrow(found_genes_with_pvals)){
-    for (j in 1:nrow(gee_pc)){
-      if (row.names(found_genes_with_pvals)[i] %in% row.names(gee_pc)[j]){
-        found_genes_with_pvals[i, 1] <- gee_pc[j, 29]
-      }
-    }
     for (j in 1:nrow(phyc_pc)){
       if (row.names(found_genes_with_pvals)[i] %in% row.names(phyc_pc)[j]){
-        found_genes_with_pvals[i, 2] <- phyc_pc[j, 1]
+        found_genes_with_pvals[i, 1] <- phyc_pc[j, 1]
       }
     }
     for (j in 1:nrow(ter_pc)){
       if (row.names(found_genes_with_pvals)[i] %in% row.names(ter_pc)[j]){
-        found_genes_with_pvals[i, 3] <- ter_pc[j, 1]
+        found_genes_with_pvals[i, 2] <- ter_pc[j, 1]
       }
     }
     for (j in 1:nrow(sim_pc)){
       if (row.names(found_genes_with_pvals)[i] %in% row.names(sim_pc)[j]){
-        found_genes_with_pvals[i, 4] <- sim_pc[j, 1]
+        found_genes_with_pvals[i, 3] <- sim_pc[j, 1]
       }
     }
     for (j in 1:nrow(sub_pc)){
       if (row.names(found_genes_with_pvals)[i] %in% row.names(sub_pc)[j]){
-        found_genes_with_pvals[i, 5] <- sub_pc[j, 1]
+        found_genes_with_pvals[i, 4] <- sub_pc[j, 1]
       }
     }
   }
@@ -255,9 +240,9 @@ plot_found_genes <- function(pval_mat, name, path_name){
 }
 
 
-all_subset_steps <- function(gee_pvals, phyc_pvals, ter_pvals, sim_pvals, sub_pvals, gene_list, plot_name, dir_name){
-  sub_results <- subset_all_gwas_types(gee_pvals, phyc_pvals, ter_pvals, sim_pvals, sub_pvals, gene_list)
-  pvals <- collect_pvals_for_found_genes(sub_results$gee_pos_ctrl, sub_results$phyc_pos_ctrl, sub_results$ter_pos_ctrl, sub_results$sim_pos_ctrl, sub_results$sub_pos_ctrl)
+all_subset_steps <- function(phyc_pvals, ter_pvals, sim_pvals, sub_pvals, gene_list, plot_name, dir_name){
+  sub_results <- subset_all_gwas_types(phyc_pvals, ter_pvals, sim_pvals, sub_pvals, gene_list)
+  pvals <- collect_pvals_for_found_genes(sub_results$phyc_pos_ctrl, sub_results$ter_pos_ctrl, sub_results$sim_pos_ctrl, sub_results$sub_pos_ctrl)
   plot_found_genes(pvals, plot_name, dir_name)
 }
 
@@ -306,32 +291,31 @@ for (p in 1:length(phenotypes)){
     print("loop start")
     print(paste(phenotypes[p], genotypes[g], sep = ""))
     
-    gee     <- t(get_gee_pvals(path, phenotypes[p], genotypes[g])) # ignores if QIC is low  # gee isa matrix. # colnames are genotype, transpose to orient the same as phyC
     phyc    <- get_phyc_trans_pvals(path, phenotypes[p], genotypes[g]) #phyc is a matrix # need to transpose to make colnames genotype
     treewas <- get_treewas_pvals(path, phenotypes[p], genotypes[g])#treewas$ter_pval # vector #treewas$sub_pval #treewas$sim_pval
 
     if (phenotypes[p] == "log_toxin"){
       print("toxin")
       name <- paste(phenotypes[p], genotypes[g], "\nexpected_toxin_genes", sep = "")
-      all_subset_steps(gee, phyc, treewas$ter_pval, treewas$sim_pval, treewas$sub_pval, expected_toxin_genes, name, pos_ctrl_dir)
+      all_subset_steps(phyc, treewas$ter_pval, treewas$sim_pval, treewas$sub_pval, expected_toxin_genes, name, pos_ctrl_dir)
     }
     
     if (phenotypes[p] %in% c("log_sporulation", "log_cfe")){
       print("spore")
       name <- paste(phenotypes[p], genotypes[g], "\nexpected_sporulation_genes", sep = "")
-      all_subset_steps(gee, phyc, treewas$ter_pval, treewas$sim_pval, treewas$sub_pval, expected_sporulation_genes, name, pos_ctrl_dir)
+      all_subset_steps(phyc, treewas$ter_pval, treewas$sim_pval, treewas$sub_pval, expected_sporulation_genes, name, pos_ctrl_dir)
     }
 
     # if (phenotypes[p] %in% c("log_germ_tc_and_gly", "log_germ_tc")){
     #   print("Germ")
     #   name <- paste(phenotypes[p], genotypes[g], "\nexpected_germination_genes", sep = "")
-    #   all_subset_steps(gee, phyc, treewas$ter_pval, treewas$sim_pval, treewas$sub_pval, expected_germination_genes, name, pos_ctrl_dir)
+    #   all_subset_steps(phyc, treewas$ter_pval, treewas$sim_pval, treewas$sub_pval, expected_germination_genes, name, pos_ctrl_dir)
     # }
 
     if (phenotypes[p] == "fqR"){
       print("fq")
       name <- paste(phenotypes[p], genotypes[g], "\nexpected_fqR_genes", sep = "")
-      all_subset_steps(gee, phyc, treewas$ter_pval, treewas$sim_pval, treewas$sub_pval, expected_fqR_genes, name, pos_ctrl_dir)
+      all_subset_steps(phyc, treewas$ter_pval, treewas$sim_pval, treewas$sub_pval, expected_fqR_genes, name, pos_ctrl_dir)
     }
   }
 }
