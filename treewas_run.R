@@ -1,4 +1,3 @@
-# 2018-08-24
 # Katie Saund
 
 # LOAD LIBRARIES -----------------------------------------------------------------------------------------
@@ -34,5 +33,8 @@ save_treewas_hits(results$terminal$sig.snps, "terminal", fname)
 save_treewas_hits(results$simultaneous$sig.snps, "simultaneous", fname)
 save_treewas_hits(results$subsequent$sig.snps, "subsequent", fname)
 save_treewas_hits(results$treeWAS.combined$treeWAS.combined, "combined", fname)
+
+# SAVE SESSION INFO
+writeLines(capture.output(sessionInfo()), paste(fname, "_sessionInfo_", format(Sys.Date(), "%Y-%m-%d"), ".txt", sep = ""))
 
 # END OF SCRIPT ------------------------------------------------------------------------------------------

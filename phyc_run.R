@@ -17,7 +17,6 @@
 # This document is split into the library of functions and then the script to run the association test. 
 
 # LOAD PHYC LIBRARY OF FUNCTIONS ----------------------------------------------#
-#source("/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-12-14_phyc_fix_delta_pheno/lib/2018-12-14_phyc_lib.R")
 source("/nfs/esnitkin/bin_group/pipeline/Github/gwas/phyc_lib.R")
 
 # READ IN ARGUMENTS -----------------------------------------------------------#
@@ -142,5 +141,8 @@ if (args$discrete_or_continuous == "continuous"){
     print("No signficiant transition results")
   }
 }
+
+# LOG SESSION INFO 
+writeLines(capture.output(sessionInfo()), paste(args$output_dir, "/", args$output_name, "_sessionInfo_", format(Sys.Date(), "%Y-%m-%d"), ".txt", sep = ""))
 
 # END OF PHYC -----------------------------------------------------------------#
