@@ -61,7 +61,7 @@ alpha_val   <- args[8]
 # FOR BOTH: 
 path <- args[9]
 phenotypes <- c("log_cfe", "log_germ_tc", "log_germ_tc_and_gly", "log_growth", "log_sporulation", "log_toxin", "fqR", "severity") 
-genotypes  <- c("_snp_stop", "_snp_ns", "_snp_del", "_snp_high", "_gene_stop", "_gene_ns", "_gene_del", "_gene_high", "_pilon_sv", "_roary_pan_genome")
+genotypes  <- c("_snp_stop", "_snp_ns", "_snp_high", "_gene_stop", "_gene_ns", "_gene_high", "_roary_pan_genome")
 
 username <- args[10]
 
