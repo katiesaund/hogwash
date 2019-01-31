@@ -60,6 +60,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_t
   if (disc_cont == "continuous"){
     
     # RECONSTRUCTION -----------------------------------------------------------
+    set.seed(3)
     fitER <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method) 
     ML_anc_rec <- fitER$ace # vector containing reconstruction data for all internal nodes (#51 -99) where tips are 1-50.
     tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
@@ -73,7 +74,8 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_t
   } else if (disc_cont == "discrete"){
     
     # RECONSTRUCTION -----------------------------------------------------------
-    recon_model <- "ER" # Model:  ER.         Indicates an equal rates model of transition. 
+    recon_model <- "ER" # Model:  ER.         Indicates an equal rates model of transition.
+    set.seed(4)
     fitER <- ace(mat[ , num, drop = TRUE], tr, model = recon_model, type = disc_cont, method = recon_method) 
     ML_anc_rec <- as.numeric(colnames(fitER$lik.anc)[apply(fitER$lik.anc, 1, which.max)]) # Extract the mostly likely character state using which.max
     names(ML_anc_rec) <- c((Ntip(tr) + 1):(Ntip(tr) + Nnode(tr)))
@@ -375,6 +377,8 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     #     proportional to length of edge. Number of edges selected for the 
     #     permuted data set is the number of times the empirical genotype 
     #     appears. 
+    
+    set.seed(1) # for reproducability of the sample() function 
     for (j in 1:permutations){  # create a random sample of the tr
       curr_num_branch <- length(which_branches)
       all_sampled_branches[j, ] <- sample(1:curr_num_branch,
@@ -1924,6 +1928,7 @@ calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, 
       all_sampled_branches <- matrix(nrow = permutations, ncol = num_sample[i])
       redistributed_hits   <- matrix(0, nrow = permutations, ncol = length(which_branches[[i]]))
       # create a random sample of the tr
+      set.seed(2)
       for(j in 1:permutations){
         curr_num_branch <- num_branch[i]
         all_sampled_branches[j, ] <- sample(1:curr_num_branch,
