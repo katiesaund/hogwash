@@ -1455,6 +1455,29 @@ read_in_arguments <- function(args){
                     "discrete_or_continuous" = discrete_or_continuous, 
                     "annotation" = annotation)
     return(results)
+  } else if (length(args) == 9){
+    test                   <- FALSE
+    phenotype              <- read_in_tsv_matrix(args[1])
+    tree                   <- read.tree(args[2])
+    # added is.rooted if statement on 2018-09-25 to deal with odd midpoint rooting issue for PSM dataset. 
+    if (!is.rooted(tree)){
+      tree <- midpoint(tree)
+    }
+    # End of section added on 2018-09-25
+    genotype               <- read_in_tsv_matrix(args[3])
+    output_name            <- args[4] # Ex: log_toxin_snp_stop
+    output_dir             <- args[5] # Directory in which all output files will be saved
+    perm                   <- as.numeric(args[6]) #typically 10,000
+    alpha                  <- as.numeric(args[7])
+    bootstrap_cutoff       <- as.numeric(args[8]) # typically 0.70
+    annotation             <- read_in_tsv_matrix(args[9])
+    discrete_or_continuous <- check_input_format(phenotype, tree, genotype, output_name, output_dir, perm, alpha, annotation)
+    results <- list("test" = test, "tree" = tree, "phenotype" = phenotype, 
+                    "genotype" = genotype, "output_name" = output_name,
+                    "output_dir" = output_dir, "perm" = perm, "alpha" = alpha, 
+                    "discrete_or_continuous" = discrete_or_continuous, 
+                    "annotation" = annotation, "bootstrap_cutoff" = bootstrap_cutoff)
+    return(results)
   } else if (length(args) == 8){
     test                   <- FALSE
     phenotype              <- read_in_tsv_matrix(args[1])
@@ -1469,19 +1492,19 @@ read_in_arguments <- function(args){
     output_dir             <- args[5] # Directory in which all output files will be saved
     perm                   <- as.numeric(args[6]) #typically 10,000
     alpha                  <- as.numeric(args[7])
-    annotation             <- read_in_tsv_matrix(args[8])
-    discrete_or_continuous <- check_input_format(phenotype, tree, genotype, output_name, output_dir, perm, alpha, annotation)
-    results <- list("test" = test, "tree" = tree, "phenotype" = phenotype, 
+    bootstrap_cutoff       <- as.numeric(args[8])
+    discrete_or_continuous <- check_input_format(phenotype, tree, genotype, output_name, output_dir, perm, alpha, NULL)
+    results <- list("test" = test, "tree" = tree, "phenotype" = phenotype,
                     "genotype" = genotype, "output_name" = output_name,
-                    "output_dir" = output_dir, "perm" = perm, "alpha" = alpha, 
-                    "discrete_or_continuous" = discrete_or_continuous, 
-                    "annotation" = annotation)
+                    "output_dir" = output_dir, "perm" = perm, "alpha" = alpha,
+                    "discrete_or_continuous" = discrete_or_continuous,
+                    "annotation" = NULL, "bootstrap_cutoff" = bootstrap_cutoff)
     return(results)
   } else {
-    stop("2 or 8 inputs required. \n
+    stop("2, 8 or 9 inputs required. \n
          Either: 1. test 2. output directory or \n
          1. Phenotype 2. Tree 3. Genotype 4. Output name 5. Output directory \n
-         6. Number of permutations 7. Alpha 8. Annotation")
+         6. Number of permutations 7. Alpha 8. Bootstrap confidence threshold and optional 9. Annotation")
   }
 } # end read_in_arguments()
 

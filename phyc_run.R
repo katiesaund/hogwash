@@ -17,7 +17,8 @@
 # This document is split into the library of functions and then the script to run the association test. 
 
 # LOAD PHYC LIBRARY OF FUNCTIONS ----------------------------------------------#
-source("/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-12-14_phyc_fix_delta_pheno/lib/2018-12-14_phyc_lib.R")
+#source("/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-12-14_phyc_fix_delta_pheno/lib/2018-12-14_phyc_lib.R")
+source("/nfs/esnitkin/bin_group/pipeline/Github/gwas/phyc_lib.R")
 
 # READ IN ARGUMENTS -----------------------------------------------------------#
 args <- commandArgs(trailingOnly = TRUE) # Grab arguments from the PBS script
@@ -31,9 +32,8 @@ phenotype_vector <- convert_matrix_to_vector(args$phenotype)
 set.seed(18591124)
 
 # ANCESTRAL RECONSTRUCTION OF PHENOTYPE ---------------------------------------#
-confidence_cutoff     <- 0.70 # BOOTSTRAP THRESHOLD
-pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(args$tree, args$phenotype, 1, args$discrete_or_continuous, confidence_cutoff)
-tree_conf             <- get_bootstrap_confidence(args$tree, confidence_cutoff)
+pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(args$tree, args$phenotype, 1, args$discrete_or_continuous, args$bootstrap_cutoff)
+tree_conf             <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
 pheno_trans           <- identify_transition_edges(args$tree, args$phenotype, 1, pheno_recon_and_conf$node_anc_rec, args$discrete_or_continuous)
 pheno_recon_edge_mat  <- pheno_recon_and_conf$recon_edge_mat
 short_edges           <- identify_short_edges(args$tree)
@@ -48,7 +48,7 @@ geno_recon_and_conf <- geno_trans <- geno_conf_ordered_by_edges <- geno_recon_or
 
 # PERFORM ANCESTRAL RECONSTRUCTION 
 for(k in 1:ncol(genotype)){
-  geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(args$tree, genotype, k, "discrete", confidence_cutoff)
+  geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(args$tree, genotype, k, "discrete", args$bootstrap_cutoff)
 }
 
 # IDENTIFY TRANSITION EDGES AND REFORMAT
@@ -119,9 +119,13 @@ if (args$discrete_or_continuous == "continuous"){
   save_hits(corrected_pvals_recon$sig_pvals, args$output_dir, args$output_name, "reconstruction_pvals_for_sig_hits")
    
   htmp_tr <- create_heatmap_compatible_tree(args$tree)
-  simple_annotation <- args$annotation[ , 1, drop = FALSE]
-  colnames(simple_annotation) <- "Ribotype" 
- 
+  if(!is.null(args$annotation)){
+    simple_annotation <- args$annotation[ , 1, drop = FALSE]
+    colnames(simple_annotation) <- "Ribotype" 
+  }else{
+    simple_annotation <- NULL
+  }
+
   if (nrow(corrected_pvals_recon$sig_pvals) > 0){
     recon_heatmap_filename_start <- paste(args$output_dir, "/phyc_", args$output_name, "_reconstruction_", sep = "")
     recon_heatmap_title    <- paste(args$output_name, " reconstruction sig hits", sep = "")
