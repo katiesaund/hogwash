@@ -4,19 +4,23 @@
 # that are compatible with treeWAs and phyC.
 
 # INPUTS into this script: 
+# Genotype matrices
 # 1. Parsed snp mat (optional)
 # 2. Parsed gene data (optional)
 # 3. Roary pan genome matrix (optional)
-# 4. Phenotypes (discrete and/or continuous) (required)
+# 4. Other non-specific genotype matrix (optional)
+# Phenotype matrix
+# 5. Phenotypes (discrete and/or continuous) (required)
 # 6. Tree (required)
 
 # OUTPUTS from this script: 
 # For each phenotype: 
 #   1. SNP mats (NS, HIGH, STOPS) (.tsv and .rda)
 #   2. Gene mats (NS, HIGH, STOPS) (.tsv and .rda)
-#   3. roary mat (.tsv)
-#   4. phenotype vector (.tsv)
-#   5. Tree (.tree)
+#   3. roary mat (.tsv and .rda)
+#   4. Other non-specific genotype matrix (.tsv and .rda)
+#   5. phenotype vector (.tsv)
+#   6. Tree (.tree)
 
 # Naming conventions: 
 #   Ex: toxin
@@ -89,7 +93,8 @@ create_phenotype_specific_genotype <- function(genotype, tr_list){
 
 save_results <- function(pheno_list, tr_list, s_ns, s_stop, s_high, s_ex, 
                          g_ns, g_ns_ex, g_stop, g_stop_ex, g_high, g_high_ex, 
-                         roary, roary_ex, output_dir){
+                         roary, roary_ex, generic_name, generic, generic_ex, 
+                         output_dir){
   
   for (l in 1:length(pheno_list)){
     file_name <- colnames(pheno_list[[l]])[1]
@@ -127,6 +132,11 @@ save_results <- function(pheno_list, tr_list, s_ns, s_stop, s_high, s_ex,
       write.table(temp_roary, file = paste(output_dir,  "/", file_name, "_roary_pan_genome.tsv", sep = ""), sep = "\t", quote = TRUE, row.names = TRUE, col.names = TRUE)
       save(temp_roary,        file = paste(output_dir,  "/", file_name, "_roary_pan_genome.rda", sep = ""))
     }
+    if (generic_ex){
+      temp_generic <- generic[[l]]
+      write.table(temp_generic, file = paste(output_dir,  "/", file_name, generic_name, ".tsv", sep = ""), sep = "\t", quote = TRUE, row.names = TRUE, col.names = TRUE)
+      save(temp_generic,        file = paste(output_dir,  "/", file_name, generic_name, ".rda", sep = ""))
+    }
   }
 } # end save_results()
 
@@ -147,7 +157,7 @@ format_data <- function(opt){
   
   # GENOTYPES
   # Set defaults to don't exist (FALSE), but update to TRUE if files are given. 
-  roary_exists <- gene_high_exists <- gene_stop_exists <- gene_ns_exists <- snp_exists <- FALSE
+  roary_exists <- gene_high_exists <- gene_stop_exists <- gene_ns_exists <- snp_exists <- generic_genotype_exists <- FALSE
   
   if (!is.null(opt$roary)){
     if (file.exists(opt$roary)){
@@ -156,24 +166,31 @@ format_data <- function(opt){
     }
   }
   
-  if (!is.null(opt$genehigh)){
-    if (file.exists(opt$genehigh)){
-      gene_high <- local(get(load(opt$genehigh)))
+  if (!is.null(opt$gene_high)){
+    if (file.exists(opt$gene_high)){
+      gene_high <- local(get(load(opt$gene_high)))
       gene_high_exists <- TRUE
     }
   }
   
-  if (!is.null(opt$genestop)){
-    if (file.exists(opt$genestop)){
-      gene_stop <- local(get(load(opt$genestop)))
+  if (!is.null(opt$gene_stop)){
+    if (file.exists(opt$gene_stop)){
+      gene_stop <- local(get(load(opt$gene_stop)))
       gene_stop_exists <- TRUE
     }
   }
   
-  if (!is.null(opt$genens)){
-    if (file.exists(opt$genens)){
-      gene_ns <-local(get(load(opt$genens)))
+  if (!is.null(opt$gene_ns)){
+    if (file.exists(opt$gene_ns)){
+      gene_ns <-local(get(load(opt$gene_ns)))
       gene_ns_exists <- TRUE
+    }
+  }
+  
+  if (!is.null(opt$generic_genotype)){
+    if (file.exists(opt$generic_genotype)){
+      generic_genotype <- read.csv(file = opt$generic_genotype, sep = "\t", header = TRUE, row.names = 1)
+      generic_genotype_exists <- TRUE
     }
   }
   
@@ -220,11 +237,29 @@ format_data <- function(opt){
     snp_high_list <- create_phenotype_specific_genotype(snp_high, tree_list)
   }
   
+  if (generic_genotype_exists){
+    generic_genotype_list <- create_phenotype_specific_genotype(generic_genotype, tree_list)
+  }
+  
   # OUTPUT ----------------------------------------------------------------------#
-  save_results(phenotype_list, tree_list, snp_ns_list, snp_stop_list, 
-               snp_high_list, snp_exists, gene_ns_list, gene_ns_exists, 
-               gene_stop_list, gene_stop_exists, gene_high_list, gene_high_exists, 
-               roary_list, roary_exists, opt$out)
+  save_results(pheno_list = phenotype_list, 
+               tr_list = tree_list, 
+               s_ns = snp_ns_list, 
+               s_stop = snp_stop_list, 
+               s_high = snp_high_list, 
+               s_ex = snp_exists, 
+               g_ns = gene_ns_list, 
+               g_ns_ex = gene_ns_exists, 
+               g_stop = gene_stop_list, 
+               g_stop_ex = gene_stop_exists, 
+               g_high = gene_high_list, 
+               g_high_ex = gene_high_exists, 
+               roary = roary_list, 
+               roary_ex = roary_exists, 
+               generic_name = opt$generic_filename,
+               generic = generic_genotype_list, 
+               generic_ex = generic_genotype_exists, 
+               output_dir= opt$out)
 } #end format_data()
 
 # LIBRARIES -------------------------------------------------------------------#
@@ -233,14 +268,16 @@ library(optparse) # Read in command line arguments with flags
 
 # INPUTS ----------------------------------------------------------------------#
 # Set up arguments
-inputs     <- list(make_option(c("-p", "--phenotype"), type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"), 
-                   make_option(c("-t", "--tree"),      type = "character", default = NULL, help = "path to phylogenetic tree .tre file",        metavar = "character"), 
-                   make_option(c("-r", "--roary"),     type = "character", default = NULL, help = "path to roary pangenome .Rtab file",         metavar = "character"), 
-                   make_option(c("-q", "--genestop"),  type = "character", default = NULL, help = "path to SNPeff high gene matrix .rda file",  metavar = "character"), 
-                   make_option(c("-i", "--genehigh"),  type = "character", default = NULL, help = "path to stop gene matrix .rda file",         metavar = "character"), 
-                   make_option(c("-n", "--genens"),    type = "character", default = NULL, help = "path to gene nonsynonymous .rda file",       metavar = "character"), 
-                   make_option(c("-s", "--snp"),       type = "character", default = NULL, help = "path to simple SNP matrix .rda file",        metavar = "character"), 
-                   make_option(c("-o", "--out"),       type = "character", default = NULL, help = "output directory",                           metavar = "character"))
+inputs     <- list(make_option(c("-p", "--phenotype"),       type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"), 
+                   make_option(c("-t", "--tree"),             type = "character", default = NULL, help = "path to phylogenetic tree .tre file",       metavar = "character"), 
+                   make_option(c("-r", "--roary"),            type = "character", default = NULL, help = "path to roary pangenome .Rtab file",        metavar = "character"), 
+                   make_option(c("-q", "--gene_stop"),        type = "character", default = NULL, help = "path to SNPeff high gene matrix .rda file", metavar = "character"), 
+                   make_option(c("-i", "--gene_high"),        type = "character", default = NULL, help = "path to stop gene matrix .rda file",        metavar = "character"), 
+                   make_option(c("-n", "--gene_ns"),          type = "character", default = NULL, help = "path to gene nonsynonymous .rda file",      metavar = "character"), 
+                   make_option(c("-s", "--snp"),              type = "character", default = NULL, help = "path to simple SNP matrix .rda file",       metavar = "character"), 
+                   make_option(c("-g", "--generic_genotype"), type = "character", default = NULL, help = "path to a generic genotype .tsv file",      metavar = "character"), 
+                   make_option(c("-f", "--generic_filename"), type = "character", default = NULL, help = "name of generic genotype",                  metavar = "character"), 
+                   make_option(c("-o", "--out"),              type = "character", default = NULL, help = "output directory",                          metavar = "character"))
 opt_parser <- OptionParser(option_list=inputs)
 opt        <- parse_args(opt_parser)
 format_data(opt)
