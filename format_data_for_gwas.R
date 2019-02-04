@@ -141,19 +141,20 @@ save_results <- function(pheno_list, tr_list, s_ns, s_stop, s_high, s_ex,
 } # end save_results()
 
 format_data <- function(opt){
-  # PHENOTYPES
+  # QC inputs
   if (is.null(opt$phenotype)){
     stop("Must include phenotype matrix")
-  } else {
-    phenotype_matrix <- read.csv(file = opt$phenotype, header = TRUE, sep = "\t", row.names = 1) 
-  }
-  
-  # TREE
+  } 
   if (is.null(opt$tree)){
     stop("Must include tree")
-  } else {
-    tree <- read.tree(file = opt$tree)
-  }
+  } 
+  
+  
+  # PHENOTYPES
+  phenotype_matrix <- read.csv(file = opt$phenotype, header = TRUE, sep = "\t", row.names = 1) 
+  
+  # TREE
+  tree <- read.tree(file = opt$tree)
   
   # GENOTYPES
   # Set defaults to don't exist (FALSE), but update to TRUE if files are given. 
@@ -197,10 +198,20 @@ format_data <- function(opt){
   if (!is.null(opt$snp)){
     if (file.exists(opt$snp)){
       snp      <- local(get(load(opt$snp)))
-      snp_ns   <- snp$snpmat[snp$ns_mut,      , drop = FALSE]
-      snp_stop <- snp$snpmat[snp$stop,        , drop = FALSE]
-      snp_high <- snp$snpmat[snp$snpeff_high, , drop = FALSE]
-      snp_exists <- TRUE
+      if (length(snp$ns_mut) == nrow(snp$mat)){
+        snp_ns   <- snp$mat[snp$ns_mut,      , drop = FALSE]
+        snp_stop <- snp$mat[snp$stop,        , drop = FALSE]
+        snp_high <- snp$mat[snp$snpeff_high, , drop = FALSE]
+        snp_exists <- TRUE
+      } else if (length(snp$ns_mut) == ncol(snp$mat)){
+        snp_ns   <- snp$mat[ , snp$ns_mut,      drop = FALSE]
+        snp_stop <- snp$mat[ , snp$stop,        drop = FALSE]
+        snp_high <- snp$mat[ , snp$snpeff_high, drop = FALSE]
+        snp_exists <- TRUE
+      } else {
+        stop("snp matrix is wrong")
+      }
+
     }
   }
   
@@ -268,7 +279,7 @@ library(optparse) # Read in command line arguments with flags
 
 # INPUTS ----------------------------------------------------------------------#
 # Set up arguments
-inputs     <- list(make_option(c("-p", "--phenotype"),       type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"), 
+inputs     <- list(make_option(c("-p", "--phenotype"),        type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"), 
                    make_option(c("-t", "--tree"),             type = "character", default = NULL, help = "path to phylogenetic tree .tre file",       metavar = "character"), 
                    make_option(c("-r", "--roary"),            type = "character", default = NULL, help = "path to roary pangenome .Rtab file",        metavar = "character"), 
                    make_option(c("-q", "--gene_stop"),        type = "character", default = NULL, help = "path to SNPeff high gene matrix .rda file", metavar = "character"), 
