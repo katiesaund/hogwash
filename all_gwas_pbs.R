@@ -27,7 +27,29 @@
 #   Column 2 is the color you want the annotation to be. 
 #   This is an optional input. 
 
-require(tools)
+
+library(optparse) # Read in command line arguments with flags
+# Set up arguments
+inputs     <- list(make_option(c("-p", "--phenotype"),        type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"), 
+                   make_option(c("-t", "--tree"),             type = "character", default = NULL, help = "path to phylogenetic tree .tre file",       metavar = "character"), 
+                   make_option(c("-r", "--roary"),            type = "character", default = NULL, help = "path to roary pangenome .Rtab file",        metavar = "character"), 
+                   make_option(c("-q", "--gene_stop"),        type = "character", default = NULL, help = "path to SNPeff high gene matrix .rda file", metavar = "character"), 
+                   make_option(c("-i", "--gene_high"),        type = "character", default = NULL, help = "path to stop gene matrix .rda file",        metavar = "character"), 
+                   make_option(c("-n", "--gene_ns"),          type = "character", default = NULL, help = "path to gene nonsynonymous .rda file",      metavar = "character"), 
+                   make_option(c("-s", "--snp"),              type = "character", default = NULL, help = "path to simple SNP matrix .rda file",       metavar = "character"), 
+                   make_option(c("-g", "--generic_genotype"), type = "character", default = NULL, help = "path to a generic genotype .tsv file",      metavar = "character"), 
+                   make_option(c("-f", "--generic_filename"), type = "character", default = NULL, help = "name of generic genotype",                  metavar = "character"), 
+                   make_option(c("-o", "--out"),              type = "character", default = NULL, help = "output directory",                          metavar = "character"),
+                   make_option(c("-T", "--treewas"),          type = "character", default = NULL, help = "whether or not to run treewas:",             metavar = "character"),
+                   make_option(c("-a", "--alpha"),            type = "character", default = NULL, help = "value of alpha",                            metavar = "character"),
+                   make_option(c("-x", "--permutations"),     type = "character", default = NULL, help = "Number of permutations to run in phyc",     metavar = "character"),
+                   make_option(c("-c", "--multiple_test_correction"), type = "character", default = NULL, help = "type of multiple test correction for treewas: fdr of bonf", metavar = "character"),
+                   make_option(c("-b", "--reconstruction"),   type = "character", default = NULL, help = "ancestral reconstruction method for treewas: ML or parsimony", metavar = "character"),
+                   make_option(c("-P", "--phyc"),             type = "character", default = NULL, help = "whether or not to run phyc",                metavar = "character"))
+opt_parser <- OptionParser(option_list=inputs)
+opt        <- parse_args(opt_parser)
+# TODO finish implementing this flag situation for generating pbs scripts. 
+
 # Read in arguments
 args <- commandArgs(trailingOnly = TRUE) # Grab arguments from the PBS script
 
@@ -41,10 +63,12 @@ args <- commandArgs(trailingOnly = TRUE) # Grab arguments from the PBS script
 # args[7] is type of ancestral reconstruction method ex: "ML" or "parsimony" 
 # args[8] is the alpha value for treewas
 
-# args[9] is path to formatted data on which you want to run GWAS ex: /nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/
+# args[9] is the phenotype matrix
+
+# args[10] is path to formatted data on which you want to run GWAS ex: /nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/
 #           phenotypes and genotype nomenclature will need to be dealt with still at a later time
 
-# args[10] is your umich email address 
+# args[11] is your umich email address 
 
 # PHYC SPECIFIC
 run_phyC  <- args[1]
@@ -58,12 +82,20 @@ test_corr   <- args[6]
 recon       <- args[7]
 alpha_val   <- args[8]
 
-# FOR BOTH: 
-path <- args[9]
-phenotypes <- c("log_cfe", "log_germ_tc", "log_germ_tc_and_gly", "log_growth", "log_sporulation", "log_toxin", "fqR", "severity") 
-genotypes  <- c("_snp_stop", "_snp_ns", "_snp_high", "_gene_stop", "_gene_ns", "_gene_high", "_roary_pan_genome")
+phenotype_mat <-  read.table(args[9], 
+                             sep = "\t",
+                             row.names = 1, 
+                             header = TRUE,
+                             stringsAsFactors = FALSE)
+phenotypes <- colnames(phenotype_mat) # c("log_cfe", "log_germ_tc", "log_germ_tc_and_gly", "log_growth", "log_sporulation", "log_toxin", "fqR", "severity") 
 
-username <- args[10]
+# FOR BOTH: 
+path <- args[10]
+genotypes  <- c("_snp_stop", "_snp_ns", "_snp_high", "_gene_stop", "_gene_ns", "_gene_high", "_roary_pan_genome")
+# change arguments into flags here so that you decide which genotype names get used or not. 
+# don't base it on this preset list. 
+
+username <- args[11]
 
 # PHYC COMMAND LINE INPUTS
 # 1. Phenotype
