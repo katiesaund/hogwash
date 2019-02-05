@@ -271,18 +271,6 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   check_if_permutation_num_valid(permutations)
   
   # Function -------------------------------------------------------------------
-  # 
-  # I DON'T KNOW WHY THE NEXT 7 lines were written. Commenting out for now.  What exactly is it capturing? Should I keep it?
-      # genotypes_to_keep <- NULL
-      # for (i in 1:ncol(mat)){
-      #   if (sum((genotype_transition_list[[i]]$transition + genotype_reconstruction[[i]]) == 2) > 1){
-      #     genotypes_to_keep <- append(genotypes_to_keep, i)
-      #   }
-      # }
-      # mat <- mat[ , genotypes_to_keep]
-  # End inexplicable code!
-  
-  # Initialize data structures (Ex: 1 pval slot pergenotype)
   num_genotypes <- ncol(mat)
   pvals <- observed_ks_pval <- trans_median <- all_edges_median <- observed_ks_stat <- rep(NA, num_genotypes) # 2018-11-12 added observed_ks_stat
   names(observed_ks_pval) <- names(pvals) <- colnames(mat)
@@ -345,22 +333,17 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
       permuted_non_trans_index <- c(1:length(which_branches))[!(c(1:length(which_branches)) %in% unique(all_sampled_branches[k, ]))]
       empirical_results        <- run_ks_test(permuted_trans_index, permuted_non_trans_index, pheno_recon_ordered_by_edges)
       empirical_ks_pval[k]     <- empirical_results$pval
-      empirical_ks_stat[k]     <- empirical_results$statistic # added 2018-11-12
+      empirical_ks_stat[k]     <- empirical_results$statistic
     } # end for (k)
-    # empirical_ks_pval is the list of p-values from the ks.test for each of the permuted genotypes for this specific genotype
     
-    # to calculate the empirical p_val we need to count the number of times the ks.test statistics were more extreme than 
     # the observed ks.test statistic: observed_ks_stat[i] (fixed this 2018-11-12; before I had it wrong with observed_ks_pval)
     # empirical p value caluclation here: (1 + more extreme observations) / (1 + permutations)
     empirical_ks_pval_list[[i]] <- empirical_ks_pval
     empirical_ks_stat_list[[i]] <- empirical_ks_stat
-    # pvals[i] <- (sum(1 + sum(empirical_ks_pval < observed_ks_pval[i]))/(permutations + 1)) # commented out on 2018-11-12 KS # only doing single tailed right now
-    pvals[i] <- (sum(1 + sum(empirical_ks_stat > observed_ks_stat[i]))/(permutations + 1)) # wrote line on 2018-11-28
+    pvals[i] <- (sum(1 + sum(empirical_ks_stat > observed_ks_stat[i]))/(permutations + 1))
   } # end for (i)
   
   # Check and return output ----------------------------------------------------
-
-  #  results <- list("pvals" = pvals, "ks_statistics" = empirical_ks_pval_list, "observed_pheno_trans_delta" = observed_pheno_trans_delta, "observed_pheno_non_trans_delta" = observed_pheno_non_trans_delta, "trans_median" = trans_median, "all_edges_median" = all_edges_median, "num_genotypes" = ncol(mat))
   results <- list("pvals" = pvals, "ks_statistics" = empirical_ks_stat_list, 
                   "observed_pheno_trans_delta" = observed_pheno_trans_delta, 
                   "observed_pheno_non_trans_delta" = observed_pheno_non_trans_delta, 
@@ -1063,162 +1046,28 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
       par(mfrow = c(3, 3))
       par(mgp   = c(3, 1, 0))
       par(oma   = c(0, 0, 4, 0))
-      
-      # 1. Continuous phenotype (contMap)
       par(mar = c(4, 4, 4, 4))
+      
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
+      
+      plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", "Genotype reconstruction:\n Red = Variant; Black = WT",                annot, "recon", j)
+      
+      plot_tree_with_colored_edges(tr, geno_transition,     geno_confidence, "grey", "red", "Genotype transition edge:\n Red = transition; Black = No transition", annot, "trans", j)
+      
+      histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno(p_trans_mat, geno_confidence, tr, j)
+      
+      histogram_abs_high_confidence_delta_pheno_highlight_transition_edges(results_all_trans, tr, j, "grey", "red") # 6. Delta phenotype histogram. Note that results_all_trans$observed_pheno_non_trans_delta[[j]] is already subset down to only high confidence edges
 
-      # 2. Genotype reconstruction
-      plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", "Genotype reconstruction:\n Red = Variant; Black = WT", annot, "recon", j)
-      
-      # 3. Genotype: all transition edges
-      plot_tree_with_colored_edges(tr, geno_transition, geno_confidence, "grey", "red", "Genotype transition edge:\n Red = transition; Black = No transition", annot, "trans", j)
-      
-      # 4. All edge distribution overlaid with only high confidence edge distribution, raw values not absolute values
-      edge_num <- length(unlist(p_trans_mat))
-      hi_edge_num <- length(unlist(p_trans_mat)[as.logical(geno_confidence[[j]])])
-      hist(as.numeric(unlist(p_trans_mat)), # plot phenotype transition for all edges
-           breaks = Nedge(tr)/4,
-           col = rgb(0, 0.5, 0, 0.25),
-           border = FALSE, 
-           ylab = "Count",
-           xlab = "Delta phenotype",
-           main = paste("|delta phenotype| on all edges \n Light Green: all edges = ", edge_num, "\n Grey: high confidence edges = ", hi_edge_num, sep = ""))
-      
-      hist(as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[j]])], # plot phenotype transition only high confidence edges for this genotype
-           breaks = Nedge(tr)/4,
-           col = rgb(0, 0, 0, 0.25),
-           border = FALSE, 
-           ylab = "Count",
-           add = TRUE)
-      
-      # 5. Absolute value of 2nd histogram within plot 4. 
-      hist(abs(as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[j]])]), # plot abs phenotype transition only high confidence edges for this genotype
-           breaks = Nedge(tr)/4,
-           col = "grey",
-           border = FALSE, 
-           xlab = "Delta phenotype",
-           ylab = "Count", 
-           main = paste("|delta phenotype| on only high confidence edges \n # edges = ", hi_edge_num))
-      
-      # 6. Delta phenotype histogram
-      # Note that results_all_trans$observed_pheno_non_trans_delta[[j]] is already subset down to only high confidence edges
-      par(mar = c(4, 4, 4, 4))
-      hist(results_all_trans$observed_pheno_non_trans_delta[[j]], 
-           breaks = Nedge(tr)/4, 
-           col = "grey",
-           border = FALSE,
-           ylab = "Count", 
-           xlab = "Delta phenotype",
-           xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[j]], results_all_trans$observed_pheno_non_trans_delta[[j]])),
-           cex = .8,
-           main = paste("|delta phenotype| on only high confidence edges \n # non-trans edges = ", 
-                        length(results_all_trans$observed_pheno_non_trans_delta[[j]]), 
-                        "\n # trans edges = ", length(results_all_trans$observed_pheno_trans_delta[[j]]), sep = "")) 
-      
+      histogram_raw_high_confidence_delta_pheno_highlight_transition_edges(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, j, "grey", "red")
      
-      hist(results_all_trans$observed_pheno_trans_delta[[j]], 
-           breaks = Nedge(tr)/4, 
-           col = "red", 
-           border = "red",
-           add = TRUE,
-           xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[j]], results_all_trans$observed_pheno_non_trans_delta[[j]])))
-      
-      # 7. non-absolute value version
-      min_x_val <- min(as.numeric(unlist(as.numeric(unlist(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2]))[as.logical(geno_confidence[[j]])]))[as.logical(geno_confidence[[j]])], na.rm = TRUE)
-      max_x_val <- max(as.numeric(unlist(as.numeric(unlist(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2]))[as.logical(geno_confidence[[j]])]))[as.logical(geno_confidence[[j]])], na.rm = TRUE)
-
-      hist(as.numeric(unlist(as.numeric(unlist(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2]))[as.logical(geno_confidence[[j]])])), # plot phenotype transition only high confidence edges for this genotype
-           breaks = Nedge(tr)/4,
-           col = "grey",
-           border = FALSE, 
-           ylab = "Count",
-           xlab = "Delta phenotype",
-           xlim = c(min_x_val, max_x_val),
-           #main = expression(paste("raw high confidence", Delta, " phenotype. Red = transition edges. ")))
-           main = paste("Raw delta phenotype on only high confidence edges # edges = ", 
-                        length(as.numeric(unlist(as.numeric(unlist(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2]))[as.logical(geno_confidence[[j]])]))), 
-                        sep = "")) 
-      
-      # 8 
-      # Calculate the delta phenotype
-      # GRAB THE IDS OF THE TRANSITION EDGES: 
-      
-      trans_index     <- c(1:Nedge(tr))[as.logical(geno_transition[[j]]$transition)]  
-      non_trans_index <- c(1:Nedge(tr))[!geno_transition[[j]]$transition]
-      # [1] EX:  8 12 13 16 19 26 27 31 37 44 52 56 64 67 68 76 77 80 89 92 97 98
-      # THESE EDGES ARE DEFINED BY THE NODES IN THE CORRESPONDING ROWS OF tr$EDGE
-      
-      # SUBSET TRANSITION / NON-TRANSITION EDGES TO ONLY HIGH CONFIDENCE ONES
-      hi_conf_trans_index     <- trans_index[    as.logical(geno_confidence[[j]][trans_index    ])]
-      hi_conf_non_trans_index <- non_trans_index[as.logical(geno_confidence[[j]][non_trans_index])]
-      hi_conf_pheno_trans_delta     <- calculate_phenotype_change_on_edge(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
-      hi_conf_pheno_non_trans_delta <- calculate_phenotype_change_on_edge(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
-
-      hist(hi_conf_pheno_non_trans_delta, 
-           main = paste("calculated differently: \n # trans edge= ", 
-                        length(hi_conf_pheno_trans_delta), "# non trans edge =", 
-                        length(hi_conf_pheno_non_trans_delta), sep = ""), 
-           breaks = Nedge(tr)/4, 
-           col = "grey",
-           border = FALSE,
-           xlim = c(0, max(hi_conf_pheno_trans_delta, hi_conf_pheno_non_trans_delta)),
-           ylab = "Count", 
-           cex = .8,
-           xlab = "Delta phenotype")
-      
-      
-      hist(hi_conf_pheno_trans_delta, 
-           breaks = Nedge(tr)/4, 
-           col = "red", 
-           border = "red",
-           add = TRUE,
-           xlim = c(0, max(hi_conf_pheno_trans_delta, hi_conf_pheno_non_trans_delta)))
-      # end temp 8
-      
-      # temp 9
-      # this is only high confidence edges
-      calc_raw_diff <- function(edge_list, ph_edges){
-        delta <- rep(NA, length(unique(edge_list)))
-        for (j in 1:length(edge_list)){
-          delta[j] <- ph_edges[edge_list[j], 1] - ph_edges[edge_list[j], 2]
-        }
-        return(delta)
-      }
-      raw_trans_delta     <- calc_raw_diff(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
-      raw_non_trans_delta <- calc_raw_diff(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
-      
-      hist(raw_non_trans_delta, 
-           main = paste("calculated differently: \n # trans edge= ", 
-                        length(raw_trans_delta), "# non trans edge =", 
-                        length(raw_non_trans_delta), sep = ""),  
-           breaks = Nedge(tr)/4, 
-           col = "grey",
-           border = FALSE,
-           xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)),
-           ylab = "Count", 
-           cex = .8,
-           xlab = "|Delta phenotype|") 
-      
-      
-      hist(raw_trans_delta, 
-           breaks = Nedge(tr)/4, 
-           col = "red", 
-           border = "red",
-           add = TRUE,
-           xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)))
-# end temp 9
-
       # 10. KS null distribution
       hist(log(results_all_trans$ks_statistics[[j]]), 
            breaks = perm/10, col = "grey", border = FALSE,
            main = paste("Null distribution of KS statistic for all transitions.\n Red = Observed KS statistic.\n p-value = ", round(pval_all_transition$hit_pvals[j, 1], 10), "\np-value rank = ", rank(pval_all_transition$hit_pvals)[j], sep = ""), 
            ylab = "Count", 
-           xlab = "log(KS statistic)", 
-           #xlim = c(min(log(results_all_trans$pvals[j]), log(results_all_trans$ks_statistics[[j]])), 0)) # 2018-11-12
-           xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])), log(results_all_trans$ks_statistics[[j]])), 0)) # 2018-11-12
-      # abline(v = log(results_all_trans$pvals[j]), col = "red") # 2018-11-12
-      abline(v = log(as.numeric(results_all_trans$observed_ks_stat[j])), col = "red")  # 2018-11-12 ; added as.numeric
+           xlab = "ln(KS statistic)", 
+           xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])), log(results_all_trans$ks_statistics[[j]])), 0))
+      abline(v = log(as.numeric(results_all_trans$observed_ks_stat[j])), col = "red")
       
       # 7. heatmap
       pheatmap(
@@ -1243,6 +1092,89 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
     }
   }
 } # end plot_significant_hits()
+
+calc_raw_diff <- function(edge_list, ph_edges){
+  delta <- rep(NA, length(unique(edge_list)))
+  for (j in 1:length(edge_list)){
+    delta[j] <- ph_edges[edge_list[j], 1] - ph_edges[edge_list[j], 2]
+  }
+  return(delta)
+} # end calc_raw_diff()
+
+histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, index, non_trans_color, trans_color){
+  trans_index     <- c(1:Nedge(tr))[as.logical(geno_transition[[index]]$transition)]  
+  non_trans_index <- c(1:Nedge(tr))[!geno_transition[[index]]$transition]
+  hi_conf_trans_index     <- trans_index[    as.logical(geno_confidence[[index]][trans_index    ])]
+  hi_conf_non_trans_index <- non_trans_index[as.logical(geno_confidence[[index]][non_trans_index])]
+  #hi_conf_pheno_trans_delta     <- calculate_phenotype_change_on_edge(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
+  #hi_conf_pheno_non_trans_delta <- calculate_phenotype_change_on_edge(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
+  raw_trans_delta     <- calc_raw_diff(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
+  raw_non_trans_delta <- calc_raw_diff(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
+  
+  hist(raw_non_trans_delta, 
+       main = paste("Raw delta phenotype on only high confidence edges\n # trans edge= ", 
+                    length(raw_trans_delta), "\n# non trans edge =", 
+                    length(raw_non_trans_delta), sep = ""),  
+       breaks = Nedge(tr)/4, 
+       col = non_trans_color,
+       border = FALSE,
+       xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)),
+       ylab = "Count", 
+       cex = .8,
+       xlab = "Raw delta phenotype") 
+  
+  hist(raw_trans_delta, 
+       breaks = Nedge(tr)/4, 
+       col = trans_color, 
+       border = trans_color,
+       add = TRUE,
+       xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)))
+}
+
+histogram_abs_high_confidence_delta_pheno_highlight_transition_edges <- function(results_all_trans, tr, index, non_trans_color, trans_color){
+  par(mar = c(4, 4, 4, 4))
+  hist(results_all_trans$observed_pheno_non_trans_delta[[index]], 
+       breaks = Nedge(tr)/4, 
+       col = non_trans_color,
+       border = FALSE,
+       ylab = "Count", 
+       xlab = "|Delta phenotype|",
+       xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[index]], results_all_trans$observed_pheno_non_trans_delta[[index]])),
+       cex = .8,
+       main = paste("|delta phenotype| on only high confidence edges \n # non-trans edges = ", 
+                    length(results_all_trans$observed_pheno_non_trans_delta[[index]]), 
+                    "\n # trans edges = ", length(results_all_trans$observed_pheno_trans_delta[[index]]), sep = "")) 
+  
+  
+  hist(results_all_trans$observed_pheno_trans_delta[[index]], 
+       breaks = Nedge(tr)/4, 
+       col = trans_color, 
+       border = trans_color,
+       add = TRUE,
+       xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[index]], results_all_trans$observed_pheno_non_trans_delta[[index]])))
+} # end histogram_abs_high_confidence_delta_pheno_highlight_transition_edges()
+
+histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_trans_mat, geno_confidence, tr, index){
+  edge_num <- length(unlist(p_trans_mat))
+  hi_edge_num <- length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
+  title <- paste("|delta phenotype| on all edges \n Light Green: all edges = ", edge_num, "\n Grey: high confidence edges = ", hi_edge_num, sep = "")
+  delta_phenotype_on_all_edges <- as.numeric(unlist(p_trans_mat))
+  hist(delta_phenotype_on_all_edges,
+       breaks = Nedge(tr)/4,
+       col = rgb(0, 0.5, 0, 0.25),
+       border = FALSE, 
+       ylab = "Count",
+       xlab = "Delta phenotype",
+       main = title)
+  
+  delta_phenotype_on_high_confidence_edges <- as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
+  hist(delta_phenotype_on_high_confidence_edges, # plot phenotype transition only high confidence edges for this genotype
+       breaks = Nedge(tr)/4,
+       col = rgb(0, 0, 0, 0.25),
+       border = FALSE, 
+       ylab = "Count",
+       add = TRUE)
+} # end histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno()
 
 
 save_data_table <- function(matrix, output_dir, pheno_geno_name, extension){
