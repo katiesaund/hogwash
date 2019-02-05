@@ -1047,7 +1047,6 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
     cellwidth = 20, 
     na_col = "grey", 
     file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap_with_log_p.pdf"))
-  
 
   save_data_table(trans_edge_mat, dir,name, "_trans_edge_matrix.tsv") 
   save_data_table(p_trans_mat, dir, name, "_pheno_trans_edge_matrix.tsv")
@@ -1070,60 +1069,10 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
 
       # 2. Genotype reconstruction
-      edge_color <- rep("black", Nedge(tr))
-      edge_color[geno_reconstruction[[j]] == 1] <- "red"
-      edge_color[geno_confidence[[j]]  == 0] <- "grey" # grey out long edges and low ML bootstrap support
-      par(mar = c(4, 4, 4, 4))
-      plot(tr, 
-           font = 1, 
-           edge.color = edge_color,
-           main = "Genotype reconstruction:\n Red = Variant; Black = WT",
-           use.edge.length = FALSE,
-           label.offset = 3, 
-           adj = 0)
-      tiplabels(pch = 21, 
-                col = annot[ , 2],  
-                adj = 2, 
-                bg = annot[ , 2], 
-                cex = 0.75)
-      if (!is.null(annot)){
-        legend("bottomleft", 
-               legend = unique(annot[ , 1]),
-               col = unique(annot[ , 2]), 
-               lty = 1,
-               ncol = length(unique(annot[ , 1])),  
-               lwd = 5, 
-               cex = 0.6)   
-      }
-         
+      plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", "Genotype reconstruction:\n Red = Variant; Black = WT", annot, "recon", j)
       
       # 3. Genotype: all transition edges
-      edge_color <- rep("black", Nedge(tr))
-      edge_color[geno_transition[[j]]$transition == 1] <- "red"
-      edge_color[geno_confidence[[j]]  == 0] <- "grey" # grey out long edges and low ML bootstrap support
-      par(mar = c(4, 4, 4, 4))
-      plot(tr, 
-           font = 1, 
-           edge.color = edge_color,
-           main = "Genotype transition edge:\n Red = transition; Black = No transition",
-           use.edge.length = FALSE,
-           label.offset = 3, 
-           adj = 0)
-      tiplabels(pch = 21, 
-                col = annot[ , 2],  
-                adj = 2, 
-                bg = annot[ , 2], 
-                cex = 0.75)
-      if (!is.null(annot)){
-        legend("bottomleft", 
-               legend = unique(annot[ , 1]),
-               col = unique(annot[ , 2]), 
-               lty = 1,
-               ncol = length(unique(annot[ , 1])),            
-               lwd = 5, 
-               cex = 0.6)   
-      }
- 
+      plot_tree_with_colored_edges(tr, geno_transition, geno_confidence, "grey", "red", "Genotype transition edge:\n Red = transition; Black = No transition", annot, "trans", j)
       
       # 4. All edge distribution overlaid with only high confidence edge distribution, raw values not absolute values
       edge_num <- length(unlist(p_trans_mat))
@@ -1524,6 +1473,40 @@ save_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
   text(x = sig_temp[ , 1], y = sig_temp[ , 2], labels = row.names(sig_temp), pos = 1, cex = 0.7)
   dev.off()
 } #end save_manhattan_plot()
+
+plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence, edge_color_na, edge_color_bright, title, annot, trans_or_recon, index){
+  edge_color <- rep("black", Nedge(tr))
+  if (trans_or_recon == "recon"){
+    edge_color[edges_to_highlight[[index]] == 1] <- edge_color_bright
+  } else if (trans_or_recon == "trans"){
+    edge_color[edges_to_highlight[[index]]$transition == 1] <- "red"
+  }
+  edge_color[geno_confidence[[index]] == 0] <- edge_color_na # grey out long edges and low ML bootstrap support
+  par(mar = c(4, 4, 4, 4))
+  plot(tr, 
+       font = 1, 
+       edge.color = edge_color,
+       main = title,
+       use.edge.length = FALSE,
+       label.offset = 3, 
+       adj = 0)
+  tiplabels(pch = 21, 
+            col = annot[ , 2],  
+            adj = 2, 
+            bg = annot[ , 2], 
+            cex = 0.75)
+  if (!is.null(annot)){
+    legend("bottomleft", 
+           legend = unique(annot[ , 1]),
+           col = unique(annot[ , 2]), 
+           lty = 1,
+           ncol = length(unique(annot[ , 1])),  
+           lwd = 5, 
+           cex = 0.6)   
+  }
+} # end plot_tree_with_colored_edges()
+
+
 
 # DISCRETE PHYC LIBRARY -------------------------------------------------------#
 
