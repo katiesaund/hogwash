@@ -30,72 +30,56 @@
 
 library(optparse) # Read in command line arguments with flags
 # Set up arguments
-inputs     <- list(make_option(c("-p", "--phenotype"),        type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"), 
-                   make_option(c("-t", "--tree"),             type = "character", default = NULL, help = "path to phylogenetic tree .tre file",       metavar = "character"), 
-                   make_option(c("-r", "--roary"),            type = "character", default = NULL, help = "path to roary pangenome .Rtab file",        metavar = "character"), 
-                   make_option(c("-q", "--gene_stop"),        type = "character", default = NULL, help = "path to SNPeff high gene matrix .rda file", metavar = "character"), 
-                   make_option(c("-i", "--gene_high"),        type = "character", default = NULL, help = "path to stop gene matrix .rda file",        metavar = "character"), 
-                   make_option(c("-n", "--gene_ns"),          type = "character", default = NULL, help = "path to gene nonsynonymous .rda file",      metavar = "character"), 
-                   make_option(c("-s", "--snp"),              type = "character", default = NULL, help = "path to simple SNP matrix .rda file",       metavar = "character"), 
-                   make_option(c("-g", "--generic_genotype"), type = "character", default = NULL, help = "path to a generic genotype .tsv file",      metavar = "character"), 
-                   make_option(c("-f", "--generic_filename"), type = "character", default = NULL, help = "name of generic genotype",                  metavar = "character"), 
-                   make_option(c("-o", "--out"),              type = "character", default = NULL, help = "output directory",                          metavar = "character"),
-                   make_option(c("-T", "--treewas"),          type = "character", default = NULL, help = "whether or not to run treewas:",             metavar = "character"),
-                   make_option(c("-a", "--alpha"),            type = "character", default = NULL, help = "value of alpha",                            metavar = "character"),
-                   make_option(c("-x", "--permutations"),     type = "character", default = NULL, help = "Number of permutations to run in phyc",     metavar = "character"),
-                   make_option(c("-c", "--multiple_test_correction"), type = "character", default = NULL, help = "type of multiple test correction for treewas: fdr of bonf", metavar = "character"),
-                   make_option(c("-b", "--reconstruction"),   type = "character", default = NULL, help = "ancestral reconstruction method for treewas: ML or parsimony", metavar = "character"),
-                   make_option(c("-P", "--phyc"),             type = "character", default = NULL, help = "whether or not to run phyc",                metavar = "character"))
+inputs     <- list(
+  make_option(c("-a", "--alpha"),                    type = "double",    default = 0.05,   help = "Value of alpha",                                               metavar = "character"),
+  make_option(c("-b", "--reconstruction"),           type = "character", default = "ML",   help = "Ancestral reconstruction method for treewas: ML or parsimony", metavar = "character"),
+  make_option(c("-c", "--multiple_test_correction"), type = "character", default = "fdr",  help = "Type of multiple test correction for treewas: fdr of bonf",    metavar = "character"),
+  make_option(c("-d", "--bootstrap"),                type = "double",    default = 0.70,   help = "Confidence threshold for bootstrap for phyc",                  metavar = "character"),
+  make_option(c("-f", "--generic_filename"),         type = "character", default = NULL,   help = "Name of generic genotype (no extension)",                      metavar = "character"), 
+  make_option(c("-g", "--generic_genotype"),         type = "logical",   default = FALSE,  help = "Whether to run GWAS on a generic genotype mat",                metavar = "character"), 
+  make_option(c("-i", "--gene_high"),                type = "logical",   default = FALSE,  help = "Whether to run GWAS on stop gene mat",                         metavar = "character"), 
+  make_option(c("-k", "--input_dir"),                type = "character", default = NULL,   help = "dir where all formatted data is stored",                       metavar = "character"), 
+  make_option(c("-n", "--gene_ns"),                  type = "logical",   default = FALSE,  help = "Whether to run GWAS on gene nonsynonymous mat",                metavar = "character"), 
+  make_option(c("-o", "--out"),                      type = "character", default = ".",    help = "Output directory",                                             metavar = "character"),
+  make_option(c("-p", "--phenotype"),                type = "character", default = NULL,   help = "phenotype matrix .tsv filename",                               metavar = "character"),
+  make_option(c("-q", "--gene_stop"),                type = "logical",   default = FALSE,  help = "Whether to run GWAS on SNPeff high gene mat",                  metavar = "character"), 
+  make_option(c("-r", "--roary"),                    type = "logical",   default = FALSE,  help = "Whether to run GWAS on roary",                                 metavar = "character"), 
+  make_option(c("-s", "--snp"),                      type = "logical",   default = FALSE,  help = "Whether to run GWAS on SNP mats",                              metavar = "character"), 
+  make_option(c("-t", "--treewas"),                  type = "logical",   default = FALSE,  help = "Whether or not to run treewas",                                metavar = "character"),
+  make_option(c("-u", "--username"),                 type = "character", default = NULL,   help = "UMich ID",                                                     metavar = "character"),
+  make_option(c("-x", "--permutations"),             type = "integer",   default = 10000,  help = "Number of permutations to run in phyc",                        metavar = "character"),
+  make_option(c("-y", "--phyc"),                     type = "logical",   default = TRUE,   help = "Whether or not to run phyc",                                   metavar = "character"))
+
 opt_parser <- OptionParser(option_list=inputs)
 opt        <- parse_args(opt_parser)
-# TODO finish implementing this flag situation for generating pbs scripts. 
 
-# Read in arguments
-args <- commandArgs(trailingOnly = TRUE) # Grab arguments from the PBS script
 
-# args[1] is path to script that runs phyC ex: /nfs/esnitkin/bin_group/pipeline/Github/gwas/phyc_run.R
-# args[2] is alpha value for phyC
-# args[3] is number of permutations for phyC
-# args[4] is the bootstrap confidence threshold (values below this are called low confidence edges)
-
-# args[5] is path to script that runs treewas ex: /nfs/esnitkin/bin_group/pipeline/Github/gwas/treewas_run.R
-# args[6] is type of multiple test correction ex: "fdr" or "bonf"
-# args[7] is type of ancestral reconstruction method ex: "ML" or "parsimony" 
-# args[8] is the alpha value for treewas
-
-# args[9] is the phenotype matrix
-
-# args[10] is path to formatted data on which you want to run GWAS ex: /nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/
-#           phenotypes and genotype nomenclature will need to be dealt with still at a later time
-
-# args[11] is your umich email address 
-
-# PHYC SPECIFIC
-run_phyC  <- args[1]
-alpha     <- args[2]
-num_perm  <- args[3]
-boot_conf <- args[4]
-
-# TREEWAS SPECIFIC
-run_treewas <- args[5]
-test_corr   <- args[6]
-recon       <- args[7]
-alpha_val   <- args[8]
-
-phenotype_mat <-  read.table(args[9], 
+phenotype_mat <-  read.table(opt$phenotype, 
                              sep = "\t",
                              row.names = 1, 
                              header = TRUE,
                              stringsAsFactors = FALSE)
-phenotypes <- colnames(phenotype_mat) # c("log_cfe", "log_germ_tc", "log_germ_tc_and_gly", "log_growth", "log_sporulation", "log_toxin", "fqR", "severity") 
+phenotypes <- colnames(phenotype_mat)
 
-# FOR BOTH: 
-path <- args[10]
-genotypes  <- c("_snp_stop", "_snp_ns", "_snp_high", "_gene_stop", "_gene_ns", "_gene_high", "_roary_pan_genome")
-# change arguments into flags here so that you decide which genotype names get used or not. 
-# don't base it on this preset list. 
-
-username <- args[11]
+genotypes <- NULL
+if (!is.null(opt$snp)){
+  genotypes <- c(genotypes, "_snp_stop", "_snp_ns", "_snp_high")
+}
+if (!is.null(opt$gene_stop)){
+  genotypes <- c(genotypes, "_gene_stop")
+}
+if (!is.null(opt$gene_high)){
+  genotypes <- c(genotypes, "_gene_high")
+}
+if (!is.null(opt$gene_ns)){
+  genotypes <- c(genotypes, "_gene_ns")
+}
+if (!is.null(opt$roary)){
+  genotypes <- c(genotypes, "_roary_pan_genome")
+}
+if (!is.null(opt$generic_genotype)){
+  genotypes <- c(genotypes, opt$generic_filename)
+}
 
 # PHYC COMMAND LINE INPUTS
 # 1. Phenotype
@@ -108,44 +92,46 @@ username <- args[11]
 # 8. Boostrap confidence threshold 
 # 9. Optional: Annotation for heatmap
 
-for (p in 1:length(phenotypes)){
-  for (g in 1:length(genotypes)){
-    if (file.exists(paste(path, phenotypes[p], "_annotation.tsv", sep = ""))){
-      annotation <- paste(path, phenotypes[p], "_annotation.tsv", sep = "")
-    } else {
-      annotation <- ""
+if (opt$phyc){
+  for (p in 1:length(phenotypes)){
+    for (g in 1:length(genotypes)){
+      if (file.exists(paste(opt$input_dir, phenotypes[p], "_annotation.tsv", sep = ""))){
+        annotation <- paste(opt$input_dir, phenotypes[p], "_annotation.tsv", sep = "")
+      } else {
+        annotation <- ""
+      }
+      
+      
+      command <- paste("Rscript /nfs/esnitkin/bin_group/pipeline/Github/gwas/phyc_run.R",
+                       paste(opt$input_dir, phenotypes[p], "_pheno.tsv", sep = ""), 
+                       paste(opt$input_dir, phenotypes[p], ".tree", sep = ""),
+                       paste(opt$input_dir, phenotypes[p], genotypes[g], ".tsv", sep = ""), 
+                       paste(phenotypes[p], genotypes[g], sep = ""),
+                       getwd(),
+                       opt$permutations, 
+                       opt$alpha,
+                       opt$bootstrap, 
+                       annotation,
+                       sep = " ")
+      fname <- paste(opt$out, "/", "phyc_", phenotypes[p], genotypes[g], ".pbs", sep = "")
+      writeLines(c("#!/bin/sh","####  PBS preamble",
+                   paste("#PBS -N phyc_", phenotypes[p], genotypes[g], sep = ""),
+                   paste("#PBS -M ", opt$username, sep = ""),  
+                   "#PBS -m a",
+                   "#PBS -l nodes=1:ppn=4,mem=40gb,walltime=150:00:00",
+                   "#PBS -V",
+                   "#PBS -j oe",
+                   "#PBS -A esnitkin_flux",
+                   "#PBS -q flux",
+                   "#PBS -l qos=flux",
+                   "cd $PBS_O_WORKDIR",
+                   command),
+                 fname,
+                 sep = "\n")  
     }
-
-    
-    command <- paste("Rscript",
-                     run_phyC,
-                     paste(path, phenotypes[p], "_pheno.tsv", sep = ""), 
-                     paste(path, phenotypes[p], ".tree", sep = ""),
-                     paste(path, phenotypes[p], genotypes[g], ".tsv", sep = ""), 
-                     paste(phenotypes[p], genotypes[g], sep = ""),
-                     getwd(),
-                     num_perm, 
-                     alpha,
-                     boot_conf, 
-                     annotation,
-                     sep = " ")
-    fname <- paste(getwd(), "/", "phyc_", phenotypes[p], genotypes[g], ".pbs", sep = "")
-    writeLines(c("#!/bin/sh","####  PBS preamble",
-                 paste("#PBS -N phyc_", phenotypes[p], genotypes[g], sep = ""),
-                 paste("#PBS -M ", username, sep = ""),  
-                 "#PBS -m a",
-                 "#PBS -l nodes=1:ppn=4,mem=40gb,walltime=150:00:00",
-                 "#PBS -V",
-                 "#PBS -j oe",
-                 "#PBS -A esnitkin_flux",
-                 "#PBS -q flux",
-                 "#PBS -l qos=flux",
-                 "cd $PBS_O_WORKDIR",
-                 command),
-               fname,
-               sep = "\n")  
   }
 }
+
 
 # TREEWAS COMMAND LINE INPUTS
 # 1. Phenotype
@@ -156,33 +142,35 @@ for (p in 1:length(phenotypes)){
 # 6. Output name
 # 7. Alpha value
 
-for (p in 1:length(phenotypes)){
-  for (g in 1:length(genotypes)){
-    command <- paste("Rscript",
-                     run_treewas,
-                     paste(path, phenotypes[p], "_pheno.tsv", sep = ""), 
-                     paste(path, phenotypes[p], ".tree", sep = ""),
-                     paste(path, phenotypes[p], genotypes[g], ".tsv", sep = ""), 
-                     recon,
-                     test_corr,
-                     paste("treewas_", phenotypes[p], genotypes[g], sep = ""),
-                     alpha_val, 
-                     sep = " ")
-    fname <- paste(getwd(), "/", "treewas_", phenotypes[p], genotypes[g], ".pbs", sep = "")
-    writeLines(c("#!/bin/sh","####  PBS preamble",
-                 paste("#PBS -N treewas_", phenotypes[p], genotypes[g], sep = ""),
-                 paste("#PBS -M ", username, sep = ""),  
-                 "#PBS -m a",
-                 "#PBS -l nodes=1:ppn=4,mem=40gb,walltime=150:00:00",
-                 "#PBS -V",
-                 "#PBS -j oe",
-                 "#PBS -A esnitkin_flux",
-                 "#PBS -q flux",
-                 "#PBS -l qos=flux",
-                 "cd $PBS_O_WORKDIR",
-                 command),
-               fname,
-               sep = "\n")  
+if (opt$treewas){
+  for (p in 1:length(phenotypes)){
+    for (g in 1:length(genotypes)){
+      command <- paste("Rscript /nfs/esnitkin/bin_group/pipeline/Github/gwas/treewas_run.R",
+                       paste(opt$input_dir, phenotypes[p], "_pheno.tsv", sep = ""), 
+                       paste(opt$input_dir, phenotypes[p], ".tree", sep = ""),
+                       paste(opt$input_dir, phenotypes[p], genotypes[g], ".tsv", sep = ""), 
+                       opt$reconstruction,
+                       opt$multiple_test_correction,
+                       paste("treewas_", phenotypes[p], genotypes[g], sep = ""),
+                       opt$alpha, 
+                       sep = " ")
+      fname <- paste(opt$out, "/", "treewas_", phenotypes[p], genotypes[g], ".pbs", sep = "")
+      writeLines(c("#!/bin/sh","####  PBS preamble",
+                   paste("#PBS -N treewas_", phenotypes[p], genotypes[g], sep = ""),
+                   paste("#PBS -M ", opt$username, sep = ""),  
+                   "#PBS -m a",
+                   "#PBS -l nodes=1:ppn=4,mem=40gb,walltime=150:00:00",
+                   "#PBS -V",
+                   "#PBS -j oe",
+                   "#PBS -A esnitkin_flux",
+                   "#PBS -q flux",
+                   "#PBS -l qos=flux",
+                   "cd $PBS_O_WORKDIR",
+                   command),
+                 fname,
+                 sep = "\n")  
+    }
   }
 }
+
 # END SCRIPT -------------------------------------------------------------------
