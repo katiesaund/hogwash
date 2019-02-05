@@ -1,15 +1,7 @@
-# 2018-12-14 forked from 2018-11-12 forked from 2018-09-26_phyc_lib.R 
 # Katie Saund
 
 # TO DO 
 # fix delta phenotype distribution
-# add log p value to output heatmaps
-
-# 2018-11-16 Added the following plot to the output: 
-# Heatmap with vertical = tree edges, horizontal = genotypes. Black = state change, white = no change. Last column in heatmap is the delta phenotype. 
-# Updated to fix the KS test plot (previously, the red line was the p-value, not the KS test statistic
-# Updated to add save feature, where names of the genotypes that are dropped because of fewer than 2 high confidence trans edges are saved in file.
-
 
 # LIBRARIES --------------------------------------------------------------------
 library(ape)       # ape::ace function (ancestral reconstruction)
