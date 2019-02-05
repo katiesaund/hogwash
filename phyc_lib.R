@@ -1,7 +1,7 @@
 # Katie Saund
 
 # TO DO 
-# fix delta phenotype distribution
+# fix delta phenotype distribution 
 
 
 # Note on phylogenetic tree structure
@@ -939,18 +939,19 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, a){
   return(hits)
 } # end keep_hits_with_more_change_on_trans_edges()
 
+plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
+  plot_p_recon <- contMap(tr, pheno_vector, method = "user", anc.states = pheno_anc_rec, plot = FALSE)
+  plot(plot_p_recon,
+       add = TRUE, 
+       ylim = c(-1 / 25 * Ntip(tr), Ntip(tr)),
+       colors = plot_p_recon$cols, 
+       lwd = 4, 
+       ftype = "off",
+       offset = 1.7)
+} # end plot_continuous_phenotype()
+
 plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges){
-  # TO DO: 
-  # Add more description to inputs.
-  # Add checks to inputs. 
   # Function description ------------------------------------------------------- 
-  # Want to plot 6 plots for each significant genotype: 
-  # 1. Continuous phenotype (contMap)
-  # 2. Genotype reconstruction
-  # 3. Genotype: all transition edges
-  # 4. Histogram of abs(delta phenotype) for all genotype transition edges 
-  # 5. Histogram of abs(delta phenotype) for all genotype nontransition edges
-  # 6. Histogram of null ks.statistic with observed ks.statistic for all transition vs nontransition edges  
   #
   # Inputs: 
   # tr.                  Phylo. 
@@ -979,8 +980,7 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   check_if_permutation_num_valid(perm)
   
   # Function -------------------------------------------------------------------
-  plot_p_recon <- contMap(tr, pheno_vector, method = "user", anc.states = pheno_anc_rec, plot = FALSE)
-  
+
   # prep for heatmap 6
   trans_edge_mat <- NULL
   for (i in 1:length(geno_transition)){
@@ -1018,7 +1018,6 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   ordered_by_p_val      <- sorted_trans_edge_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(sorted_trans_edge_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
   
-  
   pheatmap( # Plot the heatmap 
     ordered_by_p_val,
     main          = paste0("Edges:\n hi conf trans vs delta pheno"),
@@ -1049,36 +1048,9 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
     na_col = "grey", 
     file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap_with_log_p.pdf"))
   
-  
-  pheatmap( # Plot the heatmap 
-    sorted_trans_edge_mat,
-    main          = paste0("Edges:\n hi conf trans vs delta pheno"),
-    cluster_cols  = TRUE,
-    cluster_rows  = FALSE,
-    show_rownames = FALSE, 
-    color = c("white", "black"), 
-    annotation_col = significant_loci,
-    annotation_row = p_trans_mat,
-    annotation_colors = ann_colors,
-    show_colnames = TRUE, 
-    cellwidth = 20, 
-    na_col = "grey", 
-    file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap.pdf"))
-  
-  write.table(trans_edge_mat, 
-            file = paste0(dir, "/phyc_", name, "_trans_edge_matrix.tsv"), 
-            sep = "\t", 
-            quote = FALSE, 
-            row.names = TRUE, 
-            col.names = TRUE)
-  
-  write.table(p_trans_mat, 
-              file = paste0(dir, "/phyc_", name, "_pheno_trans_edge_matrix.tsv"), 
-              sep = "\t", 
-              quote = FALSE, 
-              row.names = TRUE, 
-              col.names = TRUE)
-  
+
+  save_data_table(trans_edge_mat, dir,name, "_trans_edge_matrix.tsv") 
+  save_data_table(p_trans_mat, dir, name, "_pheno_trans_edge_matrix.tsv")
   
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
   counter <- 0
@@ -1090,18 +1062,12 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
       
       pdf(fname, width = 16, height = 20)
       par(mfrow = c(3, 3))
-      par(mgp = c(3, 1, 0))
-      par(oma = c(0, 0, 4, 0))
+      par(mgp   = c(3, 1, 0))
+      par(oma   = c(0, 0, 4, 0))
       
       # 1. Continuous phenotype (contMap)
       par(mar = c(4, 4, 4, 4))
-      plot(plot_p_recon,
-           add = TRUE, 
-           ylim = c(-1 / 25 * Ntip(tr), Ntip(tr)),
-           colors = plot_p_recon$cols, 
-           lwd = 4, 
-           ftype = "off",
-           offset = 1.7)
+      plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
 
       # 2. Genotype reconstruction
       edge_color <- rep("black", Nedge(tr))
@@ -1329,6 +1295,15 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   }
 } # end plot_significant_hits()
 
+
+save_data_table <- function(matrix, output_dir, pheno_geno_name, extension){
+  write.table(matrix, 
+              file = paste0(output_dir, "/phyc_", pheno_geno_name, extension), 
+              sep = "\t", 
+              quote = FALSE, 
+              row.names = TRUE, 
+              col.names = TRUE)
+} # end save_data_table()
 
 read_in_arguments <- function(args){
   # TO DO:
