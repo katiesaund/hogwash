@@ -1068,7 +1068,7 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   
   save_manhattan_plot(dir, name, pval_all_transition$hit_pvals, a, "transition")
   
-  row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:212)
+  row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:Nedge(tr))
   # end heatmap prep
   ann_colors = list(
     locus = c(not_sig = "white", sig = "blue")
@@ -1180,16 +1180,18 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
                 adj = 2, 
                 bg = annot[ , 2], 
                 cex = 0.75)
-      legend("bottomleft", 
-             legend = unique(annot[ , 1]),
-             col = unique(annot[ , 2]), 
-             lty = 1,
-             ncol = length(unique(annot[ , 1])),  
-             lwd = 5, 
-             cex = 0.6)            
+      if (!is.null(annot)){
+        legend("bottomleft", 
+               legend = unique(annot[ , 1]),
+               col = unique(annot[ , 2]), 
+               lty = 1,
+               ncol = length(unique(annot[ , 1])),  
+               lwd = 5, 
+               cex = 0.6)   
+      }
+         
       
       # 3. Genotype: all transition edges
-      print(annot)
       edge_color <- rep("black", Nedge(tr))
       edge_color[geno_transition[[j]]$transition == 1] <- "red"
       edge_color[geno_confidence[[j]]  == 0] <- "grey" # grey out long edges and low ML bootstrap support
@@ -1206,13 +1208,16 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
                 adj = 2, 
                 bg = annot[ , 2], 
                 cex = 0.75)
-      legend("bottomleft", 
-             legend = unique(annot[ , 1]),
-             col = unique(annot[ , 2]), 
-             lty = 1,
-             ncol = length(unique(annot[ , 1])),            
-             lwd = 5, 
-             cex = 0.6)    
+      if (!is.null(annot)){
+        legend("bottomleft", 
+               legend = unique(annot[ , 1]),
+               col = unique(annot[ , 2]), 
+               lty = 1,
+               ncol = length(unique(annot[ , 1])),            
+               lwd = 5, 
+               cex = 0.6)   
+      }
+ 
       
       # 4. All edge distribution overlaid with only high confidence edge distribution, raw values not absolute values
       edge_num <- length(unlist(p_trans_mat))
