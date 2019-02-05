@@ -3,7 +3,19 @@
 # TO DO 
 # fix delta phenotype distribution
 
-# LIBRARIES --------------------------------------------------------------------
+
+# Note on phylogenetic tree structure
+# tr$edge:
+#       [,1] [,2]
+# [1,]  111  112
+# [2,]  112  113
+# [3,]  113  114
+# [4,]  114  115
+# Dim = 2*(Ntip(tr)) x 2
+# Each row is an edge. 
+# The first colum is the older node and the second column is the younger node. 
+
+# LIBRARIES -------------------------------------------------------------------#
 library(ape)       # ape::ace function (ancestral reconstruction)
 library(phytools)  # phylogenetic tree function library
 library(ComplexHeatmap) # to make final plots for discrete phenotypes
@@ -13,10 +25,9 @@ library(grid) # plots for continuous phenotypes
 library(gridExtra) # plots for continuous phenotypes
 library(ggplot2) # plots for continuous phenotypes
 
-# library(truncnorm) # truncnorm::rtruncnorm function (creates truncated normal distribution)
-# 2018-08-29 started getting a bug about truncnorm loading....will haveto figure that out later. 
+# library(truncnorm) # truncnorm::rtruncnorm function (creates truncated normal distribution) # 2018-08-29 started getting a bug about truncnorm loading....will haveto figure that out later. 
 
-# FUNCTIONS FOR PHYC -----------------------------------------------------------
+# FUNCTIONS FOR PHYC ----------------------------------------------------------#
 ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_threshold){ 
   # TO DO: 
   # 1) Break this function into two subfuctions: one for continuous, one for discrete
@@ -104,8 +115,6 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_t
   return(results)
 } # end ancestral_reconstruction_by_ML()
   
-  
-  ####################
 get_bootstrap_confidence <- function(tr, confidence_threshold){
   # Account for confidence in RAxML phylogenetic tree.  
   node_confidence <- tr$node.label
@@ -116,64 +125,9 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
     stop("tree confidence made incorrectly")
   }
   return(tree_tip_and_node_confidence)
-}
+} # end get_bootstrap_confidence()
   
-
-
-  # # Note: tr$edge is structured
-  # #       [,1] [,2]
-  # # [1,]  111  112
-  # # [2,]  112  113
-  # # [3,]  113  114
-  # # [4,]  114  115
-  # # Dim = 2*(Ntip(tr)) x 2
-  # # Each row is an edge. 
-  # # The first colum is the older node and the second column is the younger node. 
-  # 
-  # if (disc_cont == "discrete"){
-  #   invisible(sapply (1:Nedge(tr), function(i) {
-  #     # grab tr tips (i.e. younger node is a tip)
-  #     if (tr$edge[i, 2] <= Ntip(tr)){
-  #       reconstruction[i] <<- as.integer(mat[ , num][tr$edge[i, 2]])
-  #     }
-  #     # grab internal nodes
-  #     if (tr$edge[i, 2] >  Ntip(tr)){
-  #       reconstruction[i] <<- ML_anc_rec[names(ML_anc_rec) == tr$edge[i, 2]]
-  #     }
-  #   }))
-  #   reconstruction_by_node_order <- reconstruction_as_edge_mat <- NULL
-  # }
-  # 
-  # ## DEFINING RECONSTRUCTION IN TWO NEW WAYS FOR CONTINOUS 
-  # # NEW WAY 1: AS A VECTOR IN ORDER OF NODE NUMBER:
-  # 
-  # if (disc_cont == "continuous"){
-  #   reconstruction_by_node_order <- c(mat[ , num, drop = TRUE], ML_anc_rec) ### This used to be mat[1, , drop = TRUE] WHICH WAS SUPER WRONG! It should have been mat[num,,drop= FALSE] back when matrices were transposed...ACtually it was probably fine because phenotypes were always of 1....so num always equaled 1 anyways...
-  #   names(reconstruction_by_node_order) <- c(1:sum(Ntip(tr), Nnode(tr)))
-  #   # NEW WAY 2: AS A MATRIX, IN THE SAME FORMAT AS tr$EDGE. SO NODE VALUES WILL APPEAR MULTIPLE TIMES IN THE tr.
-  #   #            THIS FORMAT WILL MAKE IT MUCH EASIER TO CALCULATE PHENOTYPE CHANGE ON EDGES. 
-  #   reconstruction_as_edge_mat <- tr$edge
-  #   for (k in 1:nrow(reconstruction_as_edge_mat)){
-  #     reconstruction_as_edge_mat[k, 1] <- reconstruction_by_node_order[tr$edge[k, 1]]
-  #     reconstruction_as_edge_mat[k, 2] <- reconstruction_by_node_order[tr$edge[k, 2]]
-  #   }
-  #   reconstruction <- NULL
-  # }
-  
-
 identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
-  # node_recon was ML_anc_rec
-  
-  # Recall that:
-  # Note: tr$edge is structured
-  #       [,1] [,2]
-  # [1,]  111  112
-  # [2,]  112  113
-  # [3,]  113  114
-  # [4,]  114  115
-  # Dim = 2*(Ntip(tr)) x 2
-  # Each row is an edge.
-  # The first colum is the older/parent node and the second column is the younger/child node.
   transition <- transition_direction <- parent_node <- child_node <- integer(Nedge(tr)) # initialize all as zeroes
   
   for (i in 1:Nedge(tr)){
@@ -874,13 +828,7 @@ discretize_confidence_using_threshold <- function(confidence_vector, threshold){
 
 identify_short_edges <- function(tr){
   # Removes any edges that make up a 10% or more of the total tr length. 
-  
-  
-  # Now update pheno_conf to remove any of the very long edges
-  # while(max(tr$edge.length[as.logical(pheno_conf)]) >= (0.1 * sum(tr$edge.length[as.logical(pheno_conf)]))){
-  #   pheno_conf[tr$edge.length == max(tr$edge.length[as.logical(pheno_conf)])] <- 0
-  # }
-  
+
   short_edges <- rep(1, Nedge(tr))
   while(max(tr$edge.length[as.logical(short_edges)]) >= (0.1 * sum(tr$edge.length[as.logical(short_edges)]))){
     short_edges[tr$edge.length == max(tr$edge.length[as.logical(short_edges)])] <- 0
@@ -1277,27 +1225,6 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
                         length(as.numeric(unlist(as.numeric(unlist(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2]))[as.logical(geno_confidence[[j]])]))), 
                         sep = "")) 
       
-      #hist(results_all_trans$observed_pheno_trans_delta[[j]][as.logical(geno_confidence[[j]])],
-      #     breaks = Nedge(tr)/4,
-      #     col = "red",
-      #     border = "red",
-      #     add = TRUE)
-      
-      # the next blue is supposed to be calculating all of this in a different way: 
-      # print(order(p_trans_mat[ , 1]))
-      # ordered_p_trans_list <- p_trans_mat[order(p_trans_mat[ , 1]), ]
-      # print(ordered_p_trans_list)
-      # ordered_p_trans_list_geno_trans_only <- ordered_p_trans_list[sorted_trans_edge_mat[ , j] == 1]
-      # print(ordered_p_trans_list_geno_trans_only)
-      # ordered_p_trans_list_hi_conf_geno_trans_only <- ordered_p_trans_list_geno_trans_only[as.logical(geno_confidence[[j]])]
-      # print(ordered_p_trans_list_hi_conf_geno_trans_only)
-      # hist(ordered_p_trans_list_hi_conf_geno_trans_only,  # as.numeric(p_trans_mat[sorted_trans_edge_mat[ , j] == 1, 1])[as.logical(geno_confidence[[j]])],
-      #      breaks = 100,
-      #      col = "blue",
-      #      border = "blue",
-      #      add = TRUE)
-      # what is blue really plotting?
-      
       # 8 
       # Calculate the delta phenotype
       # GRAB THE IDS OF THE TRANSITION EDGES: 
@@ -1310,13 +1237,9 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
       # SUBSET TRANSITION / NON-TRANSITION EDGES TO ONLY HIGH CONFIDENCE ONES
       hi_conf_trans_index     <- trans_index[    as.logical(geno_confidence[[j]][trans_index    ])]
       hi_conf_non_trans_index <- non_trans_index[as.logical(geno_confidence[[j]][non_trans_index])]
-      
       hi_conf_pheno_trans_delta     <- calculate_phenotype_change_on_edge(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
       hi_conf_pheno_non_trans_delta <- calculate_phenotype_change_on_edge(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
-      
-      
-      
-      
+
       hist(hi_conf_pheno_non_trans_delta, 
            main = paste("calculated differently: \n # trans edge= ", 
                         length(hi_conf_pheno_trans_delta), "# non trans edge =", 
@@ -1369,10 +1292,8 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
            border = "red",
            add = TRUE,
            xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)))
-           
 # end temp 9
-      
-      
+
       # 10. KS null distribution
       hist(log(results_all_trans$ks_statistics[[j]]), 
            breaks = perm/10, col = "grey", border = FALSE,
@@ -1553,10 +1474,6 @@ reduce_redundancy <- function(mat, tr, dir, name){
   check_if_binary_matrix(mat)
   
   # Function -------------------------------------------------------------------
-  
-  # 2018-11-13 rewriting the remove 1, all but 1, or all occurances so that the 
-  # genotypes that are dropped can be recorded. 
-  
   geno_to_drop <- rep(FALSE, ncol(mat))
   geno_to_drop[colSums(mat) <= 1] <- TRUE
   geno_to_drop[colSums(mat) == (Ntip(tr) - 1)] <- TRUE
@@ -1568,14 +1485,6 @@ reduce_redundancy <- function(mat, tr, dir, name){
   writeLines(dropped_genotype_names, con = filename, sep = "\n")
   
   mat <- mat[ , !geno_to_drop, drop = FALSE]
-
-  #mat <- mat[ , colSums(mat) > 1               , drop = FALSE] # Remove any genotypes with only one occurance. Convergence is impossible if a genotype occurs in only 1 tip.
-  #mat <- mat[ , colSums(mat) != (Ntip(tr) - 1) , drop = FALSE] # Remove any genotypes with all but one occurance. Convergence is impossible (at least unlikely given how ace tends to build reconstructions).
-  #mat <- mat[ , colSums(mat) != Ntip(tr)       , drop = FALSE] # Remove any genotypes present at all tips. 
-
-  
-  # 2018-11-13 C. Willer's advice was to stop collapsing identical genotypes...so I'm implementing that. 
-  # mat <- collapse_identical_genotypes(mat, dir, name) # Reduce the size of geno_mat by collapsing all rows that have the same pattern in order to reduce penalization by multiple test correction later. 
   
   # Check and return output ----------------------------------------------------
   check_if_binary_matrix(mat)
@@ -1641,16 +1550,8 @@ save_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
   dev.off()
 } #end save_manhattan_plot()
 
+# DISCRETE PHYC LIBRARY -------------------------------------------------------#
 
-
-# END OF SCRIPT ----------------------------------------------------------------
-
-# 2018-08-31 left off after a cursory change to count_hits_on_edges()
-# how does change from node_tip to edges change the calculate_hit_pvals()? 
-# Have not done anything to update calculate_hit_pvals() yet. 
-
-# DISCRETE LIB
-# genotype_confidence = geno_conf_ordered_by_edges
 count_hits_on_edges <- function(genotype_reconstruction, phenotype_reconstruction, high_confidence_edges, phenotype_confidence){
   # TO DO: update description
   # 1) We're now workingwith ordered by edges rather than ordered by tips then noes
@@ -1679,44 +1580,8 @@ count_hits_on_edges <- function(genotype_reconstruction, phenotype_reconstructio
 
 
 plot_sig_hits_summary <- function(heat_tr, tr, g_mat, p_mat, annot, sig_hits, heatmap_title, filename_start, high_conf_edges, recon_or_trans, short, pheno_conf, bootstrap, pheno_recon_or_trans_by_edge, all_high_conf_edges, geno_trans_or_recon, output_name){
-  # assumes discrete phenotype
-
   hits <- g_mat[ , colnames(g_mat) %in%  row.names(sig_hits), drop = FALSE]
-  
-  # 1. All significant hits (recon or transition) as a heatmap next to tree, ribotype, and phenotype
-  # white_to_black = colorRampPalette(c("white", "black")) # Set up presence/absence colors
-  # htmp_col = white_to_black(2) # number is 2 because we're only doing discrete phenotypes. 
-  # colnames(p_mat) <- "Presence"
-  # combined_annotation <- data.frame(Ribotype = annot, presence = p_mat)
-  # ha_combined <- rowAnnotation(df = combined_annotation, 
-  #                              col = list(Ribotype= c("027" = "blue", "014-020" = "purple", "053-163" = "orange", "078-126" = "green", "other" = "grey"), 
-  #                                         Presence= c("0" = "white", "1" = "black")), 
-  #                              width = unit(10, "mm"),
-  #                              annotation_width = c(1, 1))
-  # htmp <- ComplexHeatmap::Heatmap(
-  #   matrix = hits, 
-  #   cluster_columns = TRUE, 
-  #   row_names_side = "left", 
-  #   col = htmp_col, 
-  #   show_column_names = TRUE, 
-  #   row_names_max_width = unit(20, "mm"),
-  #   show_heatmap_legend = FALSE, 
-  #   column_names_max_height = unit(50, "mm"),
-  #   row_title = "Isolates",
-  #   column_title = heatmap_title,  
-  #   cluster_rows = heat_tr, 
-  #   row_dend_side = "left", 
-  #   row_dend_width = unit(40, "mm"), 
-  #   row_names_gp = gpar(cex = 0.4), 
-  #   column_names_gp = gpar(cex = 0.75), width = unit(2 *ncol(hits), "mm")
-  # ) + ha_combined
-  # filename <- paste(filename_start, "heatmap_all_sig_hits.pdf", sep = "")
-  # pdf(filename, width = 16, height = 20)
-  # draw(htmp)
-  # dev.off()
-
-  
-  # SECOND PDF: 
+ 
   if (recon_or_trans == "trans"){
     filename <- paste(filename_start, "tree.pdf", sep = "")
   } else {
@@ -1782,33 +1647,6 @@ plot_sig_hits_summary <- function(heat_tr, tr, g_mat, p_mat, annot, sig_hits, he
       hit_name <- colnames(g_mat)[i]
       # First heatmap
       single_hit <- g_mat[ , i, drop = FALSE]
-
-      # htmp <- ComplexHeatmap::Heatmap(
-      #   matrix = single_hit, 
-      #   cluster_columns = TRUE, 
-      #   row_names_side = "left", 
-      #   col = htmp_col, 
-      #   show_column_names = TRUE, 
-      #   row_names_max_width = unit(20, "mm"),
-      #   show_heatmap_legend = FALSE, 
-      #   column_names_max_height = unit(50, "mm"),
-      #   row_title = "Isolates",
-      #   column_title = paste(output_name, " sig hit: ", hit_name, sep = ""),  
-      #   cluster_rows = heat_tr, 
-      #   row_dend_side = "left", 
-      #   row_dend_width = unit(40, "mm"), 
-      #   row_names_gp = gpar(cex = 0.4), 
-      #   column_names_gp = gpar(cex = 0.75), width = unit(2 *ncol(hits), "mm")
-      # ) + ha_combined
-      # if (recon_or_trans == "trans"){
-      #   filename <- paste(filename_start, "heatmap_sig_hit_", counter , ".pdf", sep = "")
-      # } else {
-      #   filename <- paste(filename_start, "heatmap_sig_hit_", counter , ".pdf", sep = "")
-      # } 
-      # pdf(filename, width = 16, height = 20)
-      # draw(htmp)
-      # dev.off()
-      
       # Second/Third: Geno recon or trans & Pheno recon or trans
       if (recon_or_trans == "trans"){
         filename <- paste(filename_start, "tree_sig_hit_", counter , ".pdf", sep = "")
@@ -1882,8 +1720,6 @@ create_heatmap_compatible_tree <- function(tree){
   heatmap_tree <- as.dendrogram(as.hclust.phylo(heatmap_tree))
   return(heatmap_tree)
 } # end create_heatmap_compatible_tree()
-
-
 
 calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, tr, mat, permutations, alpha, high_confidence_edges){
   # calculate_genotype_pvals is the "meat" of the phyC algorithm. 
@@ -2015,26 +1851,8 @@ calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, 
       }
       
       hit_pvals[i] <- format(round(pval, 20), nsmall = 20)
-      # v. Plot observed values on the null distribution. 
-      # fname <- paste(dir, "/", format(Sys.time(), "%Y-%m-%d_"), "Hanna_", output, "_", type, "_", outgroup, "_", permutations, "_", subset_type, "_", remove_long_edges, "_", i , "_observed_on_null_distribution.pdf", sep = "")
-      # pdf(fname)
-      # hist(redistributed_both_present,
-      #      main = row.names(mat)[i],
-      #      xlab = paste("Number of edges and pval", pval, sep = " "), 
-      #      ylab = "Count (both phenotype & genotype present)",
-      #      xlim = c(0, sum(phenotype_reconstruction[as.logical(combined_confidence[[i]])])), #length(which_branches[[i]])),
-      #      breaks = length(which_branches[[i]]))
-      # abline(v = both_present[i], col = "red")
-      # abline(v = sort(redistributed_both_present, decreasing = TRUE)[(alpha * permutations)], col = "green")
-      # abline(v = sort(redistributed_both_present, decreasing = FALSE)[(alpha * permutations)], col = "blue")
-      # dev.off()
     }
   }
-  # fname <- paste(dir, "/", format(Sys.time(), "%Y-%m-%d_"), "Hanna_", output, "_", type, "_", outgroup, "_", permutations, "_", subset_type, "_", remove_long_edges, "_total_genotype_phenotype_match.pdf", sep = "")
-  # pdf(fname)
-  # hist(count_X, main = "Total genotype/phenotype match (X count)", ylab = "Count", xlab = "Genotype/phenotype match")
-  # dev.off() 
-  
   names(hit_pvals) <- colnames(mat)
   return(hit_pvals)
 } # end calculate_hit_pvals_corrected
@@ -2045,7 +1863,6 @@ save_dropped_genotypes <- function(geno, keepers, save_dir, save_name){
   writeLines(dropped_genotype_names, con = filename, sep = "\n")
 } # end save_dropped_genotypes
 
-
 report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf_edges, geno_names, outdir, outname){
   num_high_confidence_transition_edges <- rep(0, length(genotype_transition))
   for (p in 1:length(genotype_transition)){
@@ -2054,3 +1871,5 @@ report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf
   names(num_high_confidence_transition_edges) <- geno_names
   write.table(num_high_confidence_transition_edges, file = paste(outdir, "/phyc_", outname, "_num_high_conf_trans_edges_per_geno.tsv", sep = ""), sep = "\t", quote= FALSE, col.names = FALSE, row.names = TRUE)
 } # end report_num_high_confidence_trans_edge
+
+# END OF SCRIPT ---------------------------------------------------------------#
