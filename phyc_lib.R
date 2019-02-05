@@ -1066,6 +1066,8 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   log_p_value <- data.frame(log(pval_all_transition$hit_pvals))
   column_annot <- cbind(significant_loci, log_p_value)
   
+  save_manhattan_plot(dir, name, pval_all_transition$hit_pvals, a, "transition")
+  
   row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:212)
   # end heatmap prep
   ann_colors = list(
@@ -1075,13 +1077,7 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   sorted_trans_edge_mat <-           trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[ , 1])], row.names(trans_edge_mat)), ]
   ordered_by_p_val      <- sorted_trans_edge_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(sorted_trans_edge_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
-  print("p_trans_mat")
-  print(p_trans_mat)
-  print(range(p_trans_mat))
   
-  print("sorted_trans_edge_mat")
-  print(sorted_trans_edge_mat)
-  print(range(sorted_trans_edge_mat))
   
   pheatmap( # Plot the heatmap 
     ordered_by_p_val,
@@ -1625,6 +1621,30 @@ save_hits <- function(hits, output_dir, output_name, pval_name){
     write.table(x = empty, file = paste(file_name, ".tsv", sep = ""), sep = "\t", quote = FALSE, eol = "\n", row.names = TRUE, col.names = TRUE)
   }
 } #end save_hits()
+
+save_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans_or_recon){
+  # Create negative log p-values with arbitrary locus numbers
+  neg_log_p_value <- data.frame(-log(pval_hits))
+  neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
+  colnames(neg_log_p_with_num)[1] <- "locus"
+  sig_temp <-subset(neg_log_p_with_num, neg_log_p_with_num[ , 2] > -log(alpha))
+  pdf(paste0(outdir, "/phyc_", trans_or_recon, "_", geno_pheno_name, "_manhattan_plot.pdf"))
+  with(neg_log_p_with_num,   
+       plot(x = neg_log_p_with_num[ , 1], 
+            y = neg_log_p_with_num[ , 2, drop = TRUE], 
+            type = "p", 
+            main = paste(trans_or_recon, "phyC", geno_pheno_name, sep = " "), 
+            col = rgb(0, 0, 0, 0.3), 
+            pch = 19, 
+            xlab = "Genetic locus",
+            ylab = "-ln(p-value) after FDR" ))
+  
+  abline(h = -log(alpha), col = "red")
+  text(x = sig_temp[ , 1], y = sig_temp[ , 2], labels = row.names(sig_temp), pos = 1, cex = 0.7)
+  dev.off()
+} #end save_manhattan_plot()
+
+
 
 # END OF SCRIPT ----------------------------------------------------------------
 

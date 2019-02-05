@@ -6,11 +6,11 @@ data_type <- "continuous" # or "discrete
 
 if (data_type == "continuous"){
   # continuous
-  test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/log_toxin_pheno.tsv" 
-  test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/log_toxin.tree"
-  test_geno  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/log_toxin_gene_stop.tsv"
-  test_annot <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-09-04_format_data_for_gwas/data/2018-09-05_formatted_data_for_gwas/log_toxin_annotation.tsv"
-  test_dir   <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2018-12-14_phyc_fix_delta_pheno/data/2018-12-18_morning/"
+  test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/log_toxin_pheno.tsv" 
+  test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/log_toxin.tree"
+  test_geno  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/log_toxin_gene_stop.tsv"
+  # test_annot <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/log_toxin_annotation.tsv"
+  test_dir   <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-05_add_manhattan_plot_to_phyc/data/"
   test_name  <- "log_toxin_gene_stop"
   test_perm  <- "1000"
   test_alpha <- "0.1"
@@ -23,7 +23,7 @@ if (data_type == "continuous"){
   args$output_dir             <- test_dir # Directory in which all output files will be saved
   args$perm                   <- as.numeric(test_perm) #typically 10,000
   args$alpha                  <- as.numeric(test_alpha)
-  args$annotation             <- read_in_tsv_matrix(test_annot)
+  # args$annotation             <- read_in_tsv_matrix(test_annot)
   args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$alpha, args$annot)
 } else if (data_type == "discrete"){ 
 

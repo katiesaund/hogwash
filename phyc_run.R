@@ -116,6 +116,10 @@ if (args$discrete_or_continuous == "continuous"){
   save_hits(corrected_pvals_trans$sig_pvals, args$output_dir, args$output_name, "transition_pvals_for_sig_hits")
   save_hits(corrected_pvals_recon$hit_pvals, args$output_dir, args$output_name, "reconstruction_pvals_for_all_hits")
   save_hits(corrected_pvals_recon$sig_pvals, args$output_dir, args$output_name, "reconstruction_pvals_for_sig_hits")
+  
+  save_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_trans$hit_pvals, args$alpha, "transition")
+  save_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_recon$hit_pvals, args$alpha, "transition")
+  
    
   htmp_tr <- create_heatmap_compatible_tree(args$tree)
   if(!is.null(args$annotation)){
