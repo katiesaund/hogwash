@@ -929,7 +929,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
        offset = 1.7)
 } # end plot_continuous_phenotype()
 
-plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf){
+plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf, all_trans_sig_hits){
   # Function description ------------------------------------------------------- 
   #
   # Inputs: 
@@ -974,7 +974,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   
   significant_loci <- data.frame("locus" = rep("not_sig", ncol(trans_edge_mat)), stringsAsFactors = FALSE)
   row.names(significant_loci) <- colnames(trans_edge_mat)
-  significant_loci[row.names(significant_loci) %in% row.names(all_transitions_sig_hits), ] <- "sig"
+  significant_loci[row.names(significant_loci) %in% row.names(all_trans_sig_hits), ] <- "sig"
   
   log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
   column_annot <- cbind(significant_loci, log_p_value)
@@ -1018,7 +1018,6 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
     annotation_colors = ann_colors,
     show_colnames = TRUE, 
     cellwidth = cell_width_value)
-    #file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap_with_log_p_ordered.pdf"))
   
   pheatmap( # Plot the heatmap 
     sorted_trans_edge_mat,
@@ -1033,41 +1032,24 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
     show_colnames = TRUE, 
     cellwidth = cell_width_value, 
     na_col = "grey")
-    #file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap_with_log_p.pdf"))
-
-  
   
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
-  counter <- 0
+  counter <- 0 # can I get rid of counter now? 2019-02-25
   for (j in 1:nrow(pval_all_transition$hit_pvals)){
     if (pval_all_transition$hit_pvals[j, 1] < a){ 
-
-
       counter <- counter + 1
-      # fname <- create_file_name(dir, name, paste("sig_hit_results_", counter, ".pdf", sep = ""))
-      
-      # pdf(fname, width = 16, height = 20)
       par(mfrow = c(3, 3))
       par(mgp   = c(3, 1, 0))
       par(oma   = c(0, 0, 4, 0))
       par(mar = c(4, 4, 4, 4))
       
-      if (disc_cont == "continuous"){
-        plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
-      } else { #discrete
-        plot_tree_with_colored_edges(tr, pheno_anc_rec, tr_and_pheno_hi_conf, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
-      }
-      
+      plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
       plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
-      
       plot_tree_with_colored_edges(tr, geno_transition,     geno_confidence, "grey", "red", "Genotype transition edge:\n Red = transition; Black = No transition", annot, "trans", j)
-      
       histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno(p_trans_mat, geno_confidence, tr, j)
-      
       histogram_abs_high_confidence_delta_pheno_highlight_transition_edges(results_all_trans, tr, j, "grey", "red") # 6. Delta phenotype histogram. Note that results_all_trans$observed_pheno_non_trans_delta[[j]] is already subset down to only high confidence edges
-
       histogram_raw_high_confidence_delta_pheno_highlight_transition_edges(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, j, "grey", "red")
-     
+  
       hist(log(results_all_trans$ks_statistics[[j]]), 
            breaks = perm/10, col = "grey", border = FALSE,
            main = paste("Null distribution of KS statistic for all transitions.\n Red = Observed KS statistic.\n p-value = ", round(pval_all_transition$hit_pvals[j, 1], 10), "\np-value rank = ", rank(pval_all_transition$hit_pvals)[j], sep = ""), 
@@ -1087,13 +1069,6 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
         annotation_row = p_trans_mat,
         show_colnames = TRUE,
         cellwidth = 20)
-      
-      #mtext(paste("Signicant hit:", row.names(pval_all_transition$hit_pvals)[j], sep = ""), 
-      #      outer = TRUE,
-      #     side = 3, 
-      #      cex = 1.2, 
-      #      line = 1)
-      
     }
   }
 
@@ -1742,12 +1717,11 @@ calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, 
       # x_on_r <- sum(empirical_both_present >= both_present[i])
       # y_on_s <- sum(empirical_only_geno_present <= only_geno_present[i])
 
-      # count only times when empirical, permuted overlap of genotype and phenotype is more common than obsered (both_present[i])
-      # and when the empirical, permuted genotype does not overlap with phenotype is less common than observed (only_geno_present[i])
+      # count only times when permuted (empirical) overlap of genotype and phenotype is more common than obsered (both_present[i])
+      # and when the permuted (empirical) genotype does not overlap with phenotype is less common than observed (only_geno_present[i])
       new_counter <- sum((empirical_both_present >= both_present[i]) * (empirical_only_geno_present <= only_geno_present[i]))
       temp_pval <- ((new_counter + 1)/(permutations + 1))
       
-      # made changes 2018-01-17
       if (sort(redistributed_both_present, decreasing = FALSE)[(alpha * permutations)] == 0 & both_present[i] == 0){
         pval <- 1
       } else if (temp_pval == 0 | temp_pval == 1){
@@ -1762,7 +1736,9 @@ calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, 
     }
   }
   names(hit_pvals) <- colnames(mat)
-  return(hit_pvals)
+  results <- list("hit_pvals" = hit_pvals, "permuted_count" = new_counter, "observed_overlap" = both_present)
+  # return(hit_pvals)
+  return(results)
 } # end calculate_hit_pvals_corrected
 
 get_dropped_genotypes <- function(geno, keepers){

@@ -108,7 +108,7 @@ if (args$discrete_or_continuous == "continuous"){
   all_transitions_sig_hits <- keep_hits_with_more_change_on_trans_edges(results_all_transitions, corrected_pvals_all_transitions, args$alpha)
   
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
-  trans_mat_results <- plot_significant_hits("continuous", args$tree, args$alpha, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges)
+  trans_mat_results <- plot_significant_hits("continuous", args$tree, args$alpha, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
   
   # move next five lines into a function
   results_object$transition_edge_matrix <- trans_mat_results$trans_edge_mat
@@ -130,8 +130,11 @@ if (args$discrete_or_continuous == "continuous"){
   branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
   branch_overlap_recon <- count_hits_on_edges(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
   
-  hit_pvals_trans <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
-  hit_pvals_recon <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
+  disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
+  disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
+  
+  hit_pvals_trans <- disc_trans_results$hit_pvals
+  hit_pvals_recon <- disc_recon_results$hit_pvals
   
   corrected_pvals_trans <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_trans, args$alpha)
   corrected_pvals_recon <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_recon, args$alpha)
@@ -141,8 +144,6 @@ if (args$discrete_or_continuous == "continuous"){
   results_object$sig_pvals_transition     <- corrected_pvals_trans$sig_pvals
   results_object$sig_pvals_reconstruction <- corrected_pvals_recon$sig_pvals
   
-  # plot_discrete_results <- function(dir, name, trans_results, recon_results, a, tr, annot){}
-  
   # htmp_tr <- create_heatmap_compatible_tree(args$tree)
   # if(!is.null(args$annotation)){
   #   simple_annotation <- args$annotation[ , 1, drop = FALSE]
@@ -150,10 +151,16 @@ if (args$discrete_or_continuous == "continuous"){
   #   simple_annotation <- NULL
   # }
   
-  # pdf(paste0(args$output_dir, "/phyc_temp_results_",  args$output_name, "_manhattan_plot.pdf"))
-  # make_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_trans$hit_pvals, args$alpha, "transition")
-  # make_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_recon$hit_pvals, args$alpha, "reconstruction")
-  # dev.off()
+  print("permuted_count")
+  print(str(disc_trans_results$permuted_count))
+  print(disc_trans_results$permuted_count)
+  #print(permuted_count)
+  
+  pdf(paste0(args$output_dir, "/phyc_temp_results_",  args$output_name, "_manhattan_plot.pdf"))
+  make_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_trans$hit_pvals, args$alpha, "transition")
+  make_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_recon$hit_pvals, args$alpha, "reconstruction")
+  # hist(disc_trans_results$permuted_count)
+  dev.off()
   # 
   # if (nrow(corrected_pvals_recon$sig_pvals) > 0){
   #   recon_heatmap_filename_start <- paste(args$output_dir, "/phyc_", args$output_name, "_reconstruction_", sep = "")
@@ -170,7 +177,7 @@ if (args$discrete_or_continuous == "continuous"){
   save_results_as_r_object(args$output_dir, args$output_name, results_object)
 }
 
-plot_significant_hits("discrete", args$tree, args$alpha, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges)
+#plot_significant_hits("discrete", args$tree, args$alpha, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
 
 
 # END OF PHYC -----------------------------------------------------------------#
