@@ -1,9 +1,5 @@
 # Katie Saund
 
-# TO DO 
-# fix delta phenotype distribution 
-
-
 # Note on phylogenetic tree structure
 # tr$edge:
 #       [,1] [,2]
@@ -406,7 +402,7 @@ check_if_alpha_valid <- function(a){
   check_is_number(a)
   
   # Function -------------------------------------------------------------------
-  if (a > .1 | a <= 0){
+  if (a > .4 | a <= 0){
     stop("Provide a valid alpha.")
   }
 } # end check_if_alpha_valid()
@@ -933,7 +929,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
        offset = 1.7)
 } # end plot_continuous_phenotype()
 
-plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges){
+plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf){
   # Function description ------------------------------------------------------- 
   #
   # Inputs: 
@@ -941,15 +937,9 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   # a.                   Number. Alpha. 
   # dir.                 Character. Output path.
   # name.                Character. Output name. 
-  # pval_all_transition. ?
   # pheno_vector.        Vector. 
   # annot.               Matrix. 
   # perm.                Number. 
-  # results_all_trans.   ?. 
-  # pheno_anc_rec.       ?. 
-  # geno_reconstruction. ?
-  # geno_confidence.     ?
-  # geno_transition.     ?
   
   # Output: 
   # None. 
@@ -986,10 +976,9 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   row.names(significant_loci) <- colnames(trans_edge_mat)
   significant_loci[row.names(significant_loci) %in% row.names(all_transitions_sig_hits), ] <- "sig"
   
-  log_p_value <- data.frame(log(pval_all_transition$hit_pvals))
+  log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
   column_annot <- cbind(significant_loci, log_p_value)
   
-  save_manhattan_plot(dir, name, pval_all_transition$hit_pvals, a, "transition")
   
   row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:Nedge(tr))
   # end heatmap prep
@@ -1000,6 +989,21 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
   sorted_trans_edge_mat <-           trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[ , 1])], row.names(trans_edge_mat)), ]
   ordered_by_p_val      <- sorted_trans_edge_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(sorted_trans_edge_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
+  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val) after FDR")
+
+  fname <- create_file_name(dir, name, paste("summary_and_sig_hit_results.pdf", sep = "")) # 2019-02-25 removed counter from pdf file name because combining. 
+  pdf(fname, width = 16, height = 20)
+  
+  make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, a, "transition")
+  
+  cell_width_value <- 10
+  if (ncol(ordered_by_p_val) < 50){
+    cell_width_value <- 20
+  } 
+  if (ncol(ordered_by_p_val) > 100){
+    cell_width_value <- 5
+  }
+
   
   pheatmap( # Plot the heatmap 
     ordered_by_p_val,
@@ -1013,8 +1017,8 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
     annotation_row = p_trans_mat,
     annotation_colors = ann_colors,
     show_colnames = TRUE, 
-    cellwidth = 20, 
-    file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap_with_log_p_ordered.pdf"))
+    cellwidth = cell_width_value)
+    #file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap_with_log_p_ordered.pdf"))
   
   pheatmap( # Plot the heatmap 
     sorted_trans_edge_mat,
@@ -1027,30 +1031,34 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
     annotation_row = p_trans_mat,
     annotation_colors = ann_colors,
     show_colnames = TRUE, 
-    cellwidth = 20, 
-    na_col = "grey", 
-    file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap_with_log_p.pdf"))
+    cellwidth = cell_width_value, 
+    na_col = "grey")
+    #file =  paste0(dir, "/phyc_", name, "_trans_edge_heatmap_with_log_p.pdf"))
 
-  save_data_table(trans_edge_mat, dir,name, "_trans_edge_matrix.tsv") 
-  save_data_table(p_trans_mat, dir, name, "_pheno_trans_edge_matrix.tsv")
+  
   
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
   counter <- 0
   for (j in 1:nrow(pval_all_transition$hit_pvals)){
     if (pval_all_transition$hit_pvals[j, 1] < a){ 
 
+
       counter <- counter + 1
-      fname <- create_file_name(dir, name, paste("sig_hit_results_", counter, ".pdf", sep = ""))
+      # fname <- create_file_name(dir, name, paste("sig_hit_results_", counter, ".pdf", sep = ""))
       
-      pdf(fname, width = 16, height = 20)
+      # pdf(fname, width = 16, height = 20)
       par(mfrow = c(3, 3))
       par(mgp   = c(3, 1, 0))
       par(oma   = c(0, 0, 4, 0))
       par(mar = c(4, 4, 4, 4))
       
-      plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
+      if (disc_cont == "continuous"){
+        plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
+      } else { #discrete
+        plot_tree_with_colored_edges(tr, pheno_anc_rec, tr_and_pheno_hi_conf, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
+      }
       
-      plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", "Genotype reconstruction:\n Red = Variant; Black = WT",                annot, "recon", j)
+      plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
       
       plot_tree_with_colored_edges(tr, geno_transition,     geno_confidence, "grey", "red", "Genotype transition edge:\n Red = transition; Black = No transition", annot, "trans", j)
       
@@ -1060,7 +1068,6 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
 
       histogram_raw_high_confidence_delta_pheno_highlight_transition_edges(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, j, "grey", "red")
      
-      # 10. KS null distribution
       hist(log(results_all_trans$ks_statistics[[j]]), 
            breaks = perm/10, col = "grey", border = FALSE,
            main = paste("Null distribution of KS statistic for all transitions.\n Red = Observed KS statistic.\n p-value = ", round(pval_all_transition$hit_pvals[j, 1], 10), "\np-value rank = ", rank(pval_all_transition$hit_pvals)[j], sep = ""), 
@@ -1069,10 +1076,9 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
            xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])), log(results_all_trans$ks_statistics[[j]])), 0))
       abline(v = log(as.numeric(results_all_trans$observed_ks_stat[j])), col = "red")
       
-      # 7. heatmap
       pheatmap(
         sorted_trans_edge_mat[ , j, drop = FALSE],
-        main          = paste0("Edges:\n hi conf trans vs delta pheno"),
+        main          = paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Tree edges: hi conf trans vs delta pheno"),
         cluster_cols  = FALSE,
         cluster_rows  = FALSE,
         na_col = "grey", 
@@ -1082,15 +1088,17 @@ plot_significant_hits <- function(tr, a, dir, name, pval_all_transition, pheno_v
         show_colnames = TRUE,
         cellwidth = 20)
       
-      mtext(paste("Signicant hit:", row.names(pval_all_transition$hit_pvals)[j], sep = ""), 
-            outer = TRUE,
-            side = 3, 
-            cex = 1.2, 
-            line = 1)
+      #mtext(paste("Signicant hit:", row.names(pval_all_transition$hit_pvals)[j], sep = ""), 
+      #      outer = TRUE,
+      #     side = 3, 
+      #      cex = 1.2, 
+      #      line = 1)
       
-      dev.off()
     }
   }
+
+  results <- list("trans_edge_mat" = trans_edge_mat, "p_trans_mat" = p_trans_mat)
+  return(results)
 } # end plot_significant_hits()
 
 calc_raw_diff <- function(edge_list, ph_edges){
@@ -1185,6 +1193,10 @@ save_data_table <- function(matrix, output_dir, pheno_geno_name, extension){
               row.names = TRUE, 
               col.names = TRUE)
 } # end save_data_table()
+
+save_results_as_r_object <- function(dir, name, object){
+  save(object, file = paste0(dir, "/phyc_", name, ".rda"))
+} # end save_results_as_r_object()
 
 read_in_arguments <- function(args){
   # TO DO:
@@ -1337,15 +1349,17 @@ reduce_redundancy <- function(mat, tr, dir, name){
   
   
   dropped_genotype_names <- colnames(mat)[geno_to_drop]
-  filename <- paste(dir, "/phyc_", name, "_genotypes_dropped_because_convergence_not_possible.txt", sep = "")
-  writeLines(dropped_genotype_names, con = filename, sep = "\n")
+  #filename <- paste(dir, "/phyc_", name, "_genotypes_dropped_because_convergence_not_possible.txt", sep = "")
+  #writeLines(dropped_genotype_names, con = filename, sep = "\n")
   
   mat <- mat[ , !geno_to_drop, drop = FALSE]
   
   # Check and return output ----------------------------------------------------
   check_if_binary_matrix(mat)
   check_rownames(mat, tr)
-  return(mat)
+  results <- list("mat" = mat, "dropped_genotype_names" = dropped_genotype_names)
+  #return(mat)
+  return(results)
 } # end reduce_redundancy()
 
 save_hits <- function(hits, output_dir, output_name, pval_name){
@@ -1384,13 +1398,14 @@ save_hits <- function(hits, output_dir, output_name, pval_name){
   }
 } #end save_hits()
 
-save_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans_or_recon){
+make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans_or_recon){
   # Create negative log p-values with arbitrary locus numbers
   neg_log_p_value <- data.frame(-log(pval_hits))
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
   colnames(neg_log_p_with_num)[1] <- "locus"
   sig_temp <-subset(neg_log_p_with_num, neg_log_p_with_num[ , 2] > -log(alpha))
-  pdf(paste0(outdir, "/phyc_", trans_or_recon, "_", geno_pheno_name, "_manhattan_plot.pdf"))
+  ymax <- max(-log(0.01), neg_log_p_with_num[ , 2, drop = TRUE])
+  #pdf(paste0(outdir, "/phyc_", trans_or_recon, "_", geno_pheno_name, "_manhattan_plot.pdf"))
   with(neg_log_p_with_num,   
        plot(x = neg_log_p_with_num[ , 1], 
             y = neg_log_p_with_num[ , 2, drop = TRUE], 
@@ -1399,12 +1414,15 @@ save_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
             col = rgb(0, 0, 0, 0.3), 
             pch = 19, 
             xlab = "Genetic locus",
+            ylim = c(0, ymax),
             ylab = "-ln(p-value) after FDR" ))
   
   abline(h = -log(alpha), col = "red")
-  text(x = sig_temp[ , 1], y = sig_temp[ , 2], labels = row.names(sig_temp), pos = 1, cex = 0.7)
-  dev.off()
-} #end save_manhattan_plot()
+  if (nrow(sig_temp) > 0){
+    text(x = sig_temp[ , 1], y = sig_temp[ , 2], labels = row.names(sig_temp), pos = 1, cex = 0.7)
+  }
+  #dev.off()
+} #end make_manhattan_plot()
 
 plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence, edge_color_na, edge_color_bright, title, annot, trans_or_recon, index){
   edge_color <- rep("black", Nedge(tr))
@@ -1520,12 +1538,12 @@ plot_sig_hits_summary <- function(heat_tr, tr, g_mat, p_mat, annot, sig_hits, he
        edge.color = edge_color)
   
 
-  mtext(output_name, 
-        outer = TRUE,
-        side = 3, 
-        cex = 1.2, 
-        line = 1)
-  dev.off()
+  #mtext(output_name, 
+  #      outer = TRUE,
+  #      side = 3, 
+  #      cex = 1.2, 
+  #      line = 1)
+  #dev.off()
   
   # Now 2 PDF per significant hit: 1 is the heatmap and 1 is the geno & pheno trans/recon
   
@@ -1538,12 +1556,12 @@ plot_sig_hits_summary <- function(heat_tr, tr, g_mat, p_mat, annot, sig_hits, he
       # First heatmap
       single_hit <- g_mat[ , i, drop = FALSE]
       # Second/Third: Geno recon or trans & Pheno recon or trans
-      if (recon_or_trans == "trans"){
-        filename <- paste(filename_start, "tree_sig_hit_", counter , ".pdf", sep = "")
-      } else {
-        filename <- paste(filename_start, "tree_sig_hit_", counter , ".pdf", sep = "")
-      } 
-      pdf(filename, width = 16, height = 20)
+      #if (recon_or_trans == "trans"){
+      #  filename <- paste(filename_start, "tree_sig_hit_", counter , ".pdf", sep = "")
+      #} else {
+      #  filename <- paste(filename_start, "tree_sig_hit_", counter , ".pdf", sep = "")
+      #} 
+      #pdf(filename, width = 16, height = 20)
       par(mfrow = c(1, 2))
       par(mgp = c(3, 1, 0))
       par(oma = c(0, 0, 4, 0))
@@ -1591,12 +1609,12 @@ plot_sig_hits_summary <- function(heat_tr, tr, g_mat, p_mat, annot, sig_hits, he
          label.offset = 0.0001,
          edge.color = edge_color)
       
-      mtext(paste("Sig hit: ", hit_name, sep = ""), 
-            outer = TRUE,
-            side = 3, 
-            cex = 1.2, 
-            line = 1)
-      dev.off()
+     # mtext(paste("Sig hit: ", hit_name, sep = ""), 
+    #        outer = TRUE,
+    #        side = 3, 
+    #        cex = 1.2, 
+    #        line = 1)
+    #  dev.off()
     } # end subset on significant
   } # end for loop
 } # end plot_sig_hits_summary()
@@ -1747,11 +1765,10 @@ calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, 
   return(hit_pvals)
 } # end calculate_hit_pvals_corrected
 
-save_dropped_genotypes <- function(geno, keepers, save_dir, save_name){
+get_dropped_genotypes <- function(geno, keepers){
   dropped_genotype_names <- colnames(geno)[!keepers]
-  filename <- paste(save_dir, "/phyc_", save_name, "_genotypes_dropped_because_too_few_high_conf_trans_edges.txt", sep = "")
-  writeLines(dropped_genotype_names, con = filename, sep = "\n")
-} # end save_dropped_genotypes
+  return(dropped_genotype_names)
+} # end get_dropped_genotypes
 
 report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf_edges, geno_names, outdir, outname){
   num_high_confidence_transition_edges <- rep(0, length(genotype_transition))
@@ -1759,7 +1776,8 @@ report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf
     num_high_confidence_transition_edges[p] <- sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])
   }
   names(num_high_confidence_transition_edges) <- geno_names
-  write.table(num_high_confidence_transition_edges, file = paste(outdir, "/phyc_", outname, "_num_high_conf_trans_edges_per_geno.tsv", sep = ""), sep = "\t", quote= FALSE, col.names = FALSE, row.names = TRUE)
+  return(num_high_confidence_transition_edges)
+  #write.table(num_high_confidence_transition_edges, file = paste(outdir, "/phyc_", outname, "_num_high_conf_trans_edges_per_geno.tsv", sep = ""), sep = "\t", quote= FALSE, col.names = FALSE, row.names = TRUE)
 } # end report_num_high_confidence_trans_edge
 
 # END OF SCRIPT ---------------------------------------------------------------#
