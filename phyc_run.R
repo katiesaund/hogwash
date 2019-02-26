@@ -144,22 +144,32 @@ if (args$discrete_or_continuous == "continuous"){
   results_object$sig_pvals_transition     <- corrected_pvals_trans$sig_pvals
   results_object$sig_pvals_reconstruction <- corrected_pvals_recon$sig_pvals
   
+  
+  discrete_plots(args$tree, args$output_dir, args$output_name, args$alpha, 
+                 args$annot, args$perm, corrected_pvals_recon$hit_pvals, 
+                 corrected_pvals_trans$hit_pvals, pheno_recon_ordered_by_edges,
+                 geno_recon_ordered_by_edges, pheno_recon_and_conf$node_anc_rec, disc_recon_results, 
+                 high_confidence_edges, high_conf_ordered_by_edges)
+  
   # htmp_tr <- create_heatmap_compatible_tree(args$tree)
   # if(!is.null(args$annotation)){
   #   simple_annotation <- args$annotation[ , 1, drop = FALSE]
   # }else{
   #   simple_annotation <- NULL
   # }
-  
-  print("permuted_count")
-  print(str(disc_trans_results$permuted_count))
-  print(disc_trans_results$permuted_count)
-  #print(permuted_count)
-  
-  pdf(paste0(args$output_dir, "/phyc_temp_results_",  args$output_name, "_manhattan_plot.pdf"))
+
+  stop()
+ 
+  max_x <- max(disc_trans_results$permuted_count[[1]], disc_trans_results$observed_overlap[1]) # change to loop through sig hits
+  pdf(paste0(args$output_dir, "/phyc_temp_results_",  args$output_name, ".pdf"))
   make_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_trans$hit_pvals, args$alpha, "transition")
   make_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_recon$hit_pvals, args$alpha, "reconstruction")
-  # hist(disc_trans_results$permuted_count)
+  
+  hist(disc_trans_results$permuted_count[[1]], breaks = 500, 
+       xlim = c(0, max_x), 
+       main = paste0("pval = ",corrected_pvals_trans$hit_pvals[1, 1], sep = ""))
+  abline(v = disc_trans_results$observed_overlap[1], col = "red")
+  
   dev.off()
   # 
   # if (nrow(corrected_pvals_recon$sig_pvals) > 0){
