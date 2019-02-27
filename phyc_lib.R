@@ -1779,7 +1779,7 @@ discrete_plots <- function(tr, dir, name, a,
   print("A")
   for (j in 1:nrow(recon_hit_vals)){
     if (recon_hit_vals[j, 1] < a){
-      par(mfrow = c(1, 3), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
+      par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
       # pheno  
       plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1) # replaced j with 1:length(pheno_anc_rec)
       # geno
@@ -1831,9 +1831,9 @@ discrete_plots <- function(tr, dir, name, a,
       par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
       # pheno  
       print("C")
-      print(p_trans_edges)
-      plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1) # replaced j with 1:length(pheno_anc_rec)
-      plot_tree_with_colored_edges(tr, p_trans_edges, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype transitions:\n Red = transition; Black = no change"), annot, "recon", 1)
+      p_trans_edges_as_list <- list(p_trans_edges)
+      plot_tree_with_colored_edges(tr, pheno_as_list,         pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
+      plot_tree_with_colored_edges(tr, p_trans_edges_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype transitions:\n Red = transition; Black = no change"), annot, "recon", 1)
       # geno
       plot_tree_with_colored_edges(tr, g_recon_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
       plot_tree_with_colored_edges(tr, g_trans_edges, geno_confidence, "grey", "red", paste0(row.names(trans_hit_vals)[j], "\n Genotype transitions:\n Red = transition; Black = no change"), annot, "recon", j)
@@ -1851,18 +1851,23 @@ discrete_plots <- function(tr, dir, name, a,
       
       # edge heatmap - heatmap is tree edges, annotation is phenotype edges 
       par(mfrow = c(1,1))
-      p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
+      p_trans_edges[tr_and_pheno_hi_conf == 0] <- 2 # should be NA but it won't work correctedly TODO
+      p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
       colnames(p_mat) <- "pheno_transition"
       phenotype_annotation <- as.data.frame(p_mat)
-      g_mat <- as.matrix(g_recon_edges[[j]])
+      print(phenotype_annotation)
+      temp_g_trans_edges <- g_trans_edges[[j]]
+      temp_g_trans_edges[geno_confidence[[j]] == 0] <- NA 
+      g_mat <- as.matrix(temp_g_trans_edges)
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_transition"
+      print(g_mat)
       ann_colors = list(pheno_transition = c(no_transition = "white", transition = "purple"))
       pheatmap(
         g_mat, 
         main              = paste0(row.names(trans_hit_vals)[j], "\n Tree edges: genotype & phenotype transitions"),
         cluster_cols      = FALSE,
-        cluster_rows      = TRUE,
+        cluster_rows      = FALSE, 
         na_col            = "grey", 
         show_rownames     = FALSE,
         color             = c("white", "black"),
