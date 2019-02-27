@@ -1764,22 +1764,26 @@ report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf
 discrete_plots <- function(tr, dir, name, a, 
                            annot, num_perm, recon_hit_vals, 
                            trans_hit_vals, p_recon_edges, 
-                           g_recon_edges, pheno_anc_rec, recon_perm_obs_results, 
-                           tr_and_pheno_hi_conf, geno_confidence){
+                           g_recon_edges, pheno_anc_rec, 
+                           recon_perm_obs_results, trans_perm_obs_results, 
+                           tr_and_pheno_hi_conf, geno_confidence, 
+                           g_trans_edges, p_trans_edges){
   
   pdf(paste0(dir, "/phyc_temp_results_",  name, ".pdf"))
   # reconstruction first
   par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, recon_hit_vals, a, "reconstruction")
-  par(mfrow = c(2, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
   # loop through reconstruction sig hits: 
+  pheno_as_list <- list(p_recon_edges)
+  pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
+  print("A")
   for (j in 1:nrow(recon_hit_vals)){
     if (recon_hit_vals[j, 1] < a){
+      par(mfrow = c(1, 3), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
       # pheno  
-      # TODO LEFT OFF HERE BEFORE COFFEE 2019-02-26 work on plot_tree_with_coloreD_edges_next
-      # plot_tree_with_colored_edges(tr, pheno_anc_rec, tr_and_pheno_hi_conf, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
+      plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1) # replaced j with 1:length(pheno_anc_rec)
       # geno
-      # plot_tree_with_colored_edges(tr, g_recon_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
+      plot_tree_with_colored_edges(tr, g_recon_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
       # Permutation test 
       max_x <- max(recon_perm_obs_results$permuted_count[[j]], recon_perm_obs_results$observed_overlap[j]) # change to loop through sig hits
       hist(recon_perm_obs_results$permuted_count[[j]], 
@@ -1793,59 +1797,82 @@ discrete_plots <- function(tr, dir, name, a,
       abline(v = recon_perm_obs_results$observed_overlap[j], col = "red")
       
       # edge heatmap - heatmap is tree edges, annotation is phenotype edges 
+      par(mfrow = c(1,1))
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
       colnames(p_mat) <- "pheno_presence_absence"
       phenotype_annotation <- as.data.frame(p_mat)
-      #print("phenotype_annotation")
-      #print(head(phenotype_annotation))
-      #print("g_recon_edges[[j")
-      #print(head(g_recon_edges[[j]]))
-      #print(head(as.matrix(g_recon_edges[[j]])))
       g_mat <- as.matrix(g_recon_edges[[j]])
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_presence_absence"
-      
-      print(head(g_mat))
-      print(head(phenotype_annotation))
-      
-      ann_colors = list(
-        pheno_presence_absence = c(absent = "white", present = "blue")
-      )
-      
+      ann_colors = list(pheno_presence_absence = c(absent = "white", present = "blue"))
       pheatmap(
         g_mat, 
-        main          = paste0(row.names(recon_hit_vals)[j], "\n Tree edges: genotype & phenotype presence"),
-        cluster_cols  = FALSE,
-        cluster_rows  = FALSE,
-        na_col = "grey", 
-        show_rownames = FALSE,
-        color = c("white", "black"),
-        annotation_row = phenotype_annotation,
+        main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges: genotype & phenotype presence"),
+        cluster_cols      = FALSE,
+        cluster_rows      = TRUE, 
+        na_col            = "grey", 
+        show_rownames     = FALSE, 
+        color             = c("white", "black"),
+        annotation_row    = phenotype_annotation,
         annotation_colors = ann_colors, 
-        show_colnames = TRUE,
-        cellwidth = 20)
+        show_colnames     = TRUE,
+        cellwidth         = 20)
     }
   }
   
-  dev.off()
-  print("finished reconstruction plot")
-  # transition second 
-  par(mfrow = c(1, 1))
+ 
+  # transition second -- 2/27 it's still reconstruction; change to transition
+  print("B")
+  par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, trans_hit_vals, a, "transition")
-  #   
-  # par(mfrow = c(2, 3), mgp   = c(3, 1, 0), oma   = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
-  #   
-  # # loop through transition sig hits: 
-  #   # pheno  
-  #   plot_tree_with_colored_edges(tr, pheno_anc_rec, tr_and_pheno_hi_conf, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
-  #   # TODO update second pheno plot to be pheno transitions
-  #   plot_tree_with_colored_edges(tr, pheno_anc_rec, tr_and_pheno_hi_conf, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
-  #   
-  #   # geno
-  #   plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
-  #   plot_tree_with_colored_edges(tr, geno_transition,     geno_confidence, "grey", "red", "Genotype transition edge:\n Red = transition; Black = No transition", annot, "trans", j)
-  #   
-  
+  # loop through reconstruction sig hits: 
+  for (j in 1:nrow(trans_hit_vals)){
+    if (trans_hit_vals[j, 1] < a){
+      par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
+      # pheno  
+      print("C")
+      print(p_trans_edges)
+      plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1) # replaced j with 1:length(pheno_anc_rec)
+      plot_tree_with_colored_edges(tr, p_trans_edges, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype transitions:\n Red = transition; Black = no change"), annot, "recon", 1)
+      # geno
+      plot_tree_with_colored_edges(tr, g_recon_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
+      plot_tree_with_colored_edges(tr, g_trans_edges, geno_confidence, "grey", "red", paste0(row.names(trans_hit_vals)[j], "\n Genotype transitions:\n Red = transition; Black = no change"), annot, "recon", j)
+      # Permutation test 
+      max_x <- max(trans_perm_obs_results$permuted_count[[j]], trans_perm_obs_results$observed_overlap[j]) # change to loop through sig hits
+      hist(trans_perm_obs_results$permuted_count[[j]], 
+           breaks = num_perm/10, 
+           xlim = c(0, max_x), 
+           col = "grey", 
+           border = FALSE,
+           ylab = "Count", 
+           xlab = "# edges where genotype-phenotype transitions co-occur", 
+           main = paste0("pval = ", round(trans_hit_vals[j, 1], 4) , sep = ""))
+      abline(v = trans_perm_obs_results$observed_overlap[j], col = "red")
+      
+      # edge heatmap - heatmap is tree edges, annotation is phenotype edges 
+      par(mfrow = c(1,1))
+      p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
+      colnames(p_mat) <- "pheno_transition"
+      phenotype_annotation <- as.data.frame(p_mat)
+      g_mat <- as.matrix(g_recon_edges[[j]])
+      row.names(g_mat) <- c(1:nrow(g_mat))
+      colnames(g_mat) <- "genotype_transition"
+      ann_colors = list(pheno_transition = c(no_transition = "white", transition = "purple"))
+      pheatmap(
+        g_mat, 
+        main              = paste0(row.names(trans_hit_vals)[j], "\n Tree edges: genotype & phenotype transitions"),
+        cluster_cols      = FALSE,
+        cluster_rows      = TRUE,
+        na_col            = "grey", 
+        show_rownames     = FALSE,
+        color             = c("white", "black"),
+        annotation_row    = phenotype_annotation,
+        annotation_colors = ann_colors, 
+        show_colnames     = TRUE,
+        cellwidth         = 20)
+    }
+  }
+  dev.off()
 } # end discrete_plots()
 
 

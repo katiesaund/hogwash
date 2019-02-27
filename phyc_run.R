@@ -99,8 +99,8 @@ genotype                      <- genotype[ , geno_to_keep, drop = FALSE]
 
 if (args$discrete_or_continuous == "continuous"){
   # RUN PERMUTATION TEST ------------------------------------------------------#
-  results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
-  
+  results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_trans, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
+  # 2019-02-27 changed phenotype input from pheno_recon_edge_mat to pheno_trans, which it should be. 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_all_transitions <- get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals, args$alpha)
   
@@ -127,10 +127,10 @@ if (args$discrete_or_continuous == "continuous"){
   for (k in 1:ncol(genotype)){
     genotype_transition_edges[[k]] <- geno_trans[[k]]$transition
   }
-  branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
+  branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_trans$transition, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
   branch_overlap_recon <- count_hits_on_edges(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
   
-  disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
+  disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_trans$transition, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
   disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
   
   hit_pvals_trans <- disc_trans_results$hit_pvals
@@ -144,12 +144,15 @@ if (args$discrete_or_continuous == "continuous"){
   results_object$sig_pvals_transition     <- corrected_pvals_trans$sig_pvals
   results_object$sig_pvals_reconstruction <- corrected_pvals_recon$sig_pvals
   
+  pheno_plus_recon_by_edges <- c(phenotype_vector, pheno_recon_ordered_by_edges)
   
   discrete_plots(args$tree, args$output_dir, args$output_name, args$alpha, 
                  args$annot, args$perm, corrected_pvals_recon$hit_pvals, 
-                 corrected_pvals_trans$hit_pvals, pheno_recon_ordered_by_edges,
-                 geno_recon_ordered_by_edges, pheno_recon_and_conf$node_anc_rec, disc_recon_results, 
-                 high_confidence_edges, high_conf_ordered_by_edges)
+                 corrected_pvals_trans$hit_pvals, pheno_plus_recon_by_edges,
+                 geno_recon_ordered_by_edges, pheno_recon_and_conf$node_anc_rec, 
+                 disc_recon_results, disc_trans_results,  
+                 high_confidence_edges, high_conf_ordered_by_edges, 
+                 genotype_transition_edges, pheno_trans$transition)
   
   # htmp_tr <- create_heatmap_compatible_tree(args$tree)
   # if(!is.null(args$annotation)){
@@ -157,20 +160,6 @@ if (args$discrete_or_continuous == "continuous"){
   # }else{
   #   simple_annotation <- NULL
   # }
-
-  stop()
- 
-  max_x <- max(disc_trans_results$permuted_count[[1]], disc_trans_results$observed_overlap[1]) # change to loop through sig hits
-  pdf(paste0(args$output_dir, "/phyc_temp_results_",  args$output_name, ".pdf"))
-  make_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_trans$hit_pvals, args$alpha, "transition")
-  make_manhattan_plot(args$output_dir, args$output_name, corrected_pvals_recon$hit_pvals, args$alpha, "reconstruction")
-  
-  hist(disc_trans_results$permuted_count[[1]], breaks = 500, 
-       xlim = c(0, max_x), 
-       main = paste0("pval = ",corrected_pvals_trans$hit_pvals[1, 1], sep = ""))
-  abline(v = disc_trans_results$observed_overlap[1], col = "red")
-  
-  dev.off()
   # 
   # if (nrow(corrected_pvals_recon$sig_pvals) > 0){
   #   recon_heatmap_filename_start <- paste(args$output_dir, "/phyc_", args$output_name, "_reconstruction_", sep = "")
@@ -186,8 +175,6 @@ if (args$discrete_or_continuous == "continuous"){
   
   save_results_as_r_object(args$output_dir, args$output_name, results_object)
 }
-
-#plot_significant_hits("discrete", args$tree, args$alpha, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
 
 
 # END OF PHYC -----------------------------------------------------------------#
