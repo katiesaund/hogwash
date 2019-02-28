@@ -1501,7 +1501,7 @@ discrete_plots <- function(tr, dir, name, a,
     if (recon_hit_vals[j, 1] < a){
       par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
       # pheno
-      plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1) # replaced j with 1:length(pheno_anc_rec)
+      plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
       # geno
       plot_tree_with_colored_edges(tr, g_recon_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
       # Permutation test
@@ -1513,7 +1513,7 @@ discrete_plots <- function(tr, dir, name, a,
            border = FALSE,
            ylab = "Count",
            xlab = "# edges where genotype-phenotype co-occur",
-           main = paste0("pval = ", round(recon_hit_vals[j, 1], 4) , sep = ""))
+           main = paste0("Reconstructed geno & pheno overlap\npval=", round(recon_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = ""))
       abline(v = recon_perm_obs_results$observed_overlap[j], col = "red")
 
       # edge heatmap - heatmap is tree edges, annotation is phenotype edges
@@ -1521,13 +1521,17 @@ discrete_plots <- function(tr, dir, name, a,
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
       colnames(p_mat) <- "pheno_presence_absence"
       phenotype_annotation <- as.data.frame(p_mat)
-      g_mat <- as.matrix(g_recon_edges[[j]])
+
+      temp_g_recon_edges <- g_recon_edges[[j]]
+      temp_g_recon_edges[geno_confidence[[j]] == 0] <- NA
+      g_mat <- as.matrix(temp_g_recon_edges)
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_presence_absence"
+
       ann_colors = list(pheno_presence_absence = c(absent = "white", present = "blue"))
       pheatmap(
-        g_mat,
-        main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges: genotype & phenotype presence"),
+        mat               = g_mat,
+        main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type: genotype & phenotype presence"),
         cluster_cols      = FALSE,
         cluster_rows      = TRUE,
         na_col            = "grey",
@@ -1540,21 +1544,18 @@ discrete_plots <- function(tr, dir, name, a,
     }
   }
 
-
-  # transition second -- 2/27 it's still reconstruction; change to transition
-  print("B")
+  print("transition")
   par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, trans_hit_vals, a, "transition")
-  # loop through reconstruction sig hits:
+  # loop through transition sig hits:
   for (j in 1:nrow(trans_hit_vals)){
     if (trans_hit_vals[j, 1] < a){
       par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
-      # pheno
-      print("C")
+      # Plot pheno
       p_trans_edges_as_list <- list(p_trans_edges)
       plot_tree_with_colored_edges(tr, pheno_as_list,         pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
       plot_tree_with_colored_edges(tr, p_trans_edges_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype transitions:\n Red = transition; Black = no change"), annot, "recon", 1)
-      # geno
+      # Plot geno
       plot_tree_with_colored_edges(tr, g_recon_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
       plot_tree_with_colored_edges(tr, g_trans_edges, geno_confidence, "grey", "red", paste0(row.names(trans_hit_vals)[j], "\n Genotype transitions:\n Red = transition; Black = no change"), annot, "recon", j)
       # Permutation test
@@ -1566,7 +1567,7 @@ discrete_plots <- function(tr, dir, name, a,
            border = FALSE,
            ylab = "Count",
            xlab = "# edges where genotype-phenotype transitions co-occur",
-           main = paste0("pval = ", round(trans_hit_vals[j, 1], 4) , sep = ""))
+           main = paste0("Geno & pheno transition overlap\npval=", round(trans_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = "")) # TODO add rank pvalue
       abline(v = trans_perm_obs_results$observed_overlap[j], col = "red")
 
       # edge heatmap - heatmap is tree edges, annotation is phenotype edges
@@ -1575,13 +1576,11 @@ discrete_plots <- function(tr, dir, name, a,
       p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
       colnames(p_mat) <- "pheno_transition"
       phenotype_annotation <- as.data.frame(p_mat)
-      print(phenotype_annotation)
       temp_g_trans_edges <- g_trans_edges[[j]]
       temp_g_trans_edges[geno_confidence[[j]] == 0] <- NA
       g_mat <- as.matrix(temp_g_trans_edges)
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_transition"
-      print(g_mat)
       ann_colors = list(pheno_transition = c(no_transition = "white", transition = "purple"))
       pheatmap(
         g_mat,

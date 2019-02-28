@@ -127,13 +127,10 @@ run_phyc <- function(args){
     results_object$sig_pvals_transition     <- corrected_pvals_trans$sig_pvals
     results_object$sig_pvals_reconstruction <- corrected_pvals_recon$sig_pvals
 
-    pheno_plus_recon_by_edges <- c(phenotype_vector, pheno_recon_ordered_by_edges)
+    #pheno_plus_recon_by_edges <- c(phenotype_vector, pheno_recon_ordered_by_edges)
+    # ^ this was wrong because it's adding the phenotype vector twice to the ancestral reconstruction, which aparently already had it.
 
-    print("test discrete")
-    print(length(p_recon_edges))
-    print(length(g_recon_edges[[1]]))
-    stop()
-    discrete_plots(tr = args$tree,
+    discrete_plots(tr = args$tree, # add a test to check that p_recon_edges and g_recon_edges have Nedge(tree)
                    dir = args$output_dir,
                    name = args$output_name,
                    a = args$alpha,
@@ -141,9 +138,9 @@ run_phyc <- function(args){
                    num_perm = args$perm,
                    recon_hit_vals = corrected_pvals_recon$hit_pvals,
                    trans_hit_vals = corrected_pvals_trans$hit_pvals,
-                   p_recon_edges = pheno_plus_recon_by_edges,
+                   p_recon_edges = pheno_recon_ordered_by_edges,
                    g_recon_edges = geno_recon_ordered_by_edges,
-                   pheno_anc_recon  = pheno_recon_and_conf$node_anc_rec,
+                   # pheno_anc_recon  = pheno_recon_and_conf$node_anc_rec,
                    recon_perm_obs_results = disc_recon_results,
                    trans_perm_obs_results = disc_trans_results,
                    tr_and_pheno_hi_conf = high_confidence_edges,
