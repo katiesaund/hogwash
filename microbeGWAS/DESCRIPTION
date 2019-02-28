@@ -1,6 +1,6 @@
 Package: microbeGWAS
 Type: Package
-Title: GWAS on Microbial Data
+Title: microbeGWAS: GWAS for Microbial data 
 Version: 0.1.0
 Author: Katie Saund
 Maintainer: The package maintainer <yourself@somewhere.net>
@@ -9,3 +9,15 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    ape,
+    phytools,
+    phangorn,
+    pheatmap,
+    grid,
+    gridExtra,
+    ggplot2,
+    truncnorm
+Suggests: 
+    testthat
+    
