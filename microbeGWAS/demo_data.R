@@ -12,11 +12,12 @@ test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_forma
 test_geno  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_snp_stop.tsv"
 test_annot <- NULL
 test_dir   <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-25_simplify_phyc_output/data"
-test_name  <- "fqR_snp_stop"
+test_name  <- "fqR_gene_built_from_stop_snps"
 test_perm  <- "1000"
 test_alpha <- "0.3"
 test_bootstrap <- "0.7"
 test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
+test_built_from_snps <- TRUE
 args       <- NULL
 args$test                   <- FALSE
 args$phenotype              <- read_in_tsv_matrix(test_pheno)
@@ -29,6 +30,7 @@ args$alpha                  <- as.numeric(test_alpha)
 args$annotation             <- NULL #read_in_tsv_matrix(test_annot)
 args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$alpha, args$annot)
 args$bootstrap_cutoff       <- test_bootstrap
-
+args$gene_snp_lookup        <- read_in_tsv_matrix(test_gene_snp_lookup)
+args$built_from_snps        <- test_built_from_snps
 
 run_phyc(args)

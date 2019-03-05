@@ -25,7 +25,7 @@
 
 # FUNCTIONS FOR PHYC ----------------------------------------------------------#
 ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_threshold){
-  # TO DO:
+  # TODO:
   # 1) Break this function into two subfuctions: one for continuous, one for discrete
   # 2) For those two subfunctions:
   #    a) subfunctionalize
@@ -939,7 +939,6 @@ read_in_arguments <- function(args){
     test                   <- FALSE
     phenotype              <- read_in_tsv_matrix(args[1])
     tree                   <- read.tree(args[2])
-    # added is.rooted if statement on 2018-09-25 to deal with odd midpoint rooting issue for PSM dataset.
     if (!is.rooted(tree)){
       tree <- midpoint(tree)
     }
@@ -1007,7 +1006,8 @@ read_in_tsv_matrix <- function(mat){
                      sep = "\t",
                      row.names = 1,
                      header = TRUE,
-                     stringsAsFactors = FALSE)
+                     stringsAsFactors = FALSE,
+                     check.names = FALSE)
   temp <- as.matrix(temp)
 
   # Check and return output ----------------------------------------------------
