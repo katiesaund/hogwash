@@ -1,11 +1,10 @@
 library(microbeGWAS)
 library(ape)       # ape::ace function (ancestral reconstruction)
 library(phytools)  # phylogenetic tree function library
-library(ComplexHeatmap) # to make final plots for discrete phenotypes
-library(phangorn)
-library(pheatmap) # plots for continuous phenotypes
 library(grid) # plots for continuous phenotypes
 library(gridExtra) # plots for continuous phenotypes
+library(phangorn)
+library(pheatmap) # plots for continuous phenotypesq
 library(ggplot2) # plots for continuous phenotypes
 
 test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_pheno.tsv"
@@ -17,6 +16,7 @@ test_name  <- "fqR_snp_stop"
 test_perm  <- "1000"
 test_alpha <- "0.3"
 test_bootstrap <- "0.7"
+test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
 args       <- NULL
 args$test                   <- FALSE
 args$phenotype              <- read_in_tsv_matrix(test_pheno)

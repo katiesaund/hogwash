@@ -19,7 +19,6 @@ library(microbeGWAS)
 # READ IN ARGUMENTS -----------------------------------------------------------#
 args <- commandArgs(trailingOnly = TRUE) # Grab arguments from the PBS script
 args <- read_in_arguments(args)
-print("hi brad")
 run_phyc(args)
 
 # END OF PHYC -----------------------------------------------------------------#
