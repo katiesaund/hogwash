@@ -1,3 +1,12 @@
+library(microbeGWAS)
+library(ape)       # ape::ace function (ancestral reconstruction)
+library(phytools)  # phylogenetic tree function library
+library(ComplexHeatmap) # to make final plots for discrete phenotypes
+library(phangorn)
+library(pheatmap) # plots for continuous phenotypes
+library(grid) # plots for continuous phenotypes
+library(gridExtra) # plots for continuous phenotypes
+library(ggplot2) # plots for continuous phenotypes
 
 test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_pheno.tsv"
 test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR.tree"
