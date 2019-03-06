@@ -10,24 +10,10 @@ run_phyc <- function(args){
   } else {
     genotypes_to_drop_because_not_present <- colnames(args$genotype)[colSums(args$genotype) == 0]
     genotype <- args$genotype[ , colSums(args$genotype) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
-    genotypes_to_drop_because_not_present
-
-    print(head(genotypes_to_drop_because_not_present))
-    print(head(args$gene_snp_lookup[ , 1]))
-    print(head(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present))
-
-
     gene_snp_lookup <- args$gene_snp_lookup[!(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
-
-    print("dimensions check")
-    print(length(genotypes_to_drop_because_not_present))
-    print(dim(genotype))
-    print(dim(args$genotype))
-    print(dim(gene_snp_lookup))
   }
 
   phenotype_vector <- convert_matrix_to_vector(args$phenotype) # TODO add check that it's possible to have phenotype convergence
-
 
   # ---------------------------------------------------------------------------#
   # PHYC
@@ -57,63 +43,68 @@ run_phyc <- function(args){
   if (args$built_from_snps){
     # TODO change this if statement into a function
     # CONVERT SNPS INTO GENES HERE
-    tip_nodes_by_snp_mat <- matrix(0, nrow = (Nnode(args$tree) + Ntip(args$tree)), ncol = ncol(genotype))
 
-    if (nrow(tip_nodes_by_snp_mat) != length(geno_recon_and_conf[[k]]$tip_and_node_recon)){
-      stop("mismatch in size")
-    }
-
-    for (k in 1:ncol(genotype)){
-      tip_nodes_by_snp_mat[ , k] <- geno_recon_and_conf[[k]]$tip_and_node_recon
-    }
-    row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
-    colnames(tip_nodes_by_snp_mat) <- colnames(genotype)
-
-    if (gene_snp_lookup[ , 1, drop = TRUE] != colnames(tip_nodes_by_snp_mat)){
-      stop("gene lookup size mismatch")
-    }
-
-    tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_snp_lookup[ , 2, drop = TRUE]))
-    if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
-      stop("rbind didn't work")
-    }
-
-    unique_genes <- unique(gene_snp_lookup[ , 2])
-    gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
-    for (j in 1:length(unique_genes)){
-      temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) -1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
-      class(temp_mat) <- "numeric"
-      temp_column <- rowSums(temp_mat)
-      gene_mat_built_from_snps[ , j] <- temp_column
-    }
-
-    gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
-    class(gene_mat_built_from_snps) <- "numeric"
-
-    colnames(gene_mat_built_from_snps) <- unique_genes
-    row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
-
-    gene_list_built_from_snps <- rep(list(0), length(unique_genes))
-    for (m in 1:length(unique_genes)){
-      gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
-    }
-    names(gene_list_built_from_snps) <- unique_genes
+    # tip_and_node_ancestral_reconstruction
+    geno_recon_and_conf$tip_and_node_recon <- build_gene_anc_recon_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup)
+    # node_ancestral_reconstruction
+    print("A")
+    geno_recon_and_conf$node_anc_rec <- build_node_anc_recon_from_gene_list(geno_recon_and_conf, args$tree) # must be after build_gene_anc_recon_from_snp so tip_and_node_recon is updated to be gene not snps
+    # tip and node confidence in ancestral reconstruction
+    print("B")
+    geno_recon_and_conf$tip_and_node_rec_conf <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
+    print("C")
+    # tip_nodes_by_snp_mat <- matrix(0, nrow = (Nnode(args$tree) + Ntip(args$tree)), ncol = ncol(genotype))
+    #
+    # if (nrow(tip_nodes_by_snp_mat) != length(geno_recon_and_conf[[k]]$tip_and_node_recon)){
+    #   stop("mismatch in size")
+    # }
+    #
+    # for (k in 1:ncol(genotype)){
+    #   tip_nodes_by_snp_mat[ , k] <- geno_recon_and_conf[[k]]$tip_and_node_recon
+    # }
+    # row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
+    # colnames(tip_nodes_by_snp_mat) <- colnames(genotype)
+    #
+    # if (gene_snp_lookup[ , 1, drop = TRUE] != colnames(tip_nodes_by_snp_mat)){
+    #   stop("gene lookup size mismatch")
+    # }
+    #
+    # tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_snp_lookup[ , 2, drop = TRUE]))
+    # if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
+    #   stop("rbind didn't work")
+    # }
+    #
+    # unique_genes <- unique(gene_snp_lookup[ , 2])
+    # gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
+    # for (j in 1:length(unique_genes)){
+    #   temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) -1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    #   class(temp_mat) <- "numeric"
+    #   temp_column <- rowSums(temp_mat)
+    #   gene_mat_built_from_snps[ , j] <- temp_column
+    # }
+    #
+    # gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
+    # class(gene_mat_built_from_snps) <- "numeric"
+    #
+    # colnames(gene_mat_built_from_snps) <- unique_genes
+    # row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
+    #
+    # gene_list_built_from_snps <- rep(list(0), length(unique_genes))
+    # for (m in 1:length(unique_genes)){
+    #   gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
+    # }
+    # names(gene_list_built_from_snps) <- unique_genes
 
     # end ancestral reconstruction of nodes plus tips
 
-    # TODO assign geno_recon_and_conf[[]]$tip_and_node_recon <- gene_list_built_from_snps
     # TODO create a test to check/viz that I did the above assignments correctly and started from the correct piece of data.
     # TODO how do I reconcile geno_recon_and_conf[[]] with node_anc_rec and tip_and_node_rec_conf given the new tip_and_node_recon?
       # todo repeat a similar process with confidence and just the node anc reconstruction
-      # can I build the node_anc_rec by just removing the tips from each entry of the list? I think so... will need to check if this is accurate.
 
-    # node_anc_recon
-    gene_list_built_from_snps_just_node_anc_rec <- rep(list(0), length(unique_genes))
-    for (m in 1:length(unique_genes)){
-      gene_list_built_from_snps_just_node_anc_rec[[m]] <- gene_list_built_from_snps[[m]][(Ntip(args$tree) + 1):(Ntip(args$tree) + Nedge(args$tree))]
-    }
-
-
+    #gene_list_built_from_snps_just_node_anc_rec <- rep(list(0), length(unique_genes))
+    #for (m in 1:length(unique_genes)){
+    #  gene_list_built_from_snps_just_node_anc_rec[[m]] <- gene_list_built_from_snps[[m]][(Ntip(args$tree) + 1):(Ntip(args$tree) + Nedge(args$tree))]
+    #}
   }
 
 
