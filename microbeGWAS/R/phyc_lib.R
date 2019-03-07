@@ -1464,10 +1464,29 @@ get_dropped_genotypes <- function(geno, keepers){
 } # end get_dropped_genotypes
 
 report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf_edges, geno_names, outdir, outname){
-  num_high_confidence_transition_edges <- rep(0, length(genotype_transition))
-  for (p in 1:length(genotype_transition)){
+  num_high_confidence_transition_edges <- rep(0, length(high_conf_edges))
+  print("length of high conf edges")
+  print(length(high_conf_edges))
+  print("length geno transition")
+  print(length(genotype_transition$transition))
+  print(length(genotype_transition))
+
+  print("head geno trans")
+  print(head(genotype_transition))
+
+  print("first one")
+  print(genotype_transition[[1]]$transition)
+
+  print(high_conf_edges[[1]])
+
+  print("sum of first one")
+  print(sum(genotype_transition[[1]]$transition * high_conf_edges[[1]]))
+
+  for (p in 1:length(high_conf_edges)){
     num_high_confidence_transition_edges[p] <- sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])
   }
+
+  print("hi")
   names(num_high_confidence_transition_edges) <- geno_names
   return(num_high_confidence_transition_edges)
   #write.table(num_high_confidence_transition_edges, file = paste(outdir, "/phyc_", outname, "_num_high_conf_trans_edges_per_geno.tsv", sep = ""), sep = "\t", quote= FALSE, col.names = FALSE, row.names = TRUE)
@@ -1537,7 +1556,7 @@ discrete_plots <- function(tr, dir, name, a,
      cluster_cols  = FALSE,
      na_col = "grey",
      cluster_rows  = FALSE,
-     show_rownames = FALSE,
+     show_rownames = TRUE,
      color = c("white", "black"),
      annotation_col = column_annot_ordered_by_p_val,
      annotation_row = phenotype_annotation,
@@ -1550,7 +1569,7 @@ discrete_plots <- function(tr, dir, name, a,
      main          = paste0("Edges: genotype & phenotype presence/absence"),
      cluster_cols  = TRUE,
      cluster_rows  = FALSE,
-     show_rownames = FALSE,
+     show_rownames = TRUE,
      color = c("white", "black"),
      annotation_col = column_annot_ordered_by_p_val,
      annotation_row = phenotype_annotation,
@@ -1664,7 +1683,7 @@ discrete_plots <- function(tr, dir, name, a,
     cluster_cols  = FALSE,
     na_col = "grey",
     cluster_rows  = FALSE,
-    show_rownames = FALSE,
+    show_rownames = TRUE,
     color = c("white", "black"),
     annotation_col = column_annot_ordered_by_p_val,
     annotation_row = phenotype_annotation,
@@ -1677,7 +1696,7 @@ discrete_plots <- function(tr, dir, name, a,
     main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
     cluster_cols  = TRUE,
     cluster_rows  = FALSE,
-    show_rownames = FALSE,
+    show_rownames = TRUE,
     color = c("white", "black"),
     annotation_col = column_annot_ordered_by_p_val,
     annotation_row = phenotype_annotation,
@@ -1766,7 +1785,6 @@ build_gene_anc_recon_from_snp <- function(tr, geno, g_reconstruction_and_confide
   if (gene_to_snp_lookup_table[ , 1, drop = TRUE] != colnames(tip_nodes_by_snp_mat)){
     stop("gene lookup size mismatch")
   }
-  print("here")
 
   tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
   if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
@@ -1845,6 +1863,75 @@ build_gene_confidence_from_snp <- function(tip_and_node_reconstruction_confidenc
 
   return(gene_list_built_from_snps)
 } # end build_gene_confidence_from_snp()
+
+
+build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_snp_lookup_table){
+  edges_by_snp_mat <- matrix(0, nrow = Nedge(tr), ncol = ncol(geno))
+  if (nrow(edges_by_snp_mat) != length(geno_transition[[1]]$transition)){
+    stop("mismatch in size")
+  }
+  for (k in 1:ncol(geno)){
+    edges_by_snp_mat[ , k] <- geno_transition[[k]]$transition
+  }
+  row.names(edges_by_snp_mat) <- c(1:nrow(edges_by_snp_mat))
+  colnames(edges_by_snp_mat) <- colnames(geno)
+
+  if (gene_to_snp_lookup_table[ , 1, drop = TRUE] != colnames(edges_by_snp_mat)){
+    stop("gene lookup size mismatch")
+  }
+
+  edges_by_snp_mat_with_gene_id <- rbind(edges_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
+  if (nrow(edges_by_snp_mat_with_gene_id) != (nrow(edges_by_snp_mat) + 1)){
+    stop("rbind didn't work")
+  }
+  unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
+  gene_mat_built_from_snps <- matrix(0, nrow = nrow(edges_by_snp_mat), ncol = length(unique_genes))
+  for (j in 1:length(unique_genes)){
+    temp_mat <- edges_by_snp_mat_with_gene_id[1:(nrow(edges_by_snp_mat_with_gene_id) - 1) , edges_by_snp_mat_with_gene_id[nrow(edges_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    class(temp_mat) <- "numeric"
+    temp_column <- rowSums(temp_mat)
+    gene_mat_built_from_snps[ , j] <- temp_column
+  }
+
+  gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
+  class(gene_mat_built_from_snps) <- "numeric"
+
+  colnames(gene_mat_built_from_snps) <- unique_genes
+  row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
+
+  gene_list_built_from_snps <- rep(list(0), length(unique_genes))
+  for (m in 1:length(unique_genes)){
+    gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
+  }
+  names(gene_list_built_from_snps) <- unique_genes
+
+  return(gene_list_built_from_snps)
+} # end build_gene_trans_from_snp_trans()
+
+
+build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
+  unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
+  samples_by_genes <- matrix(0, nrow = nrow(geno), ncol = length(unique_genes))
+  colnames(samples_by_genes) <- unique_genes
+  row.names(samples_by_genes) <- row.names(geno)
+
+
+  snp_geno_with_gene_id <- rbind(geno, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
+  if (nrow(snp_geno_with_gene_id) != (nrow(geno) + 1)){
+    stop("rbind didn't work")
+  }
+
+  for (j in 1:length(unique_genes)){
+    temp_mat <- snp_geno_with_gene_id[1:(nrow(snp_geno_with_gene_id) - 1) , snp_geno_with_gene_id[nrow(snp_geno_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    class(temp_mat) <- "numeric"
+    temp_column <- rowSums(temp_mat)
+    samples_by_genes[ , j] <- temp_column
+  }
+
+  samples_by_genes <- samples_by_genes > 0
+  class(samples_by_genes) <- "numeric"
+  return(samples_by_genes)
+}
 
 
 # END OF SCRIPT ---------------------------------------------------------------#

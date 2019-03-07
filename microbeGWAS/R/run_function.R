@@ -8,9 +8,14 @@ run_phyc <- function(args){
     genotype <- simplified_genotype$mat
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
   } else {
+    print("dim args$genotype")
+    print(dim(args$genotype))
     genotypes_to_drop_because_not_present <- colnames(args$genotype)[colSums(args$genotype) == 0]
     genotype <- args$genotype[ , colSums(args$genotype) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
     gene_snp_lookup <- args$gene_snp_lookup[!(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
+    unique_genes <- unique(gene_snp_lookup[ , 2])
+    print("length of unique genes")
+    print(length(unique_genes))
   }
 
   phenotype_vector <- convert_matrix_to_vector(args$phenotype) # TODO add check that it's possible to have phenotype convergence
@@ -33,87 +38,99 @@ run_phyc <- function(args){
 
   # ANCESTRAL RECONSTRUCTION OF GENOTYPES ---------------------------------------#
   # INIATLIAZE DATA STRUCTS
-  geno_recon_and_conf <- geno_trans <- geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
+  geno_recon_and_conf <- geno_trans <- rep(list(0), ncol(genotype))
 
   # PERFORM ANCESTRAL RECONSTRUCTION
   for(k in 1:ncol(genotype)){
     geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(args$tree, genotype, k, "discrete", args$bootstrap_cutoff)
   }
 
-  if (args$built_from_snps){
-    # TODO change this if statement into a function
-    # CONVERT SNPS INTO GENES HERE
+  print("original geno_and_recon_conf length")
+  print(length(geno_recon_and_conf))
 
-    # tip_and_node_ancestral_reconstruction
-    geno_recon_and_conf$tip_and_node_recon <- build_gene_anc_recon_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup)
-    # node_ancestral_reconstruction
-    print("A")
-    geno_recon_and_conf$node_anc_rec <- build_node_anc_recon_from_gene_list(geno_recon_and_conf, args$tree) # must be after build_gene_anc_recon_from_snp so tip_and_node_recon is updated to be gene not snps
-    # tip and node confidence in ancestral reconstruction
-    print("B")
-    geno_recon_and_conf$tip_and_node_rec_conf <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
-    print("C")
-    # tip_nodes_by_snp_mat <- matrix(0, nrow = (Nnode(args$tree) + Ntip(args$tree)), ncol = ncol(genotype))
-    #
-    # if (nrow(tip_nodes_by_snp_mat) != length(geno_recon_and_conf[[k]]$tip_and_node_recon)){
-    #   stop("mismatch in size")
-    # }
-    #
-    # for (k in 1:ncol(genotype)){
-    #   tip_nodes_by_snp_mat[ , k] <- geno_recon_and_conf[[k]]$tip_and_node_recon
-    # }
-    # row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
-    # colnames(tip_nodes_by_snp_mat) <- colnames(genotype)
-    #
-    # if (gene_snp_lookup[ , 1, drop = TRUE] != colnames(tip_nodes_by_snp_mat)){
-    #   stop("gene lookup size mismatch")
-    # }
-    #
-    # tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_snp_lookup[ , 2, drop = TRUE]))
-    # if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
-    #   stop("rbind didn't work")
-    # }
-    #
-    # unique_genes <- unique(gene_snp_lookup[ , 2])
-    # gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
-    # for (j in 1:length(unique_genes)){
-    #   temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) -1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
-    #   class(temp_mat) <- "numeric"
-    #   temp_column <- rowSums(temp_mat)
-    #   gene_mat_built_from_snps[ , j] <- temp_column
-    # }
-    #
-    # gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
-    # class(gene_mat_built_from_snps) <- "numeric"
-    #
-    # colnames(gene_mat_built_from_snps) <- unique_genes
-    # row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
-    #
-    # gene_list_built_from_snps <- rep(list(0), length(unique_genes))
-    # for (m in 1:length(unique_genes)){
-    #   gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
-    # }
-    # names(gene_list_built_from_snps) <- unique_genes
-
-    # end ancestral reconstruction of nodes plus tips
-
-    # TODO create a test to check/viz that I did the above assignments correctly and started from the correct piece of data.
-    # TODO how do I reconcile geno_recon_and_conf[[]] with node_anc_rec and tip_and_node_rec_conf given the new tip_and_node_recon?
-      # todo repeat a similar process with confidence and just the node anc reconstruction
-
-    #gene_list_built_from_snps_just_node_anc_rec <- rep(list(0), length(unique_genes))
-    #for (m in 1:length(unique_genes)){
-    #  gene_list_built_from_snps_just_node_anc_rec[[m]] <- gene_list_built_from_snps[[m]][(Ntip(args$tree) + 1):(Ntip(args$tree) + Nedge(args$tree))]
-    #}
-  }
-
-
-  # IDENTIFY TRANSITION EDGES AND REFORMAT
+  print("0")
   for (k in 1:ncol(genotype)){
     geno_trans[[k]] <- identify_transition_edges(args$tree, genotype, k, geno_recon_and_conf[[k]]$node_anc_rec, "discrete")
-    geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
-    geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
   }
+
+  if (args$built_from_snps){
+    # TODO change this if statement into a function
+    print("1")
+    # CONVERT SNPS INTO GENES HERE
+    # tip_and_node_ancestral_reconstruction
+    geno_recon_and_confidence_tip_node_recon <- build_gene_anc_recon_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup) # grouped by gene now
+    # geno_recon_and_conf$tip_and_node_recon <- build_gene_anc_recon_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup) # grouped by gene now
+    print("length geno_recon_and_conf 1")
+    print(length(geno_recon_and_confidence_tip_node_recon))
+
+    print("2")
+    geno_recon_and_confidence_tip_node_confidence <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
+    # geno_recon_and_conf$tip_and_node_rec_conf <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
+    print("length geno_recon_and_conf 2")
+    print(length(geno_recon_and_confidence_tip_node_confidence))
+    print("3")
+    geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, geno_trans, gene_snp_lookup)
+    print("dim genotype as snps")
+    print(dim(genotype))
+    print(row.names(genotype))
+    genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup)
+    print("dim genotype as genes")
+    print(dim(genotype))
+    simplified_genotype <- reduce_redundancy(genotype, args$tree, args$output_dir, args$output_name) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
+    genotype <- simplified_genotype$mat
+    print("dim genotype as reduced genes")
+    print(dim(genotype))
+    results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
+    genes_to_keep_in_consideration <- !(unique_genes %in% simplified_genotype$dropped_genotype_names)
+
+    # remove redundancy from geno trans, geno_recon_and_confdience_tip_node_recon, and node_confidence
+    print("length of non reduced size")
+    print(length(geno_trans))
+    print(length(geno_recon_and_confidence_tip_node_recon))
+    print(length(geno_recon_and_confidence_tip_node_confidence))
+    geno_trans <- geno_trans[genes_to_keep_in_consideration]
+
+    dummy <- geno_trans
+    geno_trans <- rep(list(NULL), length(dummy))
+    print(dummy[1])
+    print(as.numeric(as.character(unlist(dummy[1]))))
+    for (i in 1:length(dummy)){
+      geno_trans[[i]]$transition <- as.numeric(as.character(unlist((dummy[i]))))
+    }
+
+    print("test")
+    print(geno_trans)
+    # temp <- geno_trans
+    # geno_trans <- NULL
+    # geno_trans$transition <- temp
+    # geno_trans$dummy <- temp
+    # temp <- NULL
+    geno_recon_and_confidence_tip_node_recon <- geno_recon_and_confidence_tip_node_recon[genes_to_keep_in_consideration]
+    geno_recon_and_confidence_tip_node_confidence <- geno_recon_and_confidence_tip_node_confidence[genes_to_keep_in_consideration]
+    print("length of reduced sized")
+    print(length(geno_trans))
+    print(length(geno_recon_and_confidence_tip_node_recon))
+    print(length(geno_recon_and_confidence_tip_node_confidence))
+
+    geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
+    for (k in 1:ncol(genotype)){
+      geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_recon[[k]],      args$tree)
+      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_confidence[[k]], args$tree)
+    }
+
+    # TODO create a test to check/viz that I did the above assignments correctly and started from the correct piece of data.
+  } else {
+    # IDENTIFY TRANSITION EDGES AND REFORMAT
+    for (k in 1:ncol(genotype)){
+      geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
+      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
+    }
+  }
+
+  print("length geno_conf_ordered_by_edges pre A")
+  print(length(geno_conf_ordered_by_edges))
+
+  print("A")
 
   # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
   # TREE BOOTSTRAP, PHENOTYPUE RECONSTRUCTION CONFIDENCE, AND EDGE LENGTHS
@@ -125,22 +142,33 @@ run_phyc <- function(args){
     all_high_confidence_edges[[k]] <- as.numeric(geno_conf_ordered_by_edges[[k]] + high_confidence_edges == 2)
   }
 
+  print("B")
+
   # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#
   results_object$high_confidence_trasition_edges <- high_confidence_edges
+  print("foo")
+  print(str(geno_trans))
+  print(str(all_high_confidence_edges))
   num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype), args$output_dir, args$output_name)
+  print("Bar")
   results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
+
+  print("B1")
 
   # KEEP ONLY GENOTYPES WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES ----#
   geno_to_keep                  <- keep_at_least_two_high_conf_trans_edges(geno_trans, all_high_confidence_edges)
+  print("B2")
   geno_recon_ordered_by_edges   <- geno_recon_ordered_by_edges[geno_to_keep]
   high_conf_ordered_by_edges    <- all_high_confidence_edges[geno_to_keep]
   geno_trans                    <- geno_trans[geno_to_keep]
 
+  print("B3")
   dropped_genotypes <- get_dropped_genotypes(genotype, geno_to_keep)
   results_object$dropped_genotypes <- dropped_genotypes
 
   genotype                      <- genotype[ , geno_to_keep, drop = FALSE]
 
+  print("C")
   # break following if else into two seperate functions
   if (args$discrete_or_continuous == "continuous"){
     # RUN PERMUTATION TEST ------------------------------------------------------#
@@ -164,7 +192,7 @@ run_phyc <- function(args){
     save_results_as_r_object(args$output_dir, args$output_name, results_object)
 
   } else { # discrete phenotype
-
+    print("D")
     genotype_transition_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
       genotype_transition_edges[[k]] <- geno_trans[[k]]$transition
@@ -177,7 +205,7 @@ run_phyc <- function(args){
 
     hit_pvals_trans <- disc_trans_results$hit_pvals
     hit_pvals_recon <- disc_recon_results$hit_pvals
-
+    print("E")
     corrected_pvals_trans <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_trans, args$alpha)
     corrected_pvals_recon <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_recon, args$alpha)
 
@@ -186,6 +214,7 @@ run_phyc <- function(args){
     results_object$sig_pvals_transition     <- corrected_pvals_trans$sig_pvals
     results_object$sig_pvals_reconstruction <- corrected_pvals_recon$sig_pvals
 
+    print("F")
     discrete_plots(tr = args$tree, # add a test to check that p_recon_edges and g_recon_edges have Nedge(tree)
                    dir = args$output_dir,
                    name = args$output_name,
