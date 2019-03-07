@@ -121,6 +121,7 @@ run_phyc <- function(args){
     # TODO create a test to check/viz that I did the above assignments correctly and started from the correct piece of data.
   } else {
     # IDENTIFY TRANSITION EDGES AND REFORMAT
+    geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
       geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
       geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
@@ -199,6 +200,9 @@ run_phyc <- function(args){
     }
     branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_trans$transition,       high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
     branch_overlap_recon <- count_hits_on_edges(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
+
+    results_object$contingency_table_recon <- create_contingency_table(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges)
+    results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges,   pheno_trans$trasition)
 
     disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_trans$transition,       args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
     disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)

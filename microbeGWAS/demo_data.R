@@ -8,32 +8,32 @@ library(pheatmap) # plots for continuous phenotypesq
 library(ggplot2) # plots for continuous phenotypes
 
 
-# gene test built from SNPS
-test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_pheno.tsv"
-test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR.tree"
-test_geno  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_snp_stop.tsv"
-test_annot <- NULL
-test_dir   <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-06_gwas_gene_from_snp/data/"
-test_name  <- "fqR_gene_built_from_stop_snps"
-test_perm  <- "1000"
-test_alpha <- "0.3"
-test_bootstrap <- "0.7"
-test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
-test_built_from_snps <- TRUE
-
-
-# # gene test not built from SNPs
+# # gene test built from SNPS
 # test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_pheno.tsv"
 # test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR.tree"
-# test_geno  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_gene_stop.tsv"
+# test_geno  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_snp_stop.tsv"
 # test_annot <- NULL
 # test_dir   <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-06_gwas_gene_from_snp/data/"
-# test_name  <- "fqR_gene_stop"
+# test_name  <- "fqR_gene_built_from_stop_snps"
 # test_perm  <- "1000"
-# test_alpha <- "0.3"
+# test_alpha <- "0.15"
 # test_bootstrap <- "0.7"
 # test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
-# test_built_from_snps <- FALSE
+# test_built_from_snps <- TRUE
+
+
+# gene test not built from SNPs
+test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_pheno.tsv"
+test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR.tree"
+test_geno  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-02-04_format_data_for_gwas/data/2019-02-04_gwas_formatted_data/fqR_gene_stop.tsv"
+test_annot <- NULL
+test_dir   <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-06_gwas_gene_from_snp/data/"
+test_name  <- "fqR_gene_stop"
+test_perm  <- "1000"
+test_alpha <- "0.15"
+test_bootstrap <- "0.7"
+test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
+test_built_from_snps <- FALSE
 
 
 args       <- NULL

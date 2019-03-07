@@ -705,19 +705,16 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   sorted_trans_edge_mat <-           trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[ , 1])], row.names(trans_edge_mat)), ]
   ordered_by_p_val      <- sorted_trans_edge_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(sorted_trans_edge_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
-  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val) after FDR")
+  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
 
   fname <- create_file_name(dir, name, paste("summary_and_sig_hit_results.pdf", sep = "")) # 2019-02-25 removed counter from pdf file name because combining.
   pdf(fname, width = 16, height = 20)
 
   make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, a, "transition")
 
-  cell_width_value <- 10
+  cell_width_value <- 1.5
   if (ncol(ordered_by_p_val) < 50){
-    cell_width_value <- 20
-  }
-  if (ncol(ordered_by_p_val) > 100){
-    cell_width_value <- 5
+    cell_width_value <- 10
   }
 
 
@@ -1104,7 +1101,7 @@ make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
             pch = 19,
             xlab = "Genetic locus",
             ylim = c(0, ymax),
-            ylab = "-ln(p-value) after FDR" ))
+            ylab = "-ln(p-val)" ))
 
   abline(h = -log(alpha), col = "red")
   if (nrow(sig_temp) > 0){
@@ -1524,12 +1521,9 @@ discrete_plots <- function(tr, dir, name, a,
   g_recon_mat <- temp_g_recon_mat[order(temp_g_recon_mat[,1], na.last = FALSE, decreasing = FALSE ), 2:ncol(temp_g_recon_mat), drop = FALSE]
 
 
-  cell_width_value <- 5
+  cell_width_value <- 1.5
   if (ncol(g_recon_mat) < 50){
     cell_width_value <- 10
-  }
-  if (ncol(g_recon_mat) > 100){
-    cell_width_value <- 2
   }
 
   colnames(g_recon_mat) <- row.names(recon_hit_vals)
@@ -1546,7 +1540,7 @@ discrete_plots <- function(tr, dir, name, a,
 
   ordered_by_p_val      <-           g_recon_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_recon_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
-  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val) after FDR")
+  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
 
 
   # reconstruction loci summary heat maps
@@ -1556,27 +1550,27 @@ discrete_plots <- function(tr, dir, name, a,
      cluster_cols  = FALSE,
      na_col = "grey",
      cluster_rows  = FALSE,
-     show_rownames = TRUE,
+     show_rownames = FALSE,
      color = c("white", "black"),
      annotation_col = column_annot_ordered_by_p_val,
      annotation_row = phenotype_annotation,
      annotation_colors = ann_colors,
-     show_colnames = FALSE,
+     show_colnames = TRUE,
      cellwidth = cell_width_value)
 
-  pheatmap( # Plot the heatmap
-     ordered_by_p_val,
-     main          = paste0("Edges: genotype & phenotype presence/absence"),
-     cluster_cols  = TRUE,
-     cluster_rows  = FALSE,
-     show_rownames = TRUE,
-     color = c("white", "black"),
-     annotation_col = column_annot_ordered_by_p_val,
-     annotation_row = phenotype_annotation,
-     annotation_colors = ann_colors,
-     show_colnames = FALSE,
-     cellwidth = cell_width_value,
-     na_col = "grey")
+  # pheatmap( # Plot the heatmap
+  #    ordered_by_p_val,
+  #    main          = paste0("Edges: genotype & phenotype presence/absence"),
+  #    cluster_cols  = TRUE,
+  #    cluster_rows  = FALSE,
+  #    show_rownames = FALSE,
+  #    color = c("white", "black"),
+  #    annotation_col = column_annot_ordered_by_p_val,
+  #    annotation_row = phenotype_annotation,
+  #    annotation_colors = ann_colors,
+  #    show_colnames = TRUE,
+  #    cellwidth = cell_width_value,
+  #    na_col = "grey")
   # end of heatmaps
 
 
@@ -1618,25 +1612,36 @@ discrete_plots <- function(tr, dir, name, a,
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_presence"
       temp_g_mat <- cbind(g_mat, phenotype_annotation)
-      g_mat<- temp_g_mat[order(temp_g_mat[,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
+      g_mat <- temp_g_mat[order(temp_g_mat[,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
 
+      plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
 
-      ann_colors = list(pheno_presence = c(na = "grey", absent = "white", present = "red"))
-      recon_htmp <- pheatmap(
-        mat               = g_mat,
-        main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type: genotype & phenotype presence"),
-        cluster_cols      = FALSE,
-        cluster_rows      = FALSE,
-        na_col            = "grey",
-        show_rownames     = FALSE,
-        color             = c("white", "red"),
-        annotation_row    = phenotype_annotation,
-        annotation_legend = FALSE,
-        annotation_colors = ann_colors,
-        show_colnames     = TRUE,
-        legend            = FALSE,
-        cellwidth         = 20)
-      recon_htmp
+      if (plotting_logical){
+        print("g_mat")
+        print(head(colnames(g_mat)))
+        print(head(row.names(g_mat)))
+        print(g_mat[1, ])
+        print(g_mat[ , 1])
+
+        ann_colors <- make_ann_colors(g_mat)
+
+        # ann_colors = list(pheno_presence = c(na = "grey", absent = "white", present = "red"))
+        recon_htmp <- pheatmap(
+          mat               = g_mat,
+          main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type: genotype & phenotype presence"),
+          cluster_cols      = FALSE,
+          cluster_rows      = FALSE,
+          na_col            = "grey",
+          show_rownames     = FALSE,
+          color             = c("white", "red"),
+          annotation_row    = phenotype_annotation,
+          annotation_legend = FALSE,
+          annotation_colors = ann_colors,
+          show_colnames     = TRUE,
+          legend            = FALSE,
+          cellwidth         = 20)
+        recon_htmp
+      }
     }
   }
 
@@ -1673,37 +1678,37 @@ discrete_plots <- function(tr, dir, name, a,
 
   ordered_by_p_val      <-           g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_trans_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
-  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val) after FDR")
+  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
 
 
-  # reconstruction loci summary heat maps
+  # Transition loci summary heat maps
   pheatmap( # Plot the heatmap
     ordered_by_p_val,
     main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
     cluster_cols  = FALSE,
     na_col = "grey",
     cluster_rows  = FALSE,
-    show_rownames = TRUE,
+    show_rownames = FALSE,
     color = c("white", "black"),
     annotation_col = column_annot_ordered_by_p_val,
     annotation_row = phenotype_annotation,
     annotation_colors = ann_colors,
-    show_colnames = FALSE,
+    show_colnames = TRUE,
     cellwidth = cell_width_value)
 
-  pheatmap( # Plot the heatmap
-    ordered_by_p_val,
-    main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
-    cluster_cols  = TRUE,
-    cluster_rows  = FALSE,
-    show_rownames = TRUE,
-    color = c("white", "black"),
-    annotation_col = column_annot_ordered_by_p_val,
-    annotation_row = phenotype_annotation,
-    annotation_colors = ann_colors,
-    show_colnames = FALSE,
-    cellwidth = cell_width_value,
-    na_col = "grey")
+  # pheatmap( # Plot the heatmap
+  #   ordered_by_p_val,
+  #   main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
+  #   cluster_cols  = FALSE,
+  #   cluster_rows  = FALSE,
+  #   show_rownames = FALSE,
+  #   color = c("white", "black"),
+  #   annotation_col = column_annot_ordered_by_p_val,
+  #   annotation_row = phenotype_annotation,
+  #   annotation_colors = ann_colors,
+  #   show_colnames = TRUE,
+  #   cellwidth = cell_width_value,
+  #   na_col = "grey")
   # end transition heatmaps
 
 
@@ -1747,20 +1752,25 @@ discrete_plots <- function(tr, dir, name, a,
       g_mat<- temp_g_mat[order(temp_g_mat[,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
 
       ann_colors = list(pheno_transition = c( na = "grey", no_transition = "white", transition = "red"))
-      pheatmap(
-        g_mat,
-        main              = paste0(row.names(trans_hit_vals)[j], "\n Tree edges: genotype & phenotype transitions"),
-        cluster_cols      = FALSE,
-        cluster_rows      = FALSE,
-        na_col            = "grey",
-        show_rownames     = FALSE,
-        color             = c("white", "red"),
-        annotation_row    = phenotype_annotation,
-        annotation_colors = ann_colors,
-        annotation_legend = FALSE,
-        show_colnames     = TRUE,
-        legend = FALSE,
-        cellwidth         = 20)
+
+      plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
+
+      if (plotting_logical){
+        pheatmap(
+          g_mat,
+          main              = paste0(row.names(trans_hit_vals)[j], "\n Tree edges: genotype & phenotype transitions"),
+          cluster_cols      = FALSE,
+          cluster_rows      = FALSE,
+          na_col            = "grey",
+          show_rownames     = FALSE,
+          color             = c("white", "red"),
+          annotation_row    = phenotype_annotation,
+          annotation_colors = ann_colors,
+          annotation_legend = FALSE,
+          show_colnames     = TRUE,
+          legend = FALSE,
+          cellwidth         = 20)
+      }
     }
   }
   dev.off()
@@ -1933,5 +1943,66 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
   return(samples_by_genes)
 }
 
+check_if_g_mat_can_be_plotted <- function(geno_matrix){
+  ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
+  zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
+  nas <- sum(is.na(geno_matrix)) > 1
+
+  plot_logical <- FALSE #
+  if (ones == 1 && zeros == 1 && nas == 0) {
+    plot_logical <- TRUE
+  }
+  if (ones + zeros + nas == 3) {
+    plot_logical <- TRUE
+  }
+  return(plot_logical)
+}
+
+make_ann_colors <- function(geno_matrix){
+  ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
+  zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
+  nas <- sum(is.na(geno_matrix)) > 1
+
+  if (ones + zeros + nas == 3){
+    ann_colors = list(pheno_presence = c(na = "grey", absent = "white", present = "red"))
+  } else if (ones == 1 && zeros == 1 && nas == 0) {
+    ann_colors = list(pheno_presence = c(absent = "white", present = "red"))
+  } else if (ones == 1 && zeros == 0 && nas == 1) {
+    ann_colors = list(pheno_presence = c(na = "grey", present = "red"))
+  } else if (ones == 0 && zeros == 1 && nas == 1) {
+    ann_colors = list(pheno_presence = c(na = "grey", absent = "white"))
+  } else if (ones == 0 && zeros == 0 && nas == 1) {
+    ann_colors = list(pheno_presence = c(na = "grey"))
+  } else if (ones == 0 && zeros == 1 && nas == 0) {
+    ann_colors = list(pheno_presence = c(absent = "white"))
+  } else if (ones == 1 && zeros == 0 && nas == 0) {
+    ann_colors = list(pheno_presence = c(present = "red"))
+  } else {
+    stop("no ones, zeroes, or NAs present in g_mat")
+  }
+  return(ann_colors)
+}
+
+create_contingency_table <- function(genotype_by_edges, phenotype_by_edges){
+  # TODO
+  # add names to contingency table results
+  # add validations
+  # add unit tests
+  # add function description
+
+  all_tables <- rep(list(NULL), length(genotype_by_edges))
+  contingency_table <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)
+  row.names(contingency_table) <- c("geno_present", "geno_absent")
+  colnames(contingency_table) <- c("pheno_present", "pheno_absent")
+  for (i in 1:length(genotype_by_edges)){
+    temp_table <- contingency_table
+    temp_table[1, 1] <- sum(genotype_by_edges[[i]]  + phenotype_by_edges == 2,  na.rm = TRUE)
+    temp_table[2, 2] <- sum(genotype_by_edges[[i]]  + phenotype_by_edges == 0,  na.rm = TRUE)
+    temp_table[1, 2] <- sum(-genotype_by_edges[[i]] + phenotype_by_edges == -1, na.rm = TRUE)
+    temp_table[2, 1] <- sum(-genotype_by_edges[[i]] + phenotype_by_edges == 1,  na.rm = TRUE)
+    all_tables[[i]] <- temp_table
+  }
+  return(all_tables)
+} # end create_contigency_table()
 
 # END OF SCRIPT ---------------------------------------------------------------#
