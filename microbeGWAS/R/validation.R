@@ -242,6 +242,22 @@ check_for_root_and_boostrap <- function(tr){
   }
 } # end check_for_root_and_boostrap()
 
+check_if_binary_vector <- function(vec){
+  # Function description -------------------------------------------------------
+  # Check that the matrix only contains values 1 or 0.
+  #
+  # Input:
+  # vec. Vector.
+  #
+  # Output:
+  # None.
+  #
+  # Check input & function -----------------------------------------------------
+  if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "integer"){
+    stop("Vector should be only 1s and 0s")
+  }
+} # end check_if_binary_vector()
+
 
 check_if_binary_matrix <- function(mat){
   # Function description -------------------------------------------------------
@@ -366,3 +382,21 @@ check_tree_is_valid <- function(tr){
 #   }
 #
 # } # end check_transitions()
+
+check_convergence_possible <- function(vec, discrete_or_continuous){
+  convergence_not_possible <- FALSE
+  if (discrete_or_continuous == "discrete"){
+    check_if_binary_vector(vec)
+    if (sum(vec) >= (length(vec)-1) | sum(vec) <= 1){
+      convergence_not_possible <- TRUE
+    }
+
+  } else if (discrete_or_continuous == "continuous"){
+    if (length(unique(vec)) == 1){
+      convergence_not_possible <- TRUE
+    }
+  }
+  if (convergence_not_possible){
+    stop("Convergence is not possible for this phenotype")
+  }
+} # end check_convergence_possible()

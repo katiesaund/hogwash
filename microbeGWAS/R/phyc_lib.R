@@ -1008,6 +1008,8 @@ read_in_tsv_matrix <- function(mat){
   return(temp)
 } # end read_in_tsv_matrix()
 
+
+
 reduce_redundancy <- function(mat, tr, dir, name){
   # Function description -------------------------------------------------------
   # This function REMOVES GENOTYPES THAT ARE: RARE, TOO COMMON, OR IDENTICAL
@@ -1462,28 +1464,27 @@ get_dropped_genotypes <- function(geno, keepers){
 
 report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf_edges, geno_names, outdir, outname){
   num_high_confidence_transition_edges <- rep(0, length(high_conf_edges))
-  print("length of high conf edges")
-  print(length(high_conf_edges))
-  print("length geno transition")
-  print(length(genotype_transition$transition))
-  print(length(genotype_transition))
-
-  print("head geno trans")
-  print(head(genotype_transition))
-
-  print("first one")
-  print(genotype_transition[[1]]$transition)
-
-  print(high_conf_edges[[1]])
-
-  print("sum of first one")
-  print(sum(genotype_transition[[1]]$transition * high_conf_edges[[1]]))
+  # print("length of high conf edges")
+  # print(length(high_conf_edges))
+  # print("length geno transition")
+  # print(length(genotype_transition$transition))
+  # print(length(genotype_transition))
+  #
+  # print("head geno trans")
+  # print(head(genotype_transition))
+  #
+  # print("first one")
+  # print(genotype_transition[[1]]$transition)
+  #
+  # print(high_conf_edges[[1]])
+  #
+  # print("sum of first one")
+  # print(sum(genotype_transition[[1]]$transition * high_conf_edges[[1]]))
 
   for (p in 1:length(high_conf_edges)){
     num_high_confidence_transition_edges[p] <- sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])
   }
 
-  print("hi")
   names(num_high_confidence_transition_edges) <- geno_names
   return(num_high_confidence_transition_edges)
   #write.table(num_high_confidence_transition_edges, file = paste(outdir, "/phyc_", outname, "_num_high_conf_trans_edges_per_geno.tsv", sep = ""), sep = "\t", quote= FALSE, col.names = FALSE, row.names = TRUE)
@@ -1497,7 +1498,7 @@ discrete_plots <- function(tr, dir, name, a,
                            g_recon_edges, pheno_anc_rec,
                            recon_perm_obs_results, trans_perm_obs_results,
                            tr_and_pheno_hi_conf, geno_confidence,
-                           g_trans_edges, p_trans_edges){
+                           g_trans_edges, p_trans_edges, snp_in_gene){
 
   pdf(paste0(dir, "/phyc_temp_results_",  name, ".pdf"))
   # reconstruction first
@@ -1532,7 +1533,13 @@ discrete_plots <- function(tr, dir, name, a,
   row.names(significant_loci) <- row.names(recon_hit_vals)
   log_p_value <- data.frame(-log(recon_hit_vals))
   significant_loci[log_p_value > -log(a)] <- "sig"
-  column_annot <- cbind(significant_loci, log_p_value)
+
+  if (!is.null(snp_in_gene)){
+    snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
+    colnames(snp_in_gene) <- "SNPs in gene"
+  }
+
+  column_annot <- cbind(significant_loci, log_p_value, snp_in_gene) # TODO add a test to make sure order doesn't matter here
   ann_colors = list(
     locus = c(not_sig = "white", sig = "blue"),
     pheno_presence = c( na = "grey", no_transition = "white", transition = "red")
@@ -1540,8 +1547,6 @@ discrete_plots <- function(tr, dir, name, a,
 
   ordered_by_p_val      <-           g_recon_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_recon_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
-  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
-
 
   # reconstruction loci summary heat maps
   pheatmap( # Plot the heatmap
@@ -1557,22 +1562,6 @@ discrete_plots <- function(tr, dir, name, a,
      annotation_colors = ann_colors,
      show_colnames = TRUE,
      cellwidth = cell_width_value)
-
-  # pheatmap( # Plot the heatmap
-  #    ordered_by_p_val,
-  #    main          = paste0("Edges: genotype & phenotype presence/absence"),
-  #    cluster_cols  = TRUE,
-  #    cluster_rows  = FALSE,
-  #    show_rownames = FALSE,
-  #    color = c("white", "black"),
-  #    annotation_col = column_annot_ordered_by_p_val,
-  #    annotation_row = phenotype_annotation,
-  #    annotation_colors = ann_colors,
-  #    show_colnames = TRUE,
-  #    cellwidth = cell_width_value,
-  #    na_col = "grey")
-  # end of heatmaps
-
 
   # loop through reconstruction sig hits:
   pheno_as_list <- list(p_recon_edges)
@@ -1597,8 +1586,6 @@ discrete_plots <- function(tr, dir, name, a,
            main = paste0("Reconstructed geno & pheno overlap\npval=", round(recon_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = ""))
       abline(v = recon_perm_obs_results$observed_overlap[j], col = "red")
 
-      # edge heatmap - heatmap is tree edges, annotation is phenotype edges
-      # par(mfrow = c(1,1))
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1 # should be NA but it won't work correctedly TODO
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
       colnames(p_mat) <- "pheno_presence"
@@ -1617,13 +1604,14 @@ discrete_plots <- function(tr, dir, name, a,
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
 
       if (plotting_logical){
-        print("g_mat")
-        print(head(colnames(g_mat)))
-        print(head(row.names(g_mat)))
-        print(g_mat[1, ])
-        print(g_mat[ , 1])
+        if (!is.null(snp_in_gene)){
+          num_snps <- snp_in_gene[row.names(recon_hit_vals)[j], , drop = FALSE]
+          row.names(num_snps) <- "genotype_presence"
+          colnames(num_snps) <- "SNPs_in_gene"
+        }
 
         ann_colors <- make_ann_colors(g_mat)
+        ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
 
         # ann_colors = list(pheno_presence = c(na = "grey", absent = "white", present = "red"))
         recon_htmp <- pheatmap(
@@ -1635,7 +1623,8 @@ discrete_plots <- function(tr, dir, name, a,
           show_rownames     = FALSE,
           color             = c("white", "red"),
           annotation_row    = phenotype_annotation,
-          annotation_legend = FALSE,
+          annotation_col    = num_snps,
+          annotation_legend = TRUE,
           annotation_colors = ann_colors,
           show_colnames     = TRUE,
           legend            = FALSE,
@@ -1670,7 +1659,8 @@ discrete_plots <- function(tr, dir, name, a,
   row.names(significant_loci) <- row.names(trans_hit_vals)
   log_p_value <- data.frame(-log(trans_hit_vals))
   significant_loci[log_p_value > -log(a)] <- "sig"
-  column_annot <- cbind(significant_loci, log_p_value)
+
+  column_annot <- cbind(significant_loci, log_p_value, snp_in_gene)
   ann_colors = list(
     locus = c(not_sig = "white", sig = "blue"),
     pheno_transitions = c( na = "grey", no_transition = "white", transition = "red")
@@ -1678,8 +1668,6 @@ discrete_plots <- function(tr, dir, name, a,
 
   ordered_by_p_val      <-           g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_trans_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
-  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
-
 
   # Transition loci summary heat maps
   pheatmap( # Plot the heatmap
@@ -1755,7 +1743,18 @@ discrete_plots <- function(tr, dir, name, a,
 
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
 
+
       if (plotting_logical){
+
+        if (!is.null(snp_in_gene)){
+          num_snps <- snp_in_gene[row.names(trans_hit_vals)[j], , drop = FALSE]
+          row.names(num_snps) <- "genotype_transition"
+          colnames(num_snps) <- "SNPs_in_gene"
+        }
+
+        ann_colors <- make_ann_colors(g_mat)
+        ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
+
         pheatmap(
           g_mat,
           main              = paste0(row.names(trans_hit_vals)[j], "\n Tree edges: genotype & phenotype transitions"),
@@ -1765,8 +1764,9 @@ discrete_plots <- function(tr, dir, name, a,
           show_rownames     = FALSE,
           color             = c("white", "red"),
           annotation_row    = phenotype_annotation,
+          annotation_col    = num_snps,
           annotation_colors = ann_colors,
-          annotation_legend = FALSE,
+          annotation_legend = TRUE,
           show_colnames     = TRUE,
           legend = FALSE,
           cellwidth         = 20)
@@ -1809,6 +1809,11 @@ build_gene_anc_recon_from_snp <- function(tr, geno, g_reconstruction_and_confide
     gene_mat_built_from_snps[ , j] <- temp_column
   }
 
+  # snps_per_gene_mat <- gene_mat_built_from_snps
+  # colnames(snps_per_gene_mat) <- unique_genes
+  # snps_per_gene_mat[1, ] <- colSums(snps_per_gene_mat)
+  # snps_per_gene <- snps_per_gene_mat[1, , drop = TRUE]
+
   gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
   class(gene_mat_built_from_snps) <- "numeric"
 
@@ -1821,6 +1826,7 @@ build_gene_anc_recon_from_snp <- function(tr, geno, g_reconstruction_and_confide
   }
   names(gene_list_built_from_snps) <- unique_genes
 
+ # return(list("snps_per_gene" = snps_per_gene, "gene_anc_rec" = gene_list_built_from_snps)) #gene_list_built_from_snps)
   return(gene_list_built_from_snps)
 } # end build_gene_anc_recon_from_snp()
 
@@ -1849,6 +1855,9 @@ build_gene_confidence_from_snp <- function(tip_and_node_reconstruction_confidenc
     stop("gene lookup size mismatch")
   }
 
+  print("tip_node_by_snp_mat column sums")
+  print(colSums(tip_nodes_by_snp_mat))
+
   tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
   if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
     stop("rbind didn't work")
@@ -1857,7 +1866,15 @@ build_gene_confidence_from_snp <- function(tip_and_node_reconstruction_confidenc
   gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
   for (j in 1:length(unique_genes)){
     temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) - 1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    if (ncol(temp_mat) > 1){
+      print("j")
+      print(j)
+      print("temp mat - rows are tips/nodes, columns are snps grouped into a gene")
+      print(temp_mat)
+    }
     class(temp_mat) <- "numeric"
+
+
     temp_column <- apply(temp_mat, 1, min) # get minimum confidence at at tip or node
     gene_mat_built_from_snps[ , j] <- temp_column
   }
@@ -1962,6 +1979,11 @@ make_ann_colors <- function(geno_matrix){
   ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
   zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
   nas <- sum(is.na(geno_matrix)) > 1
+
+  print("totals")
+  print(ones)
+  print(zeros)
+  print(nas)
 
   if (ones + zeros + nas == 3){
     ann_colors = list(pheno_presence = c(na = "grey", absent = "white", present = "red"))
