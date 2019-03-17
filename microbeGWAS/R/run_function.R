@@ -10,17 +10,11 @@ run_phyc <- function(args){
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
     snps_per_gene <- NULL
   } else {
-    print("dim args$genotype")
-    print(dim(args$genotype))
     genotypes_to_drop_because_not_present <- colnames(args$genotype)[colSums(args$genotype) == 0]
     genotype <- args$genotype[ , colSums(args$genotype) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
     gene_snp_lookup <- args$gene_snp_lookup[!(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
     unique_genes <- unique(gene_snp_lookup[ , 2])
-    print("length of unique genes")
-    print(length(unique_genes))
     snps_per_gene <- table(gene_snp_lookup[ , 2])
-    print("snps_per_gene")
-    print(snps_per_gene)
   }
 
   phenotype_vector <- convert_matrix_to_vector(args$phenotype) # TODO add check that it's possible to have phenotype convergence
@@ -40,7 +34,6 @@ run_phyc <- function(args){
   pheno_conf_ordered_by_edges  <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_rec_conf, args$tree)
   pheno_recon_ordered_by_edges <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_recon, args$tree)
   tree_conf_ordered_by_edges   <- reorder_tips_and_nodes_to_edges(tree_conf, args$tree)
-  # pheno_trans objects and short_edges are already ordered by edges.
 
   # ANCESTRAL RECONSTRUCTION OF GENOTYPES ---------------------------------------#
   # INIATLIAZE DATA STRUCTS
@@ -50,9 +43,6 @@ run_phyc <- function(args){
   for(k in 1:ncol(genotype)){
     geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(args$tree, genotype, k, "discrete", args$bootstrap_cutoff)
   }
-
-  #print("original geno_and_recon_conf length")
-  #print(length(geno_recon_and_conf))
 
   print("0")
   for (k in 1:ncol(genotype)){
@@ -65,63 +55,26 @@ run_phyc <- function(args){
     # CONVERT SNPS INTO GENES HERE
     # tip_and_node_ancestral_reconstruction
     geno_recon_and_confidence_tip_node_recon <- build_gene_anc_recon_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup)
-
-
-
     geno_recon_and_confidence_tip_node_recon <- build_gene_anc_recon_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup) # grouped by gene now
-
-    #print("length geno_recon_and_conf 1")
-    #print(length(geno_recon_and_confidence_tip_node_recon))
-
-
-    #print("2")
     geno_recon_and_confidence_tip_node_confidence <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
-    # geno_recon_and_conf$tip_and_node_rec_conf <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
-    #print("length geno_recon_and_conf 2")
-    #print(length(geno_recon_and_confidence_tip_node_confidence))
-    #print("3")
     geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, geno_trans, gene_snp_lookup)
-    #print("dim genotype as snps")
-    #print(dim(genotype))
-    #print(row.names(genotype))
     genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup)
-    #print("dim genotype as genes")
-    #print(dim(genotype))
     simplified_genotype <- reduce_redundancy(genotype, args$tree, args$output_dir, args$output_name) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
     genotype <- simplified_genotype$mat
-    #print("dim genotype as reduced genes")
-    #print(dim(genotype))
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
     genes_to_keep_in_consideration <- !(unique_genes %in% simplified_genotype$dropped_genotype_names)
 
     # remove redundancy from geno trans, geno_recon_and_confdience_tip_node_recon, and node_confidence
-    print("length of non reduced size")
-    print(length(geno_trans))
-    print(length(geno_recon_and_confidence_tip_node_recon))
-    print(length(geno_recon_and_confidence_tip_node_confidence))
     geno_trans <- geno_trans[genes_to_keep_in_consideration]
 
     dummy <- geno_trans
     geno_trans <- rep(list(NULL), length(dummy))
-    #print(dummy[1])
-    #print(as.numeric(as.character(unlist(dummy[1]))))
     for (i in 1:length(dummy)){
       geno_trans[[i]]$transition <- as.numeric(as.character(unlist((dummy[i]))))
     }
 
-    #print("test")
-    #print(geno_trans)
-    # temp <- geno_trans
-    # geno_trans <- NULL
-    # geno_trans$transition <- temp
-    # geno_trans$dummy <- temp
-    # temp <- NULL
     geno_recon_and_confidence_tip_node_recon <- geno_recon_and_confidence_tip_node_recon[genes_to_keep_in_consideration]
     geno_recon_and_confidence_tip_node_confidence <- geno_recon_and_confidence_tip_node_confidence[genes_to_keep_in_consideration]
-    #print("length of reduced sized")
-    #print(length(geno_trans))
-    #print(length(geno_recon_and_confidence_tip_node_recon))
-    #print(length(geno_recon_and_confidence_tip_node_confidence))
 
     geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
@@ -139,9 +92,6 @@ run_phyc <- function(args){
     }
   }
 
-  #print("length geno_conf_ordered_by_edges pre A")
-  #print(length(geno_conf_ordered_by_edges))
-
   print("A")
 
   # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
@@ -158,11 +108,7 @@ run_phyc <- function(args){
 
   # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#
   results_object$high_confidence_trasition_edges <- high_confidence_edges
-  #print("foo")
-  #print(str(geno_trans))
-  #print(str(all_high_confidence_edges))
   num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype), args$output_dir, args$output_name)
-  #print("Bar")
   results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
 
   #print("B1")
@@ -213,8 +159,8 @@ run_phyc <- function(args){
     branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_trans$transition,       high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
     branch_overlap_recon <- count_hits_on_edges(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
 
-    results_object$contingency_table_recon <- create_contingency_table(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges)
-    results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges,   pheno_trans$trasition)
+    results_object$contingency_table_recon <- create_contingency_table(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, genotype)
+    results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges,   pheno_trans$transition, genotype)
 
     disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_trans$transition,       args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
     disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)

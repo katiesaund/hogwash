@@ -1464,30 +1464,12 @@ get_dropped_genotypes <- function(geno, keepers){
 
 report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf_edges, geno_names, outdir, outname){
   num_high_confidence_transition_edges <- rep(0, length(high_conf_edges))
-  # print("length of high conf edges")
-  # print(length(high_conf_edges))
-  # print("length geno transition")
-  # print(length(genotype_transition$transition))
-  # print(length(genotype_transition))
-  #
-  # print("head geno trans")
-  # print(head(genotype_transition))
-  #
-  # print("first one")
-  # print(genotype_transition[[1]]$transition)
-  #
-  # print(high_conf_edges[[1]])
-  #
-  # print("sum of first one")
-  # print(sum(genotype_transition[[1]]$transition * high_conf_edges[[1]]))
-
   for (p in 1:length(high_conf_edges)){
     num_high_confidence_transition_edges[p] <- sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])
   }
 
   names(num_high_confidence_transition_edges) <- geno_names
   return(num_high_confidence_transition_edges)
-  #write.table(num_high_confidence_transition_edges, file = paste(outdir, "/phyc_", outname, "_num_high_conf_trans_edges_per_geno.tsv", sep = ""), sep = "\t", quote= FALSE, col.names = FALSE, row.names = TRUE)
 } # end report_num_high_confidence_trans_edge
 
 
@@ -1792,8 +1774,8 @@ build_gene_anc_recon_from_snp <- function(tr, geno, g_reconstruction_and_confide
   row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
   colnames(tip_nodes_by_snp_mat) <- colnames(geno)
 
-  if (gene_to_snp_lookup_table[ , 1, drop = TRUE] != colnames(tip_nodes_by_snp_mat)){
-    stop("gene lookup size mismatch")
+  if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat)){
+    stop("mismatch")
   }
 
   tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
@@ -1851,12 +1833,10 @@ build_gene_confidence_from_snp <- function(tip_and_node_reconstruction_confidenc
   }
   row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
   colnames(tip_nodes_by_snp_mat) <- colnames(geno)
-  if (gene_to_snp_lookup_table[ , 1, drop = TRUE] != colnames(tip_nodes_by_snp_mat)){
-    stop("gene lookup size mismatch")
-  }
 
-  print("tip_node_by_snp_mat column sums")
-  print(colSums(tip_nodes_by_snp_mat))
+  if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat)){
+    stop("mismatch")
+  }
 
   tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
   if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
@@ -1866,12 +1846,6 @@ build_gene_confidence_from_snp <- function(tip_and_node_reconstruction_confidenc
   gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
   for (j in 1:length(unique_genes)){
     temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) - 1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
-    if (ncol(temp_mat) > 1){
-      print("j")
-      print(j)
-      print("temp mat - rows are tips/nodes, columns are snps grouped into a gene")
-      print(temp_mat)
-    }
     class(temp_mat) <- "numeric"
 
 
@@ -1903,8 +1877,8 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   row.names(edges_by_snp_mat) <- c(1:nrow(edges_by_snp_mat))
   colnames(edges_by_snp_mat) <- colnames(geno)
 
-  if (gene_to_snp_lookup_table[ , 1, drop = TRUE] != colnames(edges_by_snp_mat)){
-    stop("gene lookup size mismatch")
+  if (nrow(gene_to_snp_lookup_table) != ncol(edges_by_snp_mat)){
+    stop("mismatch")
   }
 
   edges_by_snp_mat_with_gene_id <- rbind(edges_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
@@ -1980,11 +1954,6 @@ make_ann_colors <- function(geno_matrix){
   zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
   nas <- sum(is.na(geno_matrix)) > 1
 
-  print("totals")
-  print(ones)
-  print(zeros)
-  print(nas)
-
   if (ones + zeros + nas == 3){
     ann_colors = list(pheno_presence = c(na = "grey", absent = "white", present = "red"))
   } else if (ones == 1 && zeros == 1 && nas == 0) {
@@ -2005,12 +1974,17 @@ make_ann_colors <- function(geno_matrix){
   return(ann_colors)
 }
 
-create_contingency_table <- function(genotype_by_edges, phenotype_by_edges){
+create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno){
   # TODO
   # add names to contingency table results
   # add validations
   # add unit tests
   # add function description
+  # genotype_by_edges should be a list
+  # phenotype_by_edges should be a numeric vector
+  # length of genotype_by_edges should be ncol of geno
+  # length of _phenotype_by_edges should be same length as every entry in genotype_by_edges
+  # all genotype_by_edges and phenotype_by_edges should be 0s or 1
 
   all_tables <- rep(list(NULL), length(genotype_by_edges))
   contingency_table <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)
@@ -2024,6 +1998,8 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges){
     temp_table[2, 1] <- sum(-genotype_by_edges[[i]] + phenotype_by_edges == 1,  na.rm = TRUE)
     all_tables[[i]] <- temp_table
   }
+
+  names(all_tables) <- colnames(geno)
   return(all_tables)
 } # end create_contigency_table()
 
