@@ -13,6 +13,8 @@ run_phyc <- function(args){
     genotypes_to_drop_because_not_present <- colnames(args$genotype)[colSums(args$genotype) == 0]
     genotype <- args$genotype[ , colSums(args$genotype) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
     gene_snp_lookup <- args$gene_snp_lookup[!(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
+    gene_snp_lookup <- gene_snp_lookup[gene_snp_lookup[ , 1] %in% colnames(genotype), , drop = FALSE]
+
     unique_genes <- unique(gene_snp_lookup[ , 2])
     snps_per_gene <- table(gene_snp_lookup[ , 2])
   }
@@ -44,7 +46,6 @@ run_phyc <- function(args){
     geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(args$tree, genotype, k, "discrete", args$bootstrap_cutoff)
   }
 
-  print("0")
   for (k in 1:ncol(genotype)){
     geno_trans[[k]] <- identify_transition_edges(args$tree, genotype, k, geno_recon_and_conf[[k]]$node_anc_rec, "discrete")
   }
@@ -54,9 +55,10 @@ run_phyc <- function(args){
     print("1")
     # CONVERT SNPS INTO GENES HERE
     # tip_and_node_ancestral_reconstruction
-    geno_recon_and_confidence_tip_node_recon <- build_gene_anc_recon_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup)
-    geno_recon_and_confidence_tip_node_recon <- build_gene_anc_recon_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup) # grouped by gene now
-    geno_recon_and_confidence_tip_node_confidence <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
+    temp_results <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup)
+    geno_recon_and_confidence_tip_node_recon <- temp_results$tip_node_recon
+    geno_recon_and_confidence_tip_node_confidence <- temp_results$tip_node_conf
+    # geno_recon_and_confidence_tip_node_confidence <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
     geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, geno_trans, gene_snp_lookup)
     genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup)
     simplified_genotype <- reduce_redundancy(genotype, args$tree, args$output_dir, args$output_name) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
@@ -111,16 +113,12 @@ run_phyc <- function(args){
   num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype), args$output_dir, args$output_name)
   results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
 
-  #print("B1")
-
   # KEEP ONLY GENOTYPES WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES ----#
   geno_to_keep                  <- keep_at_least_two_high_conf_trans_edges(geno_trans, all_high_confidence_edges)
-  print("B2")
   geno_recon_ordered_by_edges   <- geno_recon_ordered_by_edges[geno_to_keep]
   high_conf_ordered_by_edges    <- all_high_confidence_edges[geno_to_keep]
   geno_trans                    <- geno_trans[geno_to_keep]
 
-  #print("B3")
   dropped_genotypes <- get_dropped_genotypes(genotype, geno_to_keep)
   results_object$dropped_genotypes <- dropped_genotypes
 
@@ -131,7 +129,7 @@ run_phyc <- function(args){
   # break following if else into two seperate functions
   if (args$discrete_or_continuous == "continuous"){
     # RUN PERMUTATION TEST ------------------------------------------------------#
-    results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_trans, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
+    results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
 
     # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
     corrected_pvals_all_transitions <- get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals, args$alpha)
@@ -197,4 +195,7 @@ run_phyc <- function(args){
 
     save_results_as_r_object(args$output_dir, args$output_name, results_object)
   }
+  print("end")
 }
+
+

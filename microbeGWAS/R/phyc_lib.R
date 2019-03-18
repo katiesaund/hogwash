@@ -250,14 +250,28 @@ calculate_phenotype_change_on_edge <- function(edge_list, phenotype_by_edges){
 } # end calculate_phenotype_change_on_edge()
 
 run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
+  # TODO add unit tests
+  # TODO deal with cases when there isn't enough data (aren't at least 1 of least t_index and non_t_index)
   # t_index = transition edges
   # not_t_index = non transition edges
   # phenotype_by_edges = change in phenotype on each edge
+
+  # Check input ---------------------------------------------------------------#
+  if (length(t_index) < 1 | length(non_t_index) < 1){
+    stop("Not enough high confidence transition edges to use for KS test.")
+  }
 
 
   # subset index to only high confidence edges:
   p_trans_delta     <- calculate_phenotype_change_on_edge(t_index,     phenotype_by_edges)
   p_non_trans_delta <- calculate_phenotype_change_on_edge(non_t_index, phenotype_by_edges)
+
+  print("ks test")
+  print(length(t_index))
+  print(length(non_t_index))
+  print(p_trans_delta)
+  print(p_non_trans_delta)
+
   ks_results        <- ks.test(p_trans_delta, p_non_trans_delta)
   results <- list("pval"      = round(ks_results$p.value, digits = 20),
                   "statistic" = round(ks_results$statistic, digits = 20),
@@ -784,6 +798,8 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
         cellwidth = 20)
     }
   }
+
+  dev.off()
 
   results <- list("trans_edge_mat" = trans_edge_mat, "p_trans_mat" = p_trans_mat)
   return(results)
@@ -1482,7 +1498,7 @@ discrete_plots <- function(tr, dir, name, a,
                            tr_and_pheno_hi_conf, geno_confidence,
                            g_trans_edges, p_trans_edges, snp_in_gene){
 
-  pdf(paste0(dir, "/phyc_temp_results_",  name, ".pdf"))
+  pdf(paste0(dir, "/phyc_",  name, ".pdf"))
   # reconstruction first
   par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, recon_hit_vals, a, "reconstruction")
@@ -1519,9 +1535,12 @@ discrete_plots <- function(tr, dir, name, a,
   if (!is.null(snp_in_gene)){
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
     colnames(snp_in_gene) <- "SNPs in gene"
+    column_annot <- cbind(significant_loci, log_p_value, snp_in_gene) # TODO add a test to make sure order doesn't matter here
+  } else {
+    column_annot <- cbind(significant_loci, log_p_value)
   }
 
-  column_annot <- cbind(significant_loci, log_p_value, snp_in_gene) # TODO add a test to make sure order doesn't matter here
+
   ann_colors = list(
     locus = c(not_sig = "white", sig = "blue"),
     pheno_presence = c( na = "grey", no_transition = "white", transition = "red")
@@ -1586,16 +1605,17 @@ discrete_plots <- function(tr, dir, name, a,
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
 
       if (plotting_logical){
+        ann_colors <- make_ann_colors(g_mat)
+
         if (!is.null(snp_in_gene)){
           num_snps <- snp_in_gene[row.names(recon_hit_vals)[j], , drop = FALSE]
           row.names(num_snps) <- "genotype_presence"
           colnames(num_snps) <- "SNPs_in_gene"
+          ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
+        } else {
+          num_snps <- NULL
         }
 
-        ann_colors <- make_ann_colors(g_mat)
-        ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
-
-        # ann_colors = list(pheno_presence = c(na = "grey", absent = "white", present = "red"))
         recon_htmp <- pheatmap(
           mat               = g_mat,
           main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type: genotype & phenotype presence"),
@@ -1642,7 +1662,13 @@ discrete_plots <- function(tr, dir, name, a,
   log_p_value <- data.frame(-log(trans_hit_vals))
   significant_loci[log_p_value > -log(a)] <- "sig"
 
-  column_annot <- cbind(significant_loci, log_p_value, snp_in_gene)
+
+  if (!is.null(snp_in_gene)){
+    column_annot <- cbind(significant_loci, log_p_value, snp_in_gene) # TODO add a test to make sure order doesn't matter here
+  } else {
+    column_annot <- cbind(significant_loci, log_p_value)
+  }
+
   ann_colors = list(
     locus = c(not_sig = "white", sig = "blue"),
     pheno_transitions = c( na = "grey", no_transition = "white", transition = "red")
@@ -1727,15 +1753,13 @@ discrete_plots <- function(tr, dir, name, a,
 
 
       if (plotting_logical){
-
+        ann_colors <- make_ann_colors(g_mat)
         if (!is.null(snp_in_gene)){
           num_snps <- snp_in_gene[row.names(trans_hit_vals)[j], , drop = FALSE]
           row.names(num_snps) <- "genotype_transition"
           colnames(num_snps) <- "SNPs_in_gene"
+          ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
         }
-
-        ann_colors <- make_ann_colors(g_mat)
-        ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
 
         pheatmap(
           g_mat,
@@ -1763,53 +1787,70 @@ gene_test_from_snps <- function(){
 # goal of this is to rebuild the gene test from snps and keep snp annotation
 } # end gene_test_from_snps
 
-build_gene_anc_recon_from_snp <- function(tr, geno, g_reconstruction_and_confidence, gene_to_snp_lookup_table){
-  tip_nodes_by_snp_mat <- matrix(0, nrow = (Nnode(tr) + Ntip(tr)), ncol = ncol(geno))
-  if (nrow(tip_nodes_by_snp_mat) != length(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)){
+build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_and_confidence, gene_to_snp_lookup_table){
+  tip_nodes_by_snp_mat_recon <- tip_nodes_by_snp_mat_confi <- matrix(0, nrow = (Nnode(tr) + Ntip(tr)), ncol = ncol(geno))
+  if (nrow(tip_nodes_by_snp_mat_recon) != length(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)){
     stop("mismatch in size")
   }
   for (k in 1:ncol(geno)){
-    tip_nodes_by_snp_mat[ , k] <- g_reconstruction_and_confidence[[k]]$tip_and_node_recon
+    tip_nodes_by_snp_mat_recon[ , k] <- g_reconstruction_and_confidence[[k]]$tip_and_node_recon
+    tip_nodes_by_snp_mat_confi[ , k] <- g_reconstruction_and_confidence[[k]]$tip_and_node_rec_conf
   }
-  row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
-  colnames(tip_nodes_by_snp_mat) <- colnames(geno)
 
-  if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat)){
+  row.names(tip_nodes_by_snp_mat_recon) <- row.names(tip_nodes_by_snp_mat_confi) <- c(1:nrow(tip_nodes_by_snp_mat_recon))
+  colnames(tip_nodes_by_snp_mat_recon) <- colnames(tip_nodes_by_snp_mat_confi) <- colnames(geno)
+
+  if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat_recon)){
     stop("mismatch")
   }
 
-  tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
-  if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
+  recon_times_confi <- tip_nodes_by_snp_mat_recon * tip_nodes_by_snp_mat_confi
+  tip_nodes_by_snp_mat_recon_with_gene_id <- rbind(tip_nodes_by_snp_mat_recon, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
+  recon_times_confi_with_gene_id          <- rbind(recon_times_confi,          unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
+
+  if (nrow(tip_nodes_by_snp_mat_recon_with_gene_id) != (nrow(tip_nodes_by_snp_mat_recon) + 1)){
     stop("rbind didn't work")
   }
   unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
-  gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
-  for (j in 1:length(unique_genes)){
-    temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) - 1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
-    class(temp_mat) <- "numeric"
-    temp_column <- rowSums(temp_mat)
-    gene_mat_built_from_snps[ , j] <- temp_column
-  }
 
-  # snps_per_gene_mat <- gene_mat_built_from_snps
-  # colnames(snps_per_gene_mat) <- unique_genes
-  # snps_per_gene_mat[1, ] <- colSums(snps_per_gene_mat)
-  # snps_per_gene <- snps_per_gene_mat[1, , drop = TRUE]
+  gene_mat_built_from_snps <- gene_presence_confidence <- gene_absence_confidence <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat_recon), ncol = length(unique_genes))
+  for (j in 1:length(unique_genes)){
+    temp_mat               <- tip_nodes_by_snp_mat_recon_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_recon_with_gene_id) - 1), tip_nodes_by_snp_mat_recon_with_gene_id[nrow(tip_nodes_by_snp_mat_recon_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    temp_recon_times_confi <-          recon_times_confi_with_gene_id[1:(nrow(recon_times_confi_with_gene_id)           - 1),          recon_times_confi_with_gene_id[nrow(recon_times_confi_with_gene_id)        , ] == unique_genes[j], drop = FALSE]
+
+
+    class(temp_mat) <- class(temp_recon_times_confi) <- "numeric"
+    for (r in 1:nrow(gene_presence_confidence)){
+      if (rowSums(temp_mat)[r] == 0 & rowSums(temp_recon_times_confi)[r] > 0){
+        gene_absence_confidence[r, j] <- 1
+      }
+    }
+    gene_mat_built_from_snps[ , j] <- rowSums(temp_mat)
+    gene_presence_confidence[ , j] <- rowSums(temp_recon_times_confi)
+  }
 
   gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
-  class(gene_mat_built_from_snps) <- "numeric"
+  gene_presence_confidence <- gene_presence_confidence > 0
+  class(gene_mat_built_from_snps) <- class(gene_presence_confidence) <- "numeric"
 
-  colnames(gene_mat_built_from_snps) <- unique_genes
-  row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
+  print("gene_presence_confidence")
+  print(table(gene_presence_confidence))
+  print("gene_absence_confidence")
+  print(table(gene_absence_confidence))
+  gene_all_confidence <- gene_presence_confidence + gene_absence_confidence
+  print("gene_all_confidence")
+  print(table(gene_all_confidence))
 
-  gene_list_built_from_snps <- rep(list(0), length(unique_genes))
+  colnames(gene_mat_built_from_snps)  <- colnames(gene_all_confidence)  <- unique_genes
+  row.names(gene_mat_built_from_snps) <- row.names(gene_all_confidence) <- c(1:nrow(gene_mat_built_from_snps))
+
+  gene_list_built_from_snps <- gene_conf_list_built_from_snps<- rep(list(0), length(unique_genes))
   for (m in 1:length(unique_genes)){
-    gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
+    gene_list_built_from_snps[[m]]      <- gene_mat_built_from_snps[ , m, drop = TRUE]
+    gene_conf_list_built_from_snps[[m]] <- gene_all_confidence[      , m, drop = TRUE]
   }
-  names(gene_list_built_from_snps) <- unique_genes
-
- # return(list("snps_per_gene" = snps_per_gene, "gene_anc_rec" = gene_list_built_from_snps)) #gene_list_built_from_snps)
-  return(gene_list_built_from_snps)
+  names(gene_list_built_from_snps) <- names(gene_conf_list_built_from_snps) <- unique_genes
+  return(list("tip_node_recon" = gene_list_built_from_snps, "tip_node_conf" = gene_conf_list_built_from_snps ))
 } # end build_gene_anc_recon_from_snp()
 
 
@@ -1823,47 +1864,45 @@ build_node_anc_recon_from_gene_list <- function(gene_list, tr){
 } # end build_node_anc_recon_from_gene_list()
 
 
-build_gene_confidence_from_snp <- function(tip_and_node_reconstruction_confidence, tr, gene_to_snp_lookup_table, geno){
-  tip_nodes_by_snp_mat <- matrix(0, nrow = (Nnode(tr) + Ntip(tr)), ncol = ncol(geno))
-  if (nrow(tip_nodes_by_snp_mat) != length(tip_and_node_reconstruction_confidence[[1]]$tip_and_node_rec_conf)){
-    stop("mismatch in size")
-  }
-  for (k in 1:ncol(geno)){
-    tip_nodes_by_snp_mat[ , k] <- tip_and_node_reconstruction_confidence[[k]]$tip_and_node_rec_conf
-  }
-  row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
-  colnames(tip_nodes_by_snp_mat) <- colnames(geno)
-
-  if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat)){
-    stop("mismatch")
-  }
-
-  tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
-  if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
-    stop("rbind didn't work")
-  }
-  unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
-  gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
-  for (j in 1:length(unique_genes)){
-    temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) - 1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
-    class(temp_mat) <- "numeric"
-
-
-    temp_column <- apply(temp_mat, 1, min) # get minimum confidence at at tip or node
-    gene_mat_built_from_snps[ , j] <- temp_column
-  }
-
-  colnames(gene_mat_built_from_snps) <- unique_genes
-  row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
-
-  gene_list_built_from_snps <- rep(list(0), length(unique_genes))
-  for (m in 1:length(unique_genes)){
-    gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
-  }
-  names(gene_list_built_from_snps) <- unique_genes
-
-  return(gene_list_built_from_snps)
-} # end build_gene_confidence_from_snp()
+# build_gene_confidence_from_snp <- function(tip_and_node_reconstruction_confidence, tr, gene_to_snp_lookup_table, geno){
+#   tip_nodes_by_snp_mat <- matrix(0, nrow = (Nnode(tr) + Ntip(tr)), ncol = ncol(geno))
+#   if (nrow(tip_nodes_by_snp_mat) != length(tip_and_node_reconstruction_confidence[[1]]$tip_and_node_rec_conf)){
+#     stop("mismatch in size")
+#   }
+#   for (k in 1:ncol(geno)){
+#     tip_nodes_by_snp_mat[ , k] <- tip_and_node_reconstruction_confidence[[k]]$tip_and_node_rec_conf
+#   }
+#   row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
+#   colnames(tip_nodes_by_snp_mat) <- colnames(geno)
+#
+#   if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat)){
+#     stop("mismatch")
+#   }
+#
+#   tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
+#   if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
+#     stop("rbind didn't work")
+#   }
+#   unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
+#   gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
+#   for (j in 1:length(unique_genes)){
+#     temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) - 1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
+#     class(temp_mat) <- "numeric"
+#     temp_column <- apply(temp_mat, 1, min) # get minimum confidence at at tip or node
+#     gene_mat_built_from_snps[ , j] <- temp_column
+#   }
+#
+#   colnames(gene_mat_built_from_snps) <- unique_genes
+#   row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
+#
+#   gene_list_built_from_snps <- rep(list(0), length(unique_genes))
+#   for (m in 1:length(unique_genes)){
+#     gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
+#   }
+#   names(gene_list_built_from_snps) <- unique_genes
+#
+#   return(gene_list_built_from_snps)
+# } # end build_gene_confidence_from_snp()
 
 
 build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_snp_lookup_table){
