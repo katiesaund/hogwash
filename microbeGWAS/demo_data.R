@@ -8,9 +8,9 @@ library(pheatmap) # plots for continuous phenotypesq
 library(ggplot2) # plots for continuous phenotypes
 
 test_dir   <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-13_gwas_gene_from_snp/data/"
-# dataset <- 0 # Discrete, gene test built from SNPS
+dataset <- 0 # Discrete, gene test built from SNPS
 # dataset <- 1 # Discrete, gene test not built from SNPs
-dataset <- 2 # Continuous, gene test built from SNPS
+#dataset <- 2 # Continuous, gene test built from SNPS
 #dataset <- 3 # Continuous, gene test not built from SNPs
 
 if (dataset == 0){

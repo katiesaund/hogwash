@@ -1503,6 +1503,7 @@ discrete_plots <- function(tr, dir, name, a,
   par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, recon_hit_vals, a, "reconstruction")
 
+  # TODO 2019-03-18 fix all references to reconstruction a genotype transition-- because that's what it should be
   g_recon_mat <- matrix(0, nrow = Nedge(tr), ncol = length(g_recon_edges))
 
   for (i in 1:length(g_recon_edges)){
@@ -1543,7 +1544,7 @@ discrete_plots <- function(tr, dir, name, a,
 
   ann_colors = list(
     locus = c(not_sig = "white", sig = "blue"),
-    pheno_presence = c( na = "grey", no_transition = "white", transition = "red")
+    pheno_presence = c( na = "grey", absence = "white", presence = "red")
   )
 
   ordered_by_p_val      <-           g_recon_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_recon_mat))]
@@ -1552,7 +1553,7 @@ discrete_plots <- function(tr, dir, name, a,
   # reconstruction loci summary heat maps
   pheatmap( # Plot the heatmap
      ordered_by_p_val,
-     main          = paste0("Edges:\n Genotype presence/absence with phenotype presence/absence"),
+     main          = paste0("Edges:\n Genotype transition with phenotype presence/absence"),
      cluster_cols  = FALSE,
      na_col = "grey",
      cluster_rows  = FALSE,
@@ -1574,7 +1575,7 @@ discrete_plots <- function(tr, dir, name, a,
       # pheno
       plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
       # geno
-      plot_tree_with_colored_edges(tr, g_recon_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
+      plot_tree_with_colored_edges(tr, g_recon_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype transition:\n Red = transition; Black = no transition"), annot, "recon", j)
       # Permutation test
       max_x <- max(recon_perm_obs_results$permuted_count[[j]], recon_perm_obs_results$observed_overlap[j]) # change to loop through sig hits
       hist(recon_perm_obs_results$permuted_count[[j]],
@@ -1584,7 +1585,7 @@ discrete_plots <- function(tr, dir, name, a,
            border = FALSE,
            ylab = "Count",
            xlab = "# edges where genotype-phenotype co-occur",
-           main = paste0("Reconstructed geno & pheno overlap\npval=", round(recon_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = ""))
+           main = paste0("Overlap of genotype transition edge\n& phenotype presence \npval=", round(recon_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = ""))
       abline(v = recon_perm_obs_results$observed_overlap[j], col = "red")
 
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1 # should be NA but it won't work correctedly TODO
@@ -1598,7 +1599,7 @@ discrete_plots <- function(tr, dir, name, a,
       temp_g_recon_edges[geno_confidence[[j]] == 0] <- NA
       g_mat <- as.matrix(temp_g_recon_edges)
       row.names(g_mat) <- c(1:nrow(g_mat))
-      colnames(g_mat) <- "genotype_presence"
+      colnames(g_mat) <- "genotype_transition"
       temp_g_mat <- cbind(g_mat, phenotype_annotation)
       g_mat <- temp_g_mat[order(temp_g_mat[,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
 
@@ -1609,16 +1610,16 @@ discrete_plots <- function(tr, dir, name, a,
 
         if (!is.null(snp_in_gene)){
           num_snps <- snp_in_gene[row.names(recon_hit_vals)[j], , drop = FALSE]
-          row.names(num_snps) <- "genotype_presence"
+          row.names(num_snps) <- "genotype_transition"
           colnames(num_snps) <- "SNPs_in_gene"
           ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
         } else {
           num_snps <- NULL
         }
 
-        recon_htmp <- pheatmap(
+        pheatmap(
           mat               = g_mat,
-          main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type: genotype & phenotype presence"),
+          main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type\n Genotype transition edge\n & phenotype present edge"),
           cluster_cols      = FALSE,
           cluster_rows      = FALSE,
           na_col            = "grey",
@@ -1629,9 +1630,8 @@ discrete_plots <- function(tr, dir, name, a,
           annotation_legend = TRUE,
           annotation_colors = ann_colors,
           show_colnames     = TRUE,
-          legend            = FALSE,
+          legend            = TRUE,
           cellwidth         = 20)
-        recon_htmp
       }
     }
   }
@@ -1691,22 +1691,6 @@ discrete_plots <- function(tr, dir, name, a,
     annotation_colors = ann_colors,
     show_colnames = TRUE,
     cellwidth = cell_width_value)
-
-  # pheatmap( # Plot the heatmap
-  #   ordered_by_p_val,
-  #   main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
-  #   cluster_cols  = FALSE,
-  #   cluster_rows  = FALSE,
-  #   show_rownames = FALSE,
-  #   color = c("white", "black"),
-  #   annotation_col = column_annot_ordered_by_p_val,
-  #   annotation_row = phenotype_annotation,
-  #   annotation_colors = ann_colors,
-  #   show_colnames = TRUE,
-  #   cellwidth = cell_width_value,
-  #   na_col = "grey")
-  # end transition heatmaps
-
 
   # loop through transition sig hits:
   for (j in 1:nrow(trans_hit_vals)){
@@ -1788,6 +1772,19 @@ gene_test_from_snps <- function(){
 } # end gene_test_from_snps
 
 build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_and_confidence, gene_to_snp_lookup_table){
+
+  # VALIDATE INPUTS -----------------------------------------------------------#
+  check_for_root_and_boostrap(tr)
+  check_if_binary_matrix(geno)
+  check_dimensions(geno, Ntip(tr), 2, NULL, 2)
+  if (length(g_reconstruction_and_confidence) != ncol(geno)){
+    stop("wrong input")
+  }
+  check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
+  check_if_binary_vector_numeric(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)
+  check_if_binary_vector_numeric(g_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf)
+
+  # FUNCTION ------------------------------------------------------------------#
   tip_nodes_by_snp_mat_recon <- tip_nodes_by_snp_mat_confi <- matrix(0, nrow = (Nnode(tr) + Ntip(tr)), ncol = ncol(geno))
   if (nrow(tip_nodes_by_snp_mat_recon) != length(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)){
     stop("mismatch in size")
@@ -1806,6 +1803,7 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
 
   recon_times_confi <- tip_nodes_by_snp_mat_recon * tip_nodes_by_snp_mat_confi
   tip_nodes_by_snp_mat_recon_with_gene_id <- rbind(tip_nodes_by_snp_mat_recon, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
+  tip_nodes_by_snp_mat_confi_with_gene_id <- rbind(tip_nodes_by_snp_mat_confi, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
   recon_times_confi_with_gene_id          <- rbind(recon_times_confi,          unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
 
   if (nrow(tip_nodes_by_snp_mat_recon_with_gene_id) != (nrow(tip_nodes_by_snp_mat_recon) + 1)){
@@ -1815,13 +1813,14 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
 
   gene_mat_built_from_snps <- gene_presence_confidence <- gene_absence_confidence <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat_recon), ncol = length(unique_genes))
   for (j in 1:length(unique_genes)){
+
+    # Matrix of just the SNPs found in gene "j"
     temp_mat               <- tip_nodes_by_snp_mat_recon_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_recon_with_gene_id) - 1), tip_nodes_by_snp_mat_recon_with_gene_id[nrow(tip_nodes_by_snp_mat_recon_with_gene_id), ] == unique_genes[j], drop = FALSE]
-    temp_recon_times_confi <-          recon_times_confi_with_gene_id[1:(nrow(recon_times_confi_with_gene_id)           - 1),          recon_times_confi_with_gene_id[nrow(recon_times_confi_with_gene_id)        , ] == unique_genes[j], drop = FALSE]
-
-
-    class(temp_mat) <- class(temp_recon_times_confi) <- "numeric"
+    temp_recon_times_confi <-          recon_times_confi_with_gene_id[1:(nrow(recon_times_confi_with_gene_id)          - 1),           recon_times_confi_with_gene_id[nrow(recon_times_confi_with_gene_id)        , ] == unique_genes[j], drop = FALSE]
+    temp_conf              <- tip_nodes_by_snp_mat_confi_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_confi_with_gene_id) - 1), tip_nodes_by_snp_mat_confi_with_gene_id[nrow(tip_nodes_by_snp_mat_confi_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    class(temp_mat) <- class(temp_recon_times_confi) <- class(temp_conf) <- "numeric"
     for (r in 1:nrow(gene_presence_confidence)){
-      if (rowSums(temp_mat)[r] == 0 & rowSums(temp_recon_times_confi)[r] > 0){
+      if (rowSums(temp_mat)[r] == 0 & rowSums(temp_conf)[r] > 0){
         gene_absence_confidence[r, j] <- 1
       }
     }
@@ -1833,13 +1832,7 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
   gene_presence_confidence <- gene_presence_confidence > 0
   class(gene_mat_built_from_snps) <- class(gene_presence_confidence) <- "numeric"
 
-  print("gene_presence_confidence")
-  print(table(gene_presence_confidence))
-  print("gene_absence_confidence")
-  print(table(gene_absence_confidence))
   gene_all_confidence <- gene_presence_confidence + gene_absence_confidence
-  print("gene_all_confidence")
-  print(table(gene_all_confidence))
 
   colnames(gene_mat_built_from_snps)  <- colnames(gene_all_confidence)  <- unique_genes
   row.names(gene_mat_built_from_snps) <- row.names(gene_all_confidence) <- c(1:nrow(gene_mat_built_from_snps))
@@ -1864,48 +1857,20 @@ build_node_anc_recon_from_gene_list <- function(gene_list, tr){
 } # end build_node_anc_recon_from_gene_list()
 
 
-# build_gene_confidence_from_snp <- function(tip_and_node_reconstruction_confidence, tr, gene_to_snp_lookup_table, geno){
-#   tip_nodes_by_snp_mat <- matrix(0, nrow = (Nnode(tr) + Ntip(tr)), ncol = ncol(geno))
-#   if (nrow(tip_nodes_by_snp_mat) != length(tip_and_node_reconstruction_confidence[[1]]$tip_and_node_rec_conf)){
-#     stop("mismatch in size")
-#   }
-#   for (k in 1:ncol(geno)){
-#     tip_nodes_by_snp_mat[ , k] <- tip_and_node_reconstruction_confidence[[k]]$tip_and_node_rec_conf
-#   }
-#   row.names(tip_nodes_by_snp_mat) <- c(1:nrow(tip_nodes_by_snp_mat))
-#   colnames(tip_nodes_by_snp_mat) <- colnames(geno)
-#
-#   if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat)){
-#     stop("mismatch")
-#   }
-#
-#   tip_nodes_by_snp_mat_with_gene_id <- rbind(tip_nodes_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
-#   if (nrow(tip_nodes_by_snp_mat_with_gene_id) != (nrow(tip_nodes_by_snp_mat) + 1)){
-#     stop("rbind didn't work")
-#   }
-#   unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
-#   gene_mat_built_from_snps <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat), ncol = length(unique_genes))
-#   for (j in 1:length(unique_genes)){
-#     temp_mat <- tip_nodes_by_snp_mat_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_with_gene_id) - 1) , tip_nodes_by_snp_mat_with_gene_id[nrow(tip_nodes_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
-#     class(temp_mat) <- "numeric"
-#     temp_column <- apply(temp_mat, 1, min) # get minimum confidence at at tip or node
-#     gene_mat_built_from_snps[ , j] <- temp_column
-#   }
-#
-#   colnames(gene_mat_built_from_snps) <- unique_genes
-#   row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
-#
-#   gene_list_built_from_snps <- rep(list(0), length(unique_genes))
-#   for (m in 1:length(unique_genes)){
-#     gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
-#   }
-#   names(gene_list_built_from_snps) <- unique_genes
-#
-#   return(gene_list_built_from_snps)
-# } # end build_gene_confidence_from_snp()
-
-
 build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_snp_lookup_table){
+
+  # VALIDATE INPUTS -----------------------------------------------------------#
+  check_for_root_and_boostrap(tr)
+  check_if_binary_matrix(geno)
+  check_dimensions(geno, Ntip(tr), 2, NULL, 2)
+  if (length(geno_transition) != ncol(geno)){
+    stop("wrong input")
+  }
+  check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
+  check_if_binary_vector_numeric(geno_transition[[1]]$transition)
+
+  # FUNCTION ------------------------------------------------------------------#
+
   edges_by_snp_mat <- matrix(0, nrow = Nedge(tr), ncol = ncol(geno))
   if (nrow(edges_by_snp_mat) != length(geno_transition[[1]]$transition)){
     stop("mismatch in size")
@@ -1924,6 +1889,7 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   if (nrow(edges_by_snp_mat_with_gene_id) != (nrow(edges_by_snp_mat) + 1)){
     stop("rbind didn't work")
   }
+
   unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
   gene_mat_built_from_snps <- matrix(0, nrow = nrow(edges_by_snp_mat), ncol = length(unique_genes))
   for (j in 1:length(unique_genes)){

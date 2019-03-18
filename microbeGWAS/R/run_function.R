@@ -14,11 +14,9 @@ run_phyc <- function(args){
     genotype <- args$genotype[ , colSums(args$genotype) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
     gene_snp_lookup <- args$gene_snp_lookup[!(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
     gene_snp_lookup <- gene_snp_lookup[gene_snp_lookup[ , 1] %in% colnames(genotype), , drop = FALSE]
-
     unique_genes <- unique(gene_snp_lookup[ , 2])
     snps_per_gene <- table(gene_snp_lookup[ , 2])
   }
-
   phenotype_vector <- convert_matrix_to_vector(args$phenotype) # TODO add check that it's possible to have phenotype convergence
   check_convergence_possible(phenotype_vector, args$discrete_or_continuous)
 
@@ -58,9 +56,13 @@ run_phyc <- function(args){
     temp_results <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup)
     geno_recon_and_confidence_tip_node_recon <- temp_results$tip_node_recon
     geno_recon_and_confidence_tip_node_confidence <- temp_results$tip_node_conf
-    # geno_recon_and_confidence_tip_node_confidence <- build_gene_confidence_from_snp(geno_recon_and_conf, args$tree, gene_snp_lookup, genotype)
+
+    # edge based transition
     geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, geno_trans, gene_snp_lookup)
+
+    # make new genotype (just at the tips, from the snps)
     genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup)
+
     simplified_genotype <- reduce_redundancy(genotype, args$tree, args$output_dir, args$output_name) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
     genotype <- simplified_genotype$mat
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
@@ -86,7 +88,6 @@ run_phyc <- function(args){
 
     # TODO create a test to check/viz that I did the above assignments correctly and started from the correct piece of data.
   } else {
-    # IDENTIFY TRANSITION EDGES AND REFORMAT
     geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
       geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
@@ -155,12 +156,15 @@ run_phyc <- function(args){
       genotype_transition_edges[[k]] <- geno_trans[[k]]$transition
     }
     branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_trans$transition,       high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
-    branch_overlap_recon <- count_hits_on_edges(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
+    # branch_overlap_recon <- count_hits_on_edges(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
+    branch_overlap_recon <- count_hits_on_edges(genotype_transition_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
 
-    results_object$contingency_table_recon <- create_contingency_table(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, genotype)
-    results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges,   pheno_trans$transition, genotype)
+    results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges, pheno_trans$transition,       genotype)
+    # results_object$contingency_table_recon <- create_contingency_table(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, genotype)
+    results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, genotype)
 
     disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_trans$transition,       args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
+    # disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
     disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
 
     hit_pvals_trans <- disc_trans_results$hit_pvals
@@ -184,7 +188,8 @@ run_phyc <- function(args){
                    recon_hit_vals = corrected_pvals_recon$hit_pvals,
                    trans_hit_vals = corrected_pvals_trans$hit_pvals,
                    p_recon_edges = pheno_recon_ordered_by_edges,
-                   g_recon_edges = geno_recon_ordered_by_edges,
+                   # g_recon_edges = geno_recon_ordered_by_edges,
+                   g_recon_edges = genotype_transition_edges,
                    recon_perm_obs_results = disc_recon_results,
                    trans_perm_obs_results = disc_trans_results,
                    tr_and_pheno_hi_conf = high_confidence_edges,

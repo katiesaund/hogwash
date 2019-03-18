@@ -258,6 +258,22 @@ check_if_binary_vector <- function(vec){
   }
 } # end check_if_binary_vector()
 
+check_if_binary_vector_numeric <- function(vec){
+  # Function description -------------------------------------------------------
+  # Check that the matrix only contains values 1 or 0.
+  #
+  # Input:
+  # vec. Vector.
+  #
+  # Output:
+  # None.
+  #
+  # Check input & function -----------------------------------------------------
+  if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "numeric"){
+    stop("Vector should be only 1s and 0s")
+  }
+} # end check_if_binary_vector_numeric()
+
 
 check_if_binary_matrix <- function(mat){
   # Function description -------------------------------------------------------
