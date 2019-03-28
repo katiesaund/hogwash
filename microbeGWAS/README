@@ -1,0 +1,8 @@
+Notes on the Ancestral Reconstruction: 
+
+Using ace::ape(). 
+Discrete reconstruction settings: 
+Marginal = FALSE; This implies a joint estimation procedure where all nodes are considered during the reconstruction, not just the current node and downstream edges. 
+model; this gets decided by a log likelihood test. The ancestral construction is built from all three methods and then their likelihood is tested to see if the more complex models are significantly better than the simpler models. 
+Discrete case requires a maximum likelihood approach. 
+
