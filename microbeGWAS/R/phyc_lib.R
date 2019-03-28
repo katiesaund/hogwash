@@ -141,8 +141,11 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
   #   $trans_dir: Numeric Vector.
   #     Continuous and discrete: gives the direction of the transition.
 
-  # Check input ----------------------------------------------------------------
+  # Check input ---------------------------------------------------------------#
+  # TODO ADD CHECKS
 
+
+  # FUNCTION ------------------------------------------------------------------#
   transition <- transition_direction <- parent_node <- child_node <- integer(Nedge(tr)) # initialize all as zeroes
 
   for (i in 1:Nedge(tr)){
@@ -266,11 +269,11 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   p_trans_delta     <- calculate_phenotype_change_on_edge(t_index,     phenotype_by_edges)
   p_non_trans_delta <- calculate_phenotype_change_on_edge(non_t_index, phenotype_by_edges)
 
-  print("ks test")
-  print(length(t_index))
-  print(length(non_t_index))
-  print(p_trans_delta)
-  print(p_non_trans_delta)
+  #print("ks test")
+  #print(length(t_index))
+  #print(length(non_t_index))
+  #print(p_trans_delta)
+  #print(p_non_trans_delta)
 
   ks_results        <- ks.test(p_trans_delta, p_non_trans_delta)
   results <- list("pval"      = round(ks_results$p.value, digits = 20),
@@ -1133,7 +1136,7 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
   if (trans_or_recon == "recon"){
     edge_color[edges_to_highlight[[index]] == 1] <- edge_color_bright
   } else if (trans_or_recon == "trans"){
-    edge_color[edges_to_highlight[[index]]$transition == 1] <- "red"
+    edge_color[edges_to_highlight[[index]]$transition == 1] <- edge_color_bright
   }
   edge_color[geno_confidence[[index]] == 0] <- edge_color_na # grey out long edges and low ML bootstrap support
   par(mar = c(4, 4, 4, 4))
@@ -1478,7 +1481,7 @@ get_dropped_genotypes <- function(geno, keepers){
   return(dropped_genotype_names)
 } # end get_dropped_genotypes
 
-report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf_edges, geno_names, outdir, outname){
+report_num_high_confidence_trans_edge <- function(genotype_transition, high_conf_edges, geno_names){
   num_high_confidence_transition_edges <- rep(0, length(high_conf_edges))
   for (p in 1:length(high_conf_edges)){
     num_high_confidence_transition_edges[p] <- sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])

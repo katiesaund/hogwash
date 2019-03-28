@@ -82,8 +82,8 @@ run_phyc <- function(args){
 
     geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
-      geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_recon[[k]],      args$tree)
-      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_confidence[[k]], args$tree)
+      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_recon[[k]],      args$tree)
+      geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_confidence[[k]], args$tree)
     }
 
     # TODO create a test to check/viz that I did the above assignments correctly and started from the correct piece of data.
@@ -109,9 +109,29 @@ run_phyc <- function(args){
 
   print("B")
 
+  assign_high_confidence_to_transition_edges <- function(tr, all_confidence_by_edge, genotype_transition_by_edges){
+    # VALIDATION
+    if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)){
+      stop("Dimension mismatch")
+    }
+    check_for_root_and_boostrap(tr)
+    if (length(all_confidence_by_edge[[1]]) != Nedge(tr)){
+      stop("Dimension mismatch")
+    }
+
+    # FUNCTION ----------------------------------------------------------------#
+
+
+    return(transition_edge_high_confidence)
+  }
+  results_object$high_confidence_trasition_edges <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans)
+
   # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#
-  results_object$high_confidence_trasition_edges <- high_confidence_edges
-  num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype), args$output_dir, args$output_name)
+  # results_object$high_confidence_trasition_edges <- high_confidence_edges 2019-03-18 this is too simplistic-- updating using assign_high_confidence_to_transition_edges()
+  #print("high confidence edges")
+  #print(high_confidence_edges)
+  # TODO follow through on replacing high_confdience_edges as necessary
+  num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))
   results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
 
   # KEEP ONLY GENOTYPES WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES ----#
