@@ -71,7 +71,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_t
 
     # RECONSTRUCTION -----------------------------------------------------------
     set.seed(4)
-    recon_model <- pick_recon_model(mat, tr, disc_cont)
+    recon_model <- pick_recon_model(mat, tr, disc_cont, num, recon_method)
     reconstruction <- ace(mat[ , num, drop = TRUE], tr,
                  model = recon_model,
                  type = disc_cont,
@@ -2015,7 +2015,7 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
 } # end create_contigency_table()
 
 
-pick_recon_model <- function(mat, tr, disc_cont){
+pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # Use this function instead of randomly choosing ER as the model
   alpha <- 0.05
   # Reference for model testing: https://www.r-phylo.org/wiki/HowTo/Ancestral_State_Reconstruction & http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
@@ -2045,8 +2045,6 @@ pick_recon_model <- function(mat, tr, disc_cont){
   if (round(p_ER_ARD, 4) != round(new_p_ER_ARD, 4)){
     stop("ER_ARD loglikelihood test should be the same from both calculations")
   }
-
-  stop("recon model selection")
   return(best_model)
 } # end pick_recon_model()
 
