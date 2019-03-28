@@ -54,14 +54,13 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_t
 
   # Compute ancestral reconstruction
   recon_method <- "ML" # Method: ML.         Maximum Likelihood.
-  reconstruction <- integer(Nedge(tr)) # initialize vector of zeroes of length Nedge(tr)
 
   if (disc_cont == "continuous"){
 
     # RECONSTRUCTION -----------------------------------------------------------
     set.seed(3)
-    fitER <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method)
-    ML_anc_rec <- fitER$ace # vector containing reconstruction data for all internal nodes (#51 -99) where tips are 1-50.
+    reconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method)
+    ML_anc_rec <- reconstruction$ace # vector containing reconstruction data for all internal nodes (#51 -99) where tips are 1-50.
     tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
     names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
 
@@ -71,16 +70,20 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_t
   } else if (disc_cont == "discrete"){
 
     # RECONSTRUCTION -----------------------------------------------------------
-    recon_model <- "ER" # Model:  ER.         Indicates an equal rates model of transition.
     set.seed(4)
-    fitER <- ace(mat[ , num, drop = TRUE], tr, model = recon_model, type = disc_cont, method = recon_method)
-    ML_anc_rec <- as.numeric(colnames(fitER$lik.anc)[apply(fitER$lik.anc, 1, which.max)]) # Extract the mostly likely character state using which.max
+    recon_model <- pick_recon_model(mat, tr, disc_cont)
+    reconstruction <- ace(mat[ , num, drop = TRUE], tr,
+                 model = recon_model,
+                 type = disc_cont,
+                 method = recon_method,
+                 marginal = FALSE)
+    ML_anc_rec <- as.numeric(colnames(reconstruction$lik.anc)[apply(reconstruction$lik.anc, 1, which.max)]) # Extract the mostly likely character state using which.max
     names(ML_anc_rec) <- c((Ntip(tr) + 1):(Ntip(tr) + Nnode(tr)))
     tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
     names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
 
     # CONFIDENCE IN RECONSTRUCTION ---------------------------------------------
-    anc_rec_confidence <- apply(fitER$lik.anc, 1, max) # get confidence values at the nodes
+    anc_rec_confidence <- apply(reconstruction$lik.anc, 1, max) # get confidence values at the nodes
     tip_and_node_anc_rec_confidence <- c(rep(1, Ntip(tr)), anc_rec_confidence) # count all tips as high confidence
     tip_and_node_anc_rec_confidence <- discretize_confidence_using_threshold(tip_and_node_anc_rec_confidence, confidence_threshold) # count anything lower than threshold as low confidence
 
@@ -2010,5 +2013,41 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
   names(all_tables) <- colnames(geno)
   return(all_tables)
 } # end create_contigency_table()
+
+
+pick_recon_model <- function(mat, tr, disc_cont){
+  # Use this function instead of randomly choosing ER as the model
+  alpha <- 0.05
+  # Reference for model testing: https://www.r-phylo.org/wiki/HowTo/Ancestral_State_Reconstruction & http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
+
+  ERreconstruction  <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ER")
+  SYMreconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "SYM")
+  # For a binary trait SYM and ER should be identical
+  ARDreconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ARD")
+
+  p_ER_ARD  <- 1-pchisq(2*abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
+  # p_ER_SYM  <- 1-pchisq(2*abs(ERreconstruction$loglik - SYMreconstruction$loglik), 1)
+  # p_SYM_ARD <- 1-pchisq(2*abs(SYMreconstruction$loglik - ARDreconstruction$loglik), 1)
+
+  if (round(ERreconstruction$loglik, 4) != round(SYMreconstruction$loglik, 4)){
+    stop("ER and SYM loglik should be identical")
+  }
+
+  best_model <- "ER"
+  if (p_ER_ARD < alpha & AIC(ERreconstruction) > (4 + AIC(ARDreconstruction))){
+    best_model <- "ARD"
+  }
+
+  kER  <- length(ERreconstruction$rates)
+  kARD <- length(ARDreconstruction$rates)
+  new_p_ER_ARD  <- pchisq(-2*(logLik(ERreconstruction)-logLik(ARDreconstruction)),  df = kARD - kER,  lower.tail = FALSE)
+
+  if (round(p_ER_ARD, 4) != round(new_p_ER_ARD, 4)){
+    stop("ER_ARD loglikelihood test should be the same from both calculations")
+  }
+
+  stop("recon model selection")
+  return(best_model)
+} # end pick_recon_model()
 
 # END OF SCRIPT ---------------------------------------------------------------#
