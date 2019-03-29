@@ -156,7 +156,22 @@ run_phyc <- function(args){
   } # end assign_high_confidence_to_transition_edges()
 
 
-  results_object$high_confidence_trasition_edges <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans)
+  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans)
+  results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
+
+  print("pre")
+  print(table(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
+  print(summary(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
+
+  for (i in 1:ncol(genotype)){
+    geno_trans[[i]]$transition <- only_high_conf_geno_trans[[i]]
+  }
+  print("post")
+  print(table(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
+  print(summary(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
+
+  # how to plot:
+  # plot_tree_with_colored_edges(args$tree, geno_trans, all_high_confidence_edges, "grey", "red", "only new transitions", args$annot, "trans", 2)
 
   # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#
   # results_object$high_confidence_trasition_edges <- high_confidence_edges 2019-03-18 this is too simplistic-- updating using assign_high_confidence_to_transition_edges()
