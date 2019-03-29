@@ -29,6 +29,7 @@ run_phyc <- function(args){
   pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(args$tree, args$phenotype, 1, args$discrete_or_continuous)
   tree_conf             <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
   pheno_trans           <- identify_transition_edges(args$tree, args$phenotype, 1, pheno_recon_and_conf$node_anc_rec, args$discrete_or_continuous)
+  # TODO identify high confdience pheno trans edges! 2019-03-28
   pheno_recon_edge_mat  <- pheno_recon_and_conf$recon_edge_mat
   short_edges           <- identify_short_edges(args$tree)
   pheno_conf_ordered_by_edges  <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_rec_conf, args$tree)
@@ -46,6 +47,16 @@ run_phyc <- function(args){
 
   for (k in 1:ncol(genotype)){
     geno_trans[[k]] <- identify_transition_edges(args$tree, genotype, k, geno_recon_and_conf[[k]]$node_anc_rec, "discrete")
+  }
+
+
+  if (args$discrete_or_continuous == "discrete"){ #when we're doing original phyc
+    # 2019-03-28 change geno_trans to only have WT -> mutant included for $transition to better reflect original phyC
+    for (k in 1:ncol(genotype)){
+      # update definition of $transition to be only WT -> mutant
+      geno_trans[[k]]$transition <- as.numeric(geno_trans[[k]]$trans_dir == 1) # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
+    }
+    # TODO what does this update break?
   }
 
   if (args$built_from_snps){
@@ -121,9 +132,30 @@ run_phyc <- function(args){
 
     # FUNCTION ----------------------------------------------------------------#
 
+    # Identify all edges for which the edge and the parent edge are both high confidence
+    edge_and_parent_both_confident <- edge_and_parent_confident_and_trans_edge <- rep(list(rep(0, Nedge(tr))), ncol(genotype))
+    for (ge in 1:ncol(genotype)){
+      for (ed in 2:(Nedge(tr) - 1)){ # start at 2 because there isn't a parent edge to edge 1, end at Nedge- 1 because no parent to the last edge either
+        parent_edge <- find_parent_edge(tr, ed)
+        if (all_confidence_by_edge[[ge]][ed] == 1 & all_confidence_by_edge[[ge]][parent_edge] == 1){
+          edge_and_parent_both_confident[[ge]][ed] <- 1
+        }
+      }
+      edge_and_parent_both_confident[[ge]][1] <- all_confidence_by_edge[[ge]][1] # have to accoutn for the fact that there isn't a parent edge to edge 1
+      edge_and_parent_both_confident[[ge]][Nedge(tr)] <- all_confidence_by_edge[[ge]][Nedge(tr)] # have to accoutn for the fact that there isn't a parent edge to last edge
+    }
 
-    return(transition_edge_high_confidence)
-  }
+
+    # Identify high confidence transition edges by overlapping the above and transitions
+    for (k in 1:ncol(genotype)){
+      edge_and_parent_confident_and_trans_edge[[k]] <- as.numeric((edge_and_parent_both_confident[[k]] + genotype_transition_by_edges[[k]]$transition) == 2)
+    }
+
+    # Return that overlap as high confidence transitions
+    return(edge_and_parent_confident_and_trans_edge)
+  } # end assign_high_confidence_to_transition_edges()
+
+
   results_object$high_confidence_trasition_edges <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans)
 
   # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#

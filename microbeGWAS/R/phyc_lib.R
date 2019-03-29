@@ -2017,6 +2017,7 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
 
 
 pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
+  # TODO remove SYMreconstruction because it doesn't matter for discrete becuase it's always equal to ER
   # Use this function instead of randomly choosing ER as the model
   alpha <- 0.05
   # Reference for model testing: https://www.r-phylo.org/wiki/HowTo/Ancestral_State_Reconstruction & http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
@@ -2048,5 +2049,14 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   }
   return(best_model)
 } # end pick_recon_model()
+
+find_parent_edge <- function(tr, edge_num){
+  # given an edge number, get edge number of parent edge
+  parent_node <- tr$edge[edge_num, 1]
+  parent_edge <- which(tr$edge[ , 2] == parent_node)
+
+  return(parent_edge)
+  # TODO it breaks on 1st edge, need to deal with that, but not sure what's best yet
+} # end find_parent_edge
 
 # END OF SCRIPT ---------------------------------------------------------------#
