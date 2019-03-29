@@ -26,7 +26,7 @@ run_phyc <- function(args){
 
   # ANCESTRAL RECONSTRUCTION OF PHENOTYPE -------------------------------------#
   set.seed(18591124)
-  pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(args$tree, args$phenotype, 1, args$discrete_or_continuous, args$bootstrap_cutoff)
+  pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(args$tree, args$phenotype, 1, args$discrete_or_continuous)
   tree_conf             <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
   pheno_trans           <- identify_transition_edges(args$tree, args$phenotype, 1, pheno_recon_and_conf$node_anc_rec, args$discrete_or_continuous)
   pheno_recon_edge_mat  <- pheno_recon_and_conf$recon_edge_mat
@@ -41,7 +41,7 @@ run_phyc <- function(args){
 
   # PERFORM ANCESTRAL RECONSTRUCTION
   for(k in 1:ncol(genotype)){
-    geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(args$tree, genotype, k, "discrete", args$bootstrap_cutoff)
+    geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(args$tree, genotype, k, "discrete")
   }
 
   for (k in 1:ncol(genotype)){

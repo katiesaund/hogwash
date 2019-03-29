@@ -24,7 +24,7 @@
 # library(truncnorm) # truncnorm::rtruncnorm function (creates truncated normal distribution) # 2018-08-29 started getting a bug about truncnorm loading....will haveto figure that out later.
 
 # FUNCTIONS FOR PHYC ----------------------------------------------------------#
-ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_threshold){
+ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   # TODO:
   # 1) Break this function into two subfuctions: one for continuous, one for discrete
   # 2) For those two subfunctions:
@@ -54,18 +54,19 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_t
 
   # Compute ancestral reconstruction
   recon_method <- "ML" # Method: ML.         Maximum Likelihood.
+  ML_significance_threshold <- .875 # ML literature suggests that a ratio of 7:1 suggests a high confidence ancestral reconstruction per node .875/.125 = 7
 
   if (disc_cont == "continuous"){
 
     # RECONSTRUCTION -----------------------------------------------------------
     set.seed(3)
-    reconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method)
+    reconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, model = "BM")
     ML_anc_rec <- reconstruction$ace # vector containing reconstruction data for all internal nodes (#51 -99) where tips are 1-50.
     tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
     names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
 
     # CONFIDENCE IN RECONSTRUCTION ---------------------------------------------
-    tip_and_node_anc_rec_confidence <- rep(1, length(tip_and_node_recon)) # TODO is this right? seems like it's not!
+    tip_and_node_anc_rec_confidence <- rep(1, length(tip_and_node_recon)) # Ancestral reconstruction for continuous values only gives back a 95% CI. We can't use any of this information to decide which nodes are low confidence so treat all reconstructed values as high confidence.
 
   } else if (disc_cont == "discrete"){
 
@@ -76,16 +77,16 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont, confidence_t
                  model = recon_model,
                  type = disc_cont,
                  method = recon_method,
-                 marginal = FALSE)
+                 marginal = FALSE) # Want the joint reconstruction here; ape documentation does not make it obvious if this actually calculates the joint.
     ML_anc_rec <- as.numeric(colnames(reconstruction$lik.anc)[apply(reconstruction$lik.anc, 1, which.max)]) # Extract the mostly likely character state using which.max
     names(ML_anc_rec) <- c((Ntip(tr) + 1):(Ntip(tr) + Nnode(tr)))
     tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
     names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
 
     # CONFIDENCE IN RECONSTRUCTION ---------------------------------------------
-    anc_rec_confidence <- apply(reconstruction$lik.anc, 1, max) # get confidence values at the nodes
+    anc_rec_confidence <- apply(reconstruction$lik.anc, 1, max) # Get the highest confidence value at each node
     tip_and_node_anc_rec_confidence <- c(rep(1, Ntip(tr)), anc_rec_confidence) # count all tips as high confidence
-    tip_and_node_anc_rec_confidence <- discretize_confidence_using_threshold(tip_and_node_anc_rec_confidence, confidence_threshold) # count anything lower than threshold as low confidence
+    tip_and_node_anc_rec_confidence <- discretize_confidence_using_threshold(tip_and_node_anc_rec_confidence, ML_significance_threshold) # Count anything lower than threshold as low confidence
 
   } else {
     stop("Ancestral reconstruction cannot run.")
