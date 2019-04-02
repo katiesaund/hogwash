@@ -60,7 +60,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
 
     # RECONSTRUCTION -----------------------------------------------------------
     set.seed(3)
-    reconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, model = "BM")
+    reconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, model = "BM", marginal = FALSE)
     ML_anc_rec <- reconstruction$ace # vector containing reconstruction data for all internal nodes (#51 -99) where tips are 1-50.
     tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
     names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
@@ -77,7 +77,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
                  model = recon_model,
                  type = disc_cont,
                  method = recon_method,
-                 marginal = FALSE) # Want the joint reconstruction here; ape documentation does not make it obvious if this actually calculates the joint.
+                 marginal = FALSE) # Marginal = FALSE means that the marginal is in fact calculated. Do not set marginal to TRUE, because this only does the condition (only downstream edges considered). ace never calculates the joint.
     ML_anc_rec <- as.numeric(colnames(reconstruction$lik.anc)[apply(reconstruction$lik.anc, 1, which.max)]) # Extract the mostly likely character state using which.max
     names(ML_anc_rec) <- c((Ntip(tr) + 1):(Ntip(tr) + Nnode(tr)))
     tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
@@ -705,6 +705,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   # end update trans_edge_mat
   ph_trans <- abs(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2])
 
+  print("0")
   p_trans_mat <- matrix(ph_trans, nrow = length(ph_trans), ncol = 1)
   colnames(p_trans_mat) <- "delta_pheno"
   p_trans_mat <- as.data.frame(round(p_trans_mat, 2))
@@ -715,7 +716,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
 
   log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
   column_annot <- cbind(significant_loci, log_p_value)
-
+  print("1")
 
   row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:Nedge(tr))
   # end heatmap prep
@@ -732,7 +733,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   pdf(fname, width = 16, height = 20)
 
   make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, a, "transition")
-
+  print("2")
   cell_width_value <- 1.5
   if (ncol(ordered_by_p_val) < 50){
     cell_width_value <- 10
@@ -766,7 +767,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
     show_colnames = TRUE,
     cellwidth = cell_width_value,
     na_col = "grey")
-
+  print("3")
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
   counter <- 0 # can I get rid of counter now? 2019-02-25
   for (j in 1:nrow(pval_all_transition$hit_pvals)){
@@ -808,7 +809,51 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
 
   dev.off()
 
-  results <- list("trans_edge_mat" = trans_edge_mat, "p_trans_mat" = p_trans_mat)
+  print("4")
+  trans_dir_edge_mat <- NULL
+  for (i in 1:length(geno_transition)){
+    trans_dir_edge_mat <- cbind(trans_dir_edge_mat, geno_transition[[i]]$trans_dir)
+  }
+  print("5")
+  colnames(trans_dir_edge_mat) <- colnames(geno)
+  print("6")
+  # Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
+  for (c in 1:ncol(trans_dir_edge_mat)){
+    trans_dir_edge_mat[(1:Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
+  }
+  print("7")
+
+  all_tables <- all_lists <- rep(list(NULL), ncol(trans_dir_edge_mat))
+  print("8")
+  delta_pheno_table <- matrix(0, nrow = 3, ncol = 1)
+  row.names(delta_pheno_table) <- c("geno_parent_0_child_1", "geno_parent_1_child_0", "geno_no_change")
+  colnames(delta_pheno_table) <- c("sum(|delta_phenotype|)")
+  print("9")
+  for (i in 1:ncol(trans_dir_edge_mat)){
+    temp_table <- delta_pheno_table
+    temp_table[1, 1] <- sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == 1),  1], na.rm = TRUE)
+    temp_table[2, 1] <- sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == -1), 1], na.rm = TRUE)
+    temp_table[3, 1] <- sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == 0),  1], na.rm = TRUE)
+    all_tables[[i]] <- temp_table
+  }
+  print("10")
+  names(all_tables) <- colnames(geno)
+  delta_pheno_table <- all_tables
+  print("11")
+  delta_pheno_list <- rep(list(0), 3)
+  names(delta_pheno_list) <- c("geno_parent_0_child_1", "geno_parent_1_child_0", "geno_no_change")
+  for (i in 1:ncol(trans_dir_edge_mat)){
+    temp_list <- delta_pheno_list
+    temp_list[[1]] <- p_trans_mat[which(trans_dir_edge_mat[ , i] == 1),  1]
+    temp_list[[2]] <- p_trans_mat[which(trans_dir_edge_mat[ , i] == -1), 1]
+    temp_list[[3]] <- p_trans_mat[which(trans_dir_edge_mat[ , i] == 0),  1]
+    all_lists[[i]] <- temp_list
+    names(all_lists)[i] <- colnames(trans_dir_edge_mat)[i]
+  }
+  print("12")
+  delta_pheno_list <- all_lists
+  print("done with this function")
+  results <- list("trans_dir_edge_mat" = trans_dir_edge_mat, "p_trans_mat" = p_trans_mat, "delta_pheno_table" = delta_pheno_table, "delta_pheno_list" = delta_pheno_list )
   return(results)
 } # end plot_significant_hits()
 
@@ -2023,7 +2068,7 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # Reference for model testing: https://www.r-phylo.org/wiki/HowTo/Ancestral_State_Reconstruction & http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
 
   ERreconstruction  <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ER")
-  SYMreconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "SYM")
+  #SYMreconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "SYM")
   # For a binary trait SYM and ER should be identical
   ARDreconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ARD")
 
@@ -2031,9 +2076,9 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # p_ER_SYM  <- 1-pchisq(2*abs(ERreconstruction$loglik - SYMreconstruction$loglik), 1)
   # p_SYM_ARD <- 1-pchisq(2*abs(SYMreconstruction$loglik - ARDreconstruction$loglik), 1)
 
-  if (round(ERreconstruction$loglik, 4) != round(SYMreconstruction$loglik, 4)){
-    stop("ER and SYM loglik should be identical")
-  }
+  #if (round(ERreconstruction$loglik, 4) != round(SYMreconstruction$loglik, 4)){
+  #  stop("ER and SYM loglik should be identical")
+  #}
 
   best_model <- "ER"
   if (p_ER_ARD < alpha & AIC(ERreconstruction) > (4 + AIC(ARDreconstruction))){

@@ -159,16 +159,16 @@ run_phyc <- function(args){
   only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans)
   results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
 
-  print("pre")
-  print(table(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
-  print(summary(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
+  #print("pre")
+  #print(table(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
+  #print(summary(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
 
   for (i in 1:ncol(genotype)){
     geno_trans[[i]]$transition <- only_high_conf_geno_trans[[i]]
   }
-  print("post")
-  print(table(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
-  print(summary(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
+  #print("post")
+  #print(table(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
+  #print(summary(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
 
   # how to plot:
   # plot_tree_with_colored_edges(args$tree, geno_trans, all_high_confidence_edges, "grey", "red", "only new transitions", args$annot, "trans", 2)
@@ -199,23 +199,26 @@ run_phyc <- function(args){
     # RUN PERMUTATION TEST ------------------------------------------------------#
     results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
 
+    print("D")
     # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
     corrected_pvals_all_transitions <- get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals, args$alpha)
-
+    print("E")
     # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES
     all_transitions_sig_hits <- keep_hits_with_more_change_on_trans_edges(results_all_transitions, corrected_pvals_all_transitions, args$alpha)
-
+    print("F")
     # SAVE AND PLOT RESULTS -----------------------------------------------------#
     trans_mat_results <- plot_significant_hits("continuous", args$tree, args$alpha, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
-
+    print("G")
     # move next five lines into a function
-    results_object$transition_edge_matrix <- trans_mat_results$trans_edge_mat
+    results_object$genotype_transition_edge_matrix <- trans_mat_results$trans_dir_edge_mat
     results_object$phenotype_transition_edge_matrix <- trans_mat_results$p_trans_mat
+    results_object$delta_pheno_table <- trans_mat_results$delta_pheno_table
+    results_object$delta_pheno_list <- trans_mat_results$delta_pheno_list
     results_object$hit_pvals <- corrected_pvals_all_transitions$hit_pvals
     results_object$sig_hits <- all_transitions_sig_hits
-
+    print("H")
     save_results_as_r_object(args$output_dir, args$output_name, results_object)
-
+    print("I")
   } else { # discrete phenotype
     print("D")
     genotype_transition_edges <- rep(list(0), ncol(genotype))
