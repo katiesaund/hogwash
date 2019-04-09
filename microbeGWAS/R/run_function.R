@@ -19,6 +19,8 @@ run_phyc <- function(args){
   }
   phenotype_vector <- convert_matrix_to_vector(args$phenotype) # TODO add check that it's possible to have phenotype convergence
   check_convergence_possible(phenotype_vector, args$discrete_or_continuous)
+  check_if_phenotype_normal(phenotype_vector, args$discrete_or_continuous)
+  check_if_convergence_occurs(phenotype_vector, args$tree, args$discrete_or_continuous)
 
   # ---------------------------------------------------------------------------#
   # PHYC

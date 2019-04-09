@@ -2104,4 +2104,40 @@ find_parent_edge <- function(tr, edge_num){
   # TODO it breaks on 1st edge, need to deal with that, but not sure what's best yet
 } # end find_parent_edge
 
+check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
+  if (continuous_or_discrete == "continuous"){
+    result <- shapiro.test(unlist(pheno))
+    alpha <- 0.05
+    if (result$p < alpha){
+      print("Consider transforming your phenotype to be normally distributed")
+    }
+  }
+} # end check_if_phenotype_normal
+
+check_if_convergence_occurs <- function(pheno, tree, continuous_or_discrete){
+  if (continuous_or_discrete == "continuous"){
+    set.seed(1)
+    geiger_BM <- fitContinuous(tree, pheno, model = "BM")
+    geiger_OU <- fitContinuous(tree, pheno, model = "OU")
+    geiger_white <- fitContinuous(tree, pheno, model = "white")
+    aicc_values <- c(geiger_BM$opt$aicc,
+                     geiger_OU$opt$aicc,
+                     geiger_white$opt$aicc)
+
+    if (geiger_white$opt$aicc < geiger_BM$opt$aicc){
+      print("WN better than BM")
+    }
+
+    # TODO Add this as a plot to output?
+    #pdf(paste(test_dir, "/evolutionary_model_barplot.pdf", sep =""))
+    #par(mfrow = c(1,1))
+    #barplot(c(geiger_BM$opt$aicc, geiger_OU$opt$aicc, geiger_white$opt$aicc),
+    #        names.arg = c("Brownian Motion", "Ornstein-Uhlenbeck", "White Noise"),
+    #        col = c("black", "black", "black"),ylim = c(0, 600),
+    #        ylab = "AICc", xlab = "Evolutionary model",
+    #        main = "Model values for toxin")
+    #dev.off()
+  }
+} # end check_if_convergence_occurs()
+
 # END OF SCRIPT ---------------------------------------------------------------#
