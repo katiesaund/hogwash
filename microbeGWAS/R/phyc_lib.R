@@ -2062,36 +2062,48 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
 
 
 pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
-  # TODO remove SYMreconstruction because it doesn't matter for discrete becuase it's always equal to ER
-  # Use this function instead of randomly choosing ER as the model
+  # Note, SYMreconstruction removed because SYM == ER for binary inputs.
+  # Use this function to choose the best model for reconstruction.
+
+  # Check inputs --------------------------------------------------------------#
+  if (disc_cont != "discrete"){
+    stop("Only pick recon model for discrete characters. Continuous characters must be BM.")
+  }
+
+  check_if_binary_matrix(mat)
+
+  # Function ------------------------------------------------------------------#
   alpha <- 0.05
+  significant_difference_in_AIC <- 2
+
   # Reference for model testing: https://www.r-phylo.org/wiki/HowTo/Ancestral_State_Reconstruction & http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
-
+  # Test ER vs ARD
   ERreconstruction  <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ER")
-  #SYMreconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "SYM")
-  # For a binary trait SYM and ER should be identical
-  ARDreconstruction <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ARD")
 
-  p_ER_ARD  <- 1-pchisq(2*abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
-  # p_ER_SYM  <- 1-pchisq(2*abs(ERreconstruction$loglik - SYMreconstruction$loglik), 1)
-  # p_SYM_ARD <- 1-pchisq(2*abs(SYMreconstruction$loglik - ARDreconstruction$loglik), 1)
+  # Some ARD models don't work well with the data and given a warning message like:  "In sqrt(diag(solve(h))) : NaNs produced"
+  # To ensure the ER model is prefered in this case use the following warning catching:
+  error_msg <- "ARD_bad_fit"
+  ARDreconstruction <- tryCatch(ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ARD"), warning = function(x) {error_msg})
 
-  #if (round(ERreconstruction$loglik, 4) != round(SYMreconstruction$loglik, 4)){
-  #  stop("ER and SYM loglik should be identical")
-  #}
-
+  # If ARD gave a warning, pick ER
   best_model <- "ER"
-  if (p_ER_ARD < alpha & AIC(ERreconstruction) > (4 + AIC(ARDreconstruction))){
-    best_model <- "ARD"
+  if (length(ARDreconstruction) == 1){
+    best_model <- "ER"
+  } else { # Pick best of ER and ARD
+    p_ER_ARD  <- 1 - pchisq(2*abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
+    if (p_ER_ARD < alpha & AIC(ERreconstruction) > (significant_difference_in_AIC + AIC(ARDreconstruction))){
+      best_model <- "ARD"
+    }
+    kER  <- length(ERreconstruction$rates)
+    kARD <- length(ARDreconstruction$rates)
+    new_p_ER_ARD  <- pchisq(-2*(logLik(ERreconstruction)-logLik(ARDreconstruction)),  df = kARD - kER,  lower.tail = FALSE)
+
+    num_digits <- 4
+    if (round(p_ER_ARD, num_digits) != round(new_p_ER_ARD, num_digits)){
+      stop("ER_ARD loglikelihood test should be the same from both calculations")
+    }
   }
 
-  kER  <- length(ERreconstruction$rates)
-  kARD <- length(ARDreconstruction$rates)
-  new_p_ER_ARD  <- pchisq(-2*(logLik(ERreconstruction)-logLik(ARDreconstruction)),  df = kARD - kER,  lower.tail = FALSE)
-
-  if (round(p_ER_ARD, 4) != round(new_p_ER_ARD, 4)){
-    stop("ER_ARD loglikelihood test should be the same from both calculations")
-  }
   return(best_model)
 } # end pick_recon_model()
 
@@ -2109,7 +2121,7 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
     result <- shapiro.test(unlist(pheno))
     alpha <- 0.05
     if (result$p < alpha){
-      print("Consider transforming your phenotype to be normally distributed")
+      print("Consider normalizing your phenotype")
     }
   }
 } # end check_if_phenotype_normal
@@ -2118,11 +2130,7 @@ check_if_convergence_occurs <- function(pheno, tree, continuous_or_discrete){
   if (continuous_or_discrete == "continuous"){
     set.seed(1)
     geiger_BM <- fitContinuous(tree, pheno, model = "BM")
-    geiger_OU <- fitContinuous(tree, pheno, model = "OU")
     geiger_white <- fitContinuous(tree, pheno, model = "white")
-    aicc_values <- c(geiger_BM$opt$aicc,
-                     geiger_OU$opt$aicc,
-                     geiger_white$opt$aicc)
 
     if (geiger_white$opt$aicc < geiger_BM$opt$aicc){
       print("WN better than BM")
@@ -2139,5 +2147,41 @@ check_if_convergence_occurs <- function(pheno, tree, continuous_or_discrete){
     #dev.off()
   }
 } # end check_if_convergence_occurs()
+
+
+assign_high_confidence_to_transition_edges <- function(tr, all_confidence_by_edge, genotype_transition_by_edges){
+  # VALIDATION
+  if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)){
+    stop("Dimension mismatch")
+  }
+  check_for_root_and_boostrap(tr)
+  if (length(all_confidence_by_edge[[1]]) != Nedge(tr)){
+    stop("Dimension mismatch")
+  }
+
+  # FUNCTION ----------------------------------------------------------------#
+
+  # Identify all edges for which the edge and the parent edge are both high confidence
+  edge_and_parent_both_confident <- edge_and_parent_confident_and_trans_edge <- rep(list(rep(0, Nedge(tr))), ncol(genotype))
+  for (ge in 1:ncol(genotype)){
+    for (ed in 2:(Nedge(tr) - 1)){ # start at 2 because there isn't a parent edge to edge 1, end at Nedge- 1 because no parent to the last edge either
+      parent_edge <- find_parent_edge(tr, ed)
+      if (all_confidence_by_edge[[ge]][ed] == 1 & all_confidence_by_edge[[ge]][parent_edge] == 1){
+        edge_and_parent_both_confident[[ge]][ed] <- 1
+      }
+    }
+    edge_and_parent_both_confident[[ge]][1] <- all_confidence_by_edge[[ge]][1] # have to accoutn for the fact that there isn't a parent edge to edge 1
+    edge_and_parent_both_confident[[ge]][Nedge(tr)] <- all_confidence_by_edge[[ge]][Nedge(tr)] # have to accoutn for the fact that there isn't a parent edge to last edge
+  }
+
+
+  # Identify high confidence transition edges by overlapping the above and transitions
+  for (k in 1:ncol(genotype)){
+    edge_and_parent_confident_and_trans_edge[[k]] <- as.numeric((edge_and_parent_both_confident[[k]] + genotype_transition_by_edges[[k]]$transition) == 2)
+  }
+
+  # Return that overlap as high confidence transitions
+  return(edge_and_parent_confident_and_trans_edge)
+} # end assign_high_confidence_to_transition_edges()
 
 # END OF SCRIPT ---------------------------------------------------------------#

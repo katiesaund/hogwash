@@ -1,4 +1,5 @@
 run_phyc <- function(args){
+  #options(warn=2, error=recover)
   # FORMAT INPUTS ---------------------------------------------------------------#
   results_object <- NULL
 
@@ -22,6 +23,7 @@ run_phyc <- function(args){
   check_if_phenotype_normal(phenotype_vector, args$discrete_or_continuous)
   check_if_convergence_occurs(phenotype_vector, args$tree, args$discrete_or_continuous)
 
+  #stop()
   # ---------------------------------------------------------------------------#
   # PHYC
   # ---------------------------------------------------------------------------#
@@ -121,43 +123,7 @@ run_phyc <- function(args){
   }
 
   print("B")
-
-  assign_high_confidence_to_transition_edges <- function(tr, all_confidence_by_edge, genotype_transition_by_edges){
-    # VALIDATION
-    if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)){
-      stop("Dimension mismatch")
-    }
-    check_for_root_and_boostrap(tr)
-    if (length(all_confidence_by_edge[[1]]) != Nedge(tr)){
-      stop("Dimension mismatch")
-    }
-
-    # FUNCTION ----------------------------------------------------------------#
-
-    # Identify all edges for which the edge and the parent edge are both high confidence
-    edge_and_parent_both_confident <- edge_and_parent_confident_and_trans_edge <- rep(list(rep(0, Nedge(tr))), ncol(genotype))
-    for (ge in 1:ncol(genotype)){
-      for (ed in 2:(Nedge(tr) - 1)){ # start at 2 because there isn't a parent edge to edge 1, end at Nedge- 1 because no parent to the last edge either
-        parent_edge <- find_parent_edge(tr, ed)
-        if (all_confidence_by_edge[[ge]][ed] == 1 & all_confidence_by_edge[[ge]][parent_edge] == 1){
-          edge_and_parent_both_confident[[ge]][ed] <- 1
-        }
-      }
-      edge_and_parent_both_confident[[ge]][1] <- all_confidence_by_edge[[ge]][1] # have to accoutn for the fact that there isn't a parent edge to edge 1
-      edge_and_parent_both_confident[[ge]][Nedge(tr)] <- all_confidence_by_edge[[ge]][Nedge(tr)] # have to accoutn for the fact that there isn't a parent edge to last edge
-    }
-
-
-    # Identify high confidence transition edges by overlapping the above and transitions
-    for (k in 1:ncol(genotype)){
-      edge_and_parent_confident_and_trans_edge[[k]] <- as.numeric((edge_and_parent_both_confident[[k]] + genotype_transition_by_edges[[k]]$transition) == 2)
-    }
-
-    # Return that overlap as high confidence transitions
-    return(edge_and_parent_confident_and_trans_edge)
-  } # end assign_high_confidence_to_transition_edges()
-
-
+  stop()
   only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans)
   results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
 
