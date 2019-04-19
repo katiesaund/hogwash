@@ -11,7 +11,7 @@ geno      <- read.csv(args[3], header = TRUE, row.names = 1, sep = "\t")
 recon     <- args[4]
 test_corr <- args[5]
 fname     <- args[6]
-alpha     <- args[7]
+alpha     <- as.numeric(args[7])
 
 # RUN TREEWAS -----------------------------------------------------------------#
 temp <- unlist(pheno)
