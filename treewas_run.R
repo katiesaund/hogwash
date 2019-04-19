@@ -23,7 +23,7 @@ if (!is.rooted(tree)){
 }
 
 pdf_fname <- paste(fname, ".pdf", sep = "")
-geno <- remove_nonexistant_genotypes(geno)
+geno <- remove_nonexistant_genotypes(geno, fname)
 results <- run_treeWAS(tree, geno, pheno, recon, test_corr, pdf_fname, alpha)
 save(results, file = paste(fname, "_results.rda", sep = ""))
 save_treewas_hits(results$terminal$sig.snps, "terminal", fname)
