@@ -151,16 +151,23 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
 
   # FUNCTION ------------------------------------------------------------------#
   transition <- transition_direction <- parent_node <- child_node <- integer(Nedge(tr)) # initialize all as zeroes
+  older <- 1 # older node is 1st column in tr$edge
+  younger <- 2 # younger node is 2nd column in tr$edge
+  parent_0_child_1 <- 1
+  parent_1_child_0 <- -1
+  parent_equals_child <- 0
+  both_parent_and_child_are_one <- 2
+
 
   for (i in 1:Nedge(tr)){
-    if (is_tip(tr$edge[i, 1], tr)){
+    if (is_tip(tr$edge[i, older], tr)){
       stop("tree invalid")
     }
-    parent_node[i] <- node_recon[tr$edge[i, 1] - Ntip(tr)]   # Assign node value
-    if (is_tip(tr$edge[i, 2], tr)){ # child is a tip
-      child_node[i]  <- mat[ , num][tr$edge[i, 2]]           # Assign tip value
+    parent_node[i] <- node_recon[tr$edge[i, older] - Ntip(tr)]   # Assign node value
+    if (is_tip(tr$edge[i, younger], tr)){ # child is a tip
+      child_node[i]  <- mat[ , num][tr$edge[i, younger]]           # Assign tip value
     } else {  # child is internal nodes
-      child_node[i]  <- node_recon[tr$edge[i, 2] - Ntip(tr)] # Assign node value
+      child_node[i]  <- node_recon[tr$edge[i, younger] - Ntip(tr)] # Assign node value
     }
 
     transition[i] <- sum(parent_node[i] + child_node[i])
@@ -168,13 +175,13 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
     # transition[i] is not to be used when the trait is continuous because all, or very nearly all edges are transition edges.
 
     if (parent_node[i] > child_node[i]){
-      transition_direction[i] <- -1
+      transition_direction[i] <- parent_1_child_0
     } else if (parent_node[i] < child_node[i]){
-      transition_direction[i] <- 1
+      transition_direction[i] <- parent_0_child_1
     }
 
     if (disc_cont == "discrete"){
-      transition[transition == 2] <- 0 # If parent_node and child_node had same value (1) then no transition occured.
+      transition[transition == both_parent_and_child_are_one] <- parent_equals_child # If parent_node and child_node had same value (1) then no transition occured.
     } else if (disc_cont == "continuous"){
       transition <- NA # transition[i] is not to be used when the trait is continuous because all, or very nearly all edges are transition edges.
     } else {
@@ -690,15 +697,13 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   check_if_permutation_num_valid(perm)
 
   # Function -------------------------------------------------------------------
-
-  # prep for heatmap 6
   trans_edge_mat <- NULL
   for (i in 1:length(geno_transition)){
     trans_edge_mat <- cbind(trans_edge_mat, geno_transition[[i]]$transition)
   }
   colnames(trans_edge_mat) <- colnames(geno)
 
-  # Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
+  # TODO Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
   for (c in 1:ncol(trans_edge_mat)){
     trans_edge_mat[(1:Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
@@ -769,9 +774,10 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
     na_col = "grey")
   print("3")
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
-  counter <- 0 # can I get rid of counter now? 2019-02-25
+  counter <- 0 # TODO can I get rid of counter now? 2019-02-25
   for (j in 1:nrow(pval_all_transition$hit_pvals)){
     if (pval_all_transition$hit_pvals[j, 1] < a){
+      print("making significant plots")
       counter <- counter + 1
       par(mfrow = c(3, 3))
       par(mgp   = c(3, 1, 0))
@@ -814,10 +820,18 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   for (i in 1:length(geno_transition)){
     trans_dir_edge_mat <- cbind(trans_dir_edge_mat, geno_transition[[i]]$trans_dir)
   }
+  print("dim trans_dir_edge_mat")
+  print(dim(trans_dir_edge_mat))
+  print("geno_transition length")
+  print(length(geno_transition))
+  print("[[i]]$trans_dir")
+  print(geno_transition[[i]]$trans_dir)
+
+
   print("5")
   colnames(trans_dir_edge_mat) <- colnames(geno)
   print("6")
-  # Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
+  # TODO Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
   for (c in 1:ncol(trans_dir_edge_mat)){
     trans_dir_edge_mat[(1:Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
@@ -1217,18 +1231,23 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
 # DISCRETE PHYC LIBRARY -------------------------------------------------------#
 
 count_hits_on_edges <- function(genotype_reconstruction, phenotype_reconstruction, high_confidence_edges, phenotype_confidence){
-  # TO DO: update description
-  # 1) We're now workingwith ordered by edges rather than ordered by tips then noes
+  # TODO: update description
+  # 1) We're now workingwith ordered by edges rather than ordered by tips then nodes
   # 2) rename combined/genotype confidence. it's confusing.
   # 3) stop returning combined_confidence- don't need it.
 
   # genotype_reconstruction is a list of vectors. Each vector corresponds with 1 genotype from the geno_mat.
-  # Each entry in the vector corresponds to a node or tip.
+  # Each entry in the vector corresponds to edge
   # phenotype_reconstruction is a vector where each entry corresponds to a node or tip.
   # genotype_confidence is a list of vectors. Each vector corresponds with 1 genotype from the geno_mat.
   # Each entry in the vector corresponds to a node or tip. 1 means high confidence in the node, 0 means low confidence.
   # phenotype_confidence is a vector where each entry corresponds to a node of tip. Same encoding as above.
 
+  # TODO add checks / validations
+
+
+
+  # FUNCTION ------------------------------------------------------------------#
 
   both_present <- sapply(1:length(high_confidence_edges), function(x) {
     sum(phenotype_reconstruction[as.logical(high_confidence_edges[[x]])] + genotype_reconstruction[[x]][as.logical(high_confidence_edges[[x]])] == 2)
@@ -2149,7 +2168,7 @@ check_if_convergence_occurs <- function(pheno, tree, continuous_or_discrete){
 } # end check_if_convergence_occurs()
 
 
-assign_high_confidence_to_transition_edges <- function(tr, all_confidence_by_edge, genotype_transition_by_edges){
+assign_high_confidence_to_transition_edges <- function(tr, all_confidence_by_edge, genotype_transition_by_edges, geno){
   # VALIDATION
   if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)){
     stop("Dimension mismatch")
@@ -2162,8 +2181,8 @@ assign_high_confidence_to_transition_edges <- function(tr, all_confidence_by_edg
   # FUNCTION ----------------------------------------------------------------#
 
   # Identify all edges for which the edge and the parent edge are both high confidence
-  edge_and_parent_both_confident <- edge_and_parent_confident_and_trans_edge <- rep(list(rep(0, Nedge(tr))), ncol(genotype))
-  for (ge in 1:ncol(genotype)){
+  edge_and_parent_both_confident <- edge_and_parent_confident_and_trans_edge <- rep(list(rep(0, Nedge(tr))), ncol(geno))
+  for (ge in 1:ncol(geno)){
     for (ed in 2:(Nedge(tr) - 1)){ # start at 2 because there isn't a parent edge to edge 1, end at Nedge- 1 because no parent to the last edge either
       parent_edge <- find_parent_edge(tr, ed)
       if (all_confidence_by_edge[[ge]][ed] == 1 & all_confidence_by_edge[[ge]][parent_edge] == 1){
@@ -2176,7 +2195,7 @@ assign_high_confidence_to_transition_edges <- function(tr, all_confidence_by_edg
 
 
   # Identify high confidence transition edges by overlapping the above and transitions
-  for (k in 1:ncol(genotype)){
+  for (k in 1:ncol(geno)){
     edge_and_parent_confident_and_trans_edge[[k]] <- as.numeric((edge_and_parent_both_confident[[k]] + genotype_transition_by_edges[[k]]$transition) == 2)
   }
 

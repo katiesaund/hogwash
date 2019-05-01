@@ -23,7 +23,6 @@ run_phyc <- function(args){
   check_if_phenotype_normal(phenotype_vector, args$discrete_or_continuous)
   check_if_convergence_occurs(phenotype_vector, args$tree, args$discrete_or_continuous)
 
-  #stop()
   # ---------------------------------------------------------------------------#
   # PHYC
   # ---------------------------------------------------------------------------#
@@ -58,9 +57,11 @@ run_phyc <- function(args){
     # 2019-03-28 change geno_trans to only have WT -> mutant included for $transition to better reflect original phyC
     for (k in 1:ncol(genotype)){
       # update definition of $transition to be only WT -> mutant
-      geno_trans[[k]]$transition <- as.numeric(geno_trans[[k]]$trans_dir == 1) # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
+      parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
+      geno_trans[[k]]$transition <- as.numeric(geno_trans[[k]]$trans_dir == parent_WT_child_mutant)
     }
     # TODO what does this update break?
+    # it breaks the discrete transition test, but should work well for the discrete original test.
   }
 
   if (args$built_from_snps){
@@ -123,8 +124,7 @@ run_phyc <- function(args){
   }
 
   print("B")
-  stop()
-  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans)
+  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans, genotype)
   results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
 
   #print("pre")
