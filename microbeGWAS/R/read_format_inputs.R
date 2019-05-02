@@ -120,3 +120,48 @@ read_in_arguments <- function(args){
          6. Number of permutations 7. Alpha 8. Bootstrap confidence threshold and optional 9. Annotation")
   }
 } # end read_in_arguments()
+
+
+check_input_format <- function(pheno, tr, geno, name, dir, perm, a, annot){
+  # Function description -------------------------------------------------------
+  # Check that all of the inputs into phyC are in the valid format.
+  #
+  # Input:
+  # pheno. Matrix. Phenotype.
+  # tr.    Phylo. Tree.
+  # geno.  Matrix. Genotype.
+  # name.  Character. Output name.
+  # dir.   Character. Output path.
+  # perm.  Number. Times to shuffle the data on the tree to create a null distribution for the permutation test.
+  # a.     Number. Alpha.
+  # annot. Matrix. Annotation for heatmaps.
+
+  # Output:
+  # discrete_or_continuous. Character. Either "discrete" or "continuous". Describes the input phenotype.
+  #
+  # Check input ----------------------------------------------------------------
+  check_dimensions(geno, Ntip(tr), 2, NULL, 2) # Genotype matrix should have same rows as tr$tip.label, at least 2 genotypes in the columns
+  check_dimensions(pheno, Ntip(tr), 2, 1, 1) # Phnoetype matrix should have same rows as tr$tip.label and exactly 1 column
+  check_rownames(geno, tr) # Genotype rownames should be in the same order as the tr$tip.label
+  check_rownames(pheno, tr) # Phenotype rownames should be in the same order as the tr$tip.label
+  check_for_NA_and_inf(geno)
+  check_for_NA_and_inf(pheno)
+  check_for_root_and_bootstrap(tr)
+  check_tree_is_valid(tr)
+  check_if_binary_matrix(geno)
+  check_is_string(name)
+  check_if_dir_exists(dir)
+  check_if_permutation_num_valid(perm)
+  check_if_alpha_valid(a)
+  if (!is.null(annot)){
+    check_dimensions(annot, Ntip(tr), 2, 2, 2)
+  }
+
+  # Function -------------------------------------------------------------------
+  discrete_or_continuous <- assign_pheno_type(pheno)
+
+  # Check and return output ----------------------------------------------------
+  check_is_string(discrete_or_continuous)
+  return(discrete_or_continuous)
+} # end check_input_format()
+

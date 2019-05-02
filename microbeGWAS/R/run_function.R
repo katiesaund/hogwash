@@ -1,7 +1,6 @@
 run_phyc <- function(args){
   # FORMAT INPUTS ---------------------------------------------------------------#
   results_object <- NULL
-
   results_object$log <- capture.output(sessionInfo()) # log session info
 
   if (!args$built_from_snps) {

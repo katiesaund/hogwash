@@ -1,0 +1,2 @@
+library(microbeGWAS)
+context("Plots") #----------------------------------------------#

@@ -116,49 +116,6 @@ check_is_string <- function(char){
   }
 } # end check_is_string()
 
-check_input_format <- function(pheno, tr, geno, name, dir, perm, a, annot){
-  # Function description -------------------------------------------------------
-  # Check that all of the inputs into phyC are in the valid format.
-  #
-  # Input:
-  # pheno. Matrix. Phenotype.
-  # tr.    Phylo. Tree.
-  # geno.  Matrix. Genotype.
-  # name.  Character. Output name.
-  # dir.   Character. Output path.
-  # perm.  Number. Times to shuffle the data on the tree to create a null distribution for the permutation test.
-  # a.     Number. Alpha.
-  # annot. Matrix. Annotation for heatmaps.
-
-  # Output:
-  # discrete_or_continuous. Character. Either "discrete" or "continuous". Describes the input phenotype.
-  #
-  # Check input ----------------------------------------------------------------
-  check_dimensions(geno, Ntip(tr), 2, NULL, 2) # Genotype matrix should have same rows as tr$tip.label, at least 2 genotypes in the columns
-  check_dimensions(pheno, Ntip(tr), 2, 1, 1) # Phnoetype matrix should have same rows as tr$tip.label and exactly 1 column
-  check_rownames(geno, tr) # Genotype rownames should be in the same order as the tr$tip.label
-  check_rownames(pheno, tr) # Phenotype rownames should be in the same order as the tr$tip.label
-  check_for_NA_and_inf(geno)
-  check_for_NA_and_inf(pheno)
-  check_for_root_and_bootstrap(tr)
-  check_tree_is_valid(tr)
-  check_if_binary_matrix(geno)
-  check_is_string(name)
-  check_if_dir_exists(dir)
-  check_if_permutation_num_valid(perm)
-  check_if_alpha_valid(a)
-  if (!is.null(annot)){
-    check_dimensions(annot, Ntip(tr), 2, 2, 2)
-  }
-
-  # Function -------------------------------------------------------------------
-  discrete_or_continuous <- assign_pheno_type(pheno)
-
-  # Check and return output ----------------------------------------------------
-  check_is_string(discrete_or_continuous)
-  return(discrete_or_continuous)
-} # end check_input_format()
-
 check_if_vector <- function(vector){
   # Function description -------------------------------------------------------
   # Check that input is a vector.
@@ -361,6 +318,9 @@ check_is_number <- function(num){
   if (length(num) != 1){
     stop("Must be a single number")
   }
+  if (num == Inf | num == -Inf){
+    stop("This can't handle infinity.")
+  }
 } # end check_is_number()
 
 check_node_is_in_tree <- function(node_val, tr){
@@ -475,6 +435,26 @@ is_tip <- function(node_num, tr){
 
 
 check_if_g_mat_can_be_plotted <- function(geno_matrix){
+  # Function description -------------------------------------------------------
+  # TODO
+  # In order to make a heatmap there need to be 1) at least two columns, 2)
+  # two different values within the matrix (0 and 1).
+  # There can be NAs in the matrix.
+  #
+  # Inputs:
+  # geno_matrix. Matrix. 1, 0, and/or NA.
+  #
+  # Outputs:
+  # plot_logical. Logical. TRUE or FALSE.
+  #
+  # Check input ----------------------------------------------------------------
+  check_dimensions(geno_matrix, min_rows = 1, min_cols = 2)
+
+  if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0) != 0){
+    stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
+  }
+
+  # Function -------------------------------------------------------------------
   ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
   zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
   nas <- sum(is.na(geno_matrix)) > 1
@@ -486,6 +466,9 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
   if (ones + zeros + nas == 3) {
     plot_logical <- TRUE
   }
+
+  # Return output --------------------------------------------------------------
+  if(!is.logical(plot_logical)){stop("Output must be a logical")}
   return(plot_logical)
 }
 

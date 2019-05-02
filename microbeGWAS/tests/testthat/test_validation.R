@@ -1,14 +1,4 @@
 library(microbeGWAS)
-
-# TODO add test for check_if_g_mat_can_be_plotted
-
-# TODO check_is_number -- Should I also add checks to remove Inf? Inf is a numeric...but I can't imagine that would be good for GWAS...
-
-# TODO
-# test check_input_format ------------------------------------------------------
-# I'm not testing this function because the real function to test is: assign_pheno_type()
-# which I'll do in another file.
-
 context("Validation functions") #----------------------------------------------#
 
 # test check_dimensions --------------------------------------------------------
@@ -483,6 +473,11 @@ test_that("check_is_number gives an error when x = NULL", {
   expect_error(check_is_number(temp))
 })
 
+test_that("check_is_number gives an error when x = Inf", {
+  temp = Inf
+  expect_error(check_is_number(temp))
+})
+
 # test check_node_is_in_tree ---------------------------------------------------
 test_that("check_node_is_in_tree doesn't give an error when node = 1", {
   temp = rtree(10)
@@ -606,3 +601,61 @@ test_that("is_tip gives an error when given a matrix and a node", {
   expect_error(is_tip(temp_node, temp_tree))
 })
 
+# test check_if_g_mat_can_be_plotted -------------------------------------------
+test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of 2x2", {
+  temp_mat <- matrix(c(0, 1, 0, 1), nrow = 2, ncol = 2)
+  expect_true(check_if_g_mat_can_be_plotted(temp_mat))
+})
+
+test_that("check_if_g_mat_can_be_plotted returns an error for a non-binary matrix of 2x2", {
+  temp_mat <- matrix(c(0.5, 1.5, 0, 1), nrow = 2, ncol = 2)
+  expect_error(check_if_g_mat_can_be_plotted(temp_mat))
+})
+
+test_that("check_if_g_mat_can_be_plotted returns an error for a binary dataframe of 2x2", {
+  temp_mat <- as.data.frame(matrix(c(0, 1, 0, 1), nrow = 2, ncol = 2))
+  expect_error(check_if_g_mat_can_be_plotted(temp_mat))
+})
+
+test_that("check_if_g_mat_can_be_plotted returns FALSE for a binary matrix of all zeroes", {
+  temp_mat <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)
+  expect_false(check_if_g_mat_can_be_plotted(temp_mat))
+})
+
+# check_if_g_mat_can_be_plotted <- function(geno_matrix){
+#   # Function description -------------------------------------------------------
+#   # TODO
+#   # In order to make a heatmap there need to be 1) at least two columns, 2)
+#   # two different values within the matrix (0 and 1).
+#   # There can be NAs in the matrix.
+#   #
+#   # Inputs:
+#   # geno_matrix. Matrix. 1, 0, and/or NA.
+#   #
+#   # Outputs:
+#   # plot_logical. Logical. TRUE or FALSE.
+#   #
+#   # Check input ----------------------------------------------------------------
+#   check_dimensions(geno_matrix, min_rows = 1, min_cols = 2)
+#
+#   if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 == 0) != 0){
+#     stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
+#   }
+#
+#   # Function -------------------------------------------------------------------
+#   ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
+#   zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
+#   nas <- sum(is.na(geno_matrix)) > 1
+#
+#   plot_logical <- FALSE #
+#   if (ones == 1 && zeros == 1 && nas == 0) {
+#     plot_logical <- TRUE
+#   }
+#   if (ones + zeros + nas == 3) {
+#     plot_logical <- TRUE
+#   }
+#
+#   # Return output --------------------------------------------------------------
+#   if(!is.logical(plot_logical)){stop("Output must be a logical")}
+#   return(plot_logical)
+# }
