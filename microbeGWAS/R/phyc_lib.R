@@ -48,7 +48,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   #
   # Check input ----------------------------------------------------------------
   check_is_string(disc_cont)
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
 
   # Function -------------------------------------------------------------------
 
@@ -326,7 +326,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   #            NOTE: genotype_confidence lists the confidence in each edge. High confidence means the edge is high confidence by genotype reconstruction, phenotype reconstruction, bootstrap value, and edge length.
 
   # Check input ----------------------------------------------------------------
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
   check_if_permutation_num_valid(permutations)
 
   # Function -------------------------------------------------------------------
@@ -532,7 +532,7 @@ create_test_data <- function(){
   colnames(genotype_matrix) <- paste("snp", c(1:100), sep = "_")
 
   # Check and return output ----------------------------------------------------
-  check_for_root_and_boostrap(tree)
+  check_for_root_and_bootstrap(tree)
   check_dimensions(phenotype_matrix, Ntip(tree), 2, 1, 1)
   check_dimensions(genotype_matrix, Ntip(tree), 2, NULL, 1)
   check_if_binary_matrix(genotype_matrix)
@@ -685,7 +685,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   # None.
   #
   # Check inputs ---------------------------------------------------------------
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
   check_if_alpha_valid(a)
   check_if_dir_exists(dir)
   check_is_string(name)
@@ -1102,7 +1102,7 @@ reduce_redundancy <- function(mat, tr, dir, name){
   # mat. Matrix.
   #
   # Check inputs ---------------------------------------------------------------
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
   check_is_string(name)
   check_if_binary_matrix(mat)
@@ -1838,7 +1838,7 @@ gene_test_from_snps <- function(){
 build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_and_confidence, gene_to_snp_lookup_table){
 
   # VALIDATE INPUTS -----------------------------------------------------------#
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
   check_dimensions(geno, Ntip(tr), 2, NULL, 2)
   if (length(g_reconstruction_and_confidence) != ncol(geno)){
@@ -1924,7 +1924,7 @@ build_node_anc_recon_from_gene_list <- function(gene_list, tr){
 build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_snp_lookup_table){
 
   # VALIDATE INPUTS -----------------------------------------------------------#
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
   check_dimensions(geno, Ntip(tr), 2, NULL, 2)
   if (length(geno_transition) != ncol(geno)){
@@ -2166,7 +2166,7 @@ assign_high_confidence_to_transition_edges <- function(tr, all_confidence_by_edg
   if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)){
     stop("Dimension mismatch")
   }
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
   if (length(all_confidence_by_edge[[1]]) != Nedge(tr)){
     stop("Dimension mismatch")
   }

@@ -4,6 +4,8 @@ library(microbeGWAS)
 # test check_input_format ------------------------------------------------------
 #       This is a complex function with lots of inputs! This will take a bit or work to test!!!
 
+# TODO check_is_number -- Should I also add checks to remove Inf? Inf is a numeric...but I can't imagine that would be good for GWAS...
+# TODO check_node_is_in_tree -- what is the number of nodes given number of tips in a bifurcating tree? use this value to update the failing test
 
 context("Validation functions") #----------------------------------------------#
 
@@ -201,190 +203,315 @@ test_that("check_if_vector gives an error when x = NULL", {
 # test check_for_NA_and_inf ----------------------------------------------------
 test_that("check_for_NA_and_inf gives an error when x is a dataframe", {
   temp <- as.data.frame(matrix(0, 10, 10))
-  expect_error(check_if_vector(temp))
+  expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf gives an error when x is a matrix containing NA", {
-  temp <- as.data.frame(matrix(NA, 10, 10))
-  expect_error(check_if_vector(temp))
+  temp <- matrix(NA, 10, 10)
+  expect_error(check_for_NA_and_inf(temp))
 })
 
-test_that("check_for_NA_and_inf gives an error when x is a matrix containing NULL", {
-  temp <- as.data.frame(matrix(NULL, 10, 10))
-  expect_error(check_if_vector(temp))
+test_that("check_for_NA_and_inf gives an error when x is NULL", {
+  temp <- NULL
+  expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf gives an error when x is a matrix containing -Inf", {
-  temp <- matrix(0, 10, 10)
-  expect_error(check_if_vector(temp))
+  temp <- matrix(-Inf, 10, 10)
+  expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf gives an error when x is a matrix containing +Inf", {
-  temp <- as.data.frame(matrix(Inf, 10, 10))
-  expect_error(check_if_vector(temp))
+  temp <- matrix(Inf, 10, 10)
+  expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf doesn't give an error when x is a matrix of zeroes", {
-  temp <- as.data.frame(matrix(-Inf, 10, 10))
-  expect_error(check_if_vector(temp))
+  temp <- matrix(0, 10, 10)
+  expect_error(check_for_NA_and_inf(temp), NA)
 })
 
+# test check_for_root_and_bootstrap
+test_that("check_for_root_and_bootstrap doesn't give an error when x is rooted tree with node values of 100", {
+  temp_tree <- rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  expect_error(check_for_root_and_bootstrap(temp_tree), NA)
+})
 
-#
-# check_for_NA_and_inf <- function(mat){
-#   # Function description -------------------------------------------------------
-#   # Check that matrix contains no NAs and no +/- infinities.
-#   #
-#   # Input:
-#   # mat. Matrix.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input & function -----------------------------------------------------
-#   if (class(mat) != "matrix"){
-#     stop("Input should be a matrix.")
-#   }
-#   if (sum(is.na(mat)) > 0){
-#     stop("Input matrices should not have any NA values.")
-#   }
-#   if (sum(mat == -Inf) > 0){
-#     stop("Inpute matrices should not have any -Inf values.")
-#   }
-#   if (sum(mat == Inf) > 0){
-#     stop("Inpute matrices should not have any -Inf values.")
-#   }
-# } # end check_for_NA_and_inf()
-#
-# check_for_root_and_boostrap <- function(tr){
-#   # Function description -------------------------------------------------------
-#   # Check that phylogenetic tree is rooted and contains bootstrap values in the node labels.
-#   #
-#   # Input:
-#   # tr. Phylo.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input & function -----------------------------------------------------
-#   if (class(tr) != "phylo"){
-#     stop("Tree must be phylo object")
-#   }
-#   if (!is.rooted(tr)){
-#     stop("Tree must be rooted")
-#   }
-#   if (is.null(tr$node.label)){
-#     stop("Tree must have bootstrap values in the nodes")
-#   }
-# } # end check_for_root_and_boostrap()
-#
-# check_if_binary_vector <- function(vec){
-#   # Function description -------------------------------------------------------
-#   # Check that the matrix only contains values 1 or 0.
-#   #
-#   # Input:
-#   # vec. Vector.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input & function -----------------------------------------------------
-#   if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "integer"){
-#     stop("Vector should be only 1s and 0s")
-#   }
-# } # end check_if_binary_vector()
-#
-# check_if_binary_vector_numeric <- function(vec){
-#   # Function description -------------------------------------------------------
-#   # Check that the matrix only contains values 1 or 0.
-#   #
-#   # Input:
-#   # vec. Vector.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input & function -----------------------------------------------------
-#   if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "numeric"){
-#     stop("Vector should be only 1s and 0s")
-#   }
-# } # end check_if_binary_vector_numeric()
-#
-#
-# check_if_binary_matrix <- function(mat){
-#   # Function description -------------------------------------------------------
-#   # Check that the matrix only contains values 1 or 0.
-#   #
-#   # Input:
-#   # mat. Matrix.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input & function -----------------------------------------------------
-#   if (sum(!(mat %in% c(0, 1))) > 0 | class(mat) != "matrix"){
-#     stop("Genotype matrix should be only 1s and 0s")
-#   }
-# } # end check_if_binary_matrix()
-#
-# check_file_exists <- function(file_name){
-#   # Function description -------------------------------------------------------
-#   # Check that the file exists.
-#   #
-#   # Input:
-#   # file_name. Character.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input & function -----------------------------------------------------
-#   if (!file.exists(file_name)){
-#     stop("File does not exist")
-#   }
-# } # end check_file_exists()
-#
-# check_rownames <- function(mat, tr){
-#   # Function description -------------------------------------------------------
-#   # Check that phylogenetic tree tip labels are identical to the matrix row.names.
-#   #
-#   # Input:
-#   # mat. Matrix.
-#   # tr. Phylo.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input ----------------------------------------------------------------
-#   if (class(mat) != "matrix" | class(tr) != "phylo"){
-#     stop("Inputs are incorrectly formatted.")
-#   }
-#
-#   # Function -------------------------------------------------------------------
-#   if (sum(row.names(mat) != tr$tip.label) != 0){
-#     stop("Matrix must be formatted with samples in matrix in the same order as tree$tip.label.")
-#   }
-# } # end check_rownames()
-#
-# check_is_number <- function(num){
-#   # Function description -------------------------------------------------------
-#   # Check that input is some type of number.
-#   #
-#   # Input:
-#   # num. Number. Could be numeric, double, or integer.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input & function -----------------------------------------------------
-#   if (!is.numeric(num)){
-#     if (!is.integer(num)){
-#       if (!is.double(num)){
-#         stop("Must be a number")
-#       }
-#     }
-#   }
-# } # end check_is_number()
-#
+test_that("check_for_root_and_bootstrap gives an error when x is unrooted tree with node values of 100", {
+  temp_tree <- rtree(20, rooted = FALSE)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  expect_error(check_for_root_and_bootstrap(temp_tree))
+})
+
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node values of -100", {
+  temp_tree <- rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(-100, Nnode(temp_tree))
+  expect_error(check_for_root_and_bootstrap(temp_tree))
+})
+
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with too few node values", {
+  temp_tree <- rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(-100, Nnode(temp_tree) - 1)
+  expect_error(check_for_root_and_bootstrap(temp_tree))
+})
+
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with too many node values", {
+  temp_tree <- rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(-100, Nnode(temp_tree) + 1)
+  expect_error(check_for_root_and_bootstrap(temp_tree))
+})
+
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node values of NA", {
+  temp_tree <- rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(NA, Nnode(temp_tree))
+  expect_error(check_for_root_and_bootstrap(temp_tree))
+})
+
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node.labels = NULL", {
+  temp_tree <- rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- NULL
+  expect_error(check_for_root_and_bootstrap(temp_tree))
+})
+
+# test check_if_binary_vector --------------------------------------------------
+test_that("check_if_binary_vector gives an error when x is rep(NA, 10)", {
+  temp <- rep(NA, 10)
+  expect_error(check_if_binary_vector(temp))
+})
+
+test_that("check_if_binary_vector gives an error when x is NULL", {
+  temp <- NULL
+  expect_error(check_if_binary_vector(temp))
+})
+
+test_that("check_if_binary_vector gives an error when x is letters[1:10]", {
+  temp <- letters[1:10]
+  expect_error(check_if_binary_vector(temp))
+})
+
+test_that("check_if_binary_vector gives an error when x is dataframe(matrix(0, 10, 10))", {
+  temp <- as.data.frame(matrix(0, 10, 10))
+  expect_error(check_if_binary_vector(temp))
+})
+
+test_that("check_if_binary_vector gives an error when x is matrix(0, 10, 10)", {
+  temp <- as.data.frame(matrix(0, 10, 10))
+  expect_error(check_if_binary_vector(temp))
+})
+
+test_that("check_if_binary_vector doesn't give an error when x is c(1, 0, 1, 0)", {
+  temp <- c(1, 0, 1, 0)
+  expect_error(check_if_binary_vector(temp), NA)
+})
+
+test_that("check_if_binary_vector doesn't give an error when x is c(0, 0, 0, 0)", {
+  temp <- c(0, 0, 0, 0)
+  expect_error(check_if_binary_vector(temp), NA)
+})
+
+test_that("check_if_binary_vector doesn't give an error when x is c(1)", {
+  temp <- c(1)
+  expect_error(check_if_binary_vector(temp), NA)
+})
+
+# test check_if_binary_vector_numeric ------------------------------------------
+test_that("check_if_binary_vector_numeric gives an error when x is rep(NA, 10)", {
+  temp <- rep(NA, 10)
+  expect_error(check_if_binary_vector_numeric(temp))
+})
+
+test_that("check_if_binary_vector_numeric gives an error when x is NULL", {
+  temp <- NULL
+  expect_error(check_if_binary_vector_numeric(temp))
+})
+
+test_that("check_if_binary_vector_numeric gives an error when x is letters[1:10]", {
+  temp <- letters[1:10]
+  expect_error(check_if_binary_vector_numeric(temp))
+})
+
+test_that("check_if_binary_vector_numeric gives an error when x is dataframe(matrix(0, 10, 10))", {
+  temp <- as.data.frame(matrix(0, 10, 10))
+  expect_error(check_if_binary_vector_numeric(temp))
+})
+
+test_that("check_if_binary_vector_numeric gives an error when x is matrix(0, 10, 10)", {
+  temp <- as.data.frame(matrix(0, 10, 10))
+  expect_error(check_if_binary_vector_numeric(temp))
+})
+
+test_that("check_if_binary_vector_numeric doesn't give an error when x is c(1, 0, 1, 0)", {
+  temp <- c(1, 0, 1, 0)
+  expect_error(check_if_binary_vector_numeric(temp), NA)
+})
+
+test_that("check_if_binary_vector_numeric doesn't give an error when x is c(0, 0, 0, 0)", {
+  temp <- c(0, 0, 0, 0)
+  expect_error(check_if_binary_vector_numeric(temp), NA)
+})
+
+test_that("check_if_binary_vector_numeric doesn't give an error when x is c(1)", {
+  temp <- c(1)
+  expect_error(check_if_binary_vector_numeric(temp), NA)
+})
+
+# test check_if_binary_matrix --------------------------------------------------
+test_that("check_if_binary_matrix doesn't give an error when x is matrix(c(0, 1), 2, 1)", {
+  temp <- matrix(c(0, 1), 2, 1)
+  expect_error(check_if_binary_matrix(temp), NA)
+})
+
+test_that("check_if_binary_matrix gives an error when x is matrix(NA, 2, 1)", {
+  temp <- matrix(NA, 2, 1)
+  expect_error(check_if_binary_matrix(temp))
+})
+
+test_that("check_if_binary_matrix gives an error when x is matrix(Inf, 2, 1)", {
+  temp <- matrix(Inf, 2, 1)
+  expect_error(check_if_binary_matrix(temp))
+})
+
+test_that("check_if_binary_matrix gives an error when x is NULL", {
+  temp <- NULL
+  expect_error(check_if_binary_matrix(temp))
+})
+
+test_that("check_if_binary_matrix gives an error when x is matrix(c(1.5, 2.5), 2, 1)", {
+  temp <- matrix(c(1.5, 2.5), 2, 1)
+  expect_error(check_if_binary_matrix(temp))
+})
+
+test_that("check_if_binary_matrix gives an error when x is matrix(3, 2, 1)", {
+  temp <- matrix(3, 2, 1)
+  expect_error(check_if_binary_matrix(temp))
+})
+
+test_that("check_if_binary_matrix gives an error when x is as.data.frame(matrix(0, 2, 1))", {
+  temp <- as.data.frame(matrix(0, 2, 1))
+  expect_error(check_if_binary_matrix(temp))
+})
+
+# test check_file_exists -------------------------------------------------------
+test_that("check_file_exists gives an error when x is 'fake_file_name.txt'", {
+  temp <- 'fake_file_name.txt'
+  expect_error(check_file_exists(temp))
+})
+
+test_that("check_file_exists doesn't give an error when x is 'test_validation.R'", {
+  temp <- 'test_validation.R'
+  expect_error(check_file_exists(temp), NA)
+})
+
+# test check_rownames ----------------------------------------------------------
+test_that("check_rownames doesn't give an error when tree$tip.label <- row.names(mat) <- letters[1:10]", {
+  temp_tree <- rtree(10)
+  temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
+  temp_tree$tip.label <- row.names(temp_mat) <- letters[1:10]
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree), NA)
+})
+
+test_that("check_rownames gives an error when tree$tip.label <- letters[11:20],  row.names(mat) <- letters[1:10]", {
+  temp_tree <- rtree(10)
+  temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
+  temp_tree$tip.label <- letters[11:20]
+  row.names(temp_mat) <- letters[1:10]
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
+})
+
+test_that("check_rownames gives an error when Ntip(tree) != nrow(mat)", {
+  temp_tree <- rtree(10)
+  temp_mat  <- matrix(1:8, nrow = 1, ncol = 8)
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
+
+  temp_tree <- rtree(2)
+  temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
+
+})
+
+# test check_is_number ---------------------------------------------------------
+test_that("check_is_number doesn't give an error when x = 5", {
+  temp = 5
+  expect_error(check_is_number(temp), NA)
+})
+
+test_that("check_is_number doesn't give an error when x = 5.5", {
+  temp = 5.5
+  expect_error(check_is_number(temp), NA)
+})
+
+test_that("check_is_number doesn't give an error when x = pi", {
+  temp = pi
+  expect_error(check_is_number(temp), NA)
+})
+
+test_that("check_is_number doesn't give an error when x = -1/7", {
+  temp = -1/7
+  expect_error(check_is_number(temp), NA)
+})
+
+test_that("check_is_number gives an error when x = 'a'", {
+  temp = 'a'
+  expect_error(check_is_number(temp))
+})
+
+test_that("check_is_number gives an error when x = matrix(0, 10, 10)", {
+  temp = matrix(0, 10, 10)
+  expect_error(check_is_number(temp))
+})
+
+test_that("check_is_number gives an error when x = matrix(0, 1, 1)", {
+  temp = matrix(0, 10, 10)
+  expect_error(check_is_number(temp))
+})
+
+test_that("check_is_number gives an error when x = c(0, 1, 1)", {
+  temp = c(0, 1, 1)
+  expect_error(check_is_number(temp))
+})
+
+test_that("check_is_number gives an error when x = NA", {
+  temp = NA
+  expect_error(check_is_number(temp))
+})
+
+test_that("check_is_number gives an error when x = NULL", {
+  temp = NULL
+  expect_error(check_is_number(temp))
+})
+
+# test check_node_is_in_tree ---------------------------------------------------
+test_that("check_node_is_in_tree doesn't give an error when node = 1", {
+  temp = rtree(10)
+  temp$node.label <- c(1:Nnode(temp))
+  expect_error(check_node_is_in_tree(node_val = 1, tr = temp), NA)
+})
+
+test_that("check_node_is_in_tree doesn't give an error when node = Nnode(tree)", {
+  temp = rtree(10)
+  temp$node.label <- c(1:Nnode(temp))
+  expect_error(check_node_is_in_tree(node_val = Nnode(temp), tr = temp), NA)
+})
+
+test_that("check_node_is_in_tree gives an error when node = Nnode + 1", {
+  temp = rtree(10)
+  temp$node.label <- c(1:Nnode(temp))
+  expect_error(check_node_is_in_tree(node_val = Nnode(temp) + 1, tr = temp))
+})
+
+test_that("check_node_is_in_tree gives an error when node = 0", {
+  temp = rtree(10)
+  temp$node.label <- c(1:Nnode(temp))
+  expect_error(check_node_is_in_tree(node_val = 0, tr = temp))
+})
+
+test_that("check_node_is_in_tree gives an error when node = -1", {
+  temp = rtree(10)
+  temp$node.label <- c(1:Nnode(temp))
+  expect_error(check_node_is_in_tree(node_val = -1, tr = temp))
+})
+
 # check_node_is_in_tree <- function(node_val, tr){
 #   # Function description ------------------------------------------------------#
 #   # Test if a node value is plausibly contained within the tree.

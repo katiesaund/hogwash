@@ -135,7 +135,7 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, a, annot){
   check_rownames(pheno, tr) # Phenotype rownames should be in the same order as the tr$tip.label
   check_for_NA_and_inf(geno)
   check_for_NA_and_inf(pheno)
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
   check_if_binary_matrix(geno)
   check_is_string(name)
@@ -195,7 +195,7 @@ check_for_NA_and_inf <- function(mat){
   }
 } # end check_for_NA_and_inf()
 
-check_for_root_and_boostrap <- function(tr){
+check_for_root_and_bootstrap <- function(tr){
   # Function description -------------------------------------------------------
   # Check that phylogenetic tree is rooted and contains bootstrap values in the node labels.
   #
@@ -215,7 +215,17 @@ check_for_root_and_boostrap <- function(tr){
   if (is.null(tr$node.label)){
     stop("Tree must have bootstrap values in the nodes")
   }
-} # end check_for_root_and_boostrap()
+  if (length(tr$node.label) != Nnode(tr)){
+    stop("Tree must have bootstrap values for each node")
+
+  }
+  for (i in 1:length(tr$node.label)){
+    check_is_number(tr$node.label[i]) # Node lables must be bootstrap values
+    if (tr$node.label[i] < 0){
+      stop("Tree bootstrap values must be >= 0")
+    }
+  }
+} # end check_for_root_and_bootstrap()
 
 check_if_binary_vector <- function(vec){
   # Function description -------------------------------------------------------
@@ -228,8 +238,13 @@ check_if_binary_vector <- function(vec){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "integer"){
+  if (sum(!(vec %in% c(0, 1))) > 0){
     stop("Vector should be only 1s and 0s")
+  }
+  if (class(vec) != "integer"){
+    if (class(vec) != "numeric"){
+      stop("Vector should be only 1s and 0s")
+    }
   }
 } # end check_if_binary_vector()
 
@@ -299,7 +314,16 @@ check_rownames <- function(mat, tr){
   }
 
   # Function -------------------------------------------------------------------
+  if(is.null(row.names(mat))){
+    stop("Matrix must have row.names()")
+  }
+  if(is.null(tr$tip.label)){
+    stop("Tree must have tip labels")
+  }
   if (sum(row.names(mat) != tr$tip.label) != 0){
+    stop("Matrix must be formatted with samples in matrix in the same order as tree$tip.label.")
+  }
+  if (sum(row.names(mat) == tr$tip.label) != Ntip(tr)){
     stop("Matrix must be formatted with samples in matrix in the same order as tree$tip.label.")
   }
 } # end check_rownames()
@@ -307,6 +331,7 @@ check_rownames <- function(mat, tr){
 check_is_number <- function(num){
   # Function description -------------------------------------------------------
   # Check that input is some type of number.
+  # Check that the input is a single number.
   #
   # Input:
   # num. Number. Could be numeric, double, or integer.
@@ -328,6 +353,9 @@ check_is_number <- function(num){
   if (is.matrix(num)){
     stop("Number can't be a matrix")
   }
+  if (length(num) != 1){
+    stop("Must be a single number")
+  }
 } # end check_is_number()
 
 check_node_is_in_tree <- function(node_val, tr){
@@ -342,15 +370,16 @@ check_node_is_in_tree <- function(node_val, tr){
   # None.
   #
   # Check input & function ----------------------------------------------------#
-  check_for_root_and_boostrap(tr)
+  check_for_root_and_bootstrap(tr)
   check_is_number(node_val)
 
   if (node_val > Nnode(tr) + Ntip(tr)){
     stop("Node number is too high; not found in tree.")
   }
-  if (node_val < 1 | !is.integer(node_val)){
+  if (node_val < 1 | node_val %% 1 != 0){
     stop("Node number must be positive integer")
   }
+
 } # end check_node_is_in_tree()
 
 check_tree_is_valid <- function(tr){
