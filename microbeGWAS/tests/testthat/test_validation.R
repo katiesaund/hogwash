@@ -1,11 +1,13 @@
 library(microbeGWAS)
 
-# TODO
-# test check_input_format ------------------------------------------------------
-#       This is a complex function with lots of inputs! This will take a bit or work to test!!!
+# TODO add test for check_if_g_mat_can_be_plotted
 
 # TODO check_is_number -- Should I also add checks to remove Inf? Inf is a numeric...but I can't imagine that would be good for GWAS...
-# TODO check_node_is_in_tree -- what is the number of nodes given number of tips in a bifurcating tree? use this value to update the failing test
+
+# TODO
+# test check_input_format ------------------------------------------------------
+# I'm not testing this function because the real function to test is: assign_pheno_type()
+# which I'll do in another file.
 
 context("Validation functions") #----------------------------------------------#
 
@@ -494,12 +496,6 @@ test_that("check_node_is_in_tree doesn't give an error when node = Nnode(tree)",
   expect_error(check_node_is_in_tree(node_val = Nnode(temp), tr = temp), NA)
 })
 
-test_that("check_node_is_in_tree gives an error when node = Nnode + 1", {
-  temp = rtree(10)
-  temp$node.label <- c(1:Nnode(temp))
-  expect_error(check_node_is_in_tree(node_val = Nnode(temp) + 1, tr = temp))
-})
-
 test_that("check_node_is_in_tree gives an error when node = 0", {
   temp = rtree(10)
   temp$node.label <- c(1:Nnode(temp))
@@ -512,120 +508,101 @@ test_that("check_node_is_in_tree gives an error when node = -1", {
   expect_error(check_node_is_in_tree(node_val = -1, tr = temp))
 })
 
-# check_node_is_in_tree <- function(node_val, tr){
-#   # Function description ------------------------------------------------------#
-#   # Test if a node value is plausibly contained within the tree.
-#   #
-#   # Inputs:
-#   # node_val: Integer. Index of node.
-#   # tr: phylogenetic tree.
-#   #
-#   # Output:
-#   # None.
-#   #
-#   # Check input & function ----------------------------------------------------#
-#   check_for_root_and_boostrap(tr)
-#   check_is_number(node_val)
-#
-#   if (node_val > Nnode(tr) + Ntip(tr)){
-#     stop("Node number is too high; not found in tree.")
-#   }
-#   if (node_val < 1 | !is.integer(node_val)){
-#     stop("Node number must be positive integer")
-#   }
-# } # end check_node_is_in_tree()
-#
-# test_that("check_tree_is_valid returns true for randomly generated trees where Ntip is between 2 and 10", {
-#   for (i in 2:10){
-#     expect_true(check_tree_is_valid(rtree(i)))
-#   }
-#
-#
-# })
-#
-# test_that("check_tree_is_invalid throws an error when tree edge index is greater than Nedge(tree)", {
-#   invalid_tree <- rtree(10)
-#   for (j in 1:Nedge(invalid_tree)){
-#     if (invalid_tree$edge[j, 2] == 1){
-#       invalid_tree$edge[j, 2] <- Nedge(invalid_tree) + 1
-#       break
-#     }
-#   }
-#   expect_that(check_tree_is_valid(invalid_tree), throws_error())
-# })
-#
-# check_tree_is_valid <- function(tr){
-#   #` A valid tree has N nodes, with n_tips nodes being tip nodes, numbered 1 through n_tips`
-#
-#   num_edges_for_node <- table(tr$edge)
-#
-#   for (i in 1:Ntip(tr)){
-#     if (num_edges_for_node[i] != 1){
-#       stop(paste("Tip node", i, "has", num_edges_for_node[i], "edges. Should have 1 edge"))
-#     }
-#   }
-#   for (i in (Ntip(tr) + 1):(Nnode(tr) + Ntip(tr))){
-#     if (num_edges_for_node[i] != 2 && num_edges_for_node[i] != 3){
-#       stop(paste("Internal node", i, "has", num_edges_for_node[i], "edges. Should have 2(root) or 3 edge"))
-#     }
-#   }
-#   return(TRUE)
-# }
-#
-# # check_transitions <- function(transition_vector, tr){
-# #   for (i in 1:length(transition_vector)){
-# #     parent <- tr$edge[i, 1]
-# #     child <- tr$edge[i, 2]
-# #
-# #   }
-# #
-# # } # end check_transitions()
-#
-# check_convergence_possible <- function(vec, discrete_or_continuous){
-#   convergence_not_possible <- FALSE
-#   if (discrete_or_continuous == "discrete"){
-#     check_if_binary_vector(vec)
-#     if (sum(vec) >= (length(vec)-1) | sum(vec) <= 1){
-#       convergence_not_possible <- TRUE
-#     }
-#
-#   } else if (discrete_or_continuous == "continuous"){
-#     if (length(unique(vec)) == 1){
-#       convergence_not_possible <- TRUE
-#     }
-#   }
-#   if (convergence_not_possible){
-#     stop("Convergence is not possible for this phenotype")
-#   }
-# } # end check_convergence_possible()
-#
-#
-#
-#
-# context("Complex functions") #-------------------------------------------------#
-# test_that("ancestral_reconstruction_by_ML with discrete input produce ancestral reconstruction with a value for each tip and node.", {
-#   tree <- rtree(9, rooted = TRUE)
-#   tree$node.label <- rep(100, Nnode(tree))
-#   num_col <- 9
-#   num_cells <- num_col * Ntip(tree)
-#   test_mat <- matrix(rep(c(1, 0), num_cells), nrow = Ntip(tree), ncol = num_col)
-#   check_if_binary_matrix(test_mat)
-#   dummy_pheno <- ancestral_reconstruction_by_ML(tree, test_mat, 1, "discrete")
-#   dummy_geno <-  ancestral_reconstruction_by_ML(tree, test_mat, 2, "discrete")
-#   expected_length <- Ntip(tree) + Nnode(tree)
-#   expect_identical(length(dummy_pheno$tip_and_node_recon), expected_length)
-#   expect_identical(length(dummy_geno$tip_and_node_recon), expected_length)
-# })
-#
-# test_that("ancestral_reconstruction_by_ML with continuous input produce ancestral reconstruction with a value for each tip and node.", {
-#   tree <- rtree(9, rooted = TRUE)
-#   tree$node.label <- rep(100, Nnode(tree))
-#   num_col <- 9
-#   num_cells <- num_col * Ntip(tree)
-#   test_mat <- matrix(rnorm(num_cells, mean = 0, sd = 10), nrow = Ntip(tree), ncol = num_col)
-#   dummy_pheno <- ancestral_reconstruction_by_ML(tree, test_mat, 1, "continuous")
-#   dummy_geno <-  ancestral_reconstruction_by_ML(tree, test_mat, 2, "continuous")
-#   expected_length <- Ntip(tree) + Nnode(tree)
-#   expect_identical(length(dummy_pheno$tip_and_node_recon), expected_length)
-#   expect_identical(length(dummy_geno$tip_and_node_recon), expected_length)
-# })
+test_that("check_node_is_in_tree gives an error when node = Nnode + Ntip + 1", {
+  temp = rtree(10)
+  temp$node.label <- c(1:Nnode(temp))
+  expect_error(check_node_is_in_tree(node_val = Nnode(temp) + Ntip(temp) + 1, tr = temp))
+})
+
+test_that("check_node_is_in_tree gives an error when node = 1.5", {
+  temp = rtree(10)
+  temp$node.label <- c(1:Nnode(temp))
+  expect_error(check_node_is_in_tree(node_val = 1.5, tr = temp))
+})
+
+
+# test check_tree_is_valid -----------------------------------------------------
+test_that("check_tree_is_valid returns true for randomly generated trees where Ntip is between 2 and 10", {
+  for (i in 2:10){
+    expect_error(check_tree_is_valid(rtree(i)), NA)
+  }
+})
+
+test_that("check_tree_is_invalid throws an error when tree edge index is greater than Nedge(tree)", {
+  invalid_tree <- rtree(10)
+  for (j in 1:Nedge(invalid_tree)){
+    if (invalid_tree$edge[j, 2] == 1){
+      invalid_tree$edge[j, 2] <- Nedge(invalid_tree) + 1
+      break
+    }
+  }
+  expect_error(check_tree_is_valid(invalid_tree))
+})
+
+# test check_convergence_possible ----------------------------------------------
+test_that("check_convergence_possible gives an error 'discrete' and all values = 0", {
+  disc_cont <- "discrete"
+  temp_vec <- c(0,0,0,0,0,0,0,0)
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+})
+
+test_that("check_convergence_possible doesn't give an error 'discrete' and values= c(1,0,1,0,1,0,1,0)", {
+  disc_cont <- "discrete"
+  temp_vec <- c(1,0,1,0,1,0,1,0)
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec), NA)
+})
+
+test_that("check_convergence_possible gives an error 'continuous' and all values = 0", {
+  disc_cont <- "continuous"
+  temp_vec <- c(0,0,0,0,0,0,0,0)
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+})
+
+test_that("check_convergence_possible gives an error 'discrete' and values= c(0, 0.1, 0.2)", {
+  disc_cont <- "discrete"
+  temp_vec <- c(0, 0.1, 0.2)
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+})
+
+
+test_that("check_convergence_possible gives an error 'discrete' and all values = 'a'", {
+  disc_cont <- "discrete"
+  temp_vec <- rep('a', 10)
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+})
+
+# test is_tip ------------------------------------------------------------------
+test_that("is_tip returns TRUE when given a tree and the node = 1 (a tip)", {
+  temp_tree <- rtree(10)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_node <- 1
+  expect_true(is_tip(temp_node, temp_tree))
+})
+
+test_that("is_tip returns FALSE when given a tree and the node = Ntip(temp_tree) + 1 (not a tip)", {
+  temp_tree <- rtree(10)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_node <- Ntip(temp_tree) + 1
+  expect_false(is_tip(temp_node, temp_tree))
+})
+
+test_that("is_tip gives an error when given a tree and the node = 12.5", {
+  temp_tree <- rtree(10)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_node <- 12.5
+  expect_error(is_tip(temp_node, temp_tree))
+})
+
+test_that("is_tip gives an error when given a tree and the node = NA", {
+  temp_tree <- rtree(10)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_node <- NA
+  expect_error(is_tip(temp_node, temp_tree))
+})
+
+test_that("is_tip gives an error when given a matrix and a node", {
+  temp_tree <- matrix(10, 10, 1)
+  temp_node <- 5
+  expect_error(is_tip(temp_node, temp_tree))
+})
+

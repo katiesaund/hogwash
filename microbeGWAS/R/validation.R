@@ -1,3 +1,8 @@
+# Library of all functions that "check" or "assert" that something is true.
+# If any functions get added to this file, be sure to add test() to test_validation.R
+
+# TODO Add function description for check_if_g_mat_can_be_plotted
+
 check_dimensions <- function(mat, exact_rows = NULL, min_rows, exact_cols = NULL, min_cols){
   # Function description -------------------------------------------------------
   # Check that the matrix is of the specified dimensions.
@@ -377,13 +382,26 @@ check_node_is_in_tree <- function(node_val, tr){
     stop("Node number is too high; not found in tree.")
   }
   if (node_val < 1 | node_val %% 1 != 0){
-    stop("Node number must be positive integer")
+    stop("Node must be positive integer")
   }
 
 } # end check_node_is_in_tree()
 
 check_tree_is_valid <- function(tr){
-  #` A valid tree has N nodes, with n_tips nodes being tip nodes, numbered 1 through n_tips`
+  #`
+  # Function description ------------------------------------------------------#
+  # Test if a tree is valid- based on number of Nodes and Tips.
+  #
+  # Inputs:
+  # tr: phylogenetic tree.
+  #
+  # Output:
+  # None.
+  #
+  # Check input & function ----------------------------------------------------#
+  if (class(tr) != 'phylo'){
+    stop('Input must be a phylogenetic tree (object with class phylo)')
+  }
 
   num_edges_for_node <- table(tr$edge)
 
@@ -397,32 +415,77 @@ check_tree_is_valid <- function(tr){
       stop(paste("Internal node", i, "has", num_edges_for_node[i], "edges. Should have 2(root) or 3 edge"))
     }
   }
-  return(TRUE)
 }
 
-# check_transitions <- function(transition_vector, tr){
-#   for (i in 1:length(transition_vector)){
-#     parent <- tr$edge[i, 1]
-#     child <- tr$edge[i, 2]
-#
-#   }
-#
-# } # end check_transitions()
-
 check_convergence_possible <- function(vec, discrete_or_continuous){
-  convergence_not_possible <- FALSE
+  # Function description ------------------------------------------------------#
+  # Test if vector, which represents values on the tips of tree, could plausibly
+  # be consistent with convergence of those values. Eg. A value needs to appear
+  # at leaset twice in the vector.
+  #
+  # Inputs:
+  # vec. Vector. A vector of numbers. If "discrete" then vector must be binary.
+  # discrete_or_continuous. Character. Either "discrete" or "continuous."
+  #
+  # Output:
+  # None.
+  #
+  # Check input & function ----------------------------------------------------#
+  if (discrete_or_continuous != "discrete"){
+    if (discrete_or_continuous != "continuous"){
+      stop("discrete_or_continuous must be a string 'discrete' or 'continuous.'")
+    }
+  }
+
   if (discrete_or_continuous == "discrete"){
     check_if_binary_vector(vec)
     if (sum(vec) >= (length(vec)-1) | sum(vec) <= 1){
-      convergence_not_possible <- TRUE
+      stop("Convergence is not possible for this phenotype")
     }
 
   } else if (discrete_or_continuous == "continuous"){
     if (length(unique(vec)) == 1){
-      convergence_not_possible <- TRUE
+      stop("Convergence is not possible for this phenotype")
     }
   }
-  if (convergence_not_possible){
-    stop("Convergence is not possible for this phenotype")
-  }
 } # end check_convergence_possible()
+
+is_tip <- function(node_num, tr){
+  # Function description ------------------------------------------------------#
+  # Test if a node is a tip or an internal node.
+  #
+  # Inputs:
+  # node_num: Integer. Index of node.
+  # tr: phylogenetic tree.
+  #
+  # Output:
+  # Logical. TRUE OR FALSE.
+  #
+  # Check input ---------------------------------------------------------------#
+  check_tree_is_valid(tr)
+  check_is_number(node_num)
+  if (node_num < 1 ||node_num %% 1 != 0){
+    stop("Node number must be a positive integer")
+  }
+  check_node_is_in_tree(node_num, tr)
+  #
+  # Function & return output --------------------------------------------------#
+  return(node_num <= Ntip(tr))
+} # end is_tip()
+
+
+check_if_g_mat_can_be_plotted <- function(geno_matrix){
+  ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
+  zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
+  nas <- sum(is.na(geno_matrix)) > 1
+
+  plot_logical <- FALSE #
+  if (ones == 1 && zeros == 1 && nas == 0) {
+    plot_logical <- TRUE
+  }
+  if (ones + zeros + nas == 3) {
+    plot_logical <- TRUE
+  }
+  return(plot_logical)
+}
+

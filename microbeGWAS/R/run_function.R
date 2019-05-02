@@ -1,5 +1,4 @@
 run_phyc <- function(args){
-  #options(warn=2, error=recover)
   # FORMAT INPUTS ---------------------------------------------------------------#
   results_object <- NULL
 
