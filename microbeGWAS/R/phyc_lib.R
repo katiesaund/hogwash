@@ -582,7 +582,6 @@ get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, alpha
   # sig_pvals.           Vector. Only the significant FDR corrected pvalues.
   #
   # Check inputs ---------------------------------------------------------------
-  # check_if_p_val_valid(hit_values)
   check_if_alpha_valid(alpha)
 
   # Function -------------------------------------------------------------------
@@ -595,8 +594,6 @@ get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, alpha
   results                        <- list("hit_pvals" = fdr_corrected_pvals, "sig_pvals" = sig_pvals)
 
   # Check and return output ----------------------------------------------------
-  # if (nrow(fdr_corrected_pvals) > 0){check_if_p_val_valid(unlist(fdr_corrected_pvals))}
-  # if (nrow(sig_pvals) > 0){          check_if_p_val_valid(unlist(sig_pvals))}
   return(results)
 } # end get_sig_hits_while_correcting_for_multiple_testing
 
@@ -652,7 +649,6 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, a){
   #
   # Check inputs ---------------------------------------------------------------
   check_if_alpha_valid(a)
-  # check_if_p_val_valid(pvals$hit_pvals)
 
   # Function -------------------------------------------------------------------
   temp <- pvals$hit_pvals[(results$trans_median > results$all_edges_median), , drop = FALSE]
@@ -1149,9 +1145,6 @@ save_hits <- function(hits, output_dir, output_name, pval_name){
   check_is_string(pval_name)
   check_is_string(output_name)
   check_if_dir_exists(output_dir)
-  #if (nrow(hits) > 0){
-  #check_if_p_val_valid(hits)
-  #}
 
   # Function -------------------------------------------------------------------
   if (nrow(hits) > 0){

@@ -1,12 +1,12 @@
-check_dimensions <- function(mat, exact_rows, min_rows, exact_cols, min_cols){
+check_dimensions <- function(mat, exact_rows = NULL, min_rows, exact_cols = NULL, min_cols){
   # Function description -------------------------------------------------------
   # Check that the matrix is of the specified dimensions.
   #
   # Input:
   # mat:        Matrix.
-  # exact_rows. Numeric. Describes expected number of rows in matrix. Can be NULL.
+  # exact_rows. Numeric. Describes expected number of rows in matrix. Default is NULL.
   # min_rows.   Numeric. Describes minimum number of rows in matrix. Must be specified.
-  # exact_cols. Numeric. Describes expected number of columns in matrix. Can be NULL.
+  # exact_cols. Numeric. Describes expected number of columns in matrix. Default NULL.
   # min_cols.   Numeric. Describes minimum number of columns in matrix. Must be specified.
   #
   # Output:
@@ -40,7 +40,7 @@ check_dimensions <- function(mat, exact_rows, min_rows, exact_cols, min_cols){
 
 check_if_alpha_valid <- function(a){
   # Function description -------------------------------------------------------
-  # Check that the alpha (threshold for significance) is within a valid range (0 < alpha < 0.1).
+  # Check that the alpha (threshold for significance) is within a valid range (0 < alpha < 1).
   #
   # Input:
   # a. Numeric. Value of alpha.
@@ -52,7 +52,7 @@ check_if_alpha_valid <- function(a){
   check_is_number(a)
 
   # Function -------------------------------------------------------------------
-  if (a > .4 | a <= 0){
+  if (a >= 1 | a <= 0){
     stop("Provide a valid alpha.")
   }
 } # end check_if_alpha_valid()
@@ -75,31 +75,6 @@ check_if_dir_exists <- function(dir){
     stop("The output directory indicated does not exist.")
   }
 } # end check_if_dir_exists()
-
-check_if_p_val_valid <- function(p_values){
-  # Function description -------------------------------------------------------
-  # Check that p values are valid (0 <= p values <= 1).
-  #
-  # Input:
-  # p_values. Character. Path to output directory.
-  #
-  # Output:
-  # None.
-  #
-  # Check input ----------------------------------------------------------------
-  if (!is.vector(p_values)){
-    if (!is.matrix(p_values)){
-      if (!is.data.frame(p_values)){
-        stop("p_values is not formatted correctly")
-      }
-    }
-  }
-
-  # Function -------------------------------------------------------------------
-  if (max(as.numeric(p_values)) > 1 | min(as.numeric(p_values)) < 0){
-    stop("hit_values is incorrectly formatted.")
-  }
-} # end check_if_p_val_valid()
 
 check_if_permutation_num_valid <- function(perm){
   # Function description -------------------------------------------------------
@@ -181,7 +156,7 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, a, annot){
 
 check_if_vector <- function(vector){
   # Function description -------------------------------------------------------
-  # Check that input is a list.
+  # Check that input is a vector.
   #
   # Input:
   # vector. Vector.
@@ -346,6 +321,12 @@ check_is_number <- function(num){
         stop("Must be a number")
       }
     }
+  }
+  if (is.data.frame(num)){
+    stop("Number can't be a dataframe")
+  }
+  if (is.matrix(num)){
+    stop("Number can't be a matrix")
   }
 } # end check_is_number()
 
