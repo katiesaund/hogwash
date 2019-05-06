@@ -413,7 +413,7 @@ create_test_data <- function(){
   #
   # Function -------------------------------------------------------------------
   # Create tree
-  set.seed(50)
+  set.seed(1)
   tips            <- 50
   tree            <- rtree(n = tips, rooted = TRUE)
   tree$node.label <- rtruncnorm(n = Nnode(tree), sd = 10, mean = 85, a = 0, b = 100) # dummy tree bootstrap values
@@ -784,7 +784,7 @@ calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, 
       all_sampled_branches <- matrix(nrow = permutations, ncol = num_sample[i])
       redistributed_hits   <- matrix(0, nrow = permutations, ncol = length(which_branches[[i]]))
       # create a random sample of the tr
-      set.seed(2)
+      set.seed(1)
       for(j in 1:permutations){
         curr_num_branch <- num_branch[i]
         all_sampled_branches[j, ] <- sample(1:curr_num_branch,

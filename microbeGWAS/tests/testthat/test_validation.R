@@ -659,3 +659,30 @@ test_that("check_if_g_mat_can_be_plotted returns FALSE for a binary matrix of al
 #   if(!is.logical(plot_logical)){stop("Output must be a logical")}
 #   return(plot_logical)
 # }
+
+
+# test check_str_is_discrete_or_continuous
+test_that("check_str_is_discrete_or_continuous gives no error when given 'discrete'", {
+  input <- 'discrete'
+  expect_error(check_str_is_discrete_or_continuous(input), NA)
+})
+
+test_that("check_str_is_discrete_or_continuous gives no error when given 'continuous'", {
+  input <- 'continuous'
+  expect_error(check_str_is_discrete_or_continuous(input), NA)
+})
+
+test_that("check_str_is_discrete_or_continuous gives an error when given 'foobar'", {
+  input <- 'foobar'
+  expect_error(check_str_is_discrete_or_continuous(input))
+})
+
+test_that("check_str_is_discrete_or_continuous gives an error when given NA", {
+  input <- NA
+  expect_error(check_str_is_discrete_or_continuous(input))
+})
+
+test_that("check_str_is_discrete_or_continuous gives an error when given NULL", {
+  input <- NULL
+  expect_error(check_str_is_discrete_or_continuous(input))
+})

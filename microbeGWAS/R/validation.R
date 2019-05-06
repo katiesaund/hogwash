@@ -470,5 +470,26 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
   # Return output --------------------------------------------------------------
   if(!is.logical(plot_logical)){stop("Output must be a logical")}
   return(plot_logical)
-}
+} # end check_if_g_mat_can_be_plotted()
 
+
+check_str_is_discrete_or_continuous <- function(input){
+  # Function description -------------------------------------------------------
+  # Check if the string is either "discrete" or "continuous"
+  #
+  # Inputs:
+  # input. String. "discrete" or "continuous"
+  #
+  # Outputs:
+  # None.
+  #
+  # Check input ----------------------------------------------------------------
+  check_is_string(input)
+
+  # Function -------------------------------------------------------------------
+  if (input != "discrete"){
+    if (input != "continuous"){
+      stop("Input must be either 'discrete' or 'continuous'.")
+    }
+  }
+} # end check_str_is_discrete_or_continuous()

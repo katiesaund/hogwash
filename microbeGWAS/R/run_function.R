@@ -26,7 +26,7 @@ run_phyc <- function(args){
   # ---------------------------------------------------------------------------#
 
   # ANCESTRAL RECONSTRUCTION OF PHENOTYPE -------------------------------------#
-  set.seed(18591124)
+  set.seed(1)
   pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(args$tree, args$phenotype, 1, args$discrete_or_continuous)
   tree_conf             <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
   pheno_trans           <- identify_transition_edges(args$tree, args$phenotype, 1, pheno_recon_and_conf$node_anc_rec, args$discrete_or_continuous)
@@ -124,25 +124,14 @@ run_phyc <- function(args){
   print("B")
   only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans, genotype)
   results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
-
-  #print("pre")
-  #print(table(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
-  #print(summary(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
-
   for (i in 1:ncol(genotype)){
     geno_trans[[i]]$transition <- only_high_conf_geno_trans[[i]]
   }
-  #print("post")
-  #print(table(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
-  #print(summary(report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))))
-
   # how to plot:
   # plot_tree_with_colored_edges(args$tree, geno_trans, all_high_confidence_edges, "grey", "red", "only new transitions", args$annot, "trans", 2)
 
   # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#
   # results_object$high_confidence_trasition_edges <- high_confidence_edges 2019-03-18 this is too simplistic-- updating using assign_high_confidence_to_transition_edges()
-  #print("high confidence edges")
-  #print(high_confidence_edges)
   # TODO follow through on replacing high_confdience_edges as necessary
   num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))
   results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
