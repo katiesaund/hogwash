@@ -493,3 +493,24 @@ check_str_is_discrete_or_continuous <- function(input){
     }
   }
 } # end check_str_is_discrete_or_continuous()
+
+check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
+  # Function description -------------------------------------------------------
+  # Check that the reconstruction method that is being fed to ape::ace() is
+  # one of the four acceptable methods.
+  #
+  # Inputs:
+  # input. String.
+  #
+  # Output:
+  # none.
+
+  # Check inputs -------------------------------------------------------------
+  check_is_string(input)
+
+  # Function -----------------------------------------------------------------
+  acceptable_methods <- c("ML", "REML", "pic", "GLS")
+  if (!input %in% acceptable_methods){
+    stop("Reconstruction methods for ape::ace must be either: ML, REML, pic, or GLS.")
+  }
+} # end check_if_ancestral_reconstruction_method_compatible_with_ape()
