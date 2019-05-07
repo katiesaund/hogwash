@@ -81,4 +81,13 @@ test_that("check_if_convergence_occurs is silent for this specific test set", {
   expect_silent(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type))
 })
 
+test_that("check_if_convergence_occurs gives error when phenotype is incorrectly formatted", {
+  set.seed(1)
+  temp_tree <- rtree(5)
+  temp_pheno <- rnorm(1:5)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_type <- "continuous"
+  expect_error(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type))
+})
+
 #TODO add checks for when inputs are bad to check_if_convergence_occurs()

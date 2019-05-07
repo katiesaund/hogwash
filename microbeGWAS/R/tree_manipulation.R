@@ -39,7 +39,10 @@ identify_short_edges <- function(tr){
   # Tr. Phylo.
   #
   # Output:
-  # short_edges. Vector of edge indices.
+  # short_edges. Binary vector. Length = Nedge(tr). Each entry corresponds to
+  #                             an edge. 0 == long edge (low confidence in
+  #                             reconstruction value). 1 == short edge (high
+  #                             confidence in reconstruction value).
   #
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
@@ -51,6 +54,8 @@ identify_short_edges <- function(tr){
   }
 
   # Return output --------------------------------------------------------------
+  check_if_binary_vector(short_edges)
+  if (length(short_edges) != Nedge(tr)){stop("Short_edges should have length == Nedge(tr)")}
   return(short_edges)
 } # end identify_short_edges()
 
