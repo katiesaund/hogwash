@@ -195,8 +195,6 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
   check_if_alpha_valid(ML_cutoff)
-  if (class(mat) != "matrix"){stop("Ancestral reconstruction input must be a matrix")}
-  check_str_is_discrete_or_continuous(disc_cont)
   # Function -------------------------------------------------------------------
 
   anc_rec_confidence <- apply(recon$lik.anc, 1, max) # Get the highest confidence value at each node

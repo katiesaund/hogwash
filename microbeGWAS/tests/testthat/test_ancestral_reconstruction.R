@@ -1,9 +1,8 @@
 library(microbeGWAS)
 context("ancestral_reconstruction") -------------------------------------------#
 
-# TODO
-# This barely covers any test cases for these functions. Need to expand tests.
-
+# TODO I broke ancestral reconstruction by ML into several new subfunctions.
+# Add unit tests for those subfunctions.
 
 # test pick_recon_model --------------------------------------------------------
 test_that("pick_recon_model gives an error when it claims to have a discrete phenotype, but continuous phenotype is given", {
@@ -184,5 +183,54 @@ test_that("ancestral_reconstruction_by_ML with discrete input produces ancestral
   expect_equivalent(dummy_geno$recon_edge_mat[ , 2, drop = TRUE], c(0, 0, 0, 0, 0, 1, 1, 1))
 })
 
+test_that("convert_to_edge_mat gives known result when given a valid tree and fake reconstruction", {
+  set.seed(1)
+  temp_tree <- rtree(5)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  test_vector <- rep(1, Ntip(temp_tree) + Nnode(temp_tree))
+  output_matrix <- matrix(1, ncol = 2, nrow = Nedge(temp_tree))
+  expect_error(convert_to_edge_mat(temp_tree, test_vector), NA)
+  expect_equivalent(convert_to_edge_mat(temp_tree, test_vector), output_matrix)
 
 
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  test_vector <- c(1:sum(Ntip(temp_tree) + Nnode(temp_tree)))
+  test_vector <- test_vector + 10
+  output_matrix <- temp_tree$edge + 10
+  expect_error(convert_to_edge_mat(temp_tree, test_vector), NA)
+  expect_equivalent(convert_to_edge_mat(temp_tree, test_vector), output_matrix)
+})
+
+test_that("convert_to_edge_mat gives an error when not given a tree", {
+  set.seed(1)
+  temp_tree <- rtree(5)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  test_vector <- rep(1, Ntip(temp_tree) + Nnode(temp_tree))
+  output_matrix <- matrix(1, ncol = 2, nrow = Nedge(temp_tree))
+  not_a_tree <- "foobar"
+  expect_error(convert_to_edge_mat(not_a_tree, test_vector))
+  not_a_tree <- matrix(1, 10, 10)
+  expect_error(convert_to_edge_mat(not_a_tree, test_vector))
+  not_a_tree <- NA
+  expect_error(convert_to_edge_mat(not_a_tree, test_vector))
+  not_a_tree <- NULL
+  expect_error(convert_to_edge_mat(not_a_tree, test_vector))
+})
+
+test_that("convert_to_edge_mat gives an error when given vector or wrong dimension or type", {
+  set.seed(1)
+  temp_tree <- rtree(5)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  not_the_reconstruction <- rep(1, Ntip(temp_tree))
+  expect_error(convert_to_edge_mat(temp_tree, not_the_reconstruction))
+  not_the_reconstruction <- NA
+  expect_error(convert_to_edge_mat(temp_tree, not_the_reconstruction))
+  not_the_reconstruction <- NULL
+  expect_error(convert_to_edge_mat(temp_tree, not_the_reconstruction))
+  not_the_reconstruction <- matrix(1, 10, 10)
+  expect_error(convert_to_edge_mat(temp_tree, not_the_reconstruction))
+  not_the_reconstruction <- "foobar"
+  expect_error(convert_to_edge_mat(temp_tree, not_the_reconstruction))
+})
+
+# End script
