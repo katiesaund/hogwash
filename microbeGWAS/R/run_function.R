@@ -4,7 +4,7 @@ run_phyc <- function(args){
   results_object$log <- capture.output(sessionInfo()) # log session info
 
   if (!args$built_from_snps) {
-    simplified_genotype <- reduce_redundancy(args$genotype, args$tree, args$output_dir, args$output_name) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
+    simplified_genotype <- reduce_redundancy(args$genotype, args$tree) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
     genotype <- simplified_genotype$mat
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
     snps_per_gene <- NULL
@@ -77,7 +77,7 @@ run_phyc <- function(args){
     # make new genotype (just at the tips, from the snps)
     genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup)
 
-    simplified_genotype <- reduce_redundancy(genotype, args$tree, args$output_dir, args$output_name) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
+    simplified_genotype <- reduce_redundancy(genotype, args$tree) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
     genotype <- simplified_genotype$mat
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
     genes_to_keep_in_consideration <- !(unique_genes %in% simplified_genotype$dropped_genotype_names)

@@ -1,43 +1,43 @@
+# TODO: add description of keepers and write unit tests for get_dropped_genotypes
 
 get_dropped_genotypes <- function(geno, keepers){
   # Function description -------------------------------------------------------
-  # TODO
-  # Compute ancestral reconstruction from a continuous or discrete input.
+  # Given a matrix with both desirable genotypes (keepers) and undesirable
+  # genotypes and a numeric index of the keepers, get the names of the keepers.
   #
   # Inputs:
-  # Varname. Var class. Description.
+  # geno. Matrix. Numeric, binary matrix.
+  # keepers. ?
   #
   # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
+  # dropped_genotype_names. Character vector. Names of the non-keepers
+  #                         (genotypes not to be processed downstream).
   #
   # Check input ----------------------------------------------------------------
+  check_if_binary_matrix(geno)
+  # TODO add stuff for keepers
 
   # Function -------------------------------------------------------------------
+  dropped_genotype_names <- colnames(geno)[!keepers]
 
   # Return output --------------------------------------------------------------
-  dropped_genotype_names <- colnames(geno)[!keepers]
   return(dropped_genotype_names)
 } # end get_dropped_genotypes
 
-
-
-reduce_redundancy <- function(mat, tr, dir, name){
+reduce_redundancy <- function(mat, tr){
   # Function description -------------------------------------------------------
-  # This function REMOVES GENOTYPES THAT ARE: RARE, TOO COMMON, OR IDENTICAL
+  # This function removes genotypes are either too rare (only occur once) or too
+  # common (occur everywhere or everywhere but once).
   #
   # Inputs:
   # mat.  Character. Path to matrix file.
   # tr.   Phylo.
-  # dir.  Character.
-  # name. Character.
   #
   # Output:
   # mat. Matrix.
   #
   # Check inputs ---------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
-  check_if_dir_exists(dir)
-  check_is_string(name)
   check_if_binary_matrix(mat)
 
   # Function -------------------------------------------------------------------

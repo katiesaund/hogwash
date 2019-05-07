@@ -10,6 +10,7 @@ assign_pheno_type <- function(mat){
 
   # Check input ----------------------------------------------------------------
   check_dimensions(mat, NULL, 1, 1, 1)
+  if (!typeof(mat) %in% c("double", "integer", "numeric")){stop("Must be a numeric matrix")}
 
   # Function -------------------------------------------------------------------
   type <- "discrete"
@@ -19,6 +20,8 @@ assign_pheno_type <- function(mat){
 
   # Check and return output ----------------------------------------------------
   check_is_string(type)
+  check_str_is_discrete_or_continuous(type)
+
   return(type)
 } # end assign_pheno_type()
 
@@ -75,52 +78,67 @@ calc_raw_diff <- function(edge_list, ph_edges){
 
 check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
   # Function description -------------------------------------------------------
-  # TODO
+  # Given a continuous phenotype, check if the phenotype follows a normal
+  # distribution. The brownian motional model of ancestral reconstruction, which
+  # this library uses, assumes a normal distribution of the phenotype.
   # Compute ancestral reconstruction from a continuous or discrete input.
   #
   # Inputs:
-  # Varname. Var class. Description.
+  # pheno. Matrix. A one column numeric matrix.
+  # Continuous_or_discrete. String. Either 'continuous' or 'discrete.'
   #
   # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
+  # None.
   #
   # Check input ----------------------------------------------------------------
+  check_dimensions(pheno, NULL, 1, 1, 1)
+  if (!typeof(pheno) %in% c("double", "integer", "numeric")){stop("Must be a numeric matrix")}
+  check_is_string(continuous_or_discrete)
+  check_str_is_discrete_or_continuous(continuous_or_discrete)
 
   # Function -------------------------------------------------------------------
-
-  # Return output --------------------------------------------------------------
   if (continuous_or_discrete == "continuous"){
+    if (length(unique(pheno)) == 1){stop("phenotype must have some variability")}
+
     result <- shapiro.test(unlist(pheno))
     alpha <- 0.05
     if (result$p < alpha){
-      print("Consider normalizing your phenotype")
+      print("Please consider normalizing your phenotype so as to not violate
+            assumptions used in the ancestral reconstruction.")
     }
   }
 } # end check_if_phenotype_normal
 
-check_if_convergence_occurs <- function(pheno, tree, continuous_or_discrete){
+check_if_convergence_occurs <- function(pheno, tr, continuous_or_discrete){
   # Function description -------------------------------------------------------
-  # TODO
-  # Compute ancestral reconstruction from a continuous or discrete input.
+  # Given the phenotype and tr, test if a Brownian motion model or a white
+  # noise model better fit the data. If a white noise model better fits the data
+  # it could be because convergent or parallel evolution in happening on
+  # disparate parts of the tr It's just one more clue.
   #
   # Inputs:
-  # Varname. Var class. Description.
+  # pheno. Numeric matrix. One column.
+  # tr. Phylo.
+  # continuous_or_discrete. String. Either 'continuous' or 'discrete'
   #
   # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
+  # TODO? Plot?
   #
   # Check input ----------------------------------------------------------------
+  check_tree_is_valid(tr)
+  check_for_root_and_bootstrap(tr)
+  check_dimensions(pheno, NULL, 1, 1, 1)
+  check_str_is_discrete_or_continuous(continuous_or_discrete)
 
   # Function -------------------------------------------------------------------
-
-  # Return output --------------------------------------------------------------
   if (continuous_or_discrete == "continuous"){
     set.seed(1)
-    geiger_BM <- fitContinuous(tree, pheno, model = "BM")
-    geiger_white <- fitContinuous(tree, pheno, model = "white")
+    geiger_BM <- geiger::fitContinuous(tr, pheno, model = "BM")
+    geiger_white <- geiger::fitContinuous(tr, pheno, model = "white")
 
-    if (geiger_white$opt$aicc < geiger_BM$opt$aicc){
-      print("WN better than BM")
+    enough_of_a_difference_in_AIC <- 2
+    if (geiger_white$opt$aicc + enough_of_a_difference_in_AIC < geiger_BM$opt$aicc){
+      print("A white noise model better describes phenotype than does a Brownina motion model.")
     }
 
     # TODO Add this as a plot to output?
@@ -133,5 +151,8 @@ check_if_convergence_occurs <- function(pheno, tree, continuous_or_discrete){
     #        main = "Model values for toxin")
     #dev.off()
   }
+  # Return output --------------------------------------------------------------
+  # TODO? Add the plot? If I do, then I need to add unit tests
+  # TODO where is best place to put this function in the large script?
 } # end check_if_convergence_occurs()
 

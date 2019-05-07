@@ -241,6 +241,12 @@ check_if_binary_matrix <- function(mat){
   if (sum(!(mat %in% c(0, 1))) > 0 | class(mat) != "matrix"){
     stop("Genotype matrix should be only 1s and 0s")
   }
+  if (is.null(dim(mat))){
+    stop("Must be a matrix")
+  }
+  if (nrow(mat) == 0 | ncol(mat) == 0){
+    stop("matrix must have columns and rows.")
+  }
 } # end check_if_binary_matrix()
 
 check_file_exists <- function(file_name){
