@@ -65,3 +65,29 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
   }
   return(tree_tip_and_node_confidence)
 } # end get_bootstrap_confidence()
+
+reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
+  # Function description -------------------------------------------------------
+  # TODO ??
+  #
+  # Input:
+  # Tr. Phylo.
+  # tips_and_node_vector. ?
+  #
+  # Output:
+  # ordered_by_edges ?
+  #
+  # Check input ----------------------------------------------------------------
+  check_tree_is_valid(tr)
+  # TODO add check of length of edges vs tips_and_node_vector
+
+  # Function -------------------------------------------------------------------
+  ordered_by_edges <- rep(NA, Nedge(tr))
+  for (i in 1:Nedge(tr)){
+    ordered_by_edges[i] <- tips_and_node_vector[tr$edge[i, 2]]
+  }
+
+  # Return output --------------------------------------------------------------
+  return(ordered_by_edges)
+} # end reorder_tips_and_nodes_to_edges()
+
