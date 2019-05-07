@@ -309,49 +309,6 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   return(results)
 } # end calculate_genotype_significance()
 
-
-collapse_identical_genotypes <- function(genotype_matrix, output_directory, output_name){
-  # TO DO:
-  # Add a check of the output format.
-  #
-  # Function description -------------------------------------------------------
-  # Save any genotype with the same absence/presence pattern into an Rdata object
-  # and remove those duplicates from the genotype matrix to reduce the penalization
-  # induced by multiple test correction.
-  #
-  # Input:
-  # genotype_matrix.  Matrix. Genotypes in the columns, samples in the rows. All entries are either 0 or 1. No NAs.
-  # output_directory. Character. Path to output directory.
-  # output_name.      Character. Identifier for output files.
-  #
-  # Output:
-  # None.
-  #
-  # Check input ----------------------------------------------------------------
-  check_if_binary_matrix(genotype_matrix)
-  check_is_string(output_name)
-  check_if_dir_exists(output_directory)
-
-  # Function -------------------------------------------------------------------
-  genotype_matrix <- t(genotype_matrix)
-  genotype_matrix  <- as.data.frame(genotype_matrix)
-  duplicate_factor <- interaction(genotype_matrix, drop = TRUE)  #interaction function requires data.frame
-  genotype_groups  <- rep(list(NULL), length(unique(duplicate_factor)))
-  non_duplicates   <- NULL
-  for (i in 1:length(unique(duplicate_factor))){
-    genotype_groups[i]  <- list(row.names(genotype_matrix)[duplicate_factor == unique(duplicate_factor)[i]])
-    non_duplicates <- append(non_duplicates, genotype_groups[[i]][1])
-  }
-  genotype_matrix <- genotype_matrix[row.names(genotype_matrix) %in% non_duplicates, , drop = FALSE]
-  genotype_matrix <- as.matrix(genotype_matrix)
-  genotype_matrix <- t(genotype_matrix)
-  file_name <- create_file_name(output_directory, output_name, "genotypes_with_identical_patterns.rda")
-
-  # Return output --------------------------------------------------------------
-  save(genotype_groups, file = file_name)
-  return(genotype_matrix)
-} # end collapse_identical_genotypes()
-
 convert_matrix_to_vector <- function(mat){
   # Function description -------------------------------------------------------
   # Convert a single column matrix into a vector, retain row names as names of vector.
