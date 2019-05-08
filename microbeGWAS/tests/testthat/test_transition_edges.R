@@ -4,58 +4,41 @@ context("Transition edges") #----------------------------------------------#
 
 # TODO test identify_transition_edges
 
-test_that("identify_transition_edges does X given Y", {
-
-
+test_that("identify_transition_edges returns correct transition vector and trans_dir vector for discrete phenotype", {
+  set.seed(1)
+  temp_tree <- rtree(5)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_pheno <- matrix(c(1, 0, 1, 0, 1), ncol = 1)
+  row.names(temp_pheno) <- temp_tree$tip.label
+  set.seed(1)
+  temp_recon <- ancestral_reconstruction_by_ML(temp_tree, temp_pheno, 1, "discrete")
+  temp_results <- identify_transition_edges(temp_tree, temp_pheno, 1, temp_recon$node_anc_rec, "discrete")
+  expect_equivalent(temp_results$transition, c(1, 1, 0, 0, 0, 1, 0, 1))
+  expect_equivalent(temp_results$trans_dir, c(-1, 1, 0, 0, 0, -1, 0, 1))
 })
 
-# identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
+test_that("identify_transition_edges returns correct transition vector and trans_dir vector for discrete genotype", {
+  set.seed(1)
+  temp_tree <- rtree(5)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_geno <- cbind(c(1, 0, 1, 0, 1), c(1, 0, 0, 0, 0))
+  row.names(temp_geno) <- temp_tree$tip.label
+  temp_recon <- temp_results <- rep(list(0), ncol(temp_geno))
+  set.seed(1)
+  for (i in 1:2){
+    temp_recon[[i]] <- ancestral_reconstruction_by_ML(temp_tree, temp_geno, i, "discrete")
+    temp_results[[i]] <- identify_transition_edges(temp_tree, temp_geno, i, temp_recon[[i]]$node_anc_rec, "discrete")
 
-#   # FUNCTION ------------------------------------------------------------------#
-#   transition <- transition_direction <- parent_node <- child_node <- integer(Nedge(tr)) # initialize all as zeroes
-#   older <- 1 # older node is 1st column in tr$edge
-#   younger <- 2 # younger node is 2nd column in tr$edge
-#   parent_0_child_1 <- 1
-#   parent_1_child_0 <- -1
-#   parent_equals_child <- 0
-#   both_parent_and_child_are_one <- 2
-#
-#
-#   for (i in 1:Nedge(tr)){
-#     if (is_tip(tr$edge[i, older], tr)){
-#       stop("tree invalid")
-#     }
-#     parent_node[i] <- node_recon[tr$edge[i, older] - Ntip(tr)]   # Assign node value
-#     if (is_tip(tr$edge[i, younger], tr)){ # child is a tip
-#       child_node[i]  <- mat[ , num][tr$edge[i, younger]]           # Assign tip value
-#     } else {  # child is internal nodes
-#       child_node[i]  <- node_recon[tr$edge[i, younger] - Ntip(tr)] # Assign node value
-#     }
-#
-#     transition[i] <- sum(parent_node[i] + child_node[i])
-#     # transition[i] is either 0, 1, or 2 for discrete traits
-#     # transition[i] is not to be used when the trait is continuous because all, or very nearly all edges are transition edges.
-#
-#     if (parent_node[i] > child_node[i]){
-#       transition_direction[i] <- parent_1_child_0
-#     } else if (parent_node[i] < child_node[i]){
-#       transition_direction[i] <- parent_0_child_1
-#     }
-#
-#     if (disc_cont == "discrete"){
-#       transition[transition == both_parent_and_child_are_one] <- parent_equals_child # If parent_node and child_node had same value (1) then no transition occured.
-#     } else if (disc_cont == "continuous"){
-#       transition <- NA # transition[i] is not to be used when the trait is continuous because all, or very nearly all edges are transition edges.
-#     } else {
-#       stop("disc_cont must be discrete or continuous")
-#     }
-#
-#   }
-#   # Check and return output ----------------------------------------------------
-#   results <- list("transition" = transition, "trans_dir" = transition_direction)
-#   return(results)
-# } # end identify_transition_edges()
-#
+  }
+  expect_equivalent(temp_results[[1]]$transition, c(1,  1, 0, 0, 0,  1, 0, 1))
+  expect_equivalent(temp_results[[1]]$trans_dir,  c(-1, 1, 0, 0, 0, -1, 0, 1))
+  expect_equivalent(temp_results[[2]]$transition, c(0,  1, 0, 0, 0,  0, 0, 0))
+  expect_equivalent(temp_results[[2]]$trans_dir,  c(0,  1, 0, 0, 0,  0, 0, 0))
+})
+
+
+
+
 # TODO test keep_at_least_two_high_conf_trans_edges
 # keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotype_confidence){
 #   # TODO
