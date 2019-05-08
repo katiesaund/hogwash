@@ -157,13 +157,13 @@ run_phyc <- function(args){
 
     print("D")
     # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
-    corrected_pvals_all_transitions <- get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals, args$alpha)
+    corrected_pvals_all_transitions <- get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals, args$fdr)
     print("E")
     # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES
-    all_transitions_sig_hits <- keep_hits_with_more_change_on_trans_edges(results_all_transitions, corrected_pvals_all_transitions, args$alpha)
+    all_transitions_sig_hits <- keep_hits_with_more_change_on_trans_edges(results_all_transitions, corrected_pvals_all_transitions, args$fdr)
     print("F")
     # SAVE AND PLOT RESULTS -----------------------------------------------------#
-    trans_mat_results <- plot_significant_hits("continuous", args$tree, args$alpha, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
+    trans_mat_results <- plot_significant_hits("continuous", args$tree, args$fdr, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
     print("G")
     # move next five lines into a function
     results_object$genotype_transition_edge_matrix <- trans_mat_results$trans_dir_edge_mat
@@ -189,15 +189,15 @@ run_phyc <- function(args){
     # results_object$contingency_table_recon <- create_contingency_table(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, genotype)
     results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, genotype)
 
-    disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_trans$transition,       args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
-    # disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
-    disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$alpha, high_conf_ordered_by_edges)
+    disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_trans$transition,       args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
+    # disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
+    disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
 
     hit_pvals_trans <- disc_trans_results$hit_pvals
     hit_pvals_recon <- disc_recon_results$hit_pvals
     print("E")
-    corrected_pvals_trans <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_trans, args$alpha)
-    corrected_pvals_recon <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_recon, args$alpha)
+    corrected_pvals_trans <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_trans, args$fdr)
+    corrected_pvals_recon <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_recon, args$fdr)
 
     results_object$hit_pvals_transition     <- corrected_pvals_trans$hit_pvals
     results_object$hit_pvals_reconstruction <- corrected_pvals_recon$hit_pvals
@@ -208,7 +208,7 @@ run_phyc <- function(args){
     discrete_plots(tr = args$tree, # add a test to check that p_recon_edges and g_recon_edges have Nedge(tree)
                    dir = args$output_dir,
                    name = args$output_name,
-                   a = args$alpha,
+                   a = args$fdr,
                    annot = args$annot,
                    num_perm = args$perm,
                    recon_hit_vals = corrected_pvals_recon$hit_pvals,

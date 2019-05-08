@@ -194,7 +194,7 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
-  check_if_alpha_valid(ML_cutoff)
+  check_num_between_0_and_1(ML_cutoff)
   # Function -------------------------------------------------------------------
 
   anc_rec_confidence <- apply(recon$lik.anc, 1, max) # Get the highest confidence value at each node

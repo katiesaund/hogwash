@@ -174,10 +174,10 @@ get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
   # Output:
   # pvals.  List of 2.
   #         $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names = genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
-  #         $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are significant after FDR correction. Column name = "fdr_corrected_pvals[fdr_corrected_pvals < alpha]". Row.names = genotypes. Nrow = is variable-- could be between 0 and max number of genotypes. It will only have rows if the corrected p-value is less than the alpha value.
+  #         $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are significant after FDR correction. Column name = "fdr_corrected_pvals[fdr_corrected_pvals < fdr]". Row.names = genotypes. Nrow = is variable-- could be between 0 and max number of genotypes. It will only have rows if the corrected p-value is less than the fdr value.
   #
   # Check inputs ---------------------------------------------------------------
-  check_if_alpha_valid(fdr)
+  check_num_between_0_and_1(fdr)
 
   # Function -------------------------------------------------------------------
   fdr_corrected_pvals            <- p.adjust(hit_values, method = "fdr")

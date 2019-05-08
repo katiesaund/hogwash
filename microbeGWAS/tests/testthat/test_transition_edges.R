@@ -73,13 +73,13 @@ test_that("keep_at_least_two_high_conf_trans_edges returns a vector c(TRUE, FALS
 # test keep_hits_with_more_change_on_trans_edges
 test_that("keep_hits_with_more_change_on_trans_edges does X given Y", {
   num_genotypes <- 5
-  temp_alpha <- 0.05
+  temp_fdr <- 0.05
   temp_results <- temp_pvals <- NULL
   temp_results$trans_median <- rep(10, num_genotypes)
   temp_results$all_edges_median <- c(8:12)
   temp_pvals$hit_pvals <- as.data.frame(matrix(0.01, ncol = 1, nrow = num_genotypes))
   colnames(temp_pvals$hit_pvals) <- "fdr_corrected_pvals"
   row.names(temp_pvals$hit_pvals) <- letters[1:num_genotypes]
-  results <- keep_hits_with_more_change_on_trans_edges(temp_results, temp_pvals, temp_alpha)
+  results <- keep_hits_with_more_change_on_trans_edges(temp_results, temp_pvals, temp_fdr)
   expect_equivalent(row.names(results), c("a", "b"))
 })

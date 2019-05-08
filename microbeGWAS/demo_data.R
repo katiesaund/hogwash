@@ -25,7 +25,7 @@ if (dataset == 0){
   test_annot <- NULL
   test_name  <- "fqR_gene_built_from_stop_snps"
   test_perm  <- "1000"
-  test_alpha <- "0.15"
+  test_fdr <- "0.15"
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_built_from_snps <- TRUE
@@ -37,7 +37,7 @@ if (dataset == 0){
   test_annot <- NULL
   test_name  <- "fqR_gene_stop"
   test_perm  <- "1000"
-  test_alpha <- "0.15"
+  test_fdr <- "0.15"
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_built_from_snps <- FALSE
@@ -49,7 +49,7 @@ if (dataset == 0){
   test_annot <- NULL
   test_name  <- "log_toxin_gene_built_from_stop_snps"
   test_perm  <- "1000"
-  test_alpha <- "0.15"
+  test_fdr <- "0.15"
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_built_from_snps <- TRUE
@@ -61,7 +61,7 @@ if (dataset == 0){
   test_annot <- NULL
   test_name  <- "log_toxin_gene_stop"
   test_perm  <- "1000"
-  test_alpha <- "0.15"
+  test_fdr <- "0.15"
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_built_from_snps <- FALSE
@@ -73,7 +73,7 @@ if (dataset == 0){
   test_annot <- NULL
   test_name  <- "log_toxin_snp_stop"
   test_perm  <- "100"
-  test_alpha <- "0.2"
+  test_fdr <- "0.2"
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv" # TODO update this to be null
   test_built_from_snps <- FALSE
@@ -85,7 +85,7 @@ if (dataset == 0){
   test_annot <- NULL
   test_name  <- "severity_snp_stop"
   test_perm  <- "1000"
-  test_alpha <- "0.15"
+  test_fdr <- "0.15"
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_built_from_snps <- FALSE
@@ -101,9 +101,9 @@ args$genotype               <- read_in_tsv_matrix(test_geno)
 args$output_name            <- test_name # Ex: log_toxin_snp_stop
 args$output_dir             <- test_dir # Directory in which all output files will be saved
 args$perm                   <- as.numeric(test_perm) #typically 10,000
-args$alpha                  <- as.numeric(test_alpha)
+args$fdr                    <- as.numeric(test_fdr)
 args$annotation             <- NULL #read_in_tsv_matrix(test_annot)
-args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$alpha, args$annot)
+args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$fdr, args$annot)
 args$bootstrap_cutoff       <- test_bootstrap
 args$gene_snp_lookup        <- read_in_tsv_matrix(test_gene_snp_lookup)
 args$built_from_snps        <- test_built_from_snps

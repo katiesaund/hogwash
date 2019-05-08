@@ -124,7 +124,7 @@ read_in_arguments <- function(args){
 } # end read_in_arguments()
 
 
-check_input_format <- function(pheno, tr, geno, name, dir, perm, a, annot){
+check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr, annot){
   # Function description -------------------------------------------------------
   # Check that all of the inputs into phyC are in the valid format.
   #
@@ -135,7 +135,7 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, a, annot){
   # name.  Character. Output name.
   # dir.   Character. Output path.
   # perm.  Number. Times to shuffle the data on the tree to create a null distribution for the permutation test.
-  # a.     Number. Alpha.
+  # fdr.   Number. False discovery rate. Between 0 and 1.
   # annot. Matrix. Annotation for heatmaps.
 
   # Output:
@@ -154,7 +154,7 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, a, annot){
   check_is_string(name)
   check_if_dir_exists(dir)
   check_if_permutation_num_valid(perm)
-  check_if_alpha_valid(a)
+  check_num_between_0_and_1(fdr)
   if (!is.null(annot)){
     check_dimensions(annot, Ntip(tr), 2, 2, 2)
   }

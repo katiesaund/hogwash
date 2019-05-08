@@ -43,24 +43,24 @@ check_dimensions <- function(mat, exact_rows = NULL, min_rows, exact_cols = NULL
   }
 } # end check_dimensions()
 
-check_if_alpha_valid <- function(a){
+check_num_between_0_and_1 <- function(foo){
   # Function description -------------------------------------------------------
-  # Check that the alpha (threshold for significance) is within a valid range (0 < alpha < 1).
+  # Check that the input is within a valid range (0 < foo < 1).
   #
   # Input:
-  # a. Numeric. Value of alpha.
+  # foo. Numeric.
   #
   # Output:
   # None.
   #
   # Check input ----------------------------------------------------------------
-  check_is_number(a)
+  check_is_number(foo)
 
   # Function -------------------------------------------------------------------
-  if (a > 1 | a < 0){
-    stop("Provide a valid alpha.")
+  if (foo > 1 | foo < 0){
+    stop("Provide a value between 0 and 1.")
   }
-} # end check_if_alpha_valid()
+} # end check_num_between_0_and_1()
 
 check_if_dir_exists <- function(dir){
   # Function description -------------------------------------------------------

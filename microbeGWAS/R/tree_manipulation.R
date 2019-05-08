@@ -95,7 +95,7 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_number(confidence_threshold)
-  check_if_alpha_valid(confidence_threshold)
+  check_num_between_0_and_1(confidence_threshold)
   if (max(tr$node.label) > 100 | min(tr$node.label) < 0){
     stop("Tree$node.label are expected to be positive numbers between 0 and 100")
   }

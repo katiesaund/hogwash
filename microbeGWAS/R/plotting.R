@@ -28,12 +28,12 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   # No output ------------------------------------------------------------------
 } # end plot_continuous_phenotype()
 
-plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf, all_trans_sig_hits){
+plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf, all_trans_sig_hits){
   # Function description -------------------------------------------------------
   #
   # Inputs:
   # tr.                  Phylo.
-  # a.                   Number. Alpha.
+  # fdr.                 Number. False discovery rate.
   # dir.                 Character. Output path.
   # name.                Character. Output name.
   # pheno_vector.        Vector.
@@ -46,7 +46,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   # Check inputs ---------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
-  check_if_alpha_valid(a)
+  check_num_between_0_and_1(fdr)
   check_if_dir_exists(dir)
   check_is_string(name)
   check_if_vector(pheno_vector)
@@ -91,7 +91,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   fname <- create_file_name(dir, name, paste("summary_and_sig_hit_results.pdf", sep = "")) # 2019-02-25 removed counter from pdf file name because combining.
   pdf(fname, width = 16, height = 20)
 
-  make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, a, "transition")
+  make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, fdr, "transition")
   cell_width_value <- 1.5
   if (ncol(ordered_by_p_val) < 50){
     cell_width_value <- 10
@@ -127,7 +127,7 @@ plot_significant_hits <- function(disc_cont, tr, a, dir, name, pval_all_transiti
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
   counter <- 0 # TODO can I get rid of counter now? 2019-02-25
   for (j in 1:nrow(pval_all_transition$hit_pvals)){
-    if (pval_all_transition$hit_pvals[j, 1] < a){
+    if (pval_all_transition$hit_pvals[j, 1] < fdr){
       print("making significant plots")
       counter <- counter + 1
       par(mfrow = c(3, 3))
@@ -618,7 +618,7 @@ create_heatmap_compatible_tree <- function(tree){
 } # end create_heatmap_compatible_tree()
 
 
-discrete_plots <- function(tr, dir, name, a,
+discrete_plots <- function(tr, dir, name, fdr,
                            annot, num_perm, recon_hit_vals,
                            trans_hit_vals, p_recon_edges,
                            g_recon_edges, pheno_anc_rec,
@@ -644,7 +644,7 @@ discrete_plots <- function(tr, dir, name, a,
   pdf(paste0(dir, "/phyc_",  name, ".pdf"))
   # reconstruction first
   par(mfrow = c(1,1))
-  make_manhattan_plot(dir, name, recon_hit_vals, a, "reconstruction")
+  make_manhattan_plot(dir, name, recon_hit_vals, fdr, "reconstruction")
 
   # TODO 2019-03-18 fix all references to reconstruction a genotype transition-- because that's what it should be
   g_recon_mat <- matrix(0, nrow = Nedge(tr), ncol = length(g_recon_edges))
@@ -713,7 +713,7 @@ discrete_plots <- function(tr, dir, name, a,
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
   # TODO break these plots into more functions b/c lots of redundant code between recon and transition plots
   for (j in 1:nrow(recon_hit_vals)){
-    if (recon_hit_vals[j, 1] < a){
+    if (recon_hit_vals[j, 1] < fdr){
       par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
       # pheno
       plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
@@ -780,7 +780,7 @@ discrete_plots <- function(tr, dir, name, a,
   }
 
   par(mfrow = c(1,1))
-  make_manhattan_plot(dir, name, trans_hit_vals, a, "transition")
+  make_manhattan_plot(dir, name, trans_hit_vals, fdr, "transition")
 
   # start transition heatmaps
   g_trans_mat <- matrix(0, nrow = Nedge(tr), ncol = length(g_recon_edges))
@@ -803,7 +803,7 @@ discrete_plots <- function(tr, dir, name, a,
   significant_loci <- data.frame("locus" = rep("not_sig", ncol(g_trans_mat)), stringsAsFactors = FALSE)
   row.names(significant_loci) <- row.names(trans_hit_vals)
   log_p_value <- data.frame(-log(trans_hit_vals))
-  significant_loci[log_p_value > -log(a)] <- "sig"
+  significant_loci[log_p_value > -log(fdr)] <- "sig"
 
 
   if (!is.null(snp_in_gene)){
@@ -837,7 +837,7 @@ discrete_plots <- function(tr, dir, name, a,
 
   # loop through transition sig hits:
   for (j in 1:nrow(trans_hit_vals)){
-    if (trans_hit_vals[j, 1] < a){
+    if (trans_hit_vals[j, 1] < fdr){
       par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
       # Plot pheno
       p_trans_edges_as_list <- list(p_trans_edges)
