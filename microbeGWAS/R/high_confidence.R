@@ -56,7 +56,7 @@ report_num_high_confidence_trans_edge <- function(genotype_transition,
     stop("high_conf_edges should have one vector for each genotype")
   }
   if(!is.vector(genotype_transition[[1]]$transition)){stop("Input must have a vector.")}
-  if(!is.vector(high_conf_edges[[1]]$transition)){stop("Input must have a vector.")}
+  if(!is.vector(high_conf_edges[[1]])){stop("Input must have a vector.")}
   if(!is.vector(geno_names)){stop("Input must be a vector.")}
   if(!is.character(geno_names[1])){stop("Input must be a character vector.")}
 
@@ -82,12 +82,12 @@ assign_high_confidence_to_transition_edges <- function(tr,
   #
   # Inputs:
   # tr. Phylo.
-  # all_confidence_by_edge. ?
-  # genotype_transition_by_edges. ?
+  # all_confidence_by_edge. List of vectors. Each vector is binary. Length(list) == number of genomes.
+  # genotype_transition_by_edges. List of vectors. Each vector is binary. Length(list) == number of genomes.
   # geno. Matrix. Binary.
   #
   # Outputs:
-  # edge_and_parent_confident_and_trans_edge. ?
+  # edge_and_parent_confident_and_trans_edge. List of vector. Each vector is binary. Length(list) == number of genomes.
   #
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
@@ -102,24 +102,29 @@ assign_high_confidence_to_transition_edges <- function(tr,
   }
   # Function -------------------------------------------------------------------
   # Identify all edges for which the edge and the parent edge are both high confidence
-  edge_and_parent_both_confident <- edge_and_parent_confident_and_trans_edge <- rep(list(rep(0, Nedge(tr))), ncol(geno))
+  edge_and_parent_both_confident <- rep(list(rep(0, Nedge(tr))), ncol(geno))
   for (ge in 1:ncol(geno)){
-    for (ed in 2:(Nedge(tr) - 1)){ # start at 2 because there isn't a parent edge to edge 1, end at Nedge- 1 because no parent to the last edge either
+    for (ed in 1:Nedge(tr)){
       parent_edge <- find_parent_edge(tr, ed)
-      if (all_confidence_by_edge[[ge]][ed] == 1 & all_confidence_by_edge[[ge]][parent_edge] == 1){
-        edge_and_parent_both_confident[[ge]][ed] <- 1
-      }
+      if (!is.na(parent_edge)){
+        if (all_confidence_by_edge[[ge]][ed] == 1){
+          if (all_confidence_by_edge[[ge]][parent_edge] == 1){
+            edge_and_parent_both_confident[[ge]][ed] <- 1
+          }
+        }
+      } else{
+        # have to account for the fact that there isn't a parent edge two tree edges
+        edge_and_parent_both_confident[[ge]][ed] <- all_confidence_by_edge[[ge]][ed]
+      } # end if (!is.na(parent_edge))
     }
-    edge_and_parent_both_confident[[ge]][1] <- all_confidence_by_edge[[ge]][1] # have to account for the fact that there isn't a parent edge to edge 1
-    edge_and_parent_both_confident[[ge]][Nedge(tr)] <- all_confidence_by_edge[[ge]][Nedge(tr)] # have to account for the fact that there isn't a parent edge to last edge
   }
 
   # Identify high confidence transition edges by overlapping the above and transitions
+  edge_and_parent_confident_and_trans_edge <- rep(list(NULL), ncol(geno))
   for (k in 1:ncol(geno)){
     edge_and_parent_confident_and_trans_edge[[k]] <- as.numeric((edge_and_parent_both_confident[[k]] + genotype_transition_by_edges[[k]]$transition) == 2)
   }
 
   # Return output --------------------------------------------------------------
-  # Return that overlap as high confidence transitions
   return(edge_and_parent_confident_and_trans_edge)
 } # end assign_high_confidence_to_transition_edges()

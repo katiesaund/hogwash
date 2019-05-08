@@ -1,9 +1,7 @@
 library(microbeGWAS)
 context("Tree manipulation functions") #---------------------------------------#
 
-# TODO find_parent_edge() -- see if this function ever gets used before writing unit tests
-# TODO reorder_tips_and_nodes_to_edges() -- see if this function ever gets used before writing unit tests
-
+# TODO test reorder_tips_and_nodes_to_edges() -- see if this function ever gets used before writing unit tests
 # reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
 #   # Function description -------------------------------------------------------
 #   # TODO ??
