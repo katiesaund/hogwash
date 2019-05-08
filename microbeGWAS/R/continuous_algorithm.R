@@ -1,4 +1,8 @@
 run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
+  # TODO deal with cases when there isn't enough data (aren't at least 1 of least t_index and non_t_index)
+  # right now it will cause a stop error --- which won't be good for lots of things.
+  # Can't seem to recapitulate the error when there are not enough samples to run the test,but all indices are list of at least one. Hmm.
+
   # Function description -------------------------------------------------------
   # Run a Kolmogorov-Smirnov test on the continuous phenotype. The phenotype is
   # divided into two groups: transition edges and non-transition edges.
@@ -6,39 +10,34 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   # Input:
   # t_index.     Vector. Each number is the index phenotype transition edges on the tree.
   # non_t_index. Vector.  Each number is the index phenotype transition edges on the tree.
-  # phenotype_by_edges. Vector(?). Continuous phenotype.
+  # phenotype_by_edges. Numeric matrix. Phenotype values are each node stored in a matrix. Each row corresponds to an edge. 1st column is parent node. 2nd column is daughter node.
   #
   # Outputs:
   # A list of 4 elements:
-  # $pval. Numeric. KS Test p-value.
-  # $statistic. Numeric. KS Test statistic.
-  # $pheno_trans_delta. Numeric vector. The value of the delta of the phenotype on transition edges.
-  # $pheno_non_trans_delta. Numeric vector. The value of the delta of the phenotype on all non-transition edges.
-
+  #   $pval. Numeric. KS Test p-value.
+  #   $statistic. Numeric. KS Test statistic.
+  #   $pheno_trans_delta. Numeric vector. The value of the delta of the phenotype on transition edges.
+  #   $pheno_non_trans_delta. Numeric vector. The value of the delta of the phenotype on all non-transition edges.
+  #
   # Check input ----------------------------------------------------------------
+  if(!is.vector(t_index)){stop("Transition index must be a vector")}
+  check_is_number(t_index[1])
+  if(max(t_index) > nrow(phenotype_by_edges)){stop("Transition index must represent a tree edge")}
 
+  if(!is.vector(non_t_index)){stop("Non-transition index must be a vector")}
+  check_is_number(non_t_index[1])
+  if(max(non_t_index) > nrow(phenotype_by_edges)){stop("Non-transition index must represent a tree edge")}
 
-  # TODO add unit tests
-  # TODO deal with cases when there isn't enough data (aren't at least 1 of least t_index and non_t_index)
-  # t_index = transition edges
-  # not_t_index = non transition edges
-  # phenotype_by_edges = change in phenotype on each edge
-
-  # Check input ---------------------------------------------------------------#
   if (length(t_index) < 1 | length(non_t_index) < 1){
     stop("Not enough high confidence transition edges to use for KS test.")
   }
-
   # Function -------------------------------------------------------------------
-
-  # subset index to only high confidence edges:
   p_trans_delta     <- calculate_phenotype_change_on_edge(t_index,     phenotype_by_edges)
   p_non_trans_delta <- calculate_phenotype_change_on_edge(non_t_index, phenotype_by_edges)
-
+  set.seed(1)
   ks_results        <- ks.test(p_trans_delta, p_non_trans_delta)
 
   # Return output --------------------------------------------------------------
-
   results <- list("pval"      = round(ks_results$p.value, digits = 20),
                   "statistic" = round(ks_results$statistic, digits = 20),
                   "pheno_trans_delta"     = p_trans_delta,

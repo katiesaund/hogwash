@@ -114,7 +114,7 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotyp
   return(has_at_least_two_high_confidence_transition_edges)
 } # end keep_at_least_two_high_conf_trans_edges()
 
-keep_hits_with_more_change_on_trans_edges <- function(results, pvals, a){
+keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
   # Function description -------------------------------------------------------
   # Of all of the significant hits, keep only those where the
   # median(delta phenotype) on transition edges is > median(delta phenotype) on
@@ -136,19 +136,19 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, a){
   # pvals.  List of 2.
   #         $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names = genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
   #         $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are significant after FDR correction. Column name = "fdr_corrected_pvals[fdr_corrected_pvals < alpha]". Row.names = genotypes. Nrow = is variable-- could be between 0 and max number of genotypes. It will only have rows if the corrected p-value is less than the alpha value.
-  # a.      Number. Alpha (significance threshold). Between 0 and 1.
+  # fdr.    Number. False discovery rate (significance threshold). Between 0 and 1.
   # Output:
   # hits. Data.frame. 1 column. Colnum names = "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are (1) significant after multiple test correction and (2) have higher median delta phenotype on transition edges than on all edges. Values are between 1 and 0. Rownames are genotypes.
   #
   # Check inputs ---------------------------------------------------------------
-  check_if_alpha_valid(a)
+  check_num_between_0_and_1(fdr)
 
   # Function -------------------------------------------------------------------
   # Keep only hits with transition edge median delta phenotype higher than all edge delta phenotype median.
   temp <- pvals$hit_pvals[(results$trans_median > results$all_edges_median), , drop = FALSE]
 
   # Keep only those that are also significant after FDR correction.
-  hits <- temp[temp[ , 1] < a, , drop = FALSE]
+  hits <- temp[temp[ , 1] < fdr, , drop = FALSE]
 
   # Check and return output ----------------------------------------------------
   return(hits)

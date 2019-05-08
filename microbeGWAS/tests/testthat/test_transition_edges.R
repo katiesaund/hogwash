@@ -1,8 +1,6 @@
 library(microbeGWAS)
 context("Transition edges") #----------------------------------------------#
-# TODO write tests for all functions
-
-# TODO test identify_transition_edges
+# test identify_transition_edges
 
 test_that("identify_transition_edges returns correct transition vector and trans_dir vector for discrete phenotype", {
   set.seed(1)

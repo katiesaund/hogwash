@@ -1,5 +1,5 @@
 library(microbeGWAS)
-context("ancestral_reconstruction") -------------------------------------------#
+context("Ancestral reconstruction") -------------------------------------------#
 
 # TODO I broke ancestral reconstruction by ML into several new subfunctions.
 # Add unit tests for those subfunctions.
