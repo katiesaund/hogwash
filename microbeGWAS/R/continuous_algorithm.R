@@ -164,7 +164,6 @@ get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
   # a false discovery rate. Using FDR instead of FWER/bonferroni because these
   # approaches tend to suffer from low power. FDR control increases power while
   # bounding error.
-  # TODO pretty sure this is too stringent as currently implemented-- not really doing FDR. TAlk to Krishna. I should have to set the false discovery rate somewhere.
   #
   # Inputs:
   # hit_values: Numeric. Vector of the empirical p-value for each genotype. Each entry corresponds to respective column in genotype_matrix. Should be between 0 and 1.
