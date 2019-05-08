@@ -73,6 +73,18 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_permutation_num_valid(permutations)
+  check_if_binary_matrix(mat)
+  if(length(genotype_transition_list[[1]]$transition != Nedge(tr))){
+    stop("genotype$transition incorrectly formatted")
+  }
+  if(length(genotype_transition_list[[1]]$trans_dir != Nedge(tr))){
+    stop("genotype$transition incorrectly formatted")
+  }
+  if(length(genotype_transition_list) != ncol(mat)){
+    stop("genotype transition incorrectly formatted")
+  }
+
+
 
   # Function -------------------------------------------------------------------
   num_genotypes <- ncol(mat)
