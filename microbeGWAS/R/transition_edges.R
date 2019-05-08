@@ -1,13 +1,15 @@
 identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
+  # TODO-- it's very imporant that I come back to this and not rely solely on this function for the three distinct tests!
+  # TODO for example with original phyc test -- I need to ignore any transitions with transition direction -1 and only look at transition direction +1.
   # Function description -------------------------------------------------------
   # Given a reconstruction identify which edges on tree are transitions.
   # A transition edge is one in which the parent node and child node differ.
   #
   # Inputs:
   # tr: phylogenetic tree.
-  # mat: Matrix.
-  # num: numeric.
-  # node_recon.
+  # mat: Matrix. Phenotype (either continuous or binary) and a binary genotype.
+  # num: numeric. Column index (genotype index).
+  # node_recon. Either pheno_recon_and_conf$node_anc_rec or geno_recon_and_conf[[k]]$node_anc_rec.
   # disc_cont: string. Either "discrete" or "continuous".
   #
   # Outputs:
@@ -17,10 +19,14 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
   #     Discrete: Numeric vector of 0 or 1. 0 indicates parent and child node are identical. 1 indicates parent and child node differ.
   #   $trans_dir: Numeric Vector.
   #     Continuous and discrete: gives the direction of the transition.
+  #     When parent < child or parent_0_child_1 value is +1.
+  #     When parent > child or parent_1_child_0 value is -1.
 
   # Check input ---------------------------------------------------------------#
-  # TODO ADD CHECKS
-
+  check_for_root_and_bootstrap(tr)
+  check_tree_is_valid(tr)
+  check_is_number(num)
+  check_str_is_discrete_or_continuous(disc_cont)
 
   # FUNCTION ------------------------------------------------------------------#
   transition <- transition_direction <- parent_node <- child_node <- integer(Nedge(tr)) # initialize all as zeroes
@@ -55,12 +61,9 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
 
     if (disc_cont == "discrete"){
       transition[transition == both_parent_and_child_are_one] <- parent_equals_child # If parent_node and child_node had same value (1) then no transition occured.
-    } else if (disc_cont == "continuous"){
-      transition <- NA # transition[i] is not to be used when the trait is continuous because all, or very nearly all edges are transition edges.
     } else {
-      stop("disc_cont must be discrete or continuous")
+      transition <- NA # transition[i] is not to be used when the trait is continuous because all, or very nearly all edges are transition edges.
     }
-
   }
   # Check and return output ----------------------------------------------------
   results <- list("transition" = transition, "trans_dir" = transition_direction)
