@@ -29,43 +29,51 @@ context("Tree manipulation functions") #---------------------------------------#
 #   return(ordered_by_edges)
 # } # end reorder_tips_and_nodes_to_edges()
 
+# test find_parent_edge
+test_that("find_parent_edge returns edge 2 when given edge 3", {
+  set.seed(1)
+  temp_tree <- rtree(4)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_num <- 3
+  expected_result <- 2
+  expect_equal(find_parent_edge(temp_tree, temp_num), expected_result)
+})
 
-# find_parent_edge <- function(tr, edge_num){
-#   # Function description -------------------------------------------------------
-#   # Given the number of a tree edge, return the parent edge number.
-#   #
-#   # Inputs:
-#   # tr. Phylo.
-#   # edge_num. Number.
-#   #
-#   # Outputs:
-#   # parent_edge. Number.
-#   #
-#   # Check input ----------------------------------------------------------------
-#   check_tree_is_valid(tr)
-#   check_for_root_and_bootstrap(tr)
-#   check_is_number(edge_num)
-#   if (edge_num %% 1 != 0 | edge_num < 1){
-#     stop("Node number must be a positive integer")
-#   }
-#   if (edge_num > Nedge(tr)){
-#     stop("Number must be an edge in the tree.")
-#   }
-#   # Function -------------------------------------------------------------------
-#
-#   # given an edge number, get edge number of parent edge
-#   parent_node <- tr$edge[edge_num, 1]
-#   parent_edge <- which(tr$edge[ , 2] == parent_node)
-#
-#   # Return output --------------------------------------------------------------
-#   return(parent_edge)
-#   # TODO it breaks on 1st edge, need to deal with that, but not sure what's best yet
-# } # end find_parent_edge
-#
-#
+test_that("find_parent_edge returns NA when given edge 1", {
+  set.seed(1)
+  temp_tree <- rtree(4)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_num <- 1
+  expected_result <- NA
+  expect_equivalent(find_parent_edge(temp_tree, temp_num), expected_result)
+})
+
+test_that("find_parent_edge returns NA when given edge 2", {
+  set.seed(1)
+  temp_tree <- rtree(4)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_num <- 2
+  expected_result <- NA
+  expect_equal(find_parent_edge(temp_tree, temp_num), expected_result)
+})
+
+test_that("find_parent_edge returns an error when given edge 0", {
+  set.seed(1)
+  temp_tree <- rtree(4)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_num <- 0
+  expect_error(find_parent_edge(temp_tree, temp_num))
+})
+
+test_that("find_parent_edge returns an error when an edge that doesn't exist", {
+  set.seed(1)
+  temp_tree <- rtree(4)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_num <- 100
+  expect_error(find_parent_edge(temp_tree, temp_num))
+})
 
 # test identify_short_edges
-
 test_that("identify_short_edges returns the only 1s in this test tree", {
   set.seed(1)
   temp_tree <- rtree(11)
@@ -88,7 +96,6 @@ test_that("identify_short_edges returns an error on this tree, where iteratively
 })
 
 # test get_bootstrap_confidence()
-
 test_that("get_bootstrap_confidence returns correct numbers for this dummy tree", {
   set.seed(1)
   temp_tree <- rtree(10)
@@ -97,7 +104,6 @@ test_that("get_bootstrap_confidence returns correct numbers for this dummy tree"
   expected_result <- c(rep(1, 10), rep(0, 3), rep(1, 6))
   expect_identical(get_bootstrap_confidence(temp_tree, temp_treshold), expected_result)
 })
-
 
 test_that("get_bootstrap_confidence returns correct numbers for this dummy tree", {
   set.seed(1)
@@ -147,5 +153,4 @@ test_that("get_bootstrap_confidence returns error for incomplete node labels", {
   temp_treshold <- 0.5
   expect_error(get_bootstrap_confidence(temp_tree, temp_treshold))
 })
-
-
+# End of script ----------------------------------------------------------------

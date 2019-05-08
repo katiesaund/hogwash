@@ -7,7 +7,7 @@ find_parent_edge <- function(tr, edge_num){
   # edge_num. Number.
   #
   # Outputs:
-  # parent_edge. Number.
+  # parent_edge. Number or NA. NA when given edge doesn't have a parent.
   #
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
@@ -20,14 +20,16 @@ find_parent_edge <- function(tr, edge_num){
     stop("Number must be an edge in the tree.")
   }
   # Function -------------------------------------------------------------------
-
-  # given an edge number, get edge number of parent edge
-  parent_node <- tr$edge[edge_num, 1]
-  parent_edge <- which(tr$edge[ , 2] == parent_node)
+  edge_with_basal_node <- Ntip(tr) + 1
+  if (tr$edge[edge_num, 1] == edge_with_basal_node){
+    parent_edge <- NA
+  } else {
+    parent_node <- tr$edge[edge_num, 1]
+    parent_edge <- which(tr$edge[ , 2] == parent_node)
+  }
 
   # Return output --------------------------------------------------------------
   return(parent_edge)
-  # TODO it breaks on 1st edge, need to deal with that, but not sure what's best yet
 } # end find_parent_edge
 
 
