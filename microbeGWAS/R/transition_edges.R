@@ -70,27 +70,37 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
   return(results)
 } # end identify_transition_edges()
 
-
+# TODO the accuracy of this function assumes that the genotype_confidence input is already the transition confidence as calculated by: assign_high_confidence_to_transition_edges
+# TODO how to I add a check to make sure that's true? ^^^^
 keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotype_confidence){
-  # TODO
-  # 1) Update description of inputs
-  # 2) check inputs.
-  # 3) Update description of output.
-  # 4) Check output.
-  #
   # Function description -------------------------------------------------------
   # Since we're looking for convergence of transitions we need a second quality
   # control step where we remove genotypes that have only 1 transition-edge or
   # where the transition edges are identical!
   #
   # Inputs:
-  # genotype_transition.
-  # genotype_confidence.
+  # genotype_transition. List of multiple vectors ($transition and $trans_dir).
+  #                      Length(list) = number of genotypes. Length(vector) =
+  #                      Nedge(tr).
+  # genotype_confidence. List of vectors. Length(list) = number of genotypes.
+  #                      Length(vector) = Nedge(tr). Binary.
   #
   # Output:
-  # has_at_least_two_high_confidence_transition_edges.
+  # has_at_least_two_high_confidence_transition_edges. Logical vector. Length ==
+  #                                                    length(genotype_transition)
+  #                                                    == lenght(genotype_confidence)
   #
   # Check inputs ---------------------------------------------------------------
+  if (length(genotype_transition) != length(genotype_confidence)){
+    stop("Both transition and confidence should have length corresponding to number of genotypes.")
+  }
+  if(!is.vector(genotype_transition[[1]]$transition)){
+    stop("Genotype transition should have a vector called 'transition'.")
+  }
+  if(!is.vector(genotype_transition[[1]]$trans_dir)){
+    stop("Genotype transition should have a vector called 'trans_dir'.")
+  }
+  check_if_binary_vector(genotype_confidence[[1]])
 
   # Function -------------------------------------------------------------------
   has_at_least_two_high_confidence_transition_edges <- rep(FALSE, length(genotype_transition))
