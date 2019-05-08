@@ -115,7 +115,6 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotyp
 } # end keep_at_least_two_high_conf_trans_edges()
 
 keep_hits_with_more_change_on_trans_edges <- function(results, pvals, a){
-  # TODO add checks and descirption of inputs and output.
   # Function description -------------------------------------------------------
   # Of all of the significant hits, keep only those where the
   # median(delta phenotype) on transition edges is > median(delta phenotype) on

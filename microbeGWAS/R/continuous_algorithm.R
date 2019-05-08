@@ -50,23 +50,6 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   # Function description -------------------------------------------------------
   #
   # Input:
-  # mat: Matrix. Should be a phenotype with 1 column.
-  # permutations,
-  # genotype_transition_list
-  # tr
-  # pheno_recon_ordered_by_edges
-  # genotype_confidence
-  # genotype_reconstruction
-  #
-  # Outputs:
-  # pvals
-  # ks_statistics" = empirical_ks_pval_list
-  # "observed_pheno_trans_delta" = observed_pheno_trans_delta
-  # "observed_pheno_non_trans_delta" = observed_pheno_non_trans_delta
-  # "trans_median" = trans_median
-  # "all_edges_median" = all_edges_median,
-  # "num_genotypes" = ncol(mat))
-  #
   # mat is a genotype_matrix. Each row is a genotype. Each column is a 0/1 value on an edge.
   # permutations is a numeric integer.
   # genotype_transition_list is a list of length = ncol(mat) and each list has length = Nedge(tr). All entries are 0 or 1.
@@ -75,6 +58,18 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   #            THIS FORMAT WILL MAKE IT MUCH EASIER TO CALCULATE PHENOTYPE CHANGE ON EDGES.
   # genotype_confidence is a list of length = ncol(mat) and each list has length = Nedge(tr). All entries are 0 (low confidence) or 1 (high confidence).
   #            NOTE: genotype_confidence lists the confidence in each edge. High confidence means the edge is high confidence by genotype reconstruction, phenotype reconstruction, bootstrap value, and edge length.
+  #
+  # Outputs:
+  # results. List of 8.
+  #          $pvals. Named numeric vector. Length == number of genotypes. Values between 1 and 0. Names are genotype names.
+  #          $ks_statistics. List of numeric vectors. Length of list == number of genotypes. Each vector has length == number of permutations. Values between 1 and 0.
+  #          $observed_pheno_trans_delta. List of numeric vectors. Length of list == number of genotypes. Vectors are of variable length because length is the number of transition edges for that particular genotype. Vectors are numeric.
+  #          $observed_pheno_non_trans_delta. List of numeric vectors. Length of list == number of genotypes. Vectors are of variable length because length is the number of non-transition edges for that particular genotype. Vectors are numeric.
+  #          $trans_median. Numberic. Vector. Length = number of genotypes. Describes median delta phenotype on all transition edges.
+  #          $all_edges_median. Numeric vector. Length = number of genotypes. Describes median delta phenotype on all edges.
+  #          $num_genotypes. Integer. The number of genotypes.
+  #          $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values between 1 and 0.
+  #
 
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -166,17 +161,17 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
 
 get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, alpha){
   # Function description -------------------------------------------------------
-  # get_sig_hits_while_correcting_for_multiple_testing creates 2 vectors:
-  # 1) vector of all FDR corrected pvalues, &
-  # 2) vector of just significant hits.
+  # Given p-values that have not yet been corrected for multiple testing, apply a false discovery rate.
+  # TODO pretty sure this is too stringent as currently implemented-- not really doing FDR. TAlk to Krishna. I should have to set the false discovery rate somewhere.
   #
   # Inputs:
   # hit_values: Character. Vector of the empirical p-value for each genotype. Each entry corresponds to respective column in genotype_matrix. Should be between 0 and 1.
   # alpha: significance threshold as input by the user.
   #
   # Output:
-  # fdr_corrected_pvals. Vector. all FDR corrected pvalues.
-  # sig_pvals.           Vector. Only the significant FDR corrected pvalues.
+  # pvals.  List of 2.
+  #         $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names = genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
+  #         $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are significant after FDR correction. Column name = "fdr_corrected_pvals[fdr_corrected_pvals < alpha]". Row.names = genotypes. Nrow = is variable-- could be between 0 and max number of genotypes. It will only have rows if the corrected p-value is less than the alpha value.
   #
   # Check inputs ---------------------------------------------------------------
   check_if_alpha_valid(alpha)
