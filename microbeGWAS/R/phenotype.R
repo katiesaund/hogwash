@@ -41,6 +41,9 @@ calculate_phenotype_change_on_edge <- function(edge_list, phenotype_by_edges){
     stop("Cannot calculate phenotype change on edges.")
   }
   check_dimensions(phenotype_by_edges, exact_rows = NULL, min_rows = max(edge_list), exact_cols = NULL, min_cols = 2)
+  if (!is.vector(edge_list)){
+    stop("edge_list must be a vector of indices of edges")}
+  check_is_number(edge_list[1])
 
   # Function -------------------------------------------------------------------
   delta <- rep(NA, length(unique(edge_list)))
@@ -49,32 +52,44 @@ calculate_phenotype_change_on_edge <- function(edge_list, phenotype_by_edges){
   }
 
   # Check and return output ----------------------------------------------------
+  if (sum(delta < 0) > 0){
+    stop("Delta phenotype should always be recorded as an absolute value.")
+  }
+
   return(delta)
 } # end calculate_phenotype_change_on_edge()
 
-calc_raw_diff <- function(edge_list, ph_edges){
+calc_raw_diff <- function(edge_list, phenotype_by_edges){
   # Function description ------------------------------------------------------#
   # Subtract child node phenotype value from parent node phenotype value.
+  # Identical to calculate_phenotype_change_on_edge EXCEPT that calculating
+  # The raw difference rather than the absolute value of the difference.
   #
-  # Inputs:
-  # TODO
-  # edge_list. ?
-  # ph_edges. ?
+  # Input:
+  # edge_list.          Numeric vector. Each number is the index of the tree edge to be used
+  # phenotype_by_edges. Mat.            Dimensions: Nedge x 2 matrix. Entries are the phenotype value at the node, where row is the edge, 1st column is the parent node and 2nd column is the child node.
   #
-  # Output:
-  # delta. ?
-  #
-  # Check inputs ---------------------------------------------------------------
-  # TODO
+  # Outputs:
+  # delta.              Numeric vector.   Length = length(edge_list).
+
+  # Check input ----------------------------------------------------------------
+  if (max(edge_list) > nrow(phenotype_by_edges)){
+    stop("Cannot calculate phenotype change on edges.")
+  }
+  check_dimensions(phenotype_by_edges, exact_rows = NULL, min_rows = max(edge_list), exact_cols = NULL, min_cols = 2)
+  if (!is.vector(edge_list)){
+    stop("edge_list must be a vector of indices of edges")}
+  check_is_number(edge_list[1])
+
   # Function -------------------------------------------------------------------
   delta <- rep(NA, length(unique(edge_list)))
   for (j in 1:length(edge_list)){
-    delta[j] <- ph_edges[edge_list[j], 1] - ph_edges[edge_list[j], 2]
+    delta[j] <- phenotype_by_edges[edge_list[j], 1] - phenotype_by_edges[edge_list[j], 2]
   }
-  # Return outputs -------------------------------------------------------------
+
+  # Return output --------------------------------------------------------------
   return(delta)
 } # end calc_raw_diff()
-
 
 check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
   # Function description -------------------------------------------------------

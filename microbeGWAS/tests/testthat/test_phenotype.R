@@ -1,7 +1,6 @@
 library(microbeGWAS)
 context("Phenotype") #----------------------------------------------#
 
-
 # test assign_pheno_type()
 test_that("assign_pheno_type returns discrete for a discrete phenotype matrix", {
   phenotype <- matrix(0, nrow = 10, ncol = 1)
@@ -30,10 +29,58 @@ test_that("assign_pheno_type gives an error if phenotype is a matrix of with two
 })
 
 # test calculate_phenotype_change_on_edge
-# calculate_phenotype_change_on_edge <- function(edge_list, phenotype_by_edges){
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always greater than second column by 5", {
+  temp_pheno <- matrix(1:10, ncol = 2)
+  expect_equal(calculate_phenotype_change_on_edge(1:5, temp_pheno), rep(5, 5))
+})
+
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always less than second column by 5", {
+  temp_pheno <- matrix(10:1, ncol = 2)
+  expect_equal(calculate_phenotype_change_on_edge(1:5, temp_pheno), rep(5, 5))
+})
+
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always less than second column by 5", {
+  temp_pheno <- matrix(-10:-1, ncol = 2)
+  expect_equal(calculate_phenotype_change_on_edge(1:5, temp_pheno), rep(5, 5))
+})
+
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always less than second column by 5", {
+  temp_pheno <- matrix(-5:4, ncol = 2)
+  expect_equal(calculate_phenotype_change_on_edge(1:5, temp_pheno), rep(5, 5))
+})
+
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always less than second column by 5, but
+          this time only on a subset of edges", {
+  temp_pheno <- matrix(-5:4, ncol = 2)
+  expect_equal(calculate_phenotype_change_on_edge(2:4, temp_pheno), rep(5, 3))
+})
 
 # test calc_raw_diff
-# calc_raw_diff <- function(edge_list, ph_edges){
+test_that("calc_raw_diff returns a list of -5s, when first column is always greater than second column by 5", {
+  temp_pheno <- matrix(1:10, ncol = 2)
+  expect_equal(calc_raw_diff(1:5, temp_pheno), rep(-5, 5))
+})
+
+test_that("calc_raw_diff returns a list of 5s, when first column is always less than second column by 5", {
+  temp_pheno <- matrix(10:1, ncol = 2)
+  expect_equal(calc_raw_diff(1:5, temp_pheno), rep(5, 5))
+})
+
+test_that("calc_raw_diff returns a list of 5s, when first column is always less than second column by 5", {
+  temp_pheno <- matrix(-10:-1, ncol = 2)
+  expect_equal(calc_raw_diff(1:5, temp_pheno), rep(-5, 5))
+})
+
+test_that("calc_raw_diff returns a list of 5s, when first column is always less than second column by 5", {
+  temp_pheno <- matrix(-5:4, ncol = 2)
+  expect_equal(calc_raw_diff(1:5, temp_pheno), rep(-5, 5))
+})
+
+test_that("calc_raw_diff returns a list of 5s, when first column is always less than second column by 5, but
+          this time only on a subset of edges", {
+            temp_pheno <- matrix(-5:4, ncol = 2)
+            expect_equal(calc_raw_diff(2:4, temp_pheno), rep(-5, 3))
+})
 
 # test check_if_phenotype_normal
 test_that("check_if_phenotype_normal prints a statement that the data is not normal when the input is 1:100", {
@@ -89,5 +136,3 @@ test_that("check_if_convergence_occurs gives error when phenotype is incorrectly
   temp_type <- "continuous"
   expect_error(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type))
 })
-
-#TODO add checks for when inputs are bad to check_if_convergence_occurs()

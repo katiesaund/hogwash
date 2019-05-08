@@ -57,7 +57,7 @@ check_if_alpha_valid <- function(a){
   check_is_number(a)
 
   # Function -------------------------------------------------------------------
-  if (a >= 1 | a <= 0){
+  if (a > 1 | a < 0){
     stop("Provide a valid alpha.")
   }
 } # end check_if_alpha_valid()

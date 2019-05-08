@@ -51,6 +51,9 @@ identify_short_edges <- function(tr){
   short_edges <- rep(1, Nedge(tr))
   while(max(tr$edge.length[as.logical(short_edges)]) >= (0.1 * sum(tr$edge.length[as.logical(short_edges)]))){
     short_edges[tr$edge.length == max(tr$edge.length[as.logical(short_edges)])] <- 0
+    if (sum(short_edges) == 0){
+      stop("Tree edge lengths are unreasonably long compared to the other edges.")
+    }
   }
 
   # Return output --------------------------------------------------------------
@@ -60,20 +63,62 @@ identify_short_edges <- function(tr){
 } # end identify_short_edges()
 
 get_bootstrap_confidence <- function(tr, confidence_threshold){
-  # Account for confidence in RAxML phylogenetic tree.
+  # Function description -------------------------------------------------------
+  # Extracts the bootstrap confidence stored in the node.labels of the tree,
+  # convertns them to a fraction between 0 and 1, and then classifies each
+  # node as high or low confidence based on the input confidence threshold.
+  #
+  # Notes:
+  # This method requires that the bootstrap values be assigned to node
+  # labels.
+  #
+  # It makes an assumption that the bootstrap values are stored as numbers
+  # between 1 and 100, that need to then be converted to from this percentage
+  # to a fraction.
+  #
+  # A better input would be Bayesian posterior probabilities than ML derived
+  # bootstrap values...but most of what we're working with is boostrap values.
+  #
+  # Input:
+  # Tr. Phylo.
+  # confidence_threshold. Numeric. Between 0 and 1.
+  #
+  # Output:
+  # tree_tip_and_node_confidence.  Binary vector. Length = Ntip(tr) + Nnode(tr).
+  #                                The first section is the tip confidence,
+  #                                which is always, by definition 1. Then the
+  #                                remaining entries correspond to the nodes
+  #                                and is either 0 or 1.
+  #
+  # Check input ----------------------------------------------------------------
+  check_for_root_and_bootstrap(tr)
+  check_is_number(confidence_threshold)
+  check_if_alpha_valid(confidence_threshold)
+  if (max(tr$node.label) > 100 | min(tr$node.label) < 0){
+    stop("Tree$node.label are expected to be positive numbers between 0 and 100")
+  }
+
+  # Function -------------------------------------------------------------------
   node_confidence <- tr$node.label
-  node_confidence <- as.numeric(node_confidence)/100
+
+  if (max(node_confidence) > 1){
+    node_confidence <- as.numeric(node_confidence)/100
+  }
   node_confidence <- discretize_confidence_using_threshold(node_confidence, confidence_threshold)
   tree_tip_and_node_confidence <- c(rep(1, Ntip(tr)), node_confidence)
-  if (length(tree_tip_and_node_confidence) != sum(1, Nedge(tr))){
+
+  # Check and return output ----------------------------------------------------
+  check_if_binary_vector(tree_tip_and_node_confidence)
+  if (length(tree_tip_and_node_confidence) != sum(Ntip(tr) + Nnode(tr))){
     stop("tree confidence made incorrectly")
   }
+
   return(tree_tip_and_node_confidence)
 } # end get_bootstrap_confidence()
 
 reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
   # Function description -------------------------------------------------------
-  # TODO ??
+  # Convert
   #
   # Input:
   # Tr. Phylo.

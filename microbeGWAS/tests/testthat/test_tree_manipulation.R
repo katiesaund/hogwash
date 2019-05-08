@@ -1,8 +1,33 @@
 library(microbeGWAS)
 context("Tree manipulation functions") #---------------------------------------#
-# TODO add tests
 
 # TODO find_parent_edge() -- see if this function ever gets used before writing unit tests
+# TODO reorder_tips_and_nodes_to_edges() -- see if this function ever gets used before writing unit tests
+
+# reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
+#   # Function description -------------------------------------------------------
+#   # TODO ??
+#   #
+#   # Input:
+#   # Tr. Phylo.
+#   # tips_and_node_vector. ?
+#   #
+#   # Output:
+#   # ordered_by_edges ?
+#   #
+#   # Check input ----------------------------------------------------------------
+#   check_tree_is_valid(tr)
+#   # TODO add check of length of edges vs tips_and_node_vector
+#
+#   # Function -------------------------------------------------------------------
+#   ordered_by_edges <- rep(NA, Nedge(tr))
+#   for (i in 1:Nedge(tr)){
+#     ordered_by_edges[i] <- tips_and_node_vector[tr$edge[i, 2]]
+#   }
+#
+#   # Return output --------------------------------------------------------------
+#   return(ordered_by_edges)
+# } # end reorder_tips_and_nodes_to_edges()
 
 
 # find_parent_edge <- function(tr, edge_num){
@@ -41,69 +66,86 @@ context("Tree manipulation functions") #---------------------------------------#
 
 # test identify_short_edges
 
-test_that("identify_short_edges returns the longest branch in this test tree", {
+test_that("identify_short_edges returns the only 1s in this test tree", {
+  set.seed(1)
+  temp_tree <- rtree(11)
+  expect_identical(identify_short_edges(temp_tree), rep(1, Nedge(temp_tree)))
+})
+
+test_that("identify_short_edges returns a zero for the branch made artificially long in this test tree", {
+  set.seed(1)
+  temp_tree <- rtree(11)
+  tree_with_long_edge <- temp_tree
+  tree_with_long_edge$edge.length[9] <- .15 * sum(tree_with_long_edge$edge.length)
+  short_edges <- identify_short_edges(tree_with_long_edge)
+  expect_identical(short_edges[9], 0)
+})
+
+test_that("identify_short_edges returns an error on this tree, where iteratively each edge is too long.", {
   set.seed(1)
   temp_tree <- rtree(10)
-  temp_tree$edge.length
-  identify_short_edges(temp_tree)
+  expect_error(identify_short_edges(temp_tree))
+})
 
-  tree_with_long_edge <- temp_tree
-  sum(tree_with_long_edge$edge.length)
-  tree_with_long_edge$edge.length[1] <- 1
-  identify_short_edges(tree_with_long_edge)
+# test get_bootstrap_confidence()
+
+test_that("get_bootstrap_confidence returns correct numbers for this dummy tree", {
+  set.seed(1)
+  temp_tree <- rtree(10)
+  temp_tree$node.label <- c(91:99)
+  temp_treshold <- .94
+  expected_result <- c(rep(1, 10), rep(0, 3), rep(1, 6))
+  expect_identical(get_bootstrap_confidence(temp_tree, temp_treshold), expected_result)
 })
 
 
-while(max(temp_tree$edge.length[as.logical(short_edges)]) >= (0.1 * sum(temp_tree$edge.length[as.logical(short_edges)]))){
-  short_edges[temp_tree$edge.length == max(temp_tree$edge.length[as.logical(short_edges)])] <- FALSE
-}
-short_edges
+test_that("get_bootstrap_confidence returns correct numbers for this dummy tree", {
+  set.seed(1)
+  temp_tree <- rtree(10)
+  temp_tree$node.label <- c(91:99)
+  temp_treshold <- 1
+  expected_result <- c(rep(1, 10), rep(0, 9))
+  expect_identical(get_bootstrap_confidence(temp_tree, temp_treshold), expected_result)
+})
 
-# identify_short_edges <- function(tr){
+test_that("get_bootstrap_confidence returns correct numbers for this dummy tree", {
+  set.seed(1)
+  temp_tree <- rtree(10)
+  temp_tree$node.label <- c(91:99)
+  temp_treshold <- .5
+  expected_result <- c(rep(1, Nnode(temp_tree) + Ntip(temp_tree)))
+  expect_identical(get_bootstrap_confidence(temp_tree, temp_treshold), expected_result)
+})
 
-#   # Function -------------------------------------------------------------------
-#   short_edges <- rep(1, Nedge(tr))
-#   while(max(tr$edge.length[as.logical(short_edges)]) >= (0.1 * sum(tr$edge.length[as.logical(short_edges)]))){
-#     short_edges[tr$edge.length == max(tr$edge.length[as.logical(short_edges)])] <- 0
-#   }
-#
-#   # Return output --------------------------------------------------------------
-#   return(short_edges)
-# } # end identify_short_edges()
-#
-# get_bootstrap_confidence <- function(tr, confidence_threshold){
-#   # Account for confidence in RAxML phylogenetic tree.
-#   node_confidence <- tr$node.label
-#   node_confidence <- as.numeric(node_confidence)/100
-#   node_confidence <- discretize_confidence_using_threshold(node_confidence, confidence_threshold)
-#   tree_tip_and_node_confidence <- c(rep(1, Ntip(tr)), node_confidence)
-#   if (length(tree_tip_and_node_confidence) != sum(1, Nedge(tr))){
-#     stop("tree confidence made incorrectly")
-#   }
-#   return(tree_tip_and_node_confidence)
-# } # end get_bootstrap_confidence()
-#
-# reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
-#   # Function description -------------------------------------------------------
-#   # TODO ??
-#   #
-#   # Input:
-#   # Tr. Phylo.
-#   # tips_and_node_vector. ?
-#   #
-#   # Output:
-#   # ordered_by_edges ?
-#   #
-#   # Check input ----------------------------------------------------------------
-#   check_tree_is_valid(tr)
-#   # TODO add check of length of edges vs tips_and_node_vector
-#
-#   # Function -------------------------------------------------------------------
-#   ordered_by_edges <- rep(NA, Nedge(tr))
-#   for (i in 1:Nedge(tr)){
-#     ordered_by_edges[i] <- tips_and_node_vector[tr$edge[i, 2]]
-#   }
-#
-#   # Return output --------------------------------------------------------------
-#   return(ordered_by_edges)
-# } # end reorder_tips_and_nodes_to_edges()
+test_that("get_bootstrap_confidence returns error for invalid threshold", {
+  set.seed(1)
+  temp_tree <- rtree(10)
+  temp_tree$node.label <- c(91:99)
+  temp_treshold <- 50
+  expect_error(get_bootstrap_confidence(temp_tree, temp_treshold))
+})
+
+test_that("get_bootstrap_confidence returns error for tree without node labels", {
+  set.seed(1)
+  temp_tree <- rtree(10)
+  temp_treshold <- 0.5
+  expect_error(get_bootstrap_confidence(temp_tree, temp_treshold))
+})
+
+test_that("get_bootstrap_confidence returns error for tree without numeric node labels", {
+  set.seed(1)
+  temp_tree <- rtree(10)
+  temp_tree$node.label <- letters[1:Nnode(temp_tree)]
+  temp_treshold <- 0.5
+  expect_error(get_bootstrap_confidence(temp_tree, temp_treshold))
+})
+
+test_that("get_bootstrap_confidence returns error for incomplete node labels", {
+  set.seed(1)
+  temp_tree <- rtree(10)
+  temp_tree$node.label[1:5] <- c(1:5)
+  temp_treshold <- 0.5
+  expect_error(get_bootstrap_confidence(temp_tree, temp_treshold))
+})
+
+
