@@ -118,8 +118,7 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
     result <- shapiro.test(unlist(pheno))
     alpha <- 0.05
     if (result$p < alpha){
-      print("Please consider normalizing your phenotype so as to not violate
-            assumptions used in the ancestral reconstruction.")
+      print("Please consider normalizing your phenotype so as to not violate assumptions used in the ancestral reconstruction.")
     }
   }
 } # end check_if_phenotype_normal
@@ -153,7 +152,7 @@ check_if_convergence_occurs <- function(pheno, tr, continuous_or_discrete){
 
     enough_of_a_difference_in_AIC <- 2
     if (geiger_white$opt$aicc + enough_of_a_difference_in_AIC < geiger_BM$opt$aicc){
-      print("A white noise model better describes phenotype than does a Brownina motion model.")
+      print("A white noise model better describes phenotype than does a Brownian motion model.")
     }
 
     # TODO Add this as a plot to output?

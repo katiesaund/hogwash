@@ -6,15 +6,16 @@ library(gridExtra) # plots for continuous phenotypes
 library(phangorn)
 library(pheatmap) # plots for continuous phenotypesq
 library(ggplot2) # plots for continuous phenotypes
+library(geiger)
 
-test_dir <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_gwas_temp_data_updating_recon_methods/data/"
+test_dir <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-05-08_gwas_temp_data/data"
 # test_dir   <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-18_gwas_fix_geno_to_be_trans/data/"
 # dataset <- 0 # Discrete, FQR, gene test built from SNPS
 # dataset <- 1 # Discrete, FQR, gene test not built from SNPs
-#dataset <- 2 # Continuous, toxin, gene test built from SNPS
-#dataset <- 3 # Continuous, toxin, gene test not built from SNPs
-#dataset <- 4 # Continuous, toxin, STOP SNP
-dataset <- 5 # discrete, severity, stop snp
+# dataset <- 2 # Continuous, toxin, gene test built from SNPS
+# dataset <- 3 # Continuous, toxin, gene test not built from SNPs
+dataset <- 4 # Continuous, toxin, STOP SNP
+#dataset <- 5 # discrete, severity, stop snp
 
 if (dataset == 0){
   # Discrete, gene test built from SNPS
@@ -71,8 +72,8 @@ if (dataset == 0){
   test_geno  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/log_toxin_snp_stop.tsv"
   test_annot <- NULL
   test_name  <- "log_toxin_snp_stop"
-  test_perm  <- "10000"
-  test_alpha <- "0.05"
+  test_perm  <- "100"
+  test_alpha <- "0.2"
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv" # TODO update this to be null
   test_built_from_snps <- FALSE
@@ -94,6 +95,8 @@ args                        <- NULL
 args$test                   <- FALSE
 args$phenotype              <- read_in_tsv_matrix(test_pheno)
 args$tree                   <- read.tree(test_tree)
+args$tree$node.label[1]     <- 0
+args$tree$node.label        <- as.numeric(args$tree$node.label)
 args$genotype               <- read_in_tsv_matrix(test_geno)
 args$output_name            <- test_name # Ex: log_toxin_snp_stop
 args$output_dir             <- test_dir # Directory in which all output files will be saved

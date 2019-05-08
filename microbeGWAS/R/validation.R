@@ -181,7 +181,7 @@ check_for_root_and_bootstrap <- function(tr){
     stop("Tree must have bootstrap values for each node")
 
   }
-  for (i in 1:length(tr$node.label)){
+  for (i in 2:length(tr$node.label)){
     check_is_number(tr$node.label[i]) # Node lables must be bootstrap values
     if (tr$node.label[i] < 0){
       stop("Tree bootstrap values must be >= 0")

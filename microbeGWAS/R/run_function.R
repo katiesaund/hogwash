@@ -16,10 +16,11 @@ run_phyc <- function(args){
     unique_genes <- unique(gene_snp_lookup[ , 2])
     snps_per_gene <- table(gene_snp_lookup[ , 2])
   }
+  check_if_phenotype_normal(args$phenotype, args$discrete_or_continuous)
+  check_if_convergence_occurs(args$phenotype, args$tree, args$discrete_or_continuous)
   phenotype_vector <- convert_matrix_to_vector(args$phenotype) # TODO add check that it's possible to have phenotype convergence
   check_convergence_possible(phenotype_vector, args$discrete_or_continuous)
-  check_if_phenotype_normal(phenotype_vector, args$discrete_or_continuous)
-  check_if_convergence_occurs(phenotype_vector, args$tree, args$discrete_or_continuous)
+
 
   # ---------------------------------------------------------------------------#
   # PHYC

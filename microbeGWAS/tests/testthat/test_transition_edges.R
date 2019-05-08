@@ -70,44 +70,16 @@ test_that("keep_at_least_two_high_conf_trans_edges returns a vector c(TRUE, FALS
   expect_equivalent(keep_at_least_two_high_conf_trans_edges(temp_results, fake_confidence), c(FALSE, FALSE))
 })
 
-# keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotype_confidence){
-
-#   has_at_least_two_high_confidence_transition_edges <- rep(FALSE, length(genotype_transition))
-#   for (p in 1:length(genotype_transition)){
-#     if (sum(genotype_transition[[p]]$transition * genotype_confidence[[p]]) > 1){
-#       has_at_least_two_high_confidence_transition_edges[p] <- TRUE
-#     }
-#   }
-#
-#   # Check and return output ----------------------------------------------------
-#   return(has_at_least_two_high_confidence_transition_edges)
-# } # end keep_at_least_two_high_conf_trans_edges()
-#
-# TODO test keep_hits_with_more_change_on_trans_edges
-# keep_hits_with_more_change_on_trans_edges <- function(results, pvals, a){
-#   # TODO
-#   # 1) Update description of inputs
-#   # 2) check inputs.
-#   # 3) Update description of output.
-#   # 4) Check output.
-#   #
-#   # Function description -------------------------------------------------------
-#   # SUBSET SIGNIFICANT HITS WHERE THE MEDIAN(DELTA PHENOTYPE) ON TRANSITION EDGES IS > MEDIAN(DELTA PHENOTYPE) ON ALL EDGES
-#   #
-#   # Inputs:
-#   # results.
-#   # pvals.
-#   # a.      Number. Alpha (significance threshold).
-#   # Output:
-#   # has_at_least_two_high_confidence_transition_edges.
-#   #
-#   # Check inputs ---------------------------------------------------------------
-#   check_if_alpha_valid(a)
-#
-#   # Function -------------------------------------------------------------------
-#   temp <- pvals$hit_pvals[(results$trans_median > results$all_edges_median), , drop = FALSE]
-#   hits <- temp[temp[ , 1] < a, , drop = FALSE]
-#
-#   # Check and return output ----------------------------------------------------
-#   return(hits)
-# } # end keep_hits_with_more_change_on_trans_edges()
+# test keep_hits_with_more_change_on_trans_edges
+test_that("keep_hits_with_more_change_on_trans_edges does X given Y", {
+  num_genotypes <- 5
+  temp_alpha <- 0.05
+  temp_results <- temp_pvals <- NULL
+  temp_results$trans_median <- rep(10, num_genotypes)
+  temp_results$all_edges_median <- c(8:12)
+  temp_pvals$hit_pvals <- as.data.frame(matrix(0.01, ncol = 1, nrow = num_genotypes))
+  colnames(temp_pvals$hit_pvals) <- "fdr_corrected_pvals"
+  row.names(temp_pvals$hit_pvals) <- letters[1:num_genotypes]
+  results <- keep_hits_with_more_change_on_trans_edges(temp_results, temp_pvals, temp_alpha)
+  expect_equivalent(row.names(results), c("a", "b"))
+})

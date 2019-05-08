@@ -115,27 +115,40 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotyp
 } # end keep_at_least_two_high_conf_trans_edges()
 
 keep_hits_with_more_change_on_trans_edges <- function(results, pvals, a){
-  # TODO
-  # 1) Update description of inputs
-  # 2) check inputs.
-  # 3) Update description of output.
-  # 4) Check output.
-  #
+  # TODO add checks and descirption of inputs and output.
   # Function description -------------------------------------------------------
-  # SUBSET SIGNIFICANT HITS WHERE THE MEDIAN(DELTA PHENOTYPE) ON TRANSITION EDGES IS > MEDIAN(DELTA PHENOTYPE) ON ALL EDGES
+  # Of all of the significant hits, keep only those where the
+  # median(delta phenotype) on transition edges is > median(delta phenotype) on
+  # all edges. Do this so that we're only selecting for genotypes that are
+  # plausibly have large effect on phenotype, rather than miniscule effects on
+  # phenotype. Essentially, we're enforcing a one tailed test instead of using
+  # the results of a two-tailed test.
   #
   # Inputs:
-  # results.
-  # pvals.
-  # a.      Number. Alpha (significance threshold).
+  # results. List of 8.
+  #          $pvals. Named numeric vector. Length == number of genotypes. Values between 1 and 0. Names are genotype names.
+  #          $ks_statistics. List of numeric vectors. Length of list == number of genotypes. Each vector has length == number of permutations. Values between 1 and 0.
+  #          $observed_pheno_trans_delta. List of numeric vectors. Length of list == number of genotypes. Vectors are of variable length because length is the number of transition edges for that particular genotype. Vectors are numeric.
+  #          $observed_pheno_non_trans_delta. List of numeric vectors. Length of list == number of genotypes. Vectors are of variable length because length is the number of non-transition edges for that particular genotype. Vectors are numeric.
+  #          $trans_median. Numberic. Vector. Length = number of genotypes. Describes median delta phenotype on all transition edges.
+  #          $all_edges_median. Numeric vector. Length = number of genotypes. Describes median delta phenotype on all edges.
+  #          $num_genotypes. Integer. The number of genotypes.
+  #          $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values between 1 and 0.
+  # pvals.  List of 2.
+  #         $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names = genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
+  #         $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are significant after FDR correction. Column name = "fdr_corrected_pvals[fdr_corrected_pvals < alpha]". Row.names = genotypes. Nrow = is variable-- could be between 0 and max number of genotypes. It will only have rows if the corrected p-value is less than the alpha value.
+  # a.      Number. Alpha (significance threshold). Between 0 and 1.
   # Output:
-  # has_at_least_two_high_confidence_transition_edges.
+  # hits. Data.frame. 1 column. Colnum names = "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are (1) significant after multiple test correction and (2) have higher median delta phenotype on transition edges than on all edges. Values are between 1 and 0. Rownames are genotypes.
   #
   # Check inputs ---------------------------------------------------------------
   check_if_alpha_valid(a)
 
   # Function -------------------------------------------------------------------
+  # Keep only hits with transition edge median delta phenotype higher than all edge delta phenotype median.
   temp <- pvals$hit_pvals[(results$trans_median > results$all_edges_median), , drop = FALSE]
+
+  # Keep only those that are also significant after FDR correction.
   hits <- temp[temp[ , 1] < a, , drop = FALSE]
 
   # Check and return output ----------------------------------------------------

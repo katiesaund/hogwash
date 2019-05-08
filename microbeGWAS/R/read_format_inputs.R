@@ -57,6 +57,8 @@ read_in_arguments <- function(args){
     test_data              <- create_test_data()
     phenotype              <- test_data$phenotype
     tree                   <- test_data$tree
+    tree$node.label[1]     <- 0
+    tree$node.label        <- as.numeric(tree$node.label)
     genotype               <- test_data$genotype
     output_name            <- "test_data"
     output_dir             <- args[2]
