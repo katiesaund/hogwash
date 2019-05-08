@@ -159,14 +159,17 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
 
 
 
-get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, alpha){
+get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
   # Function description -------------------------------------------------------
-  # Given p-values that have not yet been corrected for multiple testing, apply a false discovery rate.
+  # Given p-values that have not yet been corrected for multiple testing, apply
+  # a false discovery rate. Using FDR instead of FWER/bonferroni because these
+  # approaches tend to suffer from low power. FDR control increases power while
+  # bounding error.
   # TODO pretty sure this is too stringent as currently implemented-- not really doing FDR. TAlk to Krishna. I should have to set the false discovery rate somewhere.
   #
   # Inputs:
-  # hit_values: Character. Vector of the empirical p-value for each genotype. Each entry corresponds to respective column in genotype_matrix. Should be between 0 and 1.
-  # alpha: significance threshold as input by the user.
+  # hit_values: Numeric. Vector of the empirical p-value for each genotype. Each entry corresponds to respective column in genotype_matrix. Should be between 0 and 1.
+  # fdr: Numeric. False discovery rate (typically ~10% for discovery work). Between 0 and 1.
   #
   # Output:
   # pvals.  List of 2.
@@ -174,13 +177,13 @@ get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, alpha
   #         $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are significant after FDR correction. Column name = "fdr_corrected_pvals[fdr_corrected_pvals < alpha]". Row.names = genotypes. Nrow = is variable-- could be between 0 and max number of genotypes. It will only have rows if the corrected p-value is less than the alpha value.
   #
   # Check inputs ---------------------------------------------------------------
-  check_if_alpha_valid(alpha)
+  check_if_alpha_valid(fdr)
 
   # Function -------------------------------------------------------------------
   fdr_corrected_pvals            <- p.adjust(hit_values, method = "fdr")
-  sig_pvals                      <- as.data.frame(fdr_corrected_pvals[fdr_corrected_pvals < alpha])
+  sig_pvals                      <- as.data.frame(fdr_corrected_pvals[fdr_corrected_pvals < fdr])
   sig_pvals                      <- as.data.frame(sig_pvals)
-  row.names(sig_pvals)           <- names(hit_values)[fdr_corrected_pvals < alpha]
+  row.names(sig_pvals)           <- names(hit_values)[fdr_corrected_pvals < fdr]
   fdr_corrected_pvals            <- as.data.frame(fdr_corrected_pvals)
   row.names(fdr_corrected_pvals) <- names(hit_values)
 
