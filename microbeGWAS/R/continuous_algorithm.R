@@ -119,8 +119,8 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
 
   # Function -------------------------------------------------------------------
   num_genotypes <- ncol(mat)
-  pvals <- observed_ks_pval <- trans_median <- all_edges_median <- observed_ks_stat <- rep(NA, num_genotypes)
-  names(observed_ks_pval) <- names(pvals) <- colnames(mat)
+  pvals <- trans_median <- all_edges_median <- observed_ks_stat <- rep(NA, num_genotypes)
+  names(pvals) <- colnames(mat)
   empirical_ks_pval_list <- empirical_ks_stat_list <- observed_pheno_trans_delta <- observed_pheno_non_trans_delta <- rep(list(0), num_genotypes)
 
   for (i in 1:num_genotypes){
@@ -128,7 +128,6 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
 
     # Run KS test to find out if the phenotype change on transition edges is significantly different from phenotype change on non-transition edges
     observed_results <- run_ks_test(indices$trans_index, indices$non_trans_index, pheno_recon_ordered_by_edges)
-    observed_ks_pval[i] <- observed_results$pval
     observed_ks_stat[i] <- observed_results$statistic
 
     # save these for reporting / plots
@@ -175,7 +174,6 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
       empirical_ks_stat[k]     <- empirical_results$statistic
     } # end for (k)
 
-    # the observed ks.test statistic: observed_ks_stat[i] (fixed this 2018-11-12; before I had it wrong with observed_ks_pval)
     # empirical p value caluclation here: (1 + more extreme observations) / (1 + permutations)
     empirical_ks_pval_list[[i]] <- empirical_ks_pval
     empirical_ks_stat_list[[i]] <- empirical_ks_stat
