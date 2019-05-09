@@ -75,7 +75,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   #                           Length($transition) == length($trans_dir) == Nedge(tr).
   #                           Each of these are either 0, 1, or -1.
   # tr. Phylo.
-  # phenotype_recon_ordered_by_edges. Matrix. Nrow = Nedge(tr). Ncol = 2. Values
+  # pheno_recon_ordered_by_edges.  Matrix. Nrow = Nedge(tr). Ncol = 2. Values
   #                                   are the phenotype reconstruction at each
   #                                   node, as ordered by edges. It's the same
   #                                   organization as tr$edge.
@@ -100,21 +100,18 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   check_if_permutation_num_valid(permutations)
   check_if_binary_matrix(mat)
   check_if_binary_vector(genotype_confidence[[1]])
-  check_dimensions(mat = mat, exact_rows = Nedge(tr), min_rows = Nedge(tr), exact_cols = NULL, min_cols = 1)
-  check_dimensions(mat = phenotype_recon_ordered_by_edges, exact_rows = Nedge(tr), min_rows = Nedge(tr), exact_cols = 2, min_cols = 2)
-  if(length(genotype_transition_list[[1]]$transition != Nedge(tr))){
+  check_dimensions(mat = mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
+  check_dimensions(mat = pheno_recon_ordered_by_edges, exact_rows = Nedge(tr), min_rows = Nedge(tr), exact_cols = 2, min_cols = 2)
+  if(length(genotype_transition_list[[1]]$transition) != Nedge(tr)){
     stop("genotype$transition incorrectly formatted")
   }
-  if(length(genotype_transition_list[[1]]$trans_dir != Nedge(tr))){
+  if(length(genotype_transition_list[[1]]$trans_dir) != Nedge(tr)){
     stop("genotype$transition incorrectly formatted")
   }
   if(length(genotype_transition_list) != ncol(mat)){
     stop("genotype transition incorrectly formatted")
   }
-  if (length(genotype_confidence) != Ntip(tr)){
-    stop("genotype_confidence incorrectly formatted")
-  }
-  if (length(genotype_confidence[[1]] != Nedge(tr))){
+  if (length(genotype_confidence[[1]]) != Nedge(tr)){
     stop("genotype_confidence is incorrectly formatted")
   }
 
@@ -136,7 +133,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     hi_conf_non_trans_index <- non_trans_index[as.logical(genotype_confidence[[i]][non_trans_index])]
 
 
-    indices <- get_hi_conf_tran_indices(geno_tran, geno_conf, index, tr)
+    indices <- get_hi_conf_tran_indices(genotype_transition_list, genotype_confidence, i, tr)
     indices$trans_index
     indices$non_trans_index
 
@@ -205,8 +202,6 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
                   "num_genotypes" = ncol(mat), "observed_ks_stat" = observed_ks_stat) # 2018-11-28
   return(results)
 } # end calculate_genotype_significance()
-
-
 
 get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
   # Function description -------------------------------------------------------

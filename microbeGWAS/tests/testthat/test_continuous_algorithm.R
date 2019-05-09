@@ -34,7 +34,32 @@ test_that("get_sig_hits_while_correcting_for_multiple_testing gives known adjust
 })
 
 test_that("calculate_genotype_significance does X given Y", {
+  num_isolates <- 5
+  num_loci <- 5
+  set.seed(1)
+  temp_tree <- rtree(num_isolates)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
+  temp_perm <- 100
+  temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(0), num_loci)
+  for (i in 1:num_loci){
+    temp_geno_trans[[i]]$transition <- c(1,0,1,0,1,0,1,0)
+    temp_geno_trans[[i]]$trans_dir <- c(1,0,-1,0,1,0,-1,0)
+    temp_conf[[i]] <- c(1, 1, 1, 0, 0, 1, 1, 1)
+    temp_geno_recon[[i]] <- rep(1, Nedge(temp_tree))
+  }
+  set.seed(1)
+  temp_pheno <- matrix(rnorm(Nedge(temp_tree) * 2), ncol = 2, nrow = Nedge(temp_tree))
+  #genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges
 
+  # left off on wednesday night with this running next step is to break down this function in many smaller easier to understand parts.
+  calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
+})
+
+test_that("get_hi_conf_tran_indices does X given Y", {
+  indices <- get_hi_conf_tran_indices(geno_tran, geno_conf, index, tr)
+  indices$trans_index
+  indices$non_trans_index
 })
 
 # calculate_genotype_significance <- function(mat, permutations, genotype_transition_list, tr, pheno_recon_ordered_by_edges, genotype_confidence, genotype_reconstruction){
