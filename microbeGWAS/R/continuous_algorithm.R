@@ -83,7 +83,7 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
   check_for_root_and_bootstrap(tr)
 
 
-    # Function -------------------------------------------------------------------
+  # Function -------------------------------------------------------------------
   # GRAB THE IDS OF THE TRANSITION EDGES
   trans_index     <- c(1:Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
   non_trans_index <- c(1:Nedge(tr))[!geno_tran[[index]]$transition]
@@ -100,6 +100,40 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
 }
 
 continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
+  # Function description -------------------------------------------------------
+  #
+  # Input:
+  # index_obj. List of 2.
+  #            $
+  # perm. Integer. Number of times to run the permutation test.
+  # tr. Phylo.
+  # geno_conf List. Length(list) = ncol(mat) == number of genotypes.
+  #                 Each entry is a vector with length == Nedge(tr). All
+  #                 entries are 0 (low confidence) or 1 (high confidence).
+  # num_i. Integer. Just the i from the loop this function is set within.
+  #
+  # Outputs:
+  # results. List of 8.
+  #          $hi_conf_edges. List of edge numbers. Corresponds to edges in tree
+  #                                                with high confidence.
+  #          $permuted_trans_index_mat. Matrix. Nrow = number of permutations.
+  #                                     Ncol = Number of transition edges. Each
+  #                                     entry is an edge number.
+  #
+
+  # Check input ----------------------------------------------------------------
+  check_for_root_and_bootstrap(tr)
+  check_is_number(perm)
+  check_if_permutation_num_valid(perm)
+  check_if_binary_vector(geno_conf[[1]])
+  check_is_number(num_i)
+  if (length(geno_conf[[1]]) != Nedge(tr)){
+    stop("geno_conf is incorrectly formatted")
+  }
+
+  # Function -------------------------------------------------------------------
+
+
   # Note on implementation of this permutation. I've tested this as a for()
   # loop, an apply statement, and using the replicate() function.
   # for() loop was more than 10x faster than the apply statement.
@@ -132,6 +166,9 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   # Notes on variable names: on May 9, 2019 which_branches became hi_conf_edges
   # and all_sampled_branches became permuted_trans_index_mat to clarify what
   # each variable means.
+
+  # Check and return output ----------------------------------------------------
+  check_dimensions(permuted_trans_index_mat, exact_rows = perm, min_rows = perm, NULL, NULL)
   return(list("hi_conf_edges" = hi_conf_edges,
               "permuted_trans_index_mat" = permuted_trans_index_mat))
 }
