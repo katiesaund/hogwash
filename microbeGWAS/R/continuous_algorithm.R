@@ -101,6 +101,10 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
 
 # genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges
 
+calculate_empirical_pheno_delta <- function(perm, permuted_trans_mat, hi_conf_edge_nums, pheno_by_edges){
+
+}
+
 # TODO look into replicate function to make permutation test run faster
 calculate_genotype_significance <- function(mat, permutations, genotype_transition_list, tr, pheno_recon_ordered_by_edges, genotype_confidence, genotype_reconstruction){
   # Function description -------------------------------------------------------
@@ -157,7 +161,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   num_genotypes <- ncol(mat)
   pvals <- trans_median <- all_edges_median <- observed_ks_stat <- rep(NA, num_genotypes)
   names(pvals) <- colnames(mat)
-  empirical_ks_pval_list <- empirical_ks_stat_list <- observed_pheno_trans_delta <- observed_pheno_non_trans_delta <- rep(list(0), num_genotypes)
+  empirical_ks_stat_list <- observed_pheno_trans_delta <- observed_pheno_non_trans_delta <- rep(list(0), num_genotypes)
 
   for (i in 1:num_genotypes){
     indices <- get_hi_conf_tran_indices(genotype_transition_list, genotype_confidence, i, tr)
@@ -165,7 +169,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     # Run KS test to find out if the phenotype change on transition edges is significantly different from phenotype change on non-transition edges
     observed_results <- run_ks_test(indices$trans_index, indices$non_trans_index, pheno_recon_ordered_by_edges)
 
-    # save these for reporting / plots
+    # Save these for reporting / plots
     observed_pheno_non_trans_delta[[i]] <- observed_results$pheno_non_trans_delta
     observed_pheno_trans_delta[[i]]     <- observed_results$pheno_trans_delta
     observed_ks_stat[i]                 <- observed_results$statistic
@@ -175,18 +179,18 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     # Create permuted transition index matrix and get edge numbersof the high confidence edges
     perm_results <- continuous_permutation(indices, tr, genotype_confidence, permutations, i)
 
-    # calculate permuted pheno deltas
-    empirical_ks_pval <- empirical_ks_stat <- rep(NA, permutations)
-    for (k in 1:nrow(perm_results$permuted_trans_index_mat)){
+
+
+    # Calculate permuted (aka empirical) pheno deltas
+    empirical_ks_stat <- rep(NA, permutations)
+    for (k in 1:permutations){
       permuted_trans_index     <- unique(perm_results$permuted_trans_index_mat[k, ])
       permuted_non_trans_index <- c(1:length(perm_results$hi_conf_edges))[!(c(1:length(perm_results$hi_conf_edges)) %in% unique(perm_results$permuted_trans_index_mat[k, ]))]
       empirical_results        <- run_ks_test(permuted_trans_index, permuted_non_trans_index, pheno_recon_ordered_by_edges)
-      empirical_ks_pval[k]     <- empirical_results$pval
       empirical_ks_stat[k]     <- empirical_results$statistic
     } # end for (k)
 
     # empirical p value caluclation here: (1 + more extreme observations) / (1 + permutations)
-    empirical_ks_pval_list[[i]] <- empirical_ks_pval
     empirical_ks_stat_list[[i]] <- empirical_ks_stat
     pvals[i] <- (sum(1 + sum(empirical_ks_stat > observed_ks_stat[i]))/(permutations + 1))
   } # end for (i)
