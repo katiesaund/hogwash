@@ -45,18 +45,43 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   return(results)
 } # end run_ks_test()
 
+get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
+  # GRAB THE IDS OF THE TRANSITION EDGES:
+  trans_index     <- c(1:Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
+  non_trans_index <- c(1:Nedge(tr))[!geno_tran[[index]]$transition]
+  # [1] EX:  8 12 13 16 19 26 27 31 37 44 52 56 64 67 68 76 77 80 89 92 97 98
+  # THESE EDGES ARE DEFINED BY THE NODES IN THE CORRESPONDING ROWS OF tr$EDGE
+
+  # SUBSET TRANSITION / NON-TRANSITION EDGES TO ONLY HIGH CONFIDENCE ONES
+  hi_conf_trans_index     <- trans_index[    as.logical(geno_conf[[index]][trans_index    ])]
+  hi_conf_non_trans_index <- non_trans_index[as.logical(geno_conf[[index]][non_trans_index])]
+
+  return(list("trans_index" = hi_conf_trans_index,
+              "non_trans_index" = hi_conf_non_trans_index))
+}
+
+
+# genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges
+
+# TODO look into replicate function to make permutation test run faster
 calculate_genotype_significance <- function(mat, permutations, genotype_transition_list, tr, pheno_recon_ordered_by_edges, genotype_confidence, genotype_reconstruction){
   # Function description -------------------------------------------------------
   #
   # Input:
-  # mat is a genotype_matrix. Each row is a genotype. Each column is a 0/1 value on an edge.
-  # permutations is a numeric integer.
-  # genotype_transition_list is a list of length = ncol(mat) and each list has length = Nedge(tr). All entries are 0 or 1.
-  # tr object of phylo.
-  # phenotype_recon_ordered_by_edges is a matrix. Nrow = Nedge(tr). Ncol =2. where the phenotype reconstruction is ordered by edges. IN THE SAME FORMAT AS tr$EDGE. SO NODE VALUES WILL APPEAR MULTIPLE TIMES IN THE tr.
-  #            THIS FORMAT WILL MAKE IT MUCH EASIER TO CALCULATE PHENOTYPE CHANGE ON EDGES.
-  # genotype_confidence is a list of length = ncol(mat) and each list has length = Nedge(tr). All entries are 0 (low confidence) or 1 (high confidence).
-  #            NOTE: genotype_confidence lists the confidence in each edge. High confidence means the edge is high confidence by genotype reconstruction, phenotype reconstruction, bootstrap value, and edge length.
+  # mat. Matrix. Nrow(mat) == number of genotypes. Each column is a variant. Matrix is binary.
+  # permutations. Integer. Number of times to run the permutation test.
+  # genotype_transition_list. List of lists. Length(genotype_transition_list) == number of genotypes.
+  #                           For each genotype there are two lists: $transition and $trans_dir
+  #                           Length($transition) == length($trans_dir) == Nedge(tr).
+  #                           Each of these are either 0, 1, or -1.
+  # tr. Phylo.
+  # phenotype_recon_ordered_by_edges. Matrix. Nrow = Nedge(tr). Ncol = 2. Values
+  #                                   are the phenotype reconstruction at each
+  #                                   node, as ordered by edges. It's the same
+  #                                   organization as tr$edge.
+  # genotype_confidence. List. Length(list) = ncol(mat) == number of genotypes.
+  #                      Each entry is a vector with length == Nedge(tr). All
+  #                      entries are 0 (low confidence) or 1 (high confidence).
   #
   # Outputs:
   # results. List of 8.
@@ -74,6 +99,9 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   check_for_root_and_bootstrap(tr)
   check_if_permutation_num_valid(permutations)
   check_if_binary_matrix(mat)
+  check_if_binary_vector(genotype_confidence[[1]])
+  check_dimensions(mat = mat, exact_rows = Nedge(tr), min_rows = Nedge(tr), exact_cols = NULL, min_cols = 1)
+  check_dimensions(mat = phenotype_recon_ordered_by_edges, exact_rows = Nedge(tr), min_rows = Nedge(tr), exact_cols = 2, min_cols = 2)
   if(length(genotype_transition_list[[1]]$transition != Nedge(tr))){
     stop("genotype$transition incorrectly formatted")
   }
@@ -83,14 +111,18 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   if(length(genotype_transition_list) != ncol(mat)){
     stop("genotype transition incorrectly formatted")
   }
-
-
+  if (length(genotype_confidence) != Ntip(tr)){
+    stop("genotype_confidence incorrectly formatted")
+  }
+  if (length(genotype_confidence[[1]] != Nedge(tr))){
+    stop("genotype_confidence is incorrectly formatted")
+  }
 
   # Function -------------------------------------------------------------------
   num_genotypes <- ncol(mat)
-  pvals <- observed_ks_pval <- trans_median <- all_edges_median <- observed_ks_stat <- rep(NA, num_genotypes) # 2018-11-12 added observed_ks_stat
+  pvals <- observed_ks_pval <- trans_median <- all_edges_median <- observed_ks_stat <- rep(NA, num_genotypes)
   names(observed_ks_pval) <- names(pvals) <- colnames(mat)
-  empirical_ks_pval_list <- empirical_ks_stat_list <- observed_pheno_trans_delta <- observed_pheno_non_trans_delta <- rep(list(0), num_genotypes) # 2018-11-12 added empirical_ks_stat_list
+  empirical_ks_pval_list <- empirical_ks_stat_list <- observed_pheno_trans_delta <- observed_pheno_non_trans_delta <- rep(list(0), num_genotypes)
 
   for (i in 1:num_genotypes){
     # GRAB THE IDS OF THE TRANSITION EDGES:
@@ -102,6 +134,12 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     # SUBSET TRANSITION / NON-TRANSITION EDGES TO ONLY HIGH CONFIDENCE ONES
     hi_conf_trans_index     <- trans_index[    as.logical(genotype_confidence[[i]][trans_index    ])]
     hi_conf_non_trans_index <- non_trans_index[as.logical(genotype_confidence[[i]][non_trans_index])]
+
+
+    indices <- get_hi_conf_tran_indices(geno_tran, geno_conf, index, tr)
+    indices$trans_index
+    indices$non_trans_index
+
 
     # Run KS test to find out if the phenotype change on transition edges is significantly different from phenotype change on non-transition edges
     observed_results <- run_ks_test(hi_conf_trans_index, hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
