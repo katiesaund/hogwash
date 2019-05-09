@@ -46,6 +46,8 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
 } # end run_ks_test()
 
 get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
+
+
   # GRAB THE IDS OF THE TRANSITION EDGES:
   trans_index     <- c(1:Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
   non_trans_index <- c(1:Nedge(tr))[!geno_tran[[index]]$transition]
@@ -106,10 +108,10 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     stop("genotype$transition incorrectly formatted")
   }
   if(length(genotype_transition_list[[1]]$trans_dir) != Nedge(tr)){
-    stop("genotype$transition incorrectly formatted")
+    stop("genotype$trans_dir incorrectly formatted")
   }
   if(length(genotype_transition_list) != ncol(mat)){
-    stop("genotype transition incorrectly formatted")
+    stop("genotype transition doesn't a list for each genotype")
   }
   if (length(genotype_confidence[[1]]) != Nedge(tr)){
     stop("genotype_confidence is incorrectly formatted")
@@ -122,24 +124,10 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   empirical_ks_pval_list <- empirical_ks_stat_list <- observed_pheno_trans_delta <- observed_pheno_non_trans_delta <- rep(list(0), num_genotypes)
 
   for (i in 1:num_genotypes){
-    # GRAB THE IDS OF THE TRANSITION EDGES:
-    trans_index     <- c(1:Nedge(tr))[as.logical(genotype_transition_list[[i]]$transition)]
-    non_trans_index <- c(1:Nedge(tr))[!genotype_transition_list[[i]]$transition]
-    # [1] EX:  8 12 13 16 19 26 27 31 37 44 52 56 64 67 68 76 77 80 89 92 97 98
-    # THESE EDGES ARE DEFINED BY THE NODES IN THE CORRESPONDING ROWS OF tr$EDGE
-
-    # SUBSET TRANSITION / NON-TRANSITION EDGES TO ONLY HIGH CONFIDENCE ONES
-    hi_conf_trans_index     <- trans_index[    as.logical(genotype_confidence[[i]][trans_index    ])]
-    hi_conf_non_trans_index <- non_trans_index[as.logical(genotype_confidence[[i]][non_trans_index])]
-
-
     indices <- get_hi_conf_tran_indices(genotype_transition_list, genotype_confidence, i, tr)
-    indices$trans_index
-    indices$non_trans_index
-
 
     # Run KS test to find out if the phenotype change on transition edges is significantly different from phenotype change on non-transition edges
-    observed_results <- run_ks_test(hi_conf_trans_index, hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
+    observed_results <- run_ks_test(indices$trans_index, indices$non_trans_index, pheno_recon_ordered_by_edges)
     observed_ks_pval[i] <- observed_results$pval
     observed_ks_stat[i] <- observed_results$statistic
 
@@ -151,7 +139,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     #
 
     # do the permutation part
-    num_sample           <- length(hi_conf_trans_index)
+    num_sample           <- length(indices$trans_index)
     all_edges            <- c(1:Nedge(tr))
     which_branches       <- all_edges[as.logical(genotype_confidence[[i]])]
     all_sampled_branches <- matrix(   nrow = permutations, ncol = num_sample)
@@ -172,7 +160,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
                                           prob = tr$edge.length[which_branches]/sum(tr$edge.length[which_branches]))
     } # end for (j)
 
-    # all_sampled_branches is my new, permuted "hi_conf_trans_index" where each row is a new list of transition genotype branches
+    # all_sampled_branches is my new, permuted "indices$trans_index" where each row is a new list of transition genotype branches
     # BUT CAVEAT: these are just fake/null transitions and some of them are probably actually touching! If I wanted to be
     # Super legit I would recreate as many hits, calculate new transitions, and then use those in my permutation test, somehow
     # controlling for variable numbers of transitions. But not doing that for now.
