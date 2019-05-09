@@ -49,9 +49,42 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
 } # end run_ks_test()
 
 get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
+  # Function description -------------------------------------------------------
+  #
+  # Input:
+  # geno_tran. List of lists. Length(genotype_transition_list) == number of genotypes.
+  #            For each genotype there are two lists: $transition and $trans_dir
+  #            Length($transition) == length($trans_dir) == Nedge(tr).
+  #            Each of these are either 0, 1, or -1.
+  # tr. Phylo.
+  # index. Number. Just i from the loop outside of this function.
+  # geno_conf.  List. Length(list) = ncol(mat) == number of genotypes.
+  #                   Each entry is a vector with length == Nedge(tr). All
+  #                   entries are 0 (low confidence) or 1 (high confidence).
+  #
+  # Outputs:
+  # results. List of 2.
+  #   "trans_index" = hi_conf_trans_index. Vector of numbers. Each number
+  #                                        corresponds to an edge that is both a
+  #                                       transition and high confidence.
+  #   "non_trans_index" = hi_conf_non_trans_index. Vector of numbers. Each number
+  #                                        corresponds to an edge that is both a
+  #                                        not a transition and high confidence.
+  #
+  # Check input ----------------------------------------------------------------
+  if (length(geno_tran) != length(geno_conf)){
+    stop("One genotype should correspond to each entry of geno_tran and geno_conf")
+  }
+  check_is_number(index)
+  if (index > length(geno_tran) | index < 1){
+    stop("Index is a counter from 1:number of genomes.")
+  }
+  check_tree_is_valid(tr)
+  check_for_root_and_bootstrap(tr)
 
 
-  # GRAB THE IDS OF THE TRANSITION EDGES:
+    # Function -------------------------------------------------------------------
+  # GRAB THE IDS OF THE TRANSITION EDGES
   trans_index     <- c(1:Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
   non_trans_index <- c(1:Nedge(tr))[!geno_tran[[index]]$transition]
   # [1] EX:  8 12 13 16 19 26 27 31 37 44 52 56 64 67 68 76 77 80 89 92 97 98
@@ -61,6 +94,7 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
   hi_conf_trans_index     <- trans_index[    as.logical(geno_conf[[index]][trans_index    ])]
   hi_conf_non_trans_index <- non_trans_index[as.logical(geno_conf[[index]][non_trans_index])]
 
+  # Return output --------------------------------------------------------------
   return(list("trans_index" = hi_conf_trans_index,
               "non_trans_index" = hi_conf_non_trans_index))
 }
