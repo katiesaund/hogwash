@@ -62,6 +62,39 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
               "non_trans_index" = hi_conf_non_trans_index))
 }
 
+continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
+  # Note on implementation of permutation. I've tested this as a for loop, an apply statement, and using the replicate() function.
+  # For loop was more than 10x faster than the apply statement.
+  # Foor loop was slightly faster than the replicate function.
+  # do the permutation part
+  num_sample           <- length(index_obj$trans_index)
+  all_edges            <- c(1:Nedge(tr))
+  which_branches       <- all_edges[as.logical(geno_conf[[num_i]])]
+  all_sampled_branches <- matrix(   nrow = perm, ncol = num_sample)
+  redistributed_hits   <- matrix(0, nrow = perm, ncol = length(which_branches))
+
+  # ii. Create a matrix where each row is a random sampling of the high
+  #     confidence edges of the tr where probability of choosing edges is
+  #     proportional to length of edge. Number of edges selected for the
+  #     permuted data set is the number of times the empirical genotype
+  #     appears.
+
+  set.seed(1) # for reproducability of the sample() function
+  for (j in 1:perm){  # create a random sample of the tr
+    curr_num_branch <- length(which_branches)
+    all_sampled_branches[j, ] <- sample(1:curr_num_branch,
+                                        size = num_sample,
+                                        replace = TRUE,
+                                        prob = tr$edge.length[which_branches]/sum(tr$edge.length[which_branches]))
+  } # end for (j)
+
+  # all_sampled_branches is my new, permuted "indices$trans_index" where each row is a new list of transition genotype branches
+  # BUT CAVEAT: these are just fake/null transitions and some of them are probably actually touching! If I wanted to be
+  # Super legit I would recreate as many hits, calculate new transitions, and then use those in my permutation test, somehow
+  # controlling for variable numbers of transitions. But not doing that for now.
+  return(list("which_branches" = which_branches,
+              "all_sampled_branches" = all_sampled_branches))
+}
 
 # genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges
 
@@ -128,13 +161,13 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
 
     # Run KS test to find out if the phenotype change on transition edges is significantly different from phenotype change on non-transition edges
     observed_results <- run_ks_test(indices$trans_index, indices$non_trans_index, pheno_recon_ordered_by_edges)
-    observed_ks_stat[i] <- observed_results$statistic
 
     # save these for reporting / plots
-    observed_pheno_trans_delta[[i]]     <- observed_results$pheno_trans_delta
     observed_pheno_non_trans_delta[[i]] <- observed_results$pheno_non_trans_delta
-    trans_median[i]     <- median(observed_results$pheno_trans_delta)
-    all_edges_median[i] <- median(c(observed_results$pheno_trans_delta, observed_results$pheno_non_trans_delta))
+    observed_pheno_trans_delta[[i]]     <- observed_results$pheno_trans_delta
+    observed_ks_stat[i]                 <- observed_results$statistic
+    trans_median[i]                     <- median(observed_results$pheno_trans_delta)
+    all_edges_median[i]                 <- median(c(observed_results$pheno_trans_delta, observed_results$pheno_non_trans_delta))
     #
 
     # do the permutation part
@@ -178,6 +211,10 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     empirical_ks_pval_list[[i]] <- empirical_ks_pval
     empirical_ks_stat_list[[i]] <- empirical_ks_stat
     pvals[i] <- (sum(1 + sum(empirical_ks_stat > observed_ks_stat[i]))/(permutations + 1))
+
+
+
+
   } # end for (i)
 
   # Return output --------------------------------------------------------------

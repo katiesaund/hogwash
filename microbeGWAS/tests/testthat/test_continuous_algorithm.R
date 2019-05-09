@@ -190,3 +190,29 @@ test_that("get_hi_conf_tran_indices returns only high confidence transition edge
 #   return(results)
 # } # end calculate_genotype_significance()
 
+
+test_that("continuous_permutation is slower or faster than with replicate", {
+  num_isolates <- 40
+  num_loci <- 80
+  set.seed(1)
+  temp_tree <- rtree(num_isolates)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_conf <- rep(list(NULL), num_loci)
+  for (i in 1:num_loci){
+    temp_conf[[i]] <- rep(c(1, 0), Nedge(temp_tree)/2)
+  }
+  num <- 1
+  index <- NULL
+  index$trans_index <- c(1:40)
+  perm <- 100000
+  results <- continuous_permutation(index, temp_tree, temp_conf, perm, num)
+})
+
+
+
+num_sample <- 3
+all_edges <- c(1:Nedge(temp_tree))
+which_branches <- all_edges[as.logical(temp_conf[[1]])]
+perm <- 1000
+all_sampled_branches <- matrix(   nrow = perm, ncol = num_sample)
+redistributed_hits   <- matrix(0, nrow = perm, ncol = length(which_branches))
