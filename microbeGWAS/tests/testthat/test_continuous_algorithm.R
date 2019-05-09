@@ -34,7 +34,7 @@ test_that("get_sig_hits_while_correcting_for_multiple_testing gives known adjust
 })
 
 # test calculate_genotype_significance
-test_that("calculate_genotype_significance does X given Y", {
+test_that("calculate_genotype_significance gives expected results given valid inputs", {
   num_isolates <- 5
   num_loci <- 8
   set.seed(1)
@@ -61,6 +61,95 @@ test_that("calculate_genotype_significance does X given Y", {
   expect_equal(round(results$ks_statistics[[1]][1:5], 3), c(0.50, 0.25, 0.75, 0.80, 0.50))
   expect_equal(round(results$pvals, 3), rep(0.812, num_loci))
 })
+
+
+test_that("calculate_genotype_significance returns a significant p-value when
+          phenotype change is noticeably higher on transition edges than on
+          non-transition tree edges", {
+  num_isolates <- 4
+  num_loci <- 2
+  set.seed(1)
+  temp_tree <- rtree(num_isolates)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
+  temp_perm <- 100
+  temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
+  for (i in 1:num_loci){
+    temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
+    temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
+    temp_conf[[i]]                  <- c(1, 1, 1, 1, 1, 1)
+    temp_geno_recon[[i]]            <- c(1, 1, 1, 1, 1, 1)
+  }
+  set.seed(1)
+  temp_pheno <- matrix(c(-1, -1, 10, 0, 10, 10, 2, 0, 11, 10, 100, 40), ncol = 2, nrow = Nedge(temp_tree))
+  # Transition edges deltas: 10, 90, 30
+  # Non-transition edge deltas: 3, 1, 1
+  results <- calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
+  alpha <- 0.01
+  expect_true(results$pvals[1] < alpha)
+  expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1]- temp_pheno[ , 2])))
+  expect_equal(results$trans_median[[1]], median(abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2])))
+  expect_equal(round(results$observed_ks_stat[1], 2), 1)
+  expect_equal(results$observed_pheno_non_trans_delta[[1]], abs(temp_pheno[1:3 , 1]- temp_pheno[1:3 , 2]))
+  expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2]))
+  expect_equal(round(results$ks_statistics[[1]][1:5], 3), c(0.75, 0.50, 0.25, 0.60, 1.00))
+})
+
+test_that("calculate_genotype_significance returns a non-significant p-value when
+          phenotype change is identical on transition and non-transition edges", {
+  num_isolates <- 4
+  num_loci <- 2
+  set.seed(1)
+  temp_tree <- rtree(num_isolates)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
+  temp_perm <- 100
+  temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
+  for (i in 1:num_loci){
+    temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
+    temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
+    temp_conf[[i]]                  <- c(1, 1, 1, 1, 1, 1)
+    temp_geno_recon[[i]]            <- c(1, 1, 1, 1, 1, 1)
+  }
+  set.seed(1)
+  temp_pheno <- matrix(c(-15, -15, 10, 0, 10, 10, -10, 0, 7, 5, 25, 7), ncol = 2, nrow = Nedge(temp_tree))
+  # Transition edges deltas: 5 15 3
+  # Non-transition edge deltas: 5 15 3
+  results <- calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
+  alpha <- 0.01
+  expect_true(results$pvals[1] > alpha)
+  expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1]- temp_pheno[ , 2])))
+  expect_equal(results$trans_median[[1]], median(abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2])))
+  expect_equal(round(results$observed_ks_stat[1], 2), 0)
+  expect_equal(results$observed_pheno_non_trans_delta[[1]], abs(temp_pheno[1:3 , 1]- temp_pheno[1:3 , 2]))
+  expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2]))
+})
+
+test_that("calculate_genotype_significance returns an error when the only
+          confident edges are transition edges. (All non-transition edges are
+          low confidence)", {
+  num_isolates <- 4
+  num_loci <- 2
+  set.seed(1)
+  temp_tree <- rtree(num_isolates)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
+  temp_perm <- 100
+  temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
+  for (i in 1:num_loci){
+    temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
+    temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
+    temp_conf[[i]]                  <- c(0, 0, 0, 1, 1, 1)
+    temp_geno_recon[[i]]            <- c(1, 1, 1, 1, 1, 1)
+  }
+  set.seed(1)
+  temp_pheno <- matrix(c(-15, -15, 10, 0, 10, 10, -10, 0, 7, 5, 25, 7), ncol = 2, nrow = Nedge(temp_tree))
+  # Transition edges deltas: 5 15 3
+  # Non-transition edge deltas: 5 15 3
+  expect_error(calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon))
+})
+
+
 
 # test get_hi_conf_tran_indices
 test_that("get_hi_conf_tran_indices returns only high confidence transition edges given this test data", {
@@ -106,7 +195,6 @@ test_that("continuous_permutation is gives consistent results with this test set
 })
 
 # test calculate_empirical_pheno_delta
-
 test_that("calculate_empirical_pheno_delta returns a list of valid ks-test results of length perm", {
   perm <- 1000
   num_isolates <- 40

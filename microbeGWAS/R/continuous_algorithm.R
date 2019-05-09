@@ -1,5 +1,6 @@
 run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   # TODO deal with cases when there isn't enough data (aren't at least 1 of least t_index and non_t_index)
+  # TODO -- If i were really fancy -- I would remove these from the genotype and then report that they're bad and continue without breaking out of the algorithm
   # right now it will cause a stop error --- which won't be good for lots of things.
   # Can't seem to recapitulate the error when there are not enough samples to run the test,but all indices are list of at least one. Hmm.
 
@@ -20,17 +21,19 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   #   $pheno_non_trans_delta. Numeric vector. The value of the delta of the phenotype on all non-transition edges.
   #
   # Check input ----------------------------------------------------------------
-  if(!is.vector(t_index)){stop("Transition index must be a vector")}
-  check_is_number(t_index[1])
-  if(max(t_index) > nrow(phenotype_by_edges)){stop("Transition index must represent a tree edge")}
-
-  if(!is.vector(non_t_index)){stop("Non-transition index must be a vector")}
-  check_is_number(non_t_index[1])
-  if(max(non_t_index) > nrow(phenotype_by_edges)){stop("Non-transition index must represent a tree edge")}
-
   if (length(t_index) < 1 | length(non_t_index) < 1){
     stop("Not enough high confidence transition edges to use for KS test.")
   }
+
+  if (!is.vector(t_index)){stop("Transition index must be a vector")}
+  check_is_number(t_index[1])
+  if (max(t_index) > nrow(phenotype_by_edges)){stop("Transition index must represent a tree edge")}
+
+  if (!is.vector(non_t_index)){stop("Non-transition index must be a vector")}
+  check_is_number(non_t_index[1])
+  if (max(non_t_index) > nrow(phenotype_by_edges)){stop("Non-transition index must represent a tree edge")}
+
+
   # Function -------------------------------------------------------------------
   p_trans_delta     <- calculate_phenotype_change_on_edge(t_index,     phenotype_by_edges)
   p_non_trans_delta <- calculate_phenotype_change_on_edge(non_t_index, phenotype_by_edges)
@@ -113,7 +116,6 @@ calculate_empirical_pheno_delta <- function(perm, permuted_trans_mat, hi_conf_ed
   return(empirical_ks_stat)
 }
 
-# TODO look into replicate function to make permutation test run faster
 calculate_genotype_significance <- function(mat, permutations, genotype_transition_list, tr, pheno_recon_ordered_by_edges, genotype_confidence, genotype_reconstruction){
   # Function description -------------------------------------------------------
   #
