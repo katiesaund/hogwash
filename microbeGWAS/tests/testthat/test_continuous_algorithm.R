@@ -33,6 +33,7 @@ test_that("get_sig_hits_while_correcting_for_multiple_testing gives known adjust
   expect_equal(nrow(results$sig_pvals), 0)
 })
 
+# test calculate_genotype_significance
 test_that("calculate_genotype_significance does X given Y", {
   num_isolates <- 5
   num_loci <- 8
@@ -61,6 +62,7 @@ test_that("calculate_genotype_significance does X given Y", {
   expect_equal(round(results$pvals, 3), rep(0.812, num_loci))
 })
 
+# test get_hi_conf_tran_indices
 test_that("get_hi_conf_tran_indices returns only high confidence transition edges given this test data", {
   num_isolates <- 5
   num_loci <- 8
@@ -79,119 +81,9 @@ test_that("get_hi_conf_tran_indices returns only high confidence transition edge
   expect_equal(indices$non_trans_index, c(2, 6, 8))
 })
 
-# calculate_genotype_significance <- function(mat, permutations, genotype_transition_list, tr, pheno_recon_ordered_by_edges, genotype_confidence, genotype_reconstruction){
-#   # Function description -------------------------------------------------------
-#   #
-#   # Input:
-#   # mat is a genotype_matrix. Each row is a genotype. Each column is a 0/1 value on an edge.
-#   # permutations is a numeric integer.
-#   # genotype_transition_list is a list of length = ncol(mat) and each list has length = Nedge(tr). All entries are 0 or 1.
-#   # tr object of phylo.
-#   # phenotype_recon_ordered_by_edges is a matrix. Nrow = Nedge(tr). Ncol =2. where the phenotype reconstruction is ordered by edges. IN THE SAME FORMAT AS tr$EDGE. SO NODE VALUES WILL APPEAR MULTIPLE TIMES IN THE tr.
-#   #            THIS FORMAT WILL MAKE IT MUCH EASIER TO CALCULATE PHENOTYPE CHANGE ON EDGES.
-#   # genotype_confidence is a list of length = ncol(mat) and each list has length = Nedge(tr). All entries are 0 (low confidence) or 1 (high confidence).
-#   #            NOTE: genotype_confidence lists the confidence in each edge. High confidence means the edge is high confidence by genotype reconstruction, phenotype reconstruction, bootstrap value, and edge length.
-#   #
-#   # Outputs:
-#   # results. List of 8.
-#   #          $pvals. Named numeric vector. Length == number of genotypes. Values between 1 and 0. Names are genotype names.
-#   #          $ks_statistics. List of numeric vectors. Length of list == number of genotypes. Each vector has length == number of permutations. Values between 1 and 0.
-#   #          $observed_pheno_trans_delta. List of numeric vectors. Length of list == number of genotypes. Vectors are of variable length because length is the number of transition edges for that particular genotype. Vectors are numeric.
-#   #          $observed_pheno_non_trans_delta. List of numeric vectors. Length of list == number of genotypes. Vectors are of variable length because length is the number of non-transition edges for that particular genotype. Vectors are numeric.
-#   #          $trans_median. Numberic. Vector. Length = number of genotypes. Describes median delta phenotype on all transition edges.
-#   #          $all_edges_median. Numeric vector. Length = number of genotypes. Describes median delta phenotype on all edges.
-#   #          $num_genotypes. Integer. The number of genotypes.
-#   #          $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values between 1 and 0.
-#   #
-#
-#   # Check input ----------------------------------------------------------------
-#   check_for_root_and_bootstrap(tr)
-#   check_if_permutation_num_valid(permutations)
-#
-#   # Function -------------------------------------------------------------------
-#   num_genotypes <- ncol(mat)
-#   pvals <- observed_ks_pval <- trans_median <- all_edges_median <- observed_ks_stat <- rep(NA, num_genotypes) # 2018-11-12 added observed_ks_stat
-#   names(observed_ks_pval) <- names(pvals) <- colnames(mat)
-#   empirical_ks_pval_list <- empirical_ks_stat_list <- observed_pheno_trans_delta <- observed_pheno_non_trans_delta <- rep(list(0), num_genotypes) # 2018-11-12 added empirical_ks_stat_list
-#
-#   for (i in 1:num_genotypes){
-#     # GRAB THE IDS OF THE TRANSITION EDGES:
-#     trans_index     <- c(1:Nedge(tr))[as.logical(genotype_transition_list[[i]]$transition)]
-#     non_trans_index <- c(1:Nedge(tr))[!genotype_transition_list[[i]]$transition]
-#     # [1] EX:  8 12 13 16 19 26 27 31 37 44 52 56 64 67 68 76 77 80 89 92 97 98
-#     # THESE EDGES ARE DEFINED BY THE NODES IN THE CORRESPONDING ROWS OF tr$EDGE
-#
-#     # SUBSET TRANSITION / NON-TRANSITION EDGES TO ONLY HIGH CONFIDENCE ONES
-#     hi_conf_trans_index     <- trans_index[    as.logical(genotype_confidence[[i]][trans_index    ])]
-#     hi_conf_non_trans_index <- non_trans_index[as.logical(genotype_confidence[[i]][non_trans_index])]
-#
-#     # Run KS test to find out if the phenotype change on transition edges is significantly different from phenotype change on non-transition edges
-#     observed_results <- run_ks_test(hi_conf_trans_index, hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
-#     observed_ks_pval[i] <- observed_results$pval
-#     observed_ks_stat[i] <- observed_results$statistic
-#
-#     # save these for reporting / plots
-#     observed_pheno_trans_delta[[i]]     <- observed_results$pheno_trans_delta
-#     observed_pheno_non_trans_delta[[i]] <- observed_results$pheno_non_trans_delta
-#     trans_median[i]     <- median(observed_results$pheno_trans_delta)
-#     all_edges_median[i] <- median(c(observed_results$pheno_trans_delta, observed_results$pheno_non_trans_delta))
-#     #
-#
-#     # do the permutation part
-#     num_sample           <- length(hi_conf_trans_index)
-#     all_edges            <- c(1:Nedge(tr))
-#     which_branches       <- all_edges[as.logical(genotype_confidence[[i]])]
-#     all_sampled_branches <- matrix(   nrow = permutations, ncol = num_sample)
-#     redistributed_hits   <- matrix(0, nrow = permutations, ncol = length(which_branches))
-#
-#     # ii. Create a matrix where each row is a random sampling of the high
-#     #     confidence edges of the tr where probability of choosing edges is
-#     #     proportional to length of edge. Number of edges selected for the
-#     #     permuted data set is the number of times the empirical genotype
-#     #     appears.
-#
-#     set.seed(1) # for reproducability of the sample() function
-#     for (j in 1:permutations){  # create a random sample of the tr
-#       curr_num_branch <- length(which_branches)
-#       all_sampled_branches[j, ] <- sample(1:curr_num_branch,
-#                                           size = num_sample,
-#                                           replace = TRUE,
-#                                           prob = tr$edge.length[which_branches]/sum(tr$edge.length[which_branches]))
-#     } # end for (j)
-#
-#     # all_sampled_branches is my new, permuted "hi_conf_trans_index" where each row is a new list of transition genotype branches
-#     # BUT CAVEAT: these are just fake/null transitions and some of them are probably actually touching! If I wanted to be
-#     # Super legit I would recreate as many hits, calculate new transitions, and then use those in my permutation test, somehow
-#     # controlling for variable numbers of transitions. But not doing that for now.
-#
-#     # calculate permuted pheno deltas
-#     empirical_ks_pval <- empirical_ks_stat <- rep(NA, permutations)
-#     for (k in 1:nrow(all_sampled_branches)){
-#       permuted_trans_index     <- unique(all_sampled_branches[k, ])
-#       permuted_non_trans_index <- c(1:length(which_branches))[!(c(1:length(which_branches)) %in% unique(all_sampled_branches[k, ]))]
-#       empirical_results        <- run_ks_test(permuted_trans_index, permuted_non_trans_index, pheno_recon_ordered_by_edges)
-#       empirical_ks_pval[k]     <- empirical_results$pval
-#       empirical_ks_stat[k]     <- empirical_results$statistic
-#     } # end for (k)
-#
-#     # the observed ks.test statistic: observed_ks_stat[i] (fixed this 2018-11-12; before I had it wrong with observed_ks_pval)
-#     # empirical p value caluclation here: (1 + more extreme observations) / (1 + permutations)
-#     empirical_ks_pval_list[[i]] <- empirical_ks_pval
-#     empirical_ks_stat_list[[i]] <- empirical_ks_stat
-#     pvals[i] <- (sum(1 + sum(empirical_ks_stat > observed_ks_stat[i]))/(permutations + 1))
-#   } # end for (i)
-#
-#   # Return output --------------------------------------------------------------
-#   results <- list("pvals" = pvals, "ks_statistics" = empirical_ks_stat_list,
-#                   "observed_pheno_trans_delta" = observed_pheno_trans_delta,
-#                   "observed_pheno_non_trans_delta" = observed_pheno_non_trans_delta,
-#                   "trans_median" = trans_median, "all_edges_median" = all_edges_median,
-#                   "num_genotypes" = ncol(mat), "observed_ks_stat" = observed_ks_stat) # 2018-11-28
-#   return(results)
-# } # end calculate_genotype_significance()
 
-
-test_that("continuous_permutation is slower or faster than with replicate", {
+# test continuous_permutation
+test_that("continuous_permutation is gives consistent results with this test set", {
   num_isolates <- 40
   num_loci <- 80
   set.seed(1)
@@ -206,13 +98,9 @@ test_that("continuous_permutation is slower or faster than with replicate", {
   index$trans_index <- c(1:40)
   perm <- 100000
   results <- continuous_permutation(index, temp_tree, temp_conf, perm, num)
+  odd_numbers <- seq(from = 1, to = 77, by = 2)
+  expect_equal(results$hi_conf_edges, odd_numbers)
+  expect_equal(nrow(results$permuted_trans_index_mat), perm)
+  expect_equal(ncol(results$permuted_trans_index_mat), length(index$trans_index))
+  expect_equal(results$permuted_trans_index_mat[1, 1:10], c(18, 8, 19, 5, 23, 25, 20, 21, 15, 38))
 })
-
-
-
-num_sample <- 3
-all_edges <- c(1:Nedge(temp_tree))
-which_branches <- all_edges[as.logical(temp_conf[[1]])]
-perm <- 1000
-all_sampled_branches <- matrix(   nrow = perm, ncol = num_sample)
-redistributed_hits   <- matrix(0, nrow = perm, ncol = length(which_branches))

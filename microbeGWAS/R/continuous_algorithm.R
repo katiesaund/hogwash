@@ -63,37 +63,40 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
 }
 
 continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
-  # Note on implementation of permutation. I've tested this as a for loop, an apply statement, and using the replicate() function.
-  # For loop was more than 10x faster than the apply statement.
-  # Foor loop was slightly faster than the replicate function.
+  # Note on implementation of this permutation. I've tested this as a for()
+  # loop, an apply statement, and using the replicate() function.
+  # for() loop was more than 10x faster than the apply statement.
+  # for() loop was slightly faster than the replicate function.
+
   # do the permutation part
-  num_sample           <- length(index_obj$trans_index)
-  all_edges            <- c(1:Nedge(tr))
-  which_branches       <- all_edges[as.logical(geno_conf[[num_i]])]
-  all_sampled_branches <- matrix(   nrow = perm, ncol = num_sample)
-  redistributed_hits   <- matrix(0, nrow = perm, ncol = length(which_branches))
-
-  # ii. Create a matrix where each row is a random sampling of the high
-  #     confidence edges of the tr where probability of choosing edges is
-  #     proportional to length of edge. Number of edges selected for the
-  #     permuted data set is the number of times the empirical genotype
-  #     appears.
-
+  num_trans_edges          <- length(index_obj$trans_index)
+  list_of_all_edges        <- c(1:Nedge(tr))
+  hi_conf_edges            <- list_of_all_edges[as.logical(geno_conf[[num_i]])]
+  num_hi_conf_edges        <- sum(geno_conf[[num_i]])
+  if (num_hi_conf_edges != length(hi_conf_edges)){
+    stop("these should be the same")
+  }
+  permuted_trans_index_mat <- matrix(   nrow = perm, ncol = num_trans_edges)
   set.seed(1) # for reproducability of the sample() function
   for (j in 1:perm){  # create a random sample of the tr
-    curr_num_branch <- length(which_branches)
-    all_sampled_branches[j, ] <- sample(1:curr_num_branch,
-                                        size = num_sample,
+    permuted_trans_index_mat[j, ] <- sample(1:num_hi_conf_edges,
+                                        size = num_trans_edges,
                                         replace = TRUE,
-                                        prob = tr$edge.length[which_branches]/sum(tr$edge.length[which_branches]))
+                                        prob = tr$edge.length[hi_conf_edges]/sum(tr$edge.length[hi_conf_edges]))
   } # end for (j)
 
-  # all_sampled_branches is my new, permuted "indices$trans_index" where each row is a new list of transition genotype branches
-  # BUT CAVEAT: these are just fake/null transitions and some of them are probably actually touching! If I wanted to be
-  # Super legit I would recreate as many hits, calculate new transitions, and then use those in my permutation test, somehow
-  # controlling for variable numbers of transitions. But not doing that for now.
-  return(list("which_branches" = which_branches,
-              "all_sampled_branches" = all_sampled_branches))
+  # permuted_trans_index_mat is my new, permuted "indices$trans_index" where
+  # each row is a new, fake list of transition genotype branches.
+  # BUT CAVEAT: these are just fake/null transitions and some of them are
+  # probably actually touching! If I wanted to be super legit I would recreate
+  # as many hits, calculate new transitions, and then use those in my permutation
+  # test, somehow controlling for variable numbers of transitions.
+
+  # Notes on variable names: on May 9, 2019 which_branches became hi_conf_edges
+  # and all_sampled_branches became permuted_trans_index_mat to clarify what
+  # each variable means.
+  return(list("hi_conf_edges" = hi_conf_edges,
+              "permuted_trans_index_mat" = permuted_trans_index_mat))
 }
 
 # genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges
@@ -168,40 +171,15 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     observed_ks_stat[i]                 <- observed_results$statistic
     trans_median[i]                     <- median(observed_results$pheno_trans_delta)
     all_edges_median[i]                 <- median(c(observed_results$pheno_trans_delta, observed_results$pheno_non_trans_delta))
-    #
 
-    # do the permutation part
-    num_sample           <- length(indices$trans_index)
-    all_edges            <- c(1:Nedge(tr))
-    which_branches       <- all_edges[as.logical(genotype_confidence[[i]])]
-    all_sampled_branches <- matrix(   nrow = permutations, ncol = num_sample)
-    redistributed_hits   <- matrix(0, nrow = permutations, ncol = length(which_branches))
-
-    # ii. Create a matrix where each row is a random sampling of the high
-    #     confidence edges of the tr where probability of choosing edges is
-    #     proportional to length of edge. Number of edges selected for the
-    #     permuted data set is the number of times the empirical genotype
-    #     appears.
-
-    set.seed(1) # for reproducability of the sample() function
-    for (j in 1:permutations){  # create a random sample of the tr
-      curr_num_branch <- length(which_branches)
-      all_sampled_branches[j, ] <- sample(1:curr_num_branch,
-                                          size = num_sample,
-                                          replace = TRUE,
-                                          prob = tr$edge.length[which_branches]/sum(tr$edge.length[which_branches]))
-    } # end for (j)
-
-    # all_sampled_branches is my new, permuted "indices$trans_index" where each row is a new list of transition genotype branches
-    # BUT CAVEAT: these are just fake/null transitions and some of them are probably actually touching! If I wanted to be
-    # Super legit I would recreate as many hits, calculate new transitions, and then use those in my permutation test, somehow
-    # controlling for variable numbers of transitions. But not doing that for now.
+    # Create permuted transition index matrix and get edge numbersof the high confidence edges
+    perm_results <- continuous_permutation(indices, tr, genotype_confidence, permutations, i)
 
     # calculate permuted pheno deltas
     empirical_ks_pval <- empirical_ks_stat <- rep(NA, permutations)
-    for (k in 1:nrow(all_sampled_branches)){
-      permuted_trans_index     <- unique(all_sampled_branches[k, ])
-      permuted_non_trans_index <- c(1:length(which_branches))[!(c(1:length(which_branches)) %in% unique(all_sampled_branches[k, ]))]
+    for (k in 1:nrow(perm_results$permuted_trans_index_mat)){
+      permuted_trans_index     <- unique(perm_results$permuted_trans_index_mat[k, ])
+      permuted_non_trans_index <- c(1:length(perm_results$hi_conf_edges))[!(c(1:length(perm_results$hi_conf_edges)) %in% unique(perm_results$permuted_trans_index_mat[k, ]))]
       empirical_results        <- run_ks_test(permuted_trans_index, permuted_non_trans_index, pheno_recon_ordered_by_edges)
       empirical_ks_pval[k]     <- empirical_results$pval
       empirical_ks_stat[k]     <- empirical_results$statistic
@@ -211,10 +189,6 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     empirical_ks_pval_list[[i]] <- empirical_ks_pval
     empirical_ks_stat_list[[i]] <- empirical_ks_stat
     pvals[i] <- (sum(1 + sum(empirical_ks_stat > observed_ks_stat[i]))/(permutations + 1))
-
-
-
-
   } # end for (i)
 
   # Return output --------------------------------------------------------------
