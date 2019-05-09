@@ -102,7 +102,15 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
 # genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges
 
 calculate_empirical_pheno_delta <- function(perm, permuted_trans_mat, hi_conf_edge_nums, pheno_by_edges){
-
+  # Calculate permuted (aka empirical) pheno deltas
+  empirical_ks_stat <- rep(NA, perm)
+  for (k in 1:perm){
+    permuted_trans_index     <- unique(permuted_trans_mat[k, ])
+    permuted_non_trans_index <- c(1:length(hi_conf_edge_nums))[!(c(1:length(hi_conf_edge_nums)) %in% unique(permuted_trans_mat[k, ]))]
+    empirical_results        <- run_ks_test(permuted_trans_index, permuted_non_trans_index, pheno_by_edges)
+    empirical_ks_stat[k]     <- empirical_results$statistic
+  } # end for (k)
+  return(empirical_ks_stat)
 }
 
 # TODO look into replicate function to make permutation test run faster

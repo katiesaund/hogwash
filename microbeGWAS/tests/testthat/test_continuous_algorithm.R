@@ -104,3 +104,22 @@ test_that("continuous_permutation is gives consistent results with this test set
   expect_equal(ncol(results$permuted_trans_index_mat), length(index$trans_index))
   expect_equal(results$permuted_trans_index_mat[1, 1:10], c(18, 8, 19, 5, 23, 25, 20, 21, 15, 38))
 })
+
+# test calculate_empirical_pheno_delta
+
+test_that("calculate_empirical_pheno_delta returns a list of valid ks-test results of length perm", {
+  perm <- 1000
+  num_isolates <- 40
+  nedge <- 78
+  set.seed(1)
+  temp_permuted_mat <- matrix(round(rnorm(perm * num_isolates, mean = 30, sd = 5), 0), nrow = perm, ncol = num_isolates)
+  set.seed(1)
+  temp_pheno <- matrix(rnorm(2 * nedge), nrow = nedge, ncol = 2)
+  temp_conf <- seq(from = 1, to = max(temp_permuted_mat), by = 2)
+  results <- calculate_empirical_pheno_delta(perm, temp_permuted_mat, temp_conf, temp_pheno)
+  length(results)
+  expect_equal(length(results), perm)
+  expect_true(max(results) < 1)
+  expect_true(min(results) > 0)
+})
+
