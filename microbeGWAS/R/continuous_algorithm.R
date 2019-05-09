@@ -187,20 +187,14 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     # Create permuted transition index matrix and get edge numbersof the high confidence edges
     perm_results <- continuous_permutation(indices, tr, genotype_confidence, permutations, i)
 
-
-
     # Calculate permuted (aka empirical) pheno deltas
-    empirical_ks_stat <- rep(NA, permutations)
-    for (k in 1:permutations){
-      permuted_trans_index     <- unique(perm_results$permuted_trans_index_mat[k, ])
-      permuted_non_trans_index <- c(1:length(perm_results$hi_conf_edges))[!(c(1:length(perm_results$hi_conf_edges)) %in% unique(perm_results$permuted_trans_index_mat[k, ]))]
-      empirical_results        <- run_ks_test(permuted_trans_index, permuted_non_trans_index, pheno_recon_ordered_by_edges)
-      empirical_ks_stat[k]     <- empirical_results$statistic
-    } # end for (k)
+    empirical_ks_stat <- calculate_empirical_pheno_delta(permutations, perm_results$permuted_trans_index_mat, perm_results$hi_conf_edges, pheno_recon_ordered_by_edges)
 
-    # empirical p value caluclation here: (1 + more extreme observations) / (1 + permutations)
-    empirical_ks_stat_list[[i]] <- empirical_ks_stat
+    # empirical p value calculation here: (1 + more extreme observations) / (1 + permutations)
     pvals[i] <- (sum(1 + sum(empirical_ks_stat > observed_ks_stat[i]))/(permutations + 1))
+
+    # Save these for reporting / plots
+    empirical_ks_stat_list[[i]] <- empirical_ks_stat
   } # end for (i)
 
   # Return output --------------------------------------------------------------
