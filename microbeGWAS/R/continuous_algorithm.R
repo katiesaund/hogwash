@@ -193,7 +193,7 @@ calculate_empirical_pheno_delta <- function(perm, permuted_trans_mat, hi_conf_ed
   return(empirical_ks_stat)
 }
 
-calculate_genotype_significance <- function(mat, permutations, genotype_transition_list, tr, pheno_recon_ordered_by_edges, genotype_confidence, genotype_reconstruction){
+continuous_calculate_pvals <- function(mat, permutations, genotype_transition_list, tr, pheno_recon_ordered_by_edges, genotype_confidence, genotype_reconstruction){
   # Function description -------------------------------------------------------
   #
   # Input:
@@ -283,7 +283,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
                   "trans_median" = trans_median, "all_edges_median" = all_edges_median,
                   "num_genotypes" = ncol(mat), "observed_ks_stat" = observed_ks_stat) # 2018-11-28
   return(results)
-} # end calculate_genotype_significance()
+} # end continuous_calculate_pvals()
 
 get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
   # Function description -------------------------------------------------------

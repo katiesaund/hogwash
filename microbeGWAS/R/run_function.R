@@ -182,13 +182,12 @@ run_phyc <- function(args){
     for (k in 1:ncol(genotype)){
       genotype_transition_edges[[k]] <- geno_trans[[k]]$transition
     }
-
     results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges, pheno_trans$transition,       genotype)
     results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, genotype)
 
-    # TODO make sure that the input into calculate_hit_pvals_corrected is appropriate for overlap vs phyc tests.
-    disc_trans_results <- calculate_hit_pvals_corrected(genotype_transition_edges, pheno_trans$transition, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
-    disc_recon_results <- calculate_hit_pvals_corrected(genotype_transition_edges, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
+    # TODO make sure that the input into discrete_calculate_pvals is appropriate for overlap vs phyc tests.
+    disc_trans_results <- discrete_calculate_pvals(genotype_transition_edges, pheno_trans$transition, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
+    disc_recon_results <- discrete_calculate_pvals(genotype_transition_edges, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
 
     corrected_pvals_trans <- get_sig_hits_while_correcting_for_multiple_testing(disc_trans_results$hit_pvals, args$fdr)
     corrected_pvals_recon <- get_sig_hits_while_correcting_for_multiple_testing(disc_recon_results$hit_pvals, args$fdr)

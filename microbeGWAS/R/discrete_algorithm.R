@@ -79,7 +79,7 @@ count_hits_on_edges <- function(genotype_transition_edges, phenotype_reconstruct
   return(hit_counts)
 } #end count_hits_on_edges()
 
-calculate_hit_pvals_corrected <- function(genotype_transition_edges, phenotype_reconstruction, tr, mat, permutations, alpha, high_confidence_edges){
+discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_reconstruction, tr, mat, permutations, alpha, high_confidence_edges){
   # Function description -------------------------------------------------------
   # calculate_genotype_pvals is the "meat" of the phyC algorithm.
   # calculate_genotype_pvals returns the empirical p-value for each observed genotype.
@@ -228,4 +228,4 @@ calculate_hit_pvals_corrected <- function(genotype_transition_edges, phenotype_r
   results <- list("hit_pvals" = hit_pvals, "permuted_count" = record_of_redistributed_both_present, "observed_overlap" = both_present)
 
   return(results)
-} # end calculate_hit_pvals_corrected
+} # end discrete_calculate_pvals

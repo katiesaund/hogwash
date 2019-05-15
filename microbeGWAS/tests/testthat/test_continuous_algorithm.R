@@ -33,8 +33,8 @@ test_that("get_sig_hits_while_correcting_for_multiple_testing gives known adjust
   expect_equal(nrow(results$sig_pvals), 0)
 })
 
-# test calculate_genotype_significance
-test_that("calculate_genotype_significance gives expected results given valid inputs", {
+# test continuous_calculate_pvals
+test_that("continuous_calculate_pvals gives expected results given valid inputs", {
   num_isolates <- 5
   num_loci <- 8
   set.seed(1)
@@ -51,7 +51,7 @@ test_that("calculate_genotype_significance gives expected results given valid in
   }
   set.seed(1)
   temp_pheno <- matrix(rnorm(Nedge(temp_tree) * 2), ncol = 2, nrow = Nedge(temp_tree))
-  results <- calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
+  results <- continuous_calculate_pvals(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
   expect_equal(results$num_genotypes, num_loci)
   expect_equal(round(results$observed_ks_stat[1], 3), 0.333)
   expect_equal(round(results$all_edges_median[1], 3), 0.993)
@@ -63,7 +63,7 @@ test_that("calculate_genotype_significance gives expected results given valid in
 })
 
 
-test_that("calculate_genotype_significance returns a significant p-value when
+test_that("continuous_calculate_pvals returns a significant p-value when
           phenotype change is noticeably higher on transition edges than on
           non-transition tree edges", {
   num_isolates <- 5
@@ -84,7 +84,7 @@ test_that("calculate_genotype_significance returns a significant p-value when
   temp_pheno <- matrix(c(-1, -1, 10, -.5, 10, 10, 0, 0, 0, -.5, 11, 30, 100, 40, 150, 0.1), ncol = 2, nrow = Nedge(temp_tree))
   # Transition edges deltas: 10, 90, 30
   # Non-transition edge deltas: 3, 1, 1
-  results <- calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
+  results <- continuous_calculate_pvals(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
   alpha <- 0.06
   expect_true(results$pvals[1] < alpha)
   expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1]- temp_pheno[ , 2])))
@@ -95,7 +95,7 @@ test_that("calculate_genotype_significance returns a significant p-value when
   expect_equal(round(results$ks_statistics[[1]][1:5], 3), c(0.40, 0.50, 1.00, 0.25, 0.25))
 })
 
-test_that("calculate_genotype_significance returns a non-significant p-value when
+test_that("continuous_calculate_pvals returns a non-significant p-value when
           phenotype change is identical on transition and non-transition edges", {
   num_isolates <- 4
   num_loci <- 2
@@ -115,7 +115,7 @@ test_that("calculate_genotype_significance returns a non-significant p-value whe
   temp_pheno <- matrix(c(-15, -15, 10, 0, 10, 10, -10, 0, 7, 5, 25, 7), ncol = 2, nrow = Nedge(temp_tree))
   # Transition edges deltas: 5 15 3
   # Non-transition edge deltas: 5 15 3
-  results <- calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
+  results <- continuous_calculate_pvals(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
   alpha <- 0.01
   expect_true(results$pvals[1] > alpha)
   expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1]- temp_pheno[ , 2])))
@@ -125,7 +125,7 @@ test_that("calculate_genotype_significance returns a non-significant p-value whe
   expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2]))
 })
 
-test_that("calculate_genotype_significance returns an error when the only
+test_that("continuous_calculate_pvals returns an error when the only
           confident edges are transition edges. (All non-transition edges are
           low confidence)", {
   num_isolates <- 4
@@ -146,7 +146,7 @@ test_that("calculate_genotype_significance returns an error when the only
   temp_pheno <- matrix(c(-15, -15, 10, 0, 10, 10, -10, 0, 7, 5, 25, 7), ncol = 2, nrow = Nedge(temp_tree))
   # Transition edges deltas: 5 15 3
   # Non-transition edge deltas: 5 15 3
-  expect_error(calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon))
+  expect_error(continuous_calculate_pvals(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon))
 })
 
 
