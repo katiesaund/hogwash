@@ -20,8 +20,10 @@ test_that("calculate_permutation_based_p_value returns a non-significant p-value
 
 # test count_hits_on_edges
 test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with genotype given this test data", {
-  num_edge <- 10
   num_samples <- 6
+  temp_tree <- rtree(num_samples)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  num_edge <- Nedge(temp_tree)
   temp_geno_recon <- temp_hi_conf_edges <- rep(list(0), num_samples)
   for (k in 1:num_samples){
     temp_geno_recon[[k]] <- temp_hi_conf_edges[[k]] <- rep(1, num_edge)
@@ -30,23 +32,28 @@ test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with geno
   num_just_geno_present <- num_edge - num_pheno_and_geno_present
   temp_pheno_recon <- c(rep(1, num_pheno_and_geno_present), rep(0, num_just_geno_present))
 
-  results <- count_hits_on_edges(temp_geno_recon, temp_pheno_recon, temp_hi_conf_edges)
-  expect_equal( results$both_present[1], num_pheno_and_geno_present)
+  results <- count_hits_on_edges(temp_geno_recon, temp_pheno_recon, temp_hi_conf_edges, temp_tree)
+  expect_equal(results$both_present[1], num_pheno_and_geno_present)
   expect_equal(results$only_geno_present[1], num_just_geno_present)
 })
 
-#   both_present <- sapply(1:length(high_confidence_edges), function(x) {
-#     sum(phenotype_reconstruction[as.logical(high_confidence_edges[[x]])] + genotype_reconstruction[[x]][as.logical(high_confidence_edges[[x]])] == 2)
-#   })
-#
-#   only_geno_present <- sapply(1:length(high_confidence_edges), function(x) {
-#     sum(genotype_reconstruction[[x]][as.logical(high_confidence_edges[[x]])]) - both_present[x]
-#   })
-#
-#   hit_counts <- list("both_present" = both_present, "only_geno_present" = only_geno_present)
-#   return(hit_counts)
-# } #end count_hits_on_edges()
-#
+test_that("count_hits_on_edges returns 0 edges shared and 0 edges only with genotype given this all absent genotype", {
+  num_samples <- 6
+  temp_tree <- rtree(num_samples)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  num_edge <- Nedge(temp_tree)
+  temp_geno_recon <- temp_hi_conf_edges <- rep(list(0), num_samples)
+  for (k in 1:num_samples){
+    temp_geno_recon[[k]] <- temp_hi_conf_edges[[k]] <- rep(0, num_edge)
+  }
+  temp_pheno_recon <- rep(1, num_edge)
+  results <- count_hits_on_edges(temp_geno_recon, temp_pheno_recon, temp_hi_conf_edges, temp_tree)
+  expect_equal(results$both_present[1], 0)
+  expect_equal(results$only_geno_present[1], 0)
+})
+
+
+
 # calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, tr, mat, permutations, alpha, high_confidence_edges){
 #   # calculate_genotype_pvals is the "meat" of the phyC algorithm.
 #   # calculate_genotype_pvals returns the empirical p-value for each observed genotype.

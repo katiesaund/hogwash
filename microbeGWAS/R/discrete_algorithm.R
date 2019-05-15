@@ -32,42 +32,49 @@ calculate_permutation_based_p_value <- function(empirical_statistic, observed_st
   return(pval)
 }
 
-count_hits_on_edges <- function(genotype_reconstruction, phenotype_reconstruction, high_confidence_edges){
-  # TODO: update description
-  # 1) We're now workingwith ordered by edges rather than ordered by tips then nodes
-  # 2) rename combined/genotype confidence. it's confusing.
-  # 3) stop returning combined_confidence- don't need it.
+count_hits_on_edges <- function(genotype_transition_edges, phenotype_reconstruction, high_confidence_edges, tr){
   # Function description -------------------------------------------------------
+  # For each genotype, return a count of the number of edges for which the
+  # genotype is a transition and the phenotype is present (when using
+  # reconstruction)/phenotype is a transition (when using transition). Also,
+  # return a count of the number of edges for which the just the genotype is a
+  # transition (phenotype is either a 0 reconstruction or not a transition).
+  # TODO: This approach assumes that the genotype_transition_edges being fed into it are all 0 > 1 for original phyC. Not sure if there is an assumption in place for the overlap test.
   # Inputs:
-  # Varname. Var class. Description.
-  # genotype_reconstruction. List of numeric vectors. Each vector corresponds with 1 genotype from the geno_mat. The numbers in each vector correspond to an edge on the tree.
-  # Each entry in the vector corresponds to edge
-  # phenotype_reconstruction is a vector where each entry corresponds to a node or tip.
-  # genotype_confidence is a list of vectors. Each vector corresponds with 1 genotype from the geno_mat.
-  # Each entry in the vector corresponds to a node or tip. 1 means high confidence in the node, 0 means low confidence.
+  # genotype_transition_edges. List of numeric vectors. Each vector corresponds with one genotype from the geno_mat. The numbers in each vector correspond to an edge on the tree.
+  # phenotype_reconstruction. Numeric vector. Each entry corresponds to an edge.
+  # high_confidence_edges. List of vectors. Each vector corresponds to the confidence of 1 genotype from the geno_mat. Each entry in the vector corresponds to an edge on the tree.
+  #                        1 means high confidence in the node, 0 means low confidence.
+  #
   # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
+  # "both_present" = both_present. Length = number of genotypes.
+  # "only_geno_present" = only_geno_present. Length = number of genotypes.
   #
   # Check input ----------------------------------------------------------------
-  if(length(genotype_reconstruction[[1]]) != length(phenotype_reconstruction)){
-    stop("Genotype reconstruction and phenotype reconstruction must be the same length")
+  check_for_root_and_bootstrap(tr)
+  check_is_number(genotype_transition_edges[[1]][1])
+  check_is_number(high_confidence_edges[[1]][1])
+  check_is_number(phenotype_reconstruction[1])
+
+  if(length(genotype_transition_edges[[1]]) != Nedge(tr)){
+    stop("Genotype transition edge vector must have an entry for each tree edge.")
   }
-  if(length(high_confidence_edges[[1]]) != length(phenotype_reconstruction)){
-    stop("Reconstruction confidence and phenotype reconstruction must be the same length")
+  if(length(phenotype_reconstruction) != Nedge(tr)){
+    stop("Phenotype transition or reconstruction edge vector must have an entry for each tree edge.")
   }
-  if (length(high_confidence_edges) != length(genotype_reconstruction)){
-    stop("There should be a confidence vector for each genotype reconstruction.")
+  if(length(high_confidence_edges[[1]]) != Nedge(tr)){
+    stop("Reconstruction confidence and must have an entry for each tree edge.")
   }
   # Function -------------------------------------------------------------------
   both_present <- sapply(1:length(high_confidence_edges), function(x) {
-    sum(phenotype_reconstruction[as.logical(high_confidence_edges[[x]])] + genotype_reconstruction[[x]][as.logical(high_confidence_edges[[x]])] == 2)
+    sum(phenotype_reconstruction[as.logical(high_confidence_edges[[x]])] + genotype_transition_edges[[x]][as.logical(high_confidence_edges[[x]])] == 2)
   })
 
   only_geno_present <- sapply(1:length(high_confidence_edges), function(x) {
-    sum(genotype_reconstruction[[x]][as.logical(high_confidence_edges[[x]])]) - both_present[x]
+    sum(genotype_transition_edges[[x]][as.logical(high_confidence_edges[[x]])]) - both_present[x]
   })
 
-  # Return output --------------------------------------------------------------
+  # Check and return output ----------------------------------------------------
   hit_counts <- list("both_present" = both_present, "only_geno_present" = only_geno_present)
   return(hit_counts)
 } #end count_hits_on_edges()
