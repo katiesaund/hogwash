@@ -197,7 +197,7 @@ continuous_calculate_pvals <- function(mat, permutations, genotype_transition_li
   # Function description -------------------------------------------------------
   #
   # Input:
-  # mat. Matrix. Nrow(mat) == number of genotypes. Each column is a variant. Matrix is binary.
+  # mat. Matrix. Nrow(mat) == number of samples. Each column is a variant. Matrix is binary.
   # permutations. Integer. Number of times to run the permutation test.
   # genotype_transition_list. List of lists. Length(genotype_transition_list) == number of genotypes.
   #                           For each genotype there are two lists: $transition and $trans_dir

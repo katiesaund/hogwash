@@ -1,5 +1,3 @@
-# DISCRETE PHYC LIBRARY -------------------------------------------------------#
-
 calculate_permutation_based_p_value <- function(empirical_statistic, observed_statistic, num_perm){
   # Function description -------------------------------------------------------
   # Given all of the empirical statistics derived from permutations, count how
@@ -79,10 +77,10 @@ count_hits_on_edges <- function(genotype_transition_edges, phenotype_reconstruct
   return(hit_counts)
 } #end count_hits_on_edges()
 
-discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_reconstruction, tr, mat, permutations, alpha, high_confidence_edges){
+discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_reconstruction, tr, mat, permutations, fdr, high_confidence_edges){
   # Function description -------------------------------------------------------
-  # calculate_genotype_pvals is the "meat" of the phyC algorithm.
-  # calculate_genotype_pvals returns the empirical p-value for each observed genotype.
+  # discrete_calculate_pvals is the "meat" of the discrete phyC algorithm.
+  # discrete_calculate_pvals returns the empirical p-value for each observed genotype.
   # Algorithm overview:
   # 1. Subset tree edges to those with high confidence (as determined by phenotype & genotype reconstructions as well as tree bootstrap values).
   # 2. For each genotype from the genotype_matrix:
@@ -91,15 +89,20 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   #         edges selected for the permuted data set is the number of times the empirical genotype appears.
   #    iii. Calculate when the randomly permuted genotype overlap with the high confidence phenotype (these values create the null distribution for the permuted genotypes)
   #    iv.  Calculate empirical p-values.
-  #    v.   Plot observed values on the null distribution.
-
+  #
   # Inputs:
-  # hit_counts.               List.    2 part list containing results of count_hits_on_edges
-  # phenotype_reconstruction. Numeric. 0/1. Length of Nedge(tree)
-  # tree:                     Phylo.   Rooted phylogenetic tree.
-  # mat:                      Matrix.  The genotype matrix. All entries are either 0 or 1. No NAs.
-  # permutations:             Number.  The number of permutations.
-  # alpha.                    Number.  Significance threshold.
+  # genotype_transition_edges. List of vectors. Length(genotype_transition_list) == number of genotypes.
+  #                           Length(each vector) == Nedge(tr).
+  #                           Each of these are either 0, 1.
+  # phenotype_reconstruction. Vector. Length() == Nedge(tr).
+  #   Note: Phenotype reconstruction could instead by phenotype transition vector.
+  # tr. Phylo.   Rooted phylogenetic tree.
+  # mat. Numeric matrix.  The genotype matrix. Nrow(mat) == number of isolates == Ntip(tr). Each column is a variant. Matrix is binary (0 or 1).
+  # permutations. Integer.  The number of times to run the permutation test.
+  # fdr. Number.  Significance threshold.
+  # high_confidence_edges. List. Length(list) = ncol(mat) == number of genotypes.
+  #                      Each entry is a vector with length == Nedge(tr). All
+  #                      entries are 0 (low confidence) or 1 (high confidence).
   #
   # Outputs:
   # "hit_pvals" = hit_pvals.
@@ -107,6 +110,25 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   # "observed_overlap" = both_present.
   #
   # Check input ----------------------------------------------------------------
+  if (ncol(mat) != length(genotype_transition_edges)){
+    stop("Genotype transition edges should have a vector for each genotype")
+  }
+  if (length(genotype_transition_edges[[1]]) != Nedge(tr)){
+    stop("Genotype transition edges should be made of vectors of length == Nedge(tree)")
+  }
+  if (length(phenotype_reconstruction) != Nedge(tr)){
+    stop("Phenotype reconstruction or transition vector should have length == Nedge(tree)")
+  }
+  check_if_permutation_num_valid(permutations)
+  check_for_root_and_bootstrap(tr)
+  check_num_between_0_and_1(fdr)
+  if (ncol(mat) != length(high_confidence_edges)){
+    stop("Confidence list should have a vector for each genotype.")
+  }
+  if (length(high_confidence_edges[[1]]) != Nedge(tr)){
+    stop("Confidence list should be made of vectors of length == Nedge(tree)")
+  }
+
 
   # Function -------------------------------------------------------------------
   branch_overlap <- count_hits_on_edges(genotype_transition_edges, phenotype_reconstruction, high_confidence_edges, tr)
@@ -208,7 +230,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       temp_pval <- ((new_counter + 1)/(permutations + 1))
       # Katie TODO 2019-02-26: save the new counter for each permutation, then plot that with the real as a red bar, add p val on top.
 
-      if (sort(redistributed_both_present, decreasing = FALSE)[(alpha * permutations)] == 0 & both_present[i] == 0){
+      if (sort(redistributed_both_present, decreasing = FALSE)[(fdr * permutations)] == 0 & both_present[i] == 0){
         pval <- 1
       } else if (temp_pval == 0 | temp_pval == 1){
         pval <- 2/(permutations + 1)
