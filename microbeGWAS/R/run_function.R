@@ -185,15 +185,12 @@ run_phyc <- function(args){
 
     # TODO make sure that the input into count_hits_on_edges is appropriate for overlap vs phyc tests.
     branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_trans$transition, high_conf_ordered_by_edges, args$tree)
-    # branch_overlap_recon <- count_hits_on_edges(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
     branch_overlap_recon <- count_hits_on_edges(genotype_transition_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, args$tree)
 
     results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges, pheno_trans$transition,       genotype)
-    # results_object$contingency_table_recon <- create_contingency_table(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, genotype)
     results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, genotype)
 
     disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_trans$transition, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
-    # disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
     disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
 
     hit_pvals_trans <- disc_trans_results$hit_pvals
