@@ -37,8 +37,14 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   # Function -------------------------------------------------------------------
   p_trans_delta     <- calculate_phenotype_change_on_edge(t_index,     phenotype_by_edges)
   p_non_trans_delta <- calculate_phenotype_change_on_edge(non_t_index, phenotype_by_edges)
+
+  # withCalligHandlers suppresses the warning message: 'cannot compute exact p-value with ties'
   set.seed(1)
-  ks_results        <- ks.test(p_trans_delta, p_non_trans_delta)
+  ks_results <-  withCallingHandlers(ks.test(p_trans_delta, p_non_trans_delta),
+                      warning=function(w) {
+                        if (grepl("cannot compute exact p-value with ties", w$message))
+                          invokeRestart("muffleWarning")
+                      } )
 
   # Return output --------------------------------------------------------------
   results <- list("pval"      = round(ks_results$p.value, digits = 20),
@@ -168,7 +174,7 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   # each variable means.
 
   # Check and return output ----------------------------------------------------
-  check_dimensions(permuted_trans_index_mat, exact_rows = perm, min_rows = perm, NULL, NULL)
+  check_dimensions(permuted_trans_index_mat, exact_rows = perm, min_rows = perm, exact_cols = NULL, min_cols = 1)
   return(list("hi_conf_edges" = hi_conf_edges,
               "permuted_trans_index_mat" = permuted_trans_index_mat))
 }
@@ -264,7 +270,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
     empirical_ks_stat <- calculate_empirical_pheno_delta(permutations, perm_results$permuted_trans_index_mat, perm_results$hi_conf_edges, pheno_recon_ordered_by_edges)
 
     # empirical p value calculation here: (1 + more extreme observations) / (1 + permutations)
-    pvals[i] <- (sum(1 + sum(empirical_ks_stat > observed_ks_stat[i]))/(permutations + 1))
+    pvals[i] <- calculate_permutation_based_p_value(empirical_ks_stat, observed_ks_stat[i], permutations)
 
     # Save these for reporting / plots
     empirical_ks_stat_list[[i]] <- empirical_ks_stat

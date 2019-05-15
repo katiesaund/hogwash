@@ -123,6 +123,7 @@ run_phyc <- function(args){
   }
 
   print("B")
+  # as of 2019-05-15 assign_high_confidence_to_transition_edges is so stringent that no genotype is getting included after this!
   only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans, genotype)
   results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
   for (i in 1:ncol(genotype)){

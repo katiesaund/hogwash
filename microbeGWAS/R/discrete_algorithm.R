@@ -1,5 +1,37 @@
 # DISCRETE PHYC LIBRARY -------------------------------------------------------#
 
+calculate_permutation_based_p_value <- function(empirical_statistic, observed_statistic, num_perm){
+  # Function description -------------------------------------------------------
+  # Given all of the empirical statistics derived from permutations, count how
+  # many of the empirical/permuted test statistics are greater than or equal to
+  # the observed/real test statistic.
+  # Adding one in the numerator and denominator accounts for the observed value.
+  #
+  # Inputs:
+  # empirical_statistic. Numeric vector. Length = num_perm.
+  # observed_statistic. Number. Length = 1.
+  # num_perm. Number.
+  #
+  # Outputs:
+  # pval = Number. Length = 1. Value between 0 and 1.
+  #
+  # Check input ----------------------------------------------------------------
+  if (length(empirical_statistic) != num_perm){
+    stop("Number of empirical test statistics should be equal to the number of permutations")
+  }
+  check_is_number(observed_statistic)
+  check_is_number(num_perm)
+  check_if_permutation_num_valid(num_perm)
+  check_is_number(empirical_statistic[1])
+
+  # Function -------------------------------------------------------------------
+  pval <- (sum(1 + sum(empirical_statistic >=  observed_statistic)) / (num_perm + 1))
+
+  # Check and return output ----------------------------------------------------
+  check_num_between_0_and_1(pval)
+  return(pval)
+}
+
 count_hits_on_edges <- function(genotype_reconstruction, phenotype_reconstruction, high_confidence_edges, phenotype_confidence){
   # TODO: update description
   # 1) We're now workingwith ordered by edges rather than ordered by tips then nodes
@@ -190,7 +222,7 @@ calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, 
       } else if (temp_pval <= 0.5){
         pval <- (temp_pval * 2)
       }
-
+z
       record_of_redistributed_both_present[[i]] <- redistributed_both_present
       hit_pvals[i] <- format(round(pval, 20), nsmall = 20)
     }
