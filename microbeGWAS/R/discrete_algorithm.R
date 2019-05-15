@@ -141,56 +141,54 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   both_present      <- observed_result$both_present
   only_geno_present <- observed_result$only_geno_present
 
+
   # initialize some values
-  num_sample                            <- both_present + only_geno_present
-  distribution_of_hits_from_permutation <- rep(0, length(both_present))
-  hit_pvals                             <- rep(NA, ncol(mat))
-  num_branch                            <- sapply(high_confidence_edges, function(x) sum(x))
-  all_edges                             <- c(1:Nedge(tr))
-  which_branches                        <- list(rep(0, length(high_confidence_edges)))
+  num_genotypes                         <- ncol(mat)
+  num_edges_with_geno_trans             <- both_present + only_geno_present
+  distribution_of_hits_from_permutation <- rep(0, num_genotypes)
+  hit_pvals                             <- rep(NA, num_genotypes)
+  num_hi_conf_edges                     <- sapply(high_confidence_edges, function(x) sum(x))
+  list_of_all_edges                     <- c(1:Nedge(tr))
+  hi_conf_edges                        <- list(rep(0, num_genotypes))
 
   # 1. Subset tr edges to those with high confidence (as determined by phenotype & genotype reconstructions as well as tr bootstrap values).
-  for (i in 1:length(high_confidence_edges)){
-    if (length(all_edges) == length(high_confidence_edges[[i]])){
-      which_branches[[i]] <- all_edges[as.logical(high_confidence_edges[[i]])]
-    }
+  for (i in 1:num_genotypes){
+    hi_conf_edges[[i]] <- list_of_all_edges[as.logical(high_confidence_edges[[i]])]
   }
 
   # 2. For each genotype from the genotype_matrix:
-  record_of_redistributed_both_present <- rep(list(0), length(both_present))
-  for (i in 1:length(both_present)){ # looping over each genotype in the genotype_matrix
-    if (num_sample[i] > num_branch[i]){
+  record_of_redistributed_both_present <- rep(list(0), num_genotypes)
+  for (i in 1:num_genotypes){ # looping over each genotype in the genotype_matrix
+    if (num_edges_with_geno_trans[i] > num_hi_conf_edges[i]){
       stop("Too many hits on the branches")
     }
     if((both_present[[i]] + only_geno_present[[i]]) < 2){
       # If there are 1 or 0 high confidence edges with the genotype present then the p-value should be reported as 1.0;
-      # both present and just hit present are made up of only high confidence branches as defined in count_hits_on_edges
+      # both_present and only_geno_present are made up of only high confidence branches as defined in count_hits_on_edges
       # which isn't quite true but will indicate that we cannot calculate a p-value because we cannot detect any
       # convergence with one or fewer affected branches. And that we should skip to the next genotype to run the permutation test.
       hit_pvals[i] <- 1.0
     } else {
       # initialize some counters/variables for this loop
-      counter              <- 0
-      resampling_record    <- numeric(0)
-      all_sampled_branches <- matrix(nrow = permutations, ncol = num_sample[i])
-      redistributed_hits   <- matrix(0, nrow = permutations, ncol = length(which_branches[[i]]))
+      permuted_geno_trans_mat <- matrix(nrow = permutations, ncol = num_edges_with_geno_trans[i])
+      redistributed_hits   <- matrix(0, nrow = permutations, ncol = num_genotypes)
+
       # create a random sample of the tr
       set.seed(1)
       for(j in 1:permutations){
-        curr_num_branch <- num_branch[i]
-        all_sampled_branches[j, ] <- sample(1:curr_num_branch,
-                                            size = num_sample[i],
+        permuted_geno_trans_mat[j, ] <- sample(1:num_hi_conf_edges[i],
+                                            size = num_edges_with_geno_trans[i],
                                             replace = TRUE,
-                                            prob = tr$edge.length[which_branches[[i]]]/sum(tr$edge.length[which_branches[[i]]]))
+                                            prob = tr$edge.length[hi_conf_edges[[i]]]/sum(tr$edge.length[hi_conf_edges[[i]]]))
       }
 
-      #this if statement deals with situation when num_sampled = 1
-      if(nrow(all_sampled_branches) != permutations){
-        all_sampled_branches <- t(all_sampled_branches)
+      #this if statement deals with situation when num_edges_with_geno_trans = 1
+      if(nrow(permuted_geno_trans_mat) != permutations){
+        permuted_geno_trans_mat <- t(permuted_geno_trans_mat)
       }
 
-      for (m in 1:nrow(all_sampled_branches)){
-        redistributed_hits[m, ][all_sampled_branches[m, ]] <- 1
+      for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:permutations
+        redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
       }
       # right now redistributed hits is simply a matrix marking which edges we hit during
       # the permutation step above- because the point of the permutation is to pretend as if
@@ -205,9 +203,9 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       })
 
       # now beginning calculating when the randomly permuted "genotypes" overlap with the hi confidence phenotype
-      temp <- matrix(0, nrow = permutations, ncol = length(which_branches[[i]])) #used to be length(Nedge(tree))
+      temp <- matrix(0, nrow = permutations, ncol = num_genotypes) #used to be length(Nedge(tree))
       redistributed_both_present <- rep(0, permutations)
-      two <- rep(2, length(which_branches[[i]]))
+      two <- rep(2, num_genotypes)
 
       for (p in 1:permutations){
         if (length(redistributed_hits[p, ]) == length(phenotype_reconstruction[as.logical(high_confidence_edges[[i]])])){
@@ -248,7 +246,6 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
     }
   }
   names(hit_pvals) <- colnames(mat)
-
 
   # Return output --------------------------------------------------------------
   results <- list("hit_pvals" = hit_pvals, "permuted_count" = record_of_redistributed_both_present, "observed_overlap" = both_present)
