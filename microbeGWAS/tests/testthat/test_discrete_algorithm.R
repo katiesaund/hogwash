@@ -1,7 +1,7 @@
 library(microbeGWAS)
 context("Discrete algorithm") -------------------------------------------------#
 
-
+# test calculate_permutation_based_p_value
 test_that("calculate_permutation_based_p_value returns a significant p-value when statistics are much lower than observed", {
   nperm <- 1000
   permuted_tests <- rep(0.1, nperm)
@@ -17,78 +17,24 @@ test_that("calculate_permutation_based_p_value returns a non-significant p-value
   alpha <- 0.01
   expect_true(calculate_permutation_based_p_value(permuted_tests, real_test, nperm) > alpha)
 })
-  # calculate_permutation_based_p_value <- function(empirical_statistic, observed_statistic, num_perm){
-  #   # Function description -------------------------------------------------------
-  #   # Given all of the empirical statistics derived from permutations, count how
-  #   # many of the empirical/permuted test statistics are greater than or equal to
-  #   # the observed/real test statistic.
-  #   # Adding one in the numerator and denominator accounts for the observed value.
-  #   #
-  #   # Inputs:
-  #   # empirical_statistic. Numeric vector. Length = num_perm.
-  #   # observed_statistic. Number. Length = 1.
-  #   # num_perm. Number.
-  #   #
-  #   # Outputs:
-  #   # pval = Number. Length = 1. Value between 0 and 1.
-  #   #
-  #   # Check input ----------------------------------------------------------------
-  #   if (length(empirical_statistic != num_perm)){
-  #     stop("Number of empirical test statistics should be equal to the number of permutations")
-  #   }
-  #   check_is_number(observed_statistic)
-  #   check_is_number(num_perm)
-  #   check_if_permutation_num_valid(num_perm)
-  #   check_is_number(empirical_statistic[1])
-  #
-  #   # Function -------------------------------------------------------------------
-  #   pval <- (sum(1 + sum(empirical_statistic >=  observed_statistic)) / (num_perm + 1))
-  #
-  #   # Check and return output ----------------------------------------------------
-  #   check_num_between_0_and_1(pval)
-  #   return(pval)
-  # }
 
+# test count_hits_on_edges
+test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with genotype given this test data", {
+  num_edge <- 10
+  num_samples <- 6
+  temp_geno_recon <- temp_hi_conf_edges <- rep(list(0), num_samples)
+  for (k in 1:num_samples){
+    temp_geno_recon[[k]] <- temp_hi_conf_edges[[k]] <- rep(1, num_edge)
+  }
+  num_pheno_and_geno_present <- 3
+  num_just_geno_present <- num_edge - num_pheno_and_geno_present
+  temp_pheno_recon <- c(rep(1, num_pheno_and_geno_present), rep(0, num_just_geno_present))
 
-
-test_that("count_hits_on_edges does X given y", {
-
+  results <- count_hits_on_edges(temp_geno_recon, temp_pheno_recon, temp_hi_conf_edges)
+  expect_equal( results$both_present[1], num_pheno_and_geno_present)
+  expect_equal(results$only_geno_present[1], num_just_geno_present)
 })
 
-
-# count_hits_on_edges <- function(genotype_reconstruction, phenotype_reconstruction, high_confidence_edges, phenotype_confidence){
-#   # TODO: update description
-#   # 1) We're now workingwith ordered by edges rather than ordered by tips then nodes
-#   # 2) rename combined/genotype confidence. it's confusing.
-#   # 3) stop returning combined_confidence- don't need it.
-#
-#   # genotype_reconstruction is a list of vectors. Each vector corresponds with 1 genotype from the geno_mat.
-#   # Each entry in the vector corresponds to edge
-#   # phenotype_reconstruction is a vector where each entry corresponds to a node or tip.
-#   # genotype_confidence is a list of vectors. Each vector corresponds with 1 genotype from the geno_mat.
-#   # Each entry in the vector corresponds to a node or tip. 1 means high confidence in the node, 0 means low confidence.
-#   # phenotype_confidence is a vector where each entry corresponds to a node of tip. Same encoding as above.
-#
-#   # TODO add checks / validations
-#   # Function description -------------------------------------------------------
-#   # TODO
-#   # Compute ancestral reconstruction from a continuous or discrete input.
-#   #
-#   # Inputs:
-#   # Varname. Var class. Description.
-#   #
-#   # Outputs:
-#   # "anc_rec" = ML_anc_rec. Vector. Description.
-#   #
-#   # Check input ----------------------------------------------------------------
-#
-#   # Function -------------------------------------------------------------------
-#
-#   # Return output --------------------------------------------------------------
-#
-#
-#   # FUNCTION ------------------------------------------------------------------#
-#
 #   both_present <- sapply(1:length(high_confidence_edges), function(x) {
 #     sum(phenotype_reconstruction[as.logical(high_confidence_edges[[x]])] + genotype_reconstruction[[x]][as.logical(high_confidence_edges[[x]])] == 2)
 #   })

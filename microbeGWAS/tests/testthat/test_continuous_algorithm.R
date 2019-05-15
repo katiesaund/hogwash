@@ -59,14 +59,14 @@ test_that("calculate_genotype_significance gives expected results given valid in
   expect_equal(results$observed_pheno_non_trans_delta[[1]], c(0.4890317, 1.3942315, 0.7832583))
   expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), c(1.202, 2.347, 0.638))
   expect_equal(round(results$ks_statistics[[1]][1:5], 3), c(0.50, 0.25, 0.75, 0.80, 0.50))
-  expect_equal(round(results$pvals, 3), rep(0.812, num_loci))
+  expect_equal(round(results$pvals, 3), rep(0.98, num_loci))
 })
 
 
 test_that("calculate_genotype_significance returns a significant p-value when
           phenotype change is noticeably higher on transition edges than on
           non-transition tree edges", {
-  num_isolates <- 4
+  num_isolates <- 5
   num_loci <- 2
   set.seed(1)
   temp_tree <- rtree(num_isolates)
@@ -75,24 +75,24 @@ test_that("calculate_genotype_significance returns a significant p-value when
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
   for (i in 1:num_loci){
-    temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
-    temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
-    temp_conf[[i]]                  <- c(1, 1, 1, 1, 1, 1)
-    temp_geno_recon[[i]]            <- c(1, 1, 1, 1, 1, 1)
+    temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1, 1, 0)
+    temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1, 1, 1)
+    temp_conf[[i]]                  <- c(1, 1, 1, 1, 1, 1, 1, 1)
+    temp_geno_recon[[i]]            <- c(1, 1, 1, 1, 1, 1, 1, 1)
   }
   set.seed(1)
-  temp_pheno <- matrix(c(-1, -1, 10, 0, 10, 10, 2, 0, 11, 10, 100, 40), ncol = 2, nrow = Nedge(temp_tree))
+  temp_pheno <- matrix(c(-1, -1, 10, -.5, 10, 10, 0, 0, 0, -.5, 11, 30, 100, 40, 150, 0.1), ncol = 2, nrow = Nedge(temp_tree))
   # Transition edges deltas: 10, 90, 30
   # Non-transition edge deltas: 3, 1, 1
   results <- calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
-  alpha <- 0.01
+  alpha <- 0.06
   expect_true(results$pvals[1] < alpha)
   expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1]- temp_pheno[ , 2])))
-  expect_equal(results$trans_median[[1]], median(abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2])))
+  expect_equal(results$trans_median[[1]], median(abs(temp_pheno[4:7 , 1]- temp_pheno[4:7 , 2])))
   expect_equal(round(results$observed_ks_stat[1], 2), 1)
-  expect_equal(results$observed_pheno_non_trans_delta[[1]], abs(temp_pheno[1:3 , 1]- temp_pheno[1:3 , 2]))
-  expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2]))
-  expect_equal(round(results$ks_statistics[[1]][1:5], 3), c(0.75, 0.50, 0.25, 0.60, 1.00))
+  expect_equal(results$observed_pheno_non_trans_delta[[1]], abs(temp_pheno[c(1:3,8), 1]- temp_pheno[c(1:3,8), 2]))
+  expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:7, 1]- temp_pheno[4:7, 2]))
+  expect_equal(round(results$ks_statistics[[1]][1:5], 3), c(0.40, 0.50, 1.00, 0.25, 0.25))
 })
 
 test_that("calculate_genotype_significance returns a non-significant p-value when

@@ -182,9 +182,9 @@ run_phyc <- function(args){
     for (k in 1:ncol(genotype)){
       genotype_transition_edges[[k]] <- geno_trans[[k]]$transition
     }
-    branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_trans$transition,       high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
+    branch_overlap_trans <- count_hits_on_edges(genotype_transition_edges,   pheno_trans$transition,       high_conf_ordered_by_edges)
     # branch_overlap_recon <- count_hits_on_edges(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
-    branch_overlap_recon <- count_hits_on_edges(genotype_transition_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges, pheno_conf_ordered_by_edges)
+    branch_overlap_recon <- count_hits_on_edges(genotype_transition_edges, pheno_recon_ordered_by_edges, high_conf_ordered_by_edges)
 
     results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges, pheno_trans$transition,       genotype)
     # results_object$contingency_table_recon <- create_contingency_table(geno_recon_ordered_by_edges, pheno_recon_ordered_by_edges, genotype)
