@@ -131,9 +131,15 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
 
 
   # Function -------------------------------------------------------------------
-  branch_overlap <- count_hits_on_edges(genotype_transition_edges, phenotype_reconstruction, high_confidence_edges, tr)
-  both_present      <- branch_overlap_trans$both_present
-  only_geno_present <- branch_overlap$only_geno_present
+
+  # Calculate observed values
+  # (Convergence of 0 -> 1 on phenotype present edges (variable: both present)
+  # versus phenotype absent edges (only_geno_present)).
+  # Phenotype present means 1 in reconstruction test or phenotype is a transition (1) in the overlap/transition test. Equivalent to Farhat et al. "Resistant" branches.
+  # Phenotype absent (only_geno_present) is equivalen to Farhat et al. "Sensitive" branches.
+  observed_result   <- count_hits_on_edges(genotype_transition_edges, phenotype_reconstruction, high_confidence_edges, tr)
+  both_present      <- observed_result$both_present
+  only_geno_present <- observed_result$only_geno_present
 
   # initialize some values
   num_sample                            <- both_present + only_geno_present
@@ -147,8 +153,6 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   for (i in 1:length(high_confidence_edges)){
     if (length(all_edges) == length(high_confidence_edges[[i]])){
       which_branches[[i]] <- all_edges[as.logical(high_confidence_edges[[i]])]
-    } else {
-      stop("which_branches incorrect")
     }
   }
 

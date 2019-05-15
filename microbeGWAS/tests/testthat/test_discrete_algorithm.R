@@ -53,6 +53,29 @@ test_that("count_hits_on_edges returns 0 edges shared and 0 edges only with geno
 })
 
 
+# test discrete_calculate_pvals
+test_that("discrete_calculate_pvals returns X given Y", {
+  num_samples <- 6
+  set.seed(1)
+  temp_tree <- rtree(num_samples)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  num_edge <- Nedge(temp_tree)
+  temp_geno_trans <- temp_hi_conf_edges <- rep(list(0), num_samples)
+  for (k in 1:num_samples){
+    temp_geno_trans[[k]] <- c(0, 0, 0, 1, 0, 0, 0, 1, 0, 0)
+    temp_hi_conf_edges[[k]] <- rep(1, num_edge)
+  }
+  temp_pheno_trans <- c(1, 1, 1, 1, 0, 0, 0, 0, 0, 0)
+  temp_geno <- matrix(1, ncol = num_samples, nrow = Ntip(temp_tree)) # doesn't match recon or transition, just made up for now.
+  temp_perm <- 1000
+  temp_fdr <- 0.25
+  disc_trans_results <- discrete_calculate_pvals(temp_geno_trans, temp_pheno_trans, temp_tree, temp_geno, temp_perm, temp_fdr, temp_hi_conf_edges)
+
+  expect_equal(round(as.numeric(disc_trans_results$hit_pvals[1]), 3), 0.763)
+  expect_equal(disc_trans_results$observed_overlap[1], 1)
+  expect_equal(length(disc_trans_results$permuted_count[[1]]), temp_perm)
+})
+
 
 # calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, tr, mat, permutations, alpha, high_confidence_edges){
 #   # calculate_genotype_pvals is the "meat" of the phyC algorithm.

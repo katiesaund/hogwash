@@ -153,7 +153,7 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   if (num_hi_conf_edges != length(hi_conf_edges)){
     stop("these should be the same")
   }
-  permuted_trans_index_mat <- matrix(   nrow = perm, ncol = num_trans_edges)
+  permuted_trans_index_mat <- matrix(nrow = perm, ncol = num_trans_edges)
   set.seed(1) # for reproducability of the sample() function
   for (j in 1:perm){  # create a random sample of the tr
     permuted_trans_index_mat[j, ] <- sample(1:num_hi_conf_edges,
