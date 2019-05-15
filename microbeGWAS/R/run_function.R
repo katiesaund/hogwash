@@ -190,14 +190,11 @@ run_phyc <- function(args){
     results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges, pheno_trans$transition,       genotype)
     results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, genotype)
 
-    disc_trans_results <- calculate_hit_pvals_corrected(branch_overlap_trans, pheno_trans$transition, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
-    disc_recon_results <- calculate_hit_pvals_corrected(branch_overlap_recon, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
+    disc_trans_results <- calculate_hit_pvals_corrected(genotype_transition_edges, pheno_trans$transition, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
+    disc_recon_results <- calculate_hit_pvals_corrected(genotype_transition_edges, pheno_recon_ordered_by_edges, args$tree, genotype, args$perm, args$fdr, high_conf_ordered_by_edges)
 
-    hit_pvals_trans <- disc_trans_results$hit_pvals
-    hit_pvals_recon <- disc_recon_results$hit_pvals
-    print("E")
-    corrected_pvals_trans <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_trans, args$fdr)
-    corrected_pvals_recon <- get_sig_hits_while_correcting_for_multiple_testing(hit_pvals_recon, args$fdr)
+    corrected_pvals_trans <- get_sig_hits_while_correcting_for_multiple_testing(disc_trans_results$hit_pvals, args$fdr)
+    corrected_pvals_recon <- get_sig_hits_while_correcting_for_multiple_testing(disc_recon_results$hit_pvals, args$fdr)
 
     results_object$hit_pvals_transition     <- corrected_pvals_trans$hit_pvals
     results_object$hit_pvals_reconstruction <- corrected_pvals_recon$hit_pvals
