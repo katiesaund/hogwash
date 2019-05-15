@@ -72,13 +72,18 @@ report_num_high_confidence_trans_edge <- function(genotype_transition,
   return(num_high_confidence_transition_edges)
 } # end report_num_high_confidence_trans_edge
 
-assign_high_confidence_to_transition_edges <- function(tr,
-                                                       all_confidence_by_edge,
-                                                       genotype_transition_by_edges,
-                                                       geno){
+assign_high_confidence_to_transition_edges_including_parent_info  <- function(tr,
+                                                                             all_confidence_by_edge,
+                                                                             genotype_transition_by_edges,
+                                                                             geno){
+  # This function used to be called: assign_high_confidence_to_transition_edges
+  # but on 2019-05-15 I figured out that this is waaay too stringent and was dropping
+  # all or nearly all of my genotypes. I rewrote the function to only look at the
+  # end in question and to ignore the parent edge.
+  # I don't know if this function will ever get used for anything.
+
   # Function description -------------------------------------------------------
-  # TODO
-  # Compute ancestral reconstruction from a continuous or discrete input.
+  # Identify all edges for which the edge and the parent edge are both high confidence
   #
   # Inputs:
   # tr. Phylo.
@@ -127,4 +132,41 @@ assign_high_confidence_to_transition_edges <- function(tr,
 
   # Return output --------------------------------------------------------------
   return(edge_and_parent_confident_and_trans_edge)
+} # end assign_high_confidence_to_transition_edges_including_parent_info()
+
+assign_high_confidence_to_transition_edges <- function(tr,
+                                                       all_confidence_by_edge,
+                                                       genotype_transition_by_edges,
+                                                       geno){
+  # Function description -------------------------------------------------------
+  # Identify all edges for which the edge is high confidence and a transition edge.
+  #
+  # Inputs:
+  # tr. Phylo.
+  # all_confidence_by_edge. List of vectors. Each vector is binary. Length(list) == number of genomes.
+  # genotype_transition_by_edges. List of vectors. Each vector is binary. Length(list) == number of genomes.
+  # geno. Matrix. Binary.
+  #
+  # Outputs:
+  # edge_and_parent_confident_and_trans_edge. List of vector. Each vector is binary. Length(list) == number of genomes.
+  #
+  # Check input ----------------------------------------------------------------
+  check_tree_is_valid(tr)
+  check_for_root_and_bootstrap(tr)
+  check_if_binary_matrix(geno)
+  if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)){
+    stop("Dimension mismatch")
+  }
+  check_for_root_and_bootstrap(tr)
+  if (length(all_confidence_by_edge[[1]]) != Nedge(tr)){
+    stop("Dimension mismatch")
+  }
+  # Function -------------------------------------------------------------------
+  edge_confident_and_trans_edge <- rep(list(NULL), ncol(geno))
+  for (k in 1:ncol(geno)){
+    edge_confident_and_trans_edge[[k]] <- as.numeric((all_confidence_by_edge[[k]] + genotype_transition_by_edges[[k]]$transition) == 2)
+  }
+
+  # Return output --------------------------------------------------------------
+  return(edge_confident_and_trans_edge)
 } # end assign_high_confidence_to_transition_edges()

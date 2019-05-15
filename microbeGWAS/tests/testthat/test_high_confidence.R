@@ -1,6 +1,6 @@
 library(microbeGWAS)
 context("High confidence") #----------------------------------------------#
-# TODO write unit tests for all three functions
+# TODO write unit tests for assign_high_confidence_to_transition_edges
 
 # test discretize_confidence_using_threshold
 test_that("discretize_confidence_using_threshold should give this expected result", {
@@ -31,8 +31,8 @@ test_that("report_num_high_confidence_trans_edge returns expected outcome for th
   expect_equal(report_num_high_confidence_trans_edge(fake_trans, fake_hi_conf_edges,fake_geno_names), expected_result)
 })
 
-# test assign_high_confidence_to_transition_edges
-test_that("assign_high_confidence_to_transition_edges returns the edges that are high confidence transition edges for this tree", {
+# test assign_high_confidence_to_transition_edges_including_parent_info
+test_that("assign_high_confidence_to_transition_edges_including_parent_info returns the edges that are high confidence transition edges for this tree", {
   set.seed(1)
   num_samples <- 5
   temp_tree <- rtree(num_samples)

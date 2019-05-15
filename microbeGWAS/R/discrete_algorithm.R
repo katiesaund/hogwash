@@ -222,7 +222,6 @@ calculate_hit_pvals_corrected <- function(hit_counts, phenotype_reconstruction, 
       } else if (temp_pval <= 0.5){
         pval <- (temp_pval * 2)
       }
-z
       record_of_redistributed_both_present[[i]] <- redistributed_both_present
       hit_pvals[i] <- format(round(pval, 20), nsmall = 20)
     }
