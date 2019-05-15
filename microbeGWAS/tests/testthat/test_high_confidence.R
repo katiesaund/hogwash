@@ -47,6 +47,28 @@ test_that("assign_high_confidence_to_transition_edges_including_parent_info retu
   }
   temp_geno <- matrix(1, ncol = num_samples, nrow = num_samples) # FYI this geno does not match up with the fake transitions I made up
   temp_tree$tip.label <- row.names(temp_geno) <- letters[1:num_samples]
+  foo <- assign_high_confidence_to_transition_edges_including_parent_info(temp_tree, temp_confidence, temp_trans, temp_geno)
+  expect_equal(foo[[1]], expected_result[[1]])
+})
+
+
+
+# test assign_high_confidence_to_transition_edges
+test_that("assign_high_confidence_to_transition_edges returns the edges that are high confidence transition edges for this tree", {
+  set.seed(1)
+  num_samples <- 5
+  temp_tree <- rtree(num_samples)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  plot(temp_tree)
+  edgelabels()
+  temp_trans <- temp_confidence <- expected_result <- rep(list(NULL), num_samples)
+  for (i in 1:num_samples){
+    temp_trans[[i]]$transition <- c(0, 0, 0, 1, 0, 1, 1, 0)
+    temp_confidence[[i]] <- c(0, 0, 0, 0, 0, 1, 1, 0)
+    expected_result[[i]] <- c(0, 0, 0, 0, 0, 1, 1, 0)
+  }
+  temp_geno <- matrix(1, ncol = num_samples, nrow = num_samples) # FYI this geno does not match up with the fake transitions I made up
+  temp_tree$tip.label <- row.names(temp_geno) <- letters[1:num_samples]
   foo <- assign_high_confidence_to_transition_edges(temp_tree, temp_confidence, temp_trans, temp_geno)
   expect_equal(foo[[1]], expected_result[[1]])
 })
