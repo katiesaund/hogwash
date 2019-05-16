@@ -171,59 +171,22 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       # This should never get triggered because we should be filtering the genotype before this step, but it's being kept in as a fail safe.
     } else {
 
-      redistributed_hits <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, num_genotypes, hi_conf_edges, i)
-
-
-
-      # # initialize some variables for this loop
-      # permuted_geno_trans_mat <- matrix(nrow = permutations, ncol = num_edges_with_geno_trans[i])
-      # redistributed_hits   <- matrix(0, nrow = permutations, ncol = num_genotypes)
-      #
-      # # create a random sample of the tr
-      # print("1:num_hi_conf_edges[i]")
-      # print(1:num_hi_conf_edges[i])
-      #
-      # print("num_edges_with_geno_trans[i]")
-      # print(num_edges_with_geno_trans[i])
-      #
-      # print("hi_conf_edges[[i]]]")
-      # print(hi_conf_edges[[i]])
-      #
-      # set.seed(1)
-      # for(j in 1:permutations){
-      #   permuted_geno_trans_mat[j, ] <- sample(1:num_hi_conf_edges[i],
-      #                                       size = num_edges_with_geno_trans[i],
-      #                                       replace = TRUE,
-      #                                       prob = tr$edge.length[hi_conf_edges[[i]]]/sum(tr$edge.length[hi_conf_edges[[i]]]))
-      # }
-      #
-      # #this if statement deals with situation when num_edges_with_geno_trans = 1; which should never happen now that we prefilter genotypes.
-      # if(nrow(permuted_geno_trans_mat) != permutations){
-      #   permuted_geno_trans_mat <- t(permuted_geno_trans_mat)
-      # }
-      #
-      # for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:nrow(permuted_geno_trans_mat is the same as 1:permutations
-      #   redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
-      # }
-      #
-      # print("red")
-      # print(redistributed_hits)
-      # print("perm")
-      # print(permuted_geno_trans_mat)
-
-      # right now redistributed hits is simply a matrix marking which edges we hit during
-      # the permutation step above- because the point of the permutation is to pretend as if
-      # we're assigning the presence of the genotype to random edges in the tree.
-
+      permuted_geno_trans_edges <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, num_genotypes, hi_conf_edges, i)
 
       # Now calculate both_present and only_geno_present with the permuted data in the same fashion as with the observed data
-      empirical_both_present <- sapply(1:nrow(redistributed_hits), function(x) {
-        sum(phenotype_reconstruction[as.logical(high_confidence_edges[[i]])] + redistributed_hits[x, ] == 2)
-      })
 
-      empirical_only_geno_present <- sapply(1:nrow(redistributed_hits), function(x) {
-        sum(redistributed_hits[x, ]) - empirical_both_present[x]
-      })
+
+
+      empirical_both_present <- count_empirical_both_present(permuted_geno_trans_edges, phenotype_reconstruction, high_confidence_edges, i)
+      empirical_only_geno_present <- count_empirical_only_geno_present(permuted_geno_trans_edges, empirical_both_present)
+
+      #empirical_both_present <- sapply(1:nrow(permuted_geno_trans_edges), function(x) {
+      #  sum(phenotype_reconstruction[as.logical(high_confidence_edges[[i]])] + permuted_geno_trans_edges[x, ] == 2)
+      #})
+
+      #empirical_only_geno_present <- sapply(1:nrow(permuted_geno_trans_edges), function(x) {
+      #  sum(permuted_geno_trans_edges[x, ]) - empirical_both_present[x]
+      #})
 
       print("empirical_both_present")
       print(empirical_both_present)
@@ -331,3 +294,17 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
   }
   return(redistributed_hits)
 } # end discrete_permutation()
+
+count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, index){
+  result <- sapply(1:nrow(permuted_mat), function(x) {
+    sum(pheno_vec[as.logical(hi_conf_edge[[index]])] + permuted_mat[x, ] == 2)
+  })
+  return(result)
+}
+
+count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
+  result <- sapply(1:nrow(permuted_mat), function(x) {
+    sum(permuted_mat[x, ]) - emp_both_present[x]
+  })
+  return(result)
+}
