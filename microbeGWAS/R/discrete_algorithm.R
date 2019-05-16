@@ -168,12 +168,22 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       # which isn't quite true but will indicate that we cannot calculate a p-value because we cannot detect any
       # convergence with one or fewer affected branches. And that we should skip to the next genotype to run the permutation test.
       hit_pvals[i] <- 1.0
+      # This should never get triggered because we should be filtering the genotype before this step, but it's being kept in as a fail safe.
     } else {
-      # initialize some counters/variables for this loop
+      # initialize some variables for this loop
       permuted_geno_trans_mat <- matrix(nrow = permutations, ncol = num_edges_with_geno_trans[i])
       redistributed_hits   <- matrix(0, nrow = permutations, ncol = num_genotypes)
 
       # create a random sample of the tr
+      print("1:num_hi_conf_edges[i]")
+      print(1:num_hi_conf_edges[i])
+
+      print("num_edges_with_geno_trans[i]")
+      print(num_edges_with_geno_trans[i])
+
+      print("hi_conf_edges[[i]]]")
+      print(hi_conf_edges[[i]])
+
       set.seed(1)
       for(j in 1:permutations){
         permuted_geno_trans_mat[j, ] <- sample(1:num_hi_conf_edges[i],
@@ -182,18 +192,26 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
                                             prob = tr$edge.length[hi_conf_edges[[i]]]/sum(tr$edge.length[hi_conf_edges[[i]]]))
       }
 
-      #this if statement deals with situation when num_edges_with_geno_trans = 1
+      #this if statement deals with situation when num_edges_with_geno_trans = 1; which should never happen now that we prefilter genotypes.
       if(nrow(permuted_geno_trans_mat) != permutations){
         permuted_geno_trans_mat <- t(permuted_geno_trans_mat)
       }
 
-      for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:permutations
+      for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:nrow(permuted_geno_trans_mat is the same as 1:permutations
         redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
       }
+
+      print("red")
+      print(redistributed_hits)
+      print("perm")
+      print(permuted_geno_trans_mat)
+
       # right now redistributed hits is simply a matrix marking which edges we hit during
       # the permutation step above- because the point of the permutation is to pretend as if
       # we're assigning the presence of the genotype to random edges in the tree.
 
+
+      # Now calculate both_present and only_geno_present with the permuted data in the same fashion as with the observed data
       empirical_both_present <- sapply(1:nrow(redistributed_hits), function(x) {
         sum(phenotype_reconstruction[as.logical(high_confidence_edges[[i]])] + redistributed_hits[x, ] == 2)
       })
@@ -202,6 +220,17 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
         sum(redistributed_hits[x, ]) - empirical_both_present[x]
       })
 
+      print("empirical_both_present")
+      print(empirical_both_present)
+      print("both_present[i]")
+      print(both_present[i])
+      print("empirical_only_geno_present")
+      print(empirical_only_geno_present)
+      print("only_geno_present[i]")
+      print(only_geno_present[i])
+
+
+      # I'm pretty sure that redistirbuted_both_present is the same thing as the empirical_both_present so I'm going to remove redistributed_both_present
       # now beginning calculating when the randomly permuted "genotypes" overlap with the hi confidence phenotype
       temp <- matrix(0, nrow = permutations, ncol = num_genotypes)
       redistributed_both_present <- rep(0, permutations)
@@ -222,6 +251,9 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       for (q in 1:permutations){
         redistributed_both_present[q] <- sum(temp[q, ] == two)
       }
+
+      print("redistributed_both_present")
+      print(redistributed_both_present)
 
       # x_on_r <- sum(empirical_both_present >= both_present[i])
       # y_on_s <- sum(empirical_only_geno_present <= only_geno_present[i])
