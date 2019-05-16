@@ -1,6 +1,6 @@
 library(microbeGWAS)
 context("Discrete algorithm") -------------------------------------------------#
-
+# TODO finishing writing unit tests
 # test calculate_permutation_based_p_value
 test_that("calculate_permutation_based_p_value returns a significant p-value when statistics are much lower than observed", {
   nperm <- 1000
@@ -79,5 +79,115 @@ test_that("discrete_calculate_pvals returns expected results given this dummy da
 })
 
 
-# test discrete_calculate_pvals
+# test discrete_permutation
 
+test_that("discrete_permutation returns expected results given this dummy data", {
+  num_samples <- 6
+  num_genotypes <- 15
+  set.seed(1)
+  temp_tree <- rtree(num_samples)
+  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  num_edge <- Nedge(temp_tree)
+  temp_geno_trans <- temp_hi_conf_edges <- rep(list(0), num_genotypes)
+  for (k in 1:num_genotypes){
+    temp_geno_trans[[k]] <- c(0, 0, 0, 1, 0, 0, 0, 1, 0, 0)
+    temp_hi_conf_edges[[k]] <- rep(1, num_edge)
+  }
+  temp_geno_trans[[15]] <- c(0, 0, 1, 1, 0, 0, 0, 1, 0, 0)
+  temp_pheno_trans <- c(1, 1, 1, 1, 0, 0, 0, 0, 0, 0)
+  temp_geno <- matrix(1, ncol = num_genotypes, nrow = Ntip(temp_tree)) # doesn't match recon or transition, just made up for now.
+  temp_perm <- 8
+
+  temp_num_edges_with_geno_trans <- sapply(temp_geno_trans, function(x) sum(x))
+  temp_num_hi_conf_edges <- sapply(temp_hi_conf_edges, function(x) sum(x))
+
+  for (m in 1:num_genotypes){
+    permuted_geno <- discrete_permutation(temp_tree, temp_perm, temp_num_edges_with_geno_trans, temp_num_hi_conf_edges, num_edge, temp_hi_conf_edges, m)
+    expect_equal(nrow(permuted_geno), temp_perm)
+    expect_equal(ncol(permuted_geno), num_edge)
+    expect_lt(max(rowSums(permuted_geno)), temp_num_edges_with_geno_trans[m] + 1)
+  }
+
+  edges_selected <- NULL
+  for (r in 1:nrow(permuted_geno)){
+    temp <-   c(1:10)[permuted_geno[r, ] == 1]
+    edges_selected <- c(edges_selected, temp)
+  }
+
+  edge_probability <- temp_tree$edge.length / sum(temp_tree$edge.length) # high confidence is one for all genotypes, so can do just one calculation for all genotypes in this case.
+  edges_selected_other_way <- sample(1:num_edge, size = length(edges_selected), replace = TRUE, prob = edge_probability)
+  ks_results <- ks.test(edges_selected_other_way, edges_selected)
+  expect_true(ks_results$p.value > 0.05)
+
+})
+
+# test count_empirical_both_present
+
+# count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, index){
+#   # Function description -------------------------------------------------------
+#   # Find number of edges on the tree where the permuted genotype is a transition
+#   # AND the phenotype is also a transition (or a phenotype is present in the
+#   # reconstruction; it depends on the type of test being run).
+#   #
+#   # Inputs:
+#   # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of tr edges. Either 0 or 1.
+#   # pheno_vec. Numeric vector.
+#   # hi_conf_edge.
+#   # index. Number. The "i" of the loop this function is run within.
+#   #
+#   # Outputs:
+#   # result. Numeric vector. Length = num perm.
+#   #
+#   # Check input ----------------------------------------------------------------
+#   check_is_number(index)
+#   check_if_binary_matrix(permuted_mat)
+#   if (length(pheno_vec) != ncol(permuted_mat)){
+#     stop("input dimension mismatch")
+#   }
+#
+#   # Function -------------------------------------------------------------------
+#   result <- sapply(1:nrow(permuted_mat), function(x) {
+#     sum(pheno_vec[as.logical(hi_conf_edge[[index]])] + permuted_mat[x, ] == 2)
+#   })
+#
+#   # Check and return output ----------------------------------------------------
+#   if (nrow(permuted_mat) != length(result)){
+#     stop("result dimension mismatch")
+#   }
+#   return(result)
+# }
+#
+
+# test count_empirical_only_geno_present
+
+# count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
+#   # Function description -------------------------------------------------------
+#   # Find number of edges on the tree where the permuted genotype is a transition
+#   # but the phenotype is not (either a transition phenotype edge or phenotype
+#   # reconstruction present -- it depends on the type of test being run).
+#   #
+#   # Inputs:
+#   # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of edges. Either 0 or 1.
+#   # emp_both_present. Numeric vector.
+#   #
+#   # Outputs:
+#   # result. Numeric vector. Length = num perm.
+#   #
+#   # Check input ----------------------------------------------------------------
+#   check_if_binary_matrix(permuted_mat)
+#   if (length(emp_both_present) != nrow(permuted_mat)){
+#     stop("Input dimension mismatch")
+#   }
+#
+#   # Function -------------------------------------------------------------------
+#   result <- sapply(1:nrow(permuted_mat), function(x) {
+#     sum(permuted_mat[x, ]) - emp_both_present[x]
+#   })
+#   # Check & return output --------------------------------------------------------------
+#   if (nrow(permuted_mat) != length(result)){
+#     stop("result dimension mismatch")
+#   }
+#
+#   return(result)
+# } # end count_empirical_only_geno_present()
+#
