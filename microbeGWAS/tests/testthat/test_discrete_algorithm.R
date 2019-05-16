@@ -116,7 +116,11 @@ test_that("discrete_permutation returns expected results given this dummy data",
 
   edge_probability <- temp_tree$edge.length / sum(temp_tree$edge.length) # high confidence is one for all genotypes, so can do just one calculation for all genotypes in this case.
   edges_selected_other_way <- sample(1:num_edge, size = length(edges_selected), replace = TRUE, prob = edge_probability)
-  ks_results <- ks.test(edges_selected_other_way, edges_selected)
+  ks_results <-  withCallingHandlers(ks.test(edges_selected_other_way, edges_selected),
+                                     warning=function(w) {
+                                       if (grepl("cannot compute exact p-value with ties", w$message))
+                                         invokeRestart("muffleWarning")
+                                     } )
   expect_true(ks_results$p.value > 0.05)
 
 })
