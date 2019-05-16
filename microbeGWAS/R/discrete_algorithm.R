@@ -203,7 +203,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       })
 
       # now beginning calculating when the randomly permuted "genotypes" overlap with the hi confidence phenotype
-      temp <- matrix(0, nrow = permutations, ncol = num_genotypes) #used to be length(Nedge(tree))
+      temp <- matrix(0, nrow = permutations, ncol = num_genotypes)
       redistributed_both_present <- rep(0, permutations)
       two <- rep(2, num_genotypes)
 
@@ -230,7 +230,6 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       # and when the permuted (empirical) genotype does not overlap with phenotype is less common than observed (only_geno_present[i])
       new_counter <- sum((empirical_both_present >= both_present[i]) * (empirical_only_geno_present <= only_geno_present[i]))
       temp_pval <- ((new_counter + 1)/(permutations + 1))
-      # Katie TODO 2019-02-26: save the new counter for each permutation, then plot that with the real as a red bar, add p val on top.
 
       if (sort(redistributed_both_present, decreasing = FALSE)[(fdr * permutations)] == 0 & both_present[i] == 0){
         pval <- 1
@@ -241,6 +240,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       } else if (temp_pval <= 0.5){
         pval <- (temp_pval * 2)
       }
+
       record_of_redistributed_both_present[[i]] <- redistributed_both_present
       hit_pvals[i] <- format(round(pval, 20), nsmall = 20)
     }
@@ -252,3 +252,38 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
 
   return(results)
 } # end discrete_calculate_pvals
+
+
+# 2019-05-15 why the heck are the pvals so weird for discrete?
+
+# weird_pval <- function(temp_pval, permutations){
+#
+#   pval <- NA
+#   if (temp_pval == 0 | temp_pval == 1){
+#     pval <- 2/(permutations + 1)
+#   } else if (temp_pval > 0.5){
+#     pval <- ((1 - temp_pval)  * 2)
+#   } else if (temp_pval <= 0.5){
+#     pval <- (temp_pval * 2)
+#   }
+#   return(pval)
+# }
+#
+#
+# pval_seq <- seq(from = 0, to  = 1, by = 0.01)
+#
+# weird_value <- rep(NA, length(pval_seq))
+# for (i in 1:length(pval_seq)){
+#   weird_value[i] <- weird_pval(pval_seq[i], 10000)
+# }
+#
+# plot(weird_value, pval_seq, xlab = "output p-value", ylab = "input p-value")
+#
+# pval <- rep(NA, 1000)
+# for (j in 1:1000){
+#   pval[j] <- (j + 1)/(1000 + 1)
+# }
+# plot(pval)
+#
+# plot(weird_value)
+
