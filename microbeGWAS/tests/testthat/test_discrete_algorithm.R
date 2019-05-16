@@ -73,7 +73,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy da
   temp_fdr <- 0.25
   disc_trans_results <- discrete_calculate_pvals(temp_geno_trans, temp_pheno_trans, temp_tree, temp_geno, temp_perm, temp_fdr, temp_hi_conf_edges)
 
-  expect_equal(round(as.numeric(disc_trans_results$hit_pvals[1]), 3), 0.889)
+  expect_equal(round(as.numeric(disc_trans_results$hit_pvals[1]), 3), 0.444)
   expect_equal(disc_trans_results$observed_overlap[1], 1)
   expect_equal(length(disc_trans_results$permuted_count[[1]]), temp_perm)
 })

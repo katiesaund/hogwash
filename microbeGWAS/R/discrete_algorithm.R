@@ -188,21 +188,9 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
               # permutation_as_or_more_extreme <- sum((empirical_both_present >= both_present[i]) * (empirical_only_geno_present <= only_geno_present[i]))
               # temp_pval <- ((permutation_as_or_more_extreme + 1)/(permutations + 1))
 
-      temp_pval <- calculate_permutation_based_p_value(empirical_both_present, both_present[i], permutations)
-
-      # TODO As of 2019-05-15 I want to completely remove this weird pval if/else statement, but waiting to do so until I discuss with Evan.
-      if (sort(empirical_both_present, decreasing = FALSE)[(fdr * permutations)] == 0 & both_present[i] == 0){ # i have no idea why this line exists
-        pval <- 1
-      } else if (temp_pval == 0 | temp_pval == 1){
-        pval <- 2/(permutations + 1)
-      } else if (temp_pval > 0.5){
-        pval <- ((1 - temp_pval)  * 2)
-      } else if (temp_pval <= 0.5){
-        pval <- (temp_pval * 2)
-      }
-
-      record_of_redistributed_both_present[[i]] <- empirical_both_present
+      pval <- calculate_permutation_based_p_value(empirical_both_present, both_present[i], permutations)
       hit_pvals[i] <- format(round(pval, 20), nsmall = 20)
+      record_of_redistributed_both_present[[i]] <- empirical_both_present
     }
   }
   names(hit_pvals) <- colnames(mat)
