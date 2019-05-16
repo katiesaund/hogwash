@@ -170,41 +170,46 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       hit_pvals[i] <- 1.0
       # This should never get triggered because we should be filtering the genotype before this step, but it's being kept in as a fail safe.
     } else {
-      # initialize some variables for this loop
-      permuted_geno_trans_mat <- matrix(nrow = permutations, ncol = num_edges_with_geno_trans[i])
-      redistributed_hits   <- matrix(0, nrow = permutations, ncol = num_genotypes)
 
-      # create a random sample of the tr
-      print("1:num_hi_conf_edges[i]")
-      print(1:num_hi_conf_edges[i])
+      redistributed_hits <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, num_genotypes, hi_conf_edges, i)
 
-      print("num_edges_with_geno_trans[i]")
-      print(num_edges_with_geno_trans[i])
 
-      print("hi_conf_edges[[i]]]")
-      print(hi_conf_edges[[i]])
 
-      set.seed(1)
-      for(j in 1:permutations){
-        permuted_geno_trans_mat[j, ] <- sample(1:num_hi_conf_edges[i],
-                                            size = num_edges_with_geno_trans[i],
-                                            replace = TRUE,
-                                            prob = tr$edge.length[hi_conf_edges[[i]]]/sum(tr$edge.length[hi_conf_edges[[i]]]))
-      }
-
-      #this if statement deals with situation when num_edges_with_geno_trans = 1; which should never happen now that we prefilter genotypes.
-      if(nrow(permuted_geno_trans_mat) != permutations){
-        permuted_geno_trans_mat <- t(permuted_geno_trans_mat)
-      }
-
-      for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:nrow(permuted_geno_trans_mat is the same as 1:permutations
-        redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
-      }
-
-      print("red")
-      print(redistributed_hits)
-      print("perm")
-      print(permuted_geno_trans_mat)
+      # # initialize some variables for this loop
+      # permuted_geno_trans_mat <- matrix(nrow = permutations, ncol = num_edges_with_geno_trans[i])
+      # redistributed_hits   <- matrix(0, nrow = permutations, ncol = num_genotypes)
+      #
+      # # create a random sample of the tr
+      # print("1:num_hi_conf_edges[i]")
+      # print(1:num_hi_conf_edges[i])
+      #
+      # print("num_edges_with_geno_trans[i]")
+      # print(num_edges_with_geno_trans[i])
+      #
+      # print("hi_conf_edges[[i]]]")
+      # print(hi_conf_edges[[i]])
+      #
+      # set.seed(1)
+      # for(j in 1:permutations){
+      #   permuted_geno_trans_mat[j, ] <- sample(1:num_hi_conf_edges[i],
+      #                                       size = num_edges_with_geno_trans[i],
+      #                                       replace = TRUE,
+      #                                       prob = tr$edge.length[hi_conf_edges[[i]]]/sum(tr$edge.length[hi_conf_edges[[i]]]))
+      # }
+      #
+      # #this if statement deals with situation when num_edges_with_geno_trans = 1; which should never happen now that we prefilter genotypes.
+      # if(nrow(permuted_geno_trans_mat) != permutations){
+      #   permuted_geno_trans_mat <- t(permuted_geno_trans_mat)
+      # }
+      #
+      # for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:nrow(permuted_geno_trans_mat is the same as 1:permutations
+      #   redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
+      # }
+      #
+      # print("red")
+      # print(redistributed_hits)
+      # print("perm")
+      # print(permuted_geno_trans_mat)
 
       # right now redistributed hits is simply a matrix marking which edges we hit during
       # the permutation step above- because the point of the permutation is to pretend as if
@@ -267,7 +272,6 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
 
   # Return output --------------------------------------------------------------
   results <- list("hit_pvals" = hit_pvals, "permuted_count" = record_of_redistributed_both_present, "observed_overlap" = both_present)
-
   return(results)
 } # end discrete_calculate_pvals
 
@@ -305,3 +309,25 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
 #
 # plot(weird_value)
 
+
+discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, number_hi_conf_edges, number_genotypes, high_conf_edges, index){
+  permuted_geno_trans_mat <- matrix(nrow = num_perm, ncol = number_edges_with_geno_trans[index])
+  redistributed_hits   <- matrix(0, nrow = num_perm, ncol = number_genotypes)
+  set.seed(1)
+  for(j in 1:num_perm){
+    permuted_geno_trans_mat[j, ] <- sample(1:number_hi_conf_edges[index],
+                                           size = number_edges_with_geno_trans[index],
+                                           replace = TRUE,
+                                           prob = tr$edge.length[high_conf_edges[[index]]]/sum(tr$edge.length[high_conf_edges[[index]]]))
+  }
+
+  #this if statement deals with situation when number_edges_with_geno_trans = 1; which should never happen now that we prefilter genotypes.
+  if(nrow(permuted_geno_trans_mat) != num_perm){
+    permuted_geno_trans_mat <- t(permuted_geno_trans_mat)
+  }
+
+  for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:nrow(permuted_geno_trans_mat) is the same as 1:permutations
+    redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
+  }
+  return(redistributed_hits)
+} # end discrete_permutation()
