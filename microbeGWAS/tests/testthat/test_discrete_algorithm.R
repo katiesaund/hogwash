@@ -56,7 +56,7 @@ test_that("count_hits_on_edges returns 0 edges shared and 0 edges only with geno
 # test discrete_calculate_pvals
 test_that("discrete_calculate_pvals returns expected results given this dummy data", {
   num_samples <- 6
-  num_genotypes <- 10
+  num_genotypes <- 15
   set.seed(1)
   temp_tree <- rtree(num_samples)
   temp_tree$node.labels <- rep(100, Nnode(temp_tree))
@@ -66,7 +66,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy da
     temp_geno_trans[[k]] <- c(0, 0, 0, 1, 0, 0, 0, 1, 0, 0)
     temp_hi_conf_edges[[k]] <- rep(1, num_edge)
   }
-  temp_geno_trans[[10]] <- c(0, 0, 1, 1, 0, 0, 0, 1, 0, 0)
+  temp_geno_trans[[15]] <- c(0, 0, 1, 1, 0, 0, 0, 1, 0, 0)
   temp_pheno_trans <- c(1, 1, 1, 1, 0, 0, 0, 0, 0, 0)
   temp_geno <- matrix(1, ncol = num_genotypes, nrow = Ntip(temp_tree)) # doesn't match recon or transition, just made up for now.
   temp_perm <- 8
@@ -77,3 +77,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy da
   expect_equal(disc_trans_results$observed_overlap[1], 1)
   expect_equal(length(disc_trans_results$permuted_count[[1]]), temp_perm)
 })
+
+
+# test discrete_calculate_pvals
+

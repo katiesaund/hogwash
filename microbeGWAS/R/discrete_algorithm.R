@@ -171,7 +171,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       # This should never get triggered because we should be filtering the genotype before this step, but it's being kept in as a fail safe.
     } else {
 
-      permuted_geno_trans_edges <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, num_genotypes, hi_conf_edges, i)
+      permuted_geno_trans_edges <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, Nedge(tr), hi_conf_edges, i)
       # Now calculate both_present and only_geno_present with the permuted data in the same fashion as with the observed data
       empirical_both_present <- count_empirical_both_present(permuted_geno_trans_edges, phenotype_reconstruction, high_confidence_edges, i)
       empirical_only_geno_present <- count_empirical_only_geno_present(permuted_geno_trans_edges, empirical_both_present)
@@ -246,23 +246,47 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
 # plot(weird_value)
 
 
-discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, number_hi_conf_edges, number_genotypes, high_conf_edges, index){
+discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, number_hi_conf_edges, number_edges, high_conf_edges, index){
   # Function description -------------------------------------------------------
   # Perform a permutation of the edges selected to be genotype transition edges.
   # permuted_geno_trans_mat is a matrix where each row corresponds to a permuted set of edges and each column corresponds to one high confidence edge.
   #   To get the edges selected in a permutation, take that row from permuted_geno_trans_mat.
   #   We could use this format only for later analyses, but a more convenient format is to conver to redistributed_hits.
   # redistributed_hits is a matrix with nrow = number of perms (same as permuted_geno_trans_mat, but each row now corresponds to a genotype)
-  # Inputs:
   #
+  # Inputs:
+  # tr. Phylo.
+  # num_perm. Number of permutations.
+  # number_edges_with_geno_trans. Numeric vector. Max value should be num edge in tr.
+  # number_hi_conf_edges. Numeric vector. Max value should be num edge in tr.
+  # number_edges. Nedge(tr).
+  # high_conf_edges. Numeric vector of edges that high confidence. Max value should be num edge in tr.
+  # index. Integer. "i" from loop. Max value is number of genotypes. Min value == 1.
   #
   # Outputs:
   #
   # Check input ----------------------------------------------------------------
+  check_if_permutation_num_valid(num_perm)
+  check_for_root_and_bootstrap(tr)
+  check_is_number(number_edges_with_geno_trans[index])
+  check_is_number(number_hi_conf_edges[index])
+  check_is_number(number_edges)
+  check_is_number(index)
+  check_is_number(high_conf_edges[[index]][1])
+  if (number_edges != Nedge(tr)){
+    stop("num edges is wrong")
+  }
+  if (index < 1){
+    stop("loop index must be positive")
+  }
+  if (max(high_conf_edges[[index]]) > Nedge(tr) | number_hi_conf_edges[index] > Nedge(tr) | number_edges_with_geno_trans[index] > Nedge(tr)){
+    stop("max value should be Nedge(tr")
+  }
+
 
   # Function -------------------------------------------------------------------
   permuted_geno_trans_mat <- matrix(nrow = num_perm, ncol = number_edges_with_geno_trans[index])
-  redistributed_hits   <- matrix(0, nrow = num_perm, ncol = number_genotypes)
+  redistributed_hits   <- matrix(0, nrow = num_perm, ncol = number_edges)
   set.seed(1)
   for(j in 1:num_perm){
     permuted_geno_trans_mat[j, ] <- sample(1:number_hi_conf_edges[index],
@@ -279,8 +303,8 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
   for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:nrow(permuted_geno_trans_mat) is the same as 1:permutations
     redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
   }
-  # Return output --------------------------------------------------------------
-
+  # Check and return output ----------------------------------------------------
+  check_dimensions(redistributed_hits, exact_rows = num_perm, min_rows = num_perm, exact_cols = Nedge(tr), min_cols = Nedge(tr))
   return(redistributed_hits)
 } # end discrete_permutation()
 
@@ -291,19 +315,19 @@ count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, 
   # reconstruction; it depends on the type of test being run).
   #
   # Inputs:
-  # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of genotypes. Either 0 or 1.
+  # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of tr edges. Either 0 or 1.
   # pheno_vec. Numeric vector.
   # hi_conf_edge.
   # index. Number. The "i" of the loop this function is run within.
   #
   # Outputs:
-  # result. Numeric vector. Length = length(emp_both_present).
+  # result. Numeric vector. Length = num perm.
   #
   # Check input ----------------------------------------------------------------
   check_is_number(index)
   check_if_binary_matrix(permuted_mat)
-  if (length(pheno_vec) != nrow(permuted_mat)){
-    stop("dimension mismatch")
+  if (length(pheno_vec) != ncol(permuted_mat)){
+    stop("input dimension mismatch")
   }
 
   # Function -------------------------------------------------------------------
@@ -312,8 +336,8 @@ count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, 
   })
 
   # Check and return output ----------------------------------------------------
-  if (length(pheno_vec) != length(result)){
-    stop("dimension mismatch")
+  if (nrow(permuted_mat) != length(result)){
+    stop("result dimension mismatch")
   }
   return(result)
 }
@@ -325,16 +349,16 @@ count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
   # reconstruction present -- it depends on the type of test being run).
   #
   # Inputs:
-  # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of genotypes. Either 0 or 1.
+  # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of edges. Either 0 or 1.
   # emp_both_present. Numeric vector.
   #
   # Outputs:
-  # result. Numeric vector. Length = length(emp_both_present).
+  # result. Numeric vector. Length = num perm.
   #
   # Check input ----------------------------------------------------------------
   check_if_binary_matrix(permuted_mat)
   if (length(emp_both_present) != nrow(permuted_mat)){
-    stop("dimension mismatch")
+    stop("Input dimension mismatch")
   }
 
   # Function -------------------------------------------------------------------
@@ -342,8 +366,8 @@ count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
     sum(permuted_mat[x, ]) - emp_both_present[x]
   })
   # Check & return output --------------------------------------------------------------
-  if (length(emp_both_present) != length(result)){
-    stop("dimension mismatch")
+  if (nrow(permuted_mat) != length(result)){
+    stop("result dimension mismatch")
   }
 
   return(result)
