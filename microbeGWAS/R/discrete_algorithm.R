@@ -172,51 +172,25 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
     } else {
 
       permuted_geno_trans_edges <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, num_genotypes, hi_conf_edges, i)
-
       # Now calculate both_present and only_geno_present with the permuted data in the same fashion as with the observed data
-
-
-
       empirical_both_present <- count_empirical_both_present(permuted_geno_trans_edges, phenotype_reconstruction, high_confidence_edges, i)
       empirical_only_geno_present <- count_empirical_only_geno_present(permuted_geno_trans_edges, empirical_both_present)
 
-      #empirical_both_present <- sapply(1:nrow(permuted_geno_trans_edges), function(x) {
-      #  sum(phenotype_reconstruction[as.logical(high_confidence_edges[[i]])] + permuted_geno_trans_edges[x, ] == 2)
-      #})
+      # Note on nomeclature from the original PhyC paper supplement page 7: https://media.nature.com/original/nature-assets/ng/journal/v45/n10/extref/ng.2747-S1.pdf
+      # X -> G on R is the same as sum(empirical_both_present >= both_present[i])
+      # X -> G on S is the same as sum(empirical_only_geno_present <= only_geno_present[i])
+      # Note: sum(empirical_both_present >= both_present[i]) always equals sum(empirical_only_geno_present <= only_geno_present[i])
+      #       so we only need to include one in the p-value calculation.
+      #       In an older version I used the following block of code, but it's equivalent to the single line below using the calculate_permutation_based_p_value() function.
 
-      #empirical_only_geno_present <- sapply(1:nrow(permuted_geno_trans_edges), function(x) {
-      #  sum(permuted_geno_trans_edges[x, ]) - empirical_both_present[x]
-      #})
+              # count only times when permuted (empirical) overlap of genotype and phenotype is more common than obsered (both_present[i])
+              # and when the permuted (empirical) genotype does not overlap with phenotype is less common than observed (only_geno_present[i])
+              # permutation_as_or_more_extreme <- sum((empirical_both_present >= both_present[i]) * (empirical_only_geno_present <= only_geno_present[i]))
+              # temp_pval <- ((permutation_as_or_more_extreme + 1)/(permutations + 1))
 
-      print("empirical_both_present")
-      print(empirical_both_present)
-      print("both_present[i]")
-      print(both_present[i])
-      print("empirical_only_geno_present")
-      print(empirical_only_geno_present)
-      print("only_geno_present[i]")
-      print(only_geno_present[i])
+      temp_pval <- calculate_permutation_based_p_value(empirical_both_present, both_present[i], permutations)
 
-
-      # I'm pretty sure that redistirbuted_both_present is the same thing as the empirical_both_present so I'm going to remove redistributed_both_present
-      # x_on_r <- sum(empirical_both_present >= both_present[i])
-      # y_on_s <- sum(empirical_only_geno_present <= only_geno_present[i])
-
-      # count only times when permuted (empirical) overlap of genotype and phenotype is more common than obsered (both_present[i])
-      # and when the permuted (empirical) genotype does not overlap with phenotype is less common than observed (only_geno_present[i])
-      new_counter <- sum((empirical_both_present >= both_present[i]) * (empirical_only_geno_present <= only_geno_present[i]))
-      temp_pval <- ((new_counter + 1)/(permutations + 1))
-
-
-      print("sort(empirical_both_present, decreasing = FALSE)[(fdr * permutations)]")
-      print(sort(empirical_both_present, decreasing = FALSE)[(fdr * permutations)])
-      print(sort(empirical_both_present, decreasing = FALSE))
-      print("fdr * permutations")
-      print(fdr * permutations)
-
-      print("both_present[i")
-      print(both_present[i])
-
+      # As of 2019-05-15 I want to completely remove this weird pval if/else statement, but waiting to do so until I discuss with Evan.
       if (sort(empirical_both_present, decreasing = FALSE)[(fdr * permutations)] == 0 & both_present[i] == 0){ # i have no idea why this line exists
         pval <- 1
       } else if (temp_pval == 0 | temp_pval == 1){
@@ -240,7 +214,6 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
 
 
 # 2019-05-15 why the heck are the pvals so weird for discrete?
-
 # weird_pval <- function(temp_pval, permutations){
 #
 #   pval <- NA
@@ -274,6 +247,20 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
 
 
 discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, number_hi_conf_edges, number_genotypes, high_conf_edges, index){
+  # Function description -------------------------------------------------------
+  # Perform a permutation of the edges selected to be genotype transition edges.
+  # permuted_geno_trans_mat is a matrix where each row corresponds to a permuted set of edges and each column corresponds to one high confidence edge.
+  #   To get the edges selected in a permutation, take that row from permuted_geno_trans_mat.
+  #   We could use this format only for later analyses, but a more convenient format is to conver to redistributed_hits.
+  # redistributed_hits is a matrix with nrow = number of perms (same as permuted_geno_trans_mat, but each row now corresponds to a genotype)
+  # Inputs:
+  #
+  #
+  # Outputs:
+  #
+  # Check input ----------------------------------------------------------------
+
+  # Function -------------------------------------------------------------------
   permuted_geno_trans_mat <- matrix(nrow = num_perm, ncol = number_edges_with_geno_trans[index])
   redistributed_hits   <- matrix(0, nrow = num_perm, ncol = number_genotypes)
   set.seed(1)
@@ -292,19 +279,72 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
   for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:nrow(permuted_geno_trans_mat) is the same as 1:permutations
     redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
   }
+  # Return output --------------------------------------------------------------
+
   return(redistributed_hits)
 } # end discrete_permutation()
 
 count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, index){
+  # Function description -------------------------------------------------------
+  # Find number of edges on the tree where the permuted genotype is a transition
+  # AND the phenotype is also a transition (or a phenotype is present in the
+  # reconstruction; it depends on the type of test being run).
+  #
+  # Inputs:
+  # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of genotypes. Either 0 or 1.
+  # pheno_vec. Numeric vector.
+  # hi_conf_edge.
+  # index. Number. The "i" of the loop this function is run within.
+  #
+  # Outputs:
+  # result. Numeric vector. Length = length(emp_both_present).
+  #
+  # Check input ----------------------------------------------------------------
+  check_is_number(index)
+  check_if_binary_matrix(permuted_mat)
+  if (length(pheno_vec) != nrow(permuted_mat)){
+    stop("dimension mismatch")
+  }
+
+  # Function -------------------------------------------------------------------
   result <- sapply(1:nrow(permuted_mat), function(x) {
     sum(pheno_vec[as.logical(hi_conf_edge[[index]])] + permuted_mat[x, ] == 2)
   })
+
+  # Check and return output ----------------------------------------------------
+  if (length(pheno_vec) != length(result)){
+    stop("dimension mismatch")
+  }
   return(result)
 }
 
 count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
+  # Function description -------------------------------------------------------
+  # Find number of edges on the tree where the permuted genotype is a transition
+  # but the phenotype is not (either a transition phenotype edge or phenotype
+  # reconstruction present -- it depends on the type of test being run).
+  #
+  # Inputs:
+  # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of genotypes. Either 0 or 1.
+  # emp_both_present. Numeric vector.
+  #
+  # Outputs:
+  # result. Numeric vector. Length = length(emp_both_present).
+  #
+  # Check input ----------------------------------------------------------------
+  check_if_binary_matrix(permuted_mat)
+  if (length(emp_both_present) != nrow(permuted_mat)){
+    stop("dimension mismatch")
+  }
+
+  # Function -------------------------------------------------------------------
   result <- sapply(1:nrow(permuted_mat), function(x) {
     sum(permuted_mat[x, ]) - emp_both_present[x]
   })
+  # Check & return output --------------------------------------------------------------
+  if (length(emp_both_present) != length(result)){
+    stop("dimension mismatch")
+  }
+
   return(result)
-}
+} # end count_empirical_only_geno_present()
