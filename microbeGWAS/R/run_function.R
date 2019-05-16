@@ -1,5 +1,7 @@
+# TODO: go through script line by and line and write unit tests for any untested functions.
+# TODO clean up script flow to make process more clear. Replace if / else with functions? How else to improve it?
 run_phyc <- function(args){
-  # FORMAT INPUTS ---------------------------------------------------------------#
+  # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
   results_object$log <- capture.output(sessionInfo()) # log session info
 
@@ -11,6 +13,7 @@ run_phyc <- function(args){
   } else {
     genotypes_to_drop_because_not_present <- colnames(args$genotype)[colSums(args$genotype) == 0]
     genotype <- args$genotype[ , colSums(args$genotype) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
+    # TODO replace the magic numbers in the next four lines. Group into a function?
     gene_snp_lookup <- args$gene_snp_lookup[!(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
     gene_snp_lookup <- gene_snp_lookup[gene_snp_lookup[ , 1] %in% colnames(genotype), , drop = FALSE]
     unique_genes <- unique(gene_snp_lookup[ , 2])
@@ -20,7 +23,6 @@ run_phyc <- function(args){
   check_if_convergence_occurs(args$phenotype, args$tree, args$discrete_or_continuous)
   phenotype_vector <- convert_matrix_to_vector(args$phenotype) # TODO add check that it's possible to have phenotype convergence
   check_convergence_possible(phenotype_vector, args$discrete_or_continuous)
-
 
   # ---------------------------------------------------------------------------#
   # PHYC
@@ -53,13 +55,18 @@ run_phyc <- function(args){
 
 
   if (args$discrete_or_continuous == "discrete"){ #when we're doing original phyc
+    # TODO this if statement is incorrect:
+      # If we're doing discrete phyC then I need to have two different definitions of genotype transition one for original phyC and one for trans/sim phyc.
+      # For original phyC then the loop below kinda makes sense (only WT -> mutant)
+      # for the trans/simultanteous phyC we need to include all transition edges (WT > mutant and mutant > WT)
+      # so who will i keep both of these straight in the code base?
     # 2019-03-28 change geno_trans to only have WT -> mutant included for $transition to better reflect original phyC
     for (k in 1:ncol(genotype)){
       # update definition of $transition to be only WT -> mutant
       parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
       geno_trans[[k]]$transition <- as.numeric(geno_trans[[k]]$trans_dir == parent_WT_child_mutant)
     }
-    # TODO what does this update break?
+    # TODO what does this update break? Turn this into a function and add unit tests.
     # it breaks the discrete transition test, but should work well for the discrete original test.
   }
 
@@ -124,6 +131,8 @@ run_phyc <- function(args){
 
   print("B")
   # as of 2019-05-15 assign_high_confidence_to_transition_edges is so stringent that no genotype is getting included after this!
+  # TODO check that assign_high_confidence_to_transition_edges is now the not stringent version (ignores parent edges) - if so, remove this and the comment above.
+  # TODO to clean up code can I move all of the results_object$dummy_name <- dummy assignments to a function at the end so as to improve readability of code / remove extra lines
   only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans, genotype)
   results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
   for (i in 1:ncol(genotype)){
@@ -151,7 +160,7 @@ run_phyc <- function(args){
   snps_per_gene <- snps_per_gene[names(snps_per_gene) %in% colnames(genotype)]
 
   print("C")
-  # break following if else into two seperate functions
+  # TODO break following if else into two seperate functions
   if (args$discrete_or_continuous == "continuous"){
     # RUN PERMUTATION TEST ------------------------------------------------------#
     results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
@@ -222,4 +231,4 @@ run_phyc <- function(args){
   print("end")
 }
 
-
+# TODO remove print statements
