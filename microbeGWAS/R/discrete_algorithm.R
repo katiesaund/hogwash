@@ -231,30 +231,6 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
 
 
       # I'm pretty sure that redistirbuted_both_present is the same thing as the empirical_both_present so I'm going to remove redistributed_both_present
-      # now beginning calculating when the randomly permuted "genotypes" overlap with the hi confidence phenotype
-      temp <- matrix(0, nrow = permutations, ncol = num_genotypes)
-      redistributed_both_present <- rep(0, permutations)
-      two <- rep(2, num_genotypes)
-
-      for (p in 1:permutations){
-        if (length(redistributed_hits[p, ]) == length(phenotype_reconstruction[as.logical(high_confidence_edges[[i]])])){
-          temp[p, ] <- redistributed_hits[p, ] + phenotype_reconstruction[as.logical(high_confidence_edges[[i]])]
-        } else {
-          stop("Dimension mismatch redistributed_hits and phenotype_reconstruction.")
-        }
-      }
-
-      # temp ranges from 0 to 2.
-      # A value of 0 means that the edge (as indicated by column) was not selected in that permutation (as indicated by row) & it's a low confidence pheno edge
-      # A value of 1 means that either the edge was not selected in that permutation but is a low confidence edge or vice versa
-      # A value of 2 means that the edge was selected in that permutation and it's a high confidence edge.
-      for (q in 1:permutations){
-        redistributed_both_present[q] <- sum(temp[q, ] == two)
-      }
-
-      print("redistributed_both_present")
-      print(redistributed_both_present)
-
       # x_on_r <- sum(empirical_both_present >= both_present[i])
       # y_on_s <- sum(empirical_only_geno_present <= only_geno_present[i])
 
@@ -263,7 +239,17 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       new_counter <- sum((empirical_both_present >= both_present[i]) * (empirical_only_geno_present <= only_geno_present[i]))
       temp_pval <- ((new_counter + 1)/(permutations + 1))
 
-      if (sort(redistributed_both_present, decreasing = FALSE)[(fdr * permutations)] == 0 & both_present[i] == 0){
+
+      print("sort(empirical_both_present, decreasing = FALSE)[(fdr * permutations)]")
+      print(sort(empirical_both_present, decreasing = FALSE)[(fdr * permutations)])
+      print(sort(empirical_both_present, decreasing = FALSE))
+      print("fdr * permutations")
+      print(fdr * permutations)
+
+      print("both_present[i")
+      print(both_present[i])
+
+      if (sort(empirical_both_present, decreasing = FALSE)[(fdr * permutations)] == 0 & both_present[i] == 0){ # i have no idea why this line exists
         pval <- 1
       } else if (temp_pval == 0 | temp_pval == 1){
         pval <- 2/(permutations + 1)
@@ -273,7 +259,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
         pval <- (temp_pval * 2)
       }
 
-      record_of_redistributed_both_present[[i]] <- redistributed_both_present
+      record_of_redistributed_both_present[[i]] <- empirical_both_present
       hit_pvals[i] <- format(round(pval, 20), nsmall = 20)
     }
   }
