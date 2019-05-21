@@ -72,7 +72,6 @@ run_phyc <- function(args){
 
   if (args$built_from_snps){
     # TODO change this if statement into a function
-    print("1")
     # CONVERT SNPS INTO GENES HERE
     # tip_and_node_ancestral_reconstruction
     temp_results <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup)
@@ -117,8 +116,6 @@ run_phyc <- function(args){
     }
   }
 
-  print("A")
-
   # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
   # TREE BOOTSTRAP, PHENOTYPUE RECONSTRUCTION CONFIDENCE, AND EDGE LENGTHS
   high_confidence_edges <- pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3
@@ -129,7 +126,6 @@ run_phyc <- function(args){
     all_high_confidence_edges[[k]] <- as.numeric(geno_conf_ordered_by_edges[[k]] + high_confidence_edges == 2)
   }
 
-  print("B")
   # as of 2019-05-15 assign_high_confidence_to_transition_edges is so stringent that no genotype is getting included after this!
   # TODO check that assign_high_confidence_to_transition_edges is now the not stringent version (ignores parent edges) - if so, remove this and the comment above.
   # TODO to clean up code can I move all of the results_object$dummy_name <- dummy assignments to a function at the end so as to improve readability of code / remove extra lines
@@ -159,22 +155,17 @@ run_phyc <- function(args){
   genotype                      <- genotype[ , geno_to_keep, drop = FALSE]
   snps_per_gene <- snps_per_gene[names(snps_per_gene) %in% colnames(genotype)]
 
-  print("C")
   # TODO break following if else into two seperate functions
   if (args$discrete_or_continuous == "continuous"){
     # RUN PERMUTATION TEST ------------------------------------------------------#
     results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
 
-    print("D")
     # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
     corrected_pvals_all_transitions <- get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals, args$fdr)
-    print("E")
     # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES
     all_transitions_sig_hits <- keep_hits_with_more_change_on_trans_edges(results_all_transitions, corrected_pvals_all_transitions, args$fdr)
-    print("F")
     # SAVE AND PLOT RESULTS -----------------------------------------------------#
     trans_mat_results <- plot_significant_hits("continuous", args$tree, args$fdr, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
-    print("G")
     # move next five lines into a function
     results_object$genotype_transition_edge_matrix <- trans_mat_results$trans_dir_edge_mat
     results_object$phenotype_transition_edge_matrix <- trans_mat_results$p_trans_mat
@@ -182,11 +173,8 @@ run_phyc <- function(args){
     results_object$delta_pheno_list <- trans_mat_results$delta_pheno_list
     results_object$hit_pvals <- corrected_pvals_all_transitions$hit_pvals
     results_object$sig_hits <- all_transitions_sig_hits
-    print("H")
     save_results_as_r_object(args$output_dir, args$output_name, results_object)
-    print("I")
   } else { # discrete phenotype
-    print("D")
     genotype_transition_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
       genotype_transition_edges[[k]] <- geno_trans[[k]]$transition
@@ -206,7 +194,6 @@ run_phyc <- function(args){
     results_object$sig_pvals_transition     <- corrected_pvals_trans$sig_pvals
     results_object$sig_pvals_reconstruction <- corrected_pvals_recon$sig_pvals
 
-    print("F")
     discrete_plots(tr = args$tree, # add a test to check that p_recon_edges and g_recon_edges have Nedge(tree)
                    dir = args$output_dir,
                    name = args$output_name,
@@ -228,7 +215,4 @@ run_phyc <- function(args){
 
     save_results_as_r_object(args$output_dir, args$output_name, results_object)
   }
-  print("end")
 }
-
-# TODO remove print statements
