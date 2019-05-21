@@ -1,4 +1,4 @@
-rm(list=ls())
+# rm(list=ls())
 library(microbeGWAS)
 library(ape)       # ape::ace function (ancestral reconstruction)
 library(phytools)  # phylogenetic tree function library
