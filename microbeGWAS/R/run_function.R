@@ -5,7 +5,7 @@ run_phyc <- function(args){
   results_object <- NULL
   results_object$log <- capture.output(sessionInfo()) # log session info
 
-  if (!args$built_from_snps) {
+  if (!args$group_genotype) {
     simplified_genotype <- reduce_redundancy(args$genotype, args$tree) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
     genotype <- simplified_genotype$mat
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
@@ -70,7 +70,7 @@ run_phyc <- function(args){
     # it breaks the discrete transition test, but should work well for the discrete original test.
   }
 
-  if (args$built_from_snps){
+  if (args$group_genotype){
     # TODO change this if statement into a function
     # CONVERT SNPS INTO GENES HERE
     # tip_and_node_ancestral_reconstruction
