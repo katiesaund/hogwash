@@ -23,21 +23,9 @@ run_phyc <- function(args){
 
   phenotype_vector <- prepare_phenotype(args$phenotype, args$discrete_or_continuous, args$tree)
 
-  # ---------------------------------------------------------------------------#
-  # PHYC
-  # ---------------------------------------------------------------------------#
-
   # ANCESTRAL RECONSTRUCTION OF PHENOTYPE -------------------------------------#
   set.seed(1)
   pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(args$tree, args$phenotype, 1, args$discrete_or_continuous)
-  tree_conf             <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
-  pheno_trans           <- identify_transition_edges(args$tree, args$phenotype, 1, pheno_recon_and_conf$node_anc_rec, args$discrete_or_continuous)
-  # TODO identify high confdience pheno trans edges! 2019-03-28
-  pheno_recon_edge_mat  <- pheno_recon_and_conf$recon_edge_mat
-  short_edges           <- identify_short_edges(args$tree)
-  pheno_conf_ordered_by_edges  <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_rec_conf, args$tree)
-  pheno_recon_ordered_by_edges <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_recon, args$tree)
-  tree_conf_ordered_by_edges   <- reorder_tips_and_nodes_to_edges(tree_conf, args$tree)
 
   # ANCESTRAL RECONSTRUCTION OF GENOTYPES ---------------------------------------#
   # INIATLIAZE DATA STRUCTS
@@ -117,6 +105,12 @@ run_phyc <- function(args){
 
   # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
   # TREE BOOTSTRAP, PHENOTYPUE RECONSTRUCTION CONFIDENCE, AND EDGE LENGTHS
+  pheno_conf_ordered_by_edges <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_rec_conf, args$tree)
+  tree_conf                   <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
+  tree_conf_ordered_by_edges  <- reorder_tips_and_nodes_to_edges(tree_conf, args$tree)
+  short_edges                 <- identify_short_edges(args$tree)
+
+
   high_confidence_edges <- pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3
   all_high_confidence_edges <- rep(list(0), ncol(genotype))
 
@@ -156,6 +150,7 @@ run_phyc <- function(args){
 
   # TODO break following if else into two seperate functions
   if (args$discrete_or_continuous == "continuous"){
+    pheno_recon_edge_mat  <- pheno_recon_and_conf$recon_edge_mat
     # RUN PERMUTATION TEST ------------------------------------------------------#
     results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
 
@@ -178,6 +173,10 @@ run_phyc <- function(args){
     for (k in 1:ncol(genotype)){
       genotype_transition_edges[[k]] <- geno_trans[[k]]$transition
     }
+
+    pheno_trans           <- identify_transition_edges(args$tree, args$phenotype, 1, pheno_recon_and_conf$node_anc_rec, args$discrete_or_continuous)
+    pheno_recon_ordered_by_edges <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_recon, args$tree)
+
     results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges, pheno_trans$transition,       genotype)
     results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, genotype)
 
