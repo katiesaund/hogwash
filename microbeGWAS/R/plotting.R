@@ -719,6 +719,9 @@ discrete_plots <- function(tr, dir, name, fdr,
   }
 
   ann_colors = list(locus = locus_col, pheno_presence = pheno_presence_col)
+
+
+
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (plotting_logical){
     # reconstruction loci summary heat maps
@@ -840,13 +843,60 @@ discrete_plots <- function(tr, dir, name, fdr,
     column_annot <- cbind(significant_loci, log_p_value)
   }
 
-  ann_colors = list(
-    locus = c(not_sig = "white", sig = "blue"),
-    pheno_transitions = c( na = "grey", no_transition = "white", transition = "red")
-  )
-
   ordered_by_p_val      <-           g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_trans_mat)), drop = FALSE]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
+
+  # if (length(unique(phenotype_annotation[ ,1])) == 3){
+  #   pheno_presence_col = c(na = "grey", absence = "white", presence = "red")
+  # } else if (length(unique(phenotype_annotation[ ,1])) == 2){
+  #   if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 0)) == 2){
+  #     pheno_presence_col = c(na = "grey", absence = "white")
+  #   } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 1)) == 2){
+  #     pheno_presence_col = c( na = "grey", presence = "red")
+  #   } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(1, 0)) == 2){
+  #     pheno_presence_col = c(absence = "white", presence = "red")
+  #   }
+  # } else if (length(unique(phenotype_annotation[ ,1])) == 1){
+  #   pheno_presence_col = c(presence = "red")
+  #   if (unique(phenotype_annotation[ ,1]) == -1){
+  #     pheno_presence_col = c(na = "grey")
+  #   } else if (unique(phenotype_annotation[ ,1]) == 0){
+  #     pheno_presence_col = c(absence = "white")
+  #   }
+  # }
+
+
+  if (length(unique(phenotype_annotation[ ,1])) == 3){
+    pheno_presence_col = c("-1" = "grey", "0" = "white", "1" = "red")
+  } else if (length(unique(phenotype_annotation[ ,1])) == 2){
+    if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 0)) == 2){
+      pheno_presence_col = c("-1" = "grey", "0" = "white")
+    } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 1)) == 2){
+      pheno_presence_col = c("-1" = "grey", "1" = "red")
+    } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(1, 0)) == 2){
+      pheno_presence_col = c("0" = "white", "1" = "red")
+    }
+  } else if (length(unique(phenotype_annotation[ ,1])) == 1){
+    pheno_presence_col = c("1" = "red")
+    if (unique(phenotype_annotation[ ,1]) == -1){
+      pheno_presence_col = c("-1" = "grey")
+    } else if (unique(phenotype_annotation[ ,1]) == 0){
+      pheno_presence_col = c("0" = "white")
+    }
+  }
+
+  if (length(unique(column_annot_ordered_by_p_val[ ,1])) == 2){
+    locus_col = c(not_sig = "white", sig = "blue")
+  } else if (length(unique(column_annot_ordered_by_p_val[ ,1])) == 1){
+    locus_col = c(sig = "blue")
+    if (unique(column_annot_ordered_by_p_val[ ,1]) == "not_sig"){
+      locus_col = c(not_sig = "white")
+    }
+  }
+
+  ann_colors = list(locus = locus_col, pheno_presence = pheno_presence_col)
+
+
 
 
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
@@ -905,10 +955,9 @@ discrete_plots <- function(tr, dir, name, fdr,
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_transition"
       temp_g_mat <- cbind(g_mat, phenotype_annotation)
-      g_mat<- temp_g_mat[order(temp_g_mat[,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
+      g_mat <- temp_g_mat[order(temp_g_mat[ ,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
 
       ann_colors = list(pheno_transition = c( na = "grey", no_transition = "white", transition = "red"))
-
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
 
 
