@@ -21,25 +21,7 @@ run_phyc <- function(args){
     snps_per_gene <- table(gene_snp_lookup[ , 2])
   }
 
-  phenotype_vector <- prepare_phenotype(args$phenotype, args$discrete_or_continuous, args$tree)
-
-  # ANCESTRAL RECONSTRUCTION OF PHENOTYPE -------------------------------------#
-  set.seed(1)
-  pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(args$tree, args$phenotype, 1, args$discrete_or_continuous)
-
-  # ANCESTRAL RECONSTRUCTION OF GENOTYPES ---------------------------------------#
-  # INIATLIAZE DATA STRUCTS
-  geno_recon_and_conf <- geno_trans <- rep(list(0), ncol(genotype))
-
-  # PERFORM ANCESTRAL RECONSTRUCTION
-  for(k in 1:ncol(genotype)){
-    geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(args$tree, genotype, k, "discrete")
-  }
-
-  for (k in 1:ncol(genotype)){
-    geno_trans[[k]] <- identify_transition_edges(args$tree, genotype, k, geno_recon_and_conf[[k]]$node_anc_rec, "discrete")
-  }
-
+  AR <- prepare_ancestral_reconstructions(args$tree, args$phenotype, genotype, args$discrete_or_continuous)
 
   if (args$discrete_or_continuous == "discrete"){ #when we're doing original phyc
     # TODO this if statement is incorrect:
@@ -51,7 +33,7 @@ run_phyc <- function(args){
     for (k in 1:ncol(genotype)){
       # update definition of $transition to be only WT -> mutant
       parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
-      geno_trans[[k]]$transition <- as.numeric(geno_trans[[k]]$trans_dir == parent_WT_child_mutant)
+      AR$geno_trans[[k]]$transition <- as.numeric(AR$geno_trans[[k]]$trans_dir == parent_WT_child_mutant)
     }
     # TODO what does this update break? Turn this into a function and add unit tests.
     # it breaks the discrete transition test, but should work well for the discrete original test.
@@ -61,12 +43,12 @@ run_phyc <- function(args){
     # TODO change this if statement into a function
     # CONVERT SNPS INTO GENES HERE
     # tip_and_node_ancestral_reconstruction
-    temp_results <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, geno_recon_and_conf, gene_snp_lookup)
+    temp_results <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, AR$geno_recon_and_conf, gene_snp_lookup)
     geno_recon_and_confidence_tip_node_recon <- temp_results$tip_node_recon
     geno_recon_and_confidence_tip_node_confidence <- temp_results$tip_node_conf
 
     # edge based transition
-    geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, geno_trans, gene_snp_lookup)
+    AR$geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, AR$geno_trans, gene_snp_lookup)
 
     # make new genotype (just at the tips, from the snps)
     genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup)
@@ -77,12 +59,12 @@ run_phyc <- function(args){
     genes_to_keep_in_consideration <- !(unique_genes %in% simplified_genotype$dropped_genotype_names)
 
     # remove redundancy from geno trans, geno_recon_and_confdience_tip_node_recon, and node_confidence
-    geno_trans <- geno_trans[genes_to_keep_in_consideration]
+    AR$geno_trans <- AR$geno_trans[genes_to_keep_in_consideration]
 
-    dummy <- geno_trans
-    geno_trans <- rep(list(NULL), length(dummy))
+    dummy <- AR$geno_trans
+    AR$geno_trans <- rep(list(NULL), length(dummy))
     for (i in 1:length(dummy)){
-      geno_trans[[i]]$transition <- as.numeric(as.character(unlist((dummy[i]))))
+      AR$geno_trans[[i]]$transition <- as.numeric(as.character(unlist((dummy[i]))))
     }
 
     geno_recon_and_confidence_tip_node_recon <- geno_recon_and_confidence_tip_node_recon[genes_to_keep_in_consideration]
@@ -98,14 +80,14 @@ run_phyc <- function(args){
   } else {
     geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
-      geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
-      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
+      geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
+      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
     }
   }
 
   # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
   # TREE BOOTSTRAP, PHENOTYPUE RECONSTRUCTION CONFIDENCE, AND EDGE LENGTHS
-  pheno_conf_ordered_by_edges <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_rec_conf, args$tree)
+  pheno_conf_ordered_by_edges <- reorder_tips_and_nodes_to_edges(AR$pheno_recon_and_conf$tip_and_node_rec_conf, args$tree)
   tree_conf                   <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
   tree_conf_ordered_by_edges  <- reorder_tips_and_nodes_to_edges(tree_conf, args$tree)
   short_edges                 <- identify_short_edges(args$tree)
@@ -122,10 +104,10 @@ run_phyc <- function(args){
   # as of 2019-05-15 assign_high_confidence_to_transition_edges is so stringent that no genotype is getting included after this!
   # TODO check that assign_high_confidence_to_transition_edges is now the not stringent version (ignores parent edges) - if so, remove this and the comment above.
   # TODO to clean up code can I move all of the results_object$dummy_name <- dummy assignments to a function at the end so as to improve readability of code / remove extra lines
-  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, geno_trans, genotype)
+  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, AR$geno_trans, genotype)
   results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
   for (i in 1:ncol(genotype)){
-    geno_trans[[i]]$transition <- only_high_conf_geno_trans[[i]]
+    AR$geno_trans[[i]]$transition <- only_high_conf_geno_trans[[i]]
   }
   # how to plot:
   # plot_tree_with_colored_edges(args$tree, geno_trans, all_high_confidence_edges, "grey", "red", "only new transitions", args$annot, "trans", 2)
@@ -133,14 +115,14 @@ run_phyc <- function(args){
   # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#
   # results_object$high_confidence_trasition_edges <- high_confidence_edges 2019-03-18 this is too simplistic-- updating using assign_high_confidence_to_transition_edges()
   # TODO follow through on replacing high_confdience_edges as necessary
-  num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(geno_trans, all_high_confidence_edges, colnames(genotype))
+  num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(AR$geno_trans, all_high_confidence_edges, colnames(genotype))
   results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
 
   # KEEP ONLY GENOTYPES WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES ----#
-  geno_to_keep                  <- keep_at_least_two_high_conf_trans_edges(geno_trans, all_high_confidence_edges)
+  geno_to_keep                  <- keep_at_least_two_high_conf_trans_edges(AR$geno_trans, all_high_confidence_edges)
   geno_recon_ordered_by_edges   <- geno_recon_ordered_by_edges[geno_to_keep]
   high_conf_ordered_by_edges    <- all_high_confidence_edges[geno_to_keep]
-  geno_trans                    <- geno_trans[geno_to_keep]
+  AR$geno_trans                    <- AR$geno_trans[geno_to_keep]
 
   dropped_genotypes <- get_dropped_genotypes(genotype, geno_to_keep)
   results_object$dropped_genotypes <- dropped_genotypes
@@ -150,16 +132,17 @@ run_phyc <- function(args){
 
   # TODO break following if else into two seperate functions
   if (args$discrete_or_continuous == "continuous"){
-    pheno_recon_edge_mat  <- pheno_recon_and_conf$recon_edge_mat
+    pheno_recon_edge_mat  <- AR$pheno_recon_and_conf$recon_edge_mat
     # RUN PERMUTATION TEST ------------------------------------------------------#
-    results_all_transitions <- calculate_genotype_significance(genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
+    results_all_transitions <- calculate_genotype_significance(genotype, args$perm, AR$geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges)
 
     # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
     corrected_pvals_all_transitions <- get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals, args$fdr)
     # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES
     all_transitions_sig_hits <- keep_hits_with_more_change_on_trans_edges(results_all_transitions, corrected_pvals_all_transitions, args$fdr)
     # SAVE AND PLOT RESULTS -----------------------------------------------------#
-    trans_mat_results <- plot_significant_hits("continuous", args$tree, args$fdr, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
+    phenotype_vector <- prepare_phenotype(args$phenotype, args$discrete_or_continuous, args$tree)
+    trans_mat_results <- plot_significant_hits("continuous", args$tree, args$fdr, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, AR$pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, AR$geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
     # move next five lines into a function
     results_object$genotype_transition_edge_matrix <- trans_mat_results$trans_dir_edge_mat
     results_object$phenotype_transition_edge_matrix <- trans_mat_results$p_trans_mat
@@ -171,11 +154,11 @@ run_phyc <- function(args){
   } else { # discrete phenotype
     genotype_transition_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
-      genotype_transition_edges[[k]] <- geno_trans[[k]]$transition
+      genotype_transition_edges[[k]] <- AR$geno_trans[[k]]$transition
     }
 
-    pheno_trans           <- identify_transition_edges(args$tree, args$phenotype, 1, pheno_recon_and_conf$node_anc_rec, args$discrete_or_continuous)
-    pheno_recon_ordered_by_edges <- reorder_tips_and_nodes_to_edges(pheno_recon_and_conf$tip_and_node_recon, args$tree)
+    pheno_trans           <- identify_transition_edges(args$tree, args$phenotype, 1, AR$pheno_recon_and_conf$node_anc_rec, args$discrete_or_continuous)
+    pheno_recon_ordered_by_edges <- reorder_tips_and_nodes_to_edges(AR$pheno_recon_and_conf$tip_and_node_recon, args$tree)
 
     results_object$contingency_table_trans <- create_contingency_table(genotype_transition_edges, pheno_trans$transition,       genotype)
     results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, genotype)

@@ -97,5 +97,4 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   return(pheno_vector)
 } # end prepare_phenotype
 
-
 # END OF SCRIPT ---------------------------------------------------------------#

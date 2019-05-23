@@ -293,3 +293,39 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
   # Return output --------------------------------------------------------------
   return(reconstruction_as_edge_mat)
 } # end convert_to_edge_mat()
+
+prepare_ancestral_reconstructions <- function(tr, pheno, geno, disc_cont){
+  # Function description -------------------------------------------------------
+  # Run ancestral reconstructions for phenotype and genotypes.
+  #
+  # Inputs:
+  # tr. Phylo. Ntip = nrow(pheno).
+  # pheno. Matrix. Nrow = Ntip(tr). Ncol = 1.
+  # geno. Matrix. Binary.
+  # disc_cont. String. Either "discrete" or "continuous"
+  #
+  #
+  # Outputs:
+  # pheno_vector. Vector. Length = Ntip(tr).
+  #
+  # Check input ----------------------------------------------------------------
+  check_for_root_and_bootstrap(tr)
+  check_str_is_discrete_or_continuous(disc_cont)
+  check_dimensions(pheno, exact_rows = Ntip(tr), min_rows = Ntip(tr), min_cols = 1, exact_cols = 1)
+  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = Ntip(tr), min_cols = 1)
+  check_if_binary_matrix(geno)
+
+  # Function -------------------------------------------------------------------
+  pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(tr, pheno, 1, disc_cont)
+  geno_recon_and_conf <- geno_trans <- rep(list(0), ncol(geno))
+  for (k in 1:ncol(geno)){
+    geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(tr, geno, k, "discrete")
+  }
+  for (k in 1:ncol(geno)){
+    geno_trans[[k]] <- identify_transition_edges(tr, geno, k, geno_recon_and_conf[[k]]$node_anc_rec, "discrete")
+  }
+
+  # Check and return output ----------------------------------------------------
+  results <- list("pheno_recon_and_conf" = pheno_recon_and_conf, "geno_recon_and_conf" = geno_recon_and_conf, "geno_trans" = geno_trans)
+  return(results)
+} # end prepare_ancestral_reconstructions
