@@ -11,21 +11,24 @@ run_phyc <- function(args){
 
   AR <- prepare_ancestral_reconstructions(args$tree, args$phenotype, genotype, args$discrete_or_continuous)
 
-  if (args$discrete_or_continuous == "discrete"){ #when we're doing original phyc
-    # TODO this if statement is incorrect:
-      # If we're doing discrete phyC then I need to have two different definitions of genotype transition one for original phyC and one for trans/sim phyc.
-      # For original phyC then the loop below kinda makes sense (only WT -> mutant)
-      # for the trans/simultanteous phyC we need to include all transition edges (WT > mutant and mutant > WT)
-      # so who will i keep both of these straight in the code base?
-    # 2019-03-28 change geno_trans to only have WT -> mutant included for $transition to better reflect original phyC
-    for (k in 1:ncol(genotype)){
-      # update definition of $transition to be only WT -> mutant
-      parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
-      AR$geno_trans[[k]]$transition <- as.numeric(AR$geno_trans[[k]]$trans_dir == parent_WT_child_mutant)
-    }
-    # TODO what does this update break? Turn this into a function and add unit tests.
-    # it breaks the discrete transition test, but should work well for the discrete original test.
-  }
+  geno_trans_disc_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT).
+  geno_trans_disc_original <- prepare_genotype_transitions_for_original_discrete_test(args$discrete_or_continuous, genotype, AR$geno_trans) # Keep only WT -> mutant transitions.
+
+  # if (args$discrete_or_continuous == "discrete"){ #when we're doing original phyc
+  #   # TODO this if statement is incorrect:
+  #     # If we're doing discrete phyC then I need to have two different definitions of genotype transition one for original phyC and one for trans/sim phyc.
+  #     # For original phyC then the loop below kinda makes sense (only WT -> mutant)
+  #     # for the trans/simultanteous phyC we need to include all transition edges (WT > mutant and mutant > WT)
+  #     # so who will i keep both of these straight in the code base?
+  #   # 2019-03-28 change geno_trans to only have WT -> mutant included for $transition to better reflect original phyC
+  #   for (k in 1:ncol(genotype)){
+  #     # update definition of $transition to be only WT -> mutant
+  #     parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
+  #     AR$geno_trans[[k]]$transition <- as.numeric(AR$geno_trans[[k]]$trans_dir == parent_WT_child_mutant)
+  #   }
+  #   # TODO what does this update break? Turn this into a function and add unit tests.
+  #   # it breaks the discrete transition test, but should work well for the discrete original test.
+  # }
 
   if (args$group_genotype){
     # TODO change this if statement into a function
@@ -110,7 +113,7 @@ run_phyc <- function(args){
   geno_to_keep                  <- keep_at_least_two_high_conf_trans_edges(AR$geno_trans, all_high_confidence_edges)
   geno_recon_ordered_by_edges   <- geno_recon_ordered_by_edges[geno_to_keep]
   high_conf_ordered_by_edges    <- all_high_confidence_edges[geno_to_keep]
-  AR$geno_trans                    <- AR$geno_trans[geno_to_keep]
+  AR$geno_trans                 <- AR$geno_trans[geno_to_keep]
 
   dropped_genotypes <- get_dropped_genotypes(genotype, geno_to_keep)
   results_object$dropped_genotypes <- dropped_genotypes

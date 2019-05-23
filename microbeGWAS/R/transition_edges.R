@@ -150,3 +150,25 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
   # Check and return output ----------------------------------------------------
   return(hits)
 } # end keep_hits_with_more_change_on_trans_edges()
+
+prepare_genotype_transitions_for_original_discrete_test <- function(disc_cont, geno, genotype_transition){
+  if (disc_cont == "discrete"){
+    # Discrete testing requires two different definitions of genotype
+    # transition:
+    # 1) Version based on the original phyC
+    # 2) Version for requiring concomitant transition state change phenotype
+    #    and genotype.
+    # This function converstions geno_trans$transition from the object created
+    # for concomitant test to the version required for the original test.
+    #
+    # Note: for original phyC prepare genotype transition as below: keep only
+    #       WT -> mutant transitions (0 -> 1).
+
+    # Function ---------------------------------------------------------------
+    for (k in 1:ncol(geno)){
+      parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
+      genotype_transition[[k]]$transition <- as.numeric(genotype_transition[[k]]$trans_dir == parent_WT_child_mutant)
+    }
+    return(genotype_transition)
+  }
+} # prepare_genotype_transitions_for_original_discrete_test
