@@ -18,7 +18,8 @@ Imports:
     gridExtra,
     ggplot2,
     truncnorm,
-    geiger
+    geiger,
+    optparse
 Suggests: 
     testthat
     
