@@ -1,3 +1,6 @@
+# TODO rewrite check_input_format() and read_in_arguments()! They're very outdated.
+# TODO write unit tests for them both.
+# Note: they get called in phyc_run.R in this dir: /nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS
 read_in_tsv_matrix <- function(mat){
   # Function description -------------------------------------------------------
   # Read in the standardized GWAS matrix format: rows correspond to samples, columns correspond to genotypes/phenotypes.
@@ -167,3 +170,24 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr, annot){
   return(discrete_or_continuous)
 } # end check_input_format()
 
+
+new_read_in_arguments <- function(){
+  INPUTS ----------------------------------------------------------------------#
+    # Set up arguments
+    inputs     <- list(make_option(c("-p", "--phenotype"),        type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"),
+                       make_option(c("-t", "--tree"),             type = "character", default = NULL, help = "path to phylogenetic tree .tre file",       metavar = "character"),
+                       make_option(c("-r", "--roary"),            type = "character", default = NULL, help = "path to roary pangenome .Rtab file",        metavar = "character"),
+                       make_option(c("-q", "--gene_stop"),        type = "character", default = NULL, help = "path to SNPeff high gene matrix .rda file", metavar = "character"),
+                       make_option(c("-i", "--gene_high"),        type = "character", default = NULL, help = "path to stop gene matrix .rda file",        metavar = "character"),
+                       make_option(c("-n", "--gene_ns"),          type = "character", default = NULL, help = "path to gene nonsynonymous .rda file",      metavar = "character"),
+                       make_option(c("-s", "--snp"),              type = "character", default = NULL, help = "path to simple SNP matrix .rda file",       metavar = "character"),
+                       make_option(c("-g", "--generic_genotype"), type = "character", default = NULL, help = "path to a generic genotype .tsv file",      metavar = "character"),
+                       make_option(c("-f", "--generic_filename"), type = "character", default = NULL, help = "name of generic genotype",                  metavar = "character"),
+                       make_option(c("-o", "--out"),              type = "character", default = NULL, help = "output directory",                          metavar = "character"))
+    opt_parser <- OptionParser(option_list=inputs)
+    opt        <- parse_args(opt_parser)
+
+    if (!is.null(opt$snp)){
+      if (file.exists(opt$snp)){
+        snp      <- local(get(load(opt$snp)))}}
+}
