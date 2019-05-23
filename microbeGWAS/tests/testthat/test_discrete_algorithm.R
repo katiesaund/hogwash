@@ -71,6 +71,9 @@ test_that("discrete_calculate_pvals returns expected results given this dummy da
   temp_geno <- matrix(1, ncol = num_genotypes, nrow = Ntip(temp_tree)) # doesn't match recon or transition, just made up for now.
   temp_perm <- 8
   temp_fdr <- 0.25
+
+  expect_error(discrete_calculate_pvals(temp_geno_trans, temp_pheno_trans, temp_tree, temp_geno, temp_perm, temp_fdr, temp_hi_conf_edges), NA)
+
   disc_trans_results <- discrete_calculate_pvals(temp_geno_trans, temp_pheno_trans, temp_tree, temp_geno, temp_perm, temp_fdr, temp_hi_conf_edges)
 
   expect_equal(round(as.numeric(disc_trans_results$hit_pvals[1]), 3), 0.444)
@@ -127,40 +130,16 @@ test_that("discrete_permutation returns expected results given this dummy data",
 
 # test count_empirical_both_present
 
-# count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, index){
-#   # Function description -------------------------------------------------------
-#   # Find number of edges on the tree where the permuted genotype is a transition
-#   # AND the phenotype is also a transition (or a phenotype is present in the
-#   # reconstruction; it depends on the type of test being run).
-#   #
-#   # Inputs:
-#   # permuted_mat. Matrix. Nrow = number of permutations. Ncol = number of tr edges. Either 0 or 1.
-#   # pheno_vec. Numeric vector.
-#   # hi_conf_edge.
-#   # index. Number. The "i" of the loop this function is run within.
-#   #
-#   # Outputs:
-#   # result. Numeric vector. Length = num perm.
-#   #
-#   # Check input ----------------------------------------------------------------
-#   check_is_number(index)
-#   check_if_binary_matrix(permuted_mat)
-#   if (length(pheno_vec) != ncol(permuted_mat)){
-#     stop("input dimension mismatch")
-#   }
-#
-#   # Function -------------------------------------------------------------------
-#   result <- sapply(1:nrow(permuted_mat), function(x) {
-#     sum(pheno_vec[as.logical(hi_conf_edge[[index]])] + permuted_mat[x, ] == 2)
-#   })
-#
-#   # Check and return output ----------------------------------------------------
-#   if (nrow(permuted_mat) != length(result)){
-#     stop("result dimension mismatch")
-#   }
-#   return(result)
-# }
-#
+test_that("count_empirical_both_present gives X given Y", {
+  temp_pheno_vec <- c(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+  temp_hi_conf_edge <- NULL
+  temp_hi_conf_edge[[1]] <- c(0, 1 ,1, 0, 0, 1, 1, 0, 0, 1, 1, 1)
+  temp_hi_conf_edge[[2]] <- c(0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1)
+  temp_permuted_mat <- matrix(rbinom(120, 1, .5), ncol = 12, nrow = 10)
+  temp_index <- 1
+  expect_error(count_empirical_both_present(temp_permuted_mat, temp_pheno_vec, temp_hi_conf_edge, temp_index), NA)
+  expect_warning(count_empirical_both_present(temp_permuted_mat, temp_pheno_vec, temp_hi_conf_edge, temp_index), NA)
+})
 
 # test count_empirical_only_geno_present
 

@@ -321,20 +321,11 @@ count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, 
     stop("phenotype vs confidence dimension mismatch")
   }
 
-  # temp
-  print(length(pheno_vec))
-  print(length(as.logical(hi_conf_edge[[index]])))
-  print(length(pheno_vec[as.logical(hi_conf_edge[[index]])]))
-  print(length(permuted_mat[1, ]))
-  print(length(permuted_mat[2, ]))
-  print(dim(permuted_mat))
-
   # Function -------------------------------------------------------------------
   result <- sapply(1:nrow(permuted_mat), function(x) {
-    sum(pheno_vec[as.logical(hi_conf_edge[[index]])] + permuted_mat[x, ] == 2)
+    sum((pheno_vec + permuted_mat[x, ]) == 2 & hi_conf_edge[[index]] == 1)
   })
 
-  print(result)
   # Check and return output ----------------------------------------------------
   if (nrow(permuted_mat) != length(result)){
     stop("result dimension mismatch")
