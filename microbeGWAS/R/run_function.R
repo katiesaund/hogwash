@@ -31,50 +31,61 @@ run_phyc <- function(args){
     }
   }
 
-  # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
-  # TREE BOOTSTRAP, PHENOTYPUE RECONSTRUCTION CONFIDENCE, AND EDGE LENGTHS
-  pheno_conf_ordered_by_edges <- reorder_tips_and_nodes_to_edges(AR$pheno_recon_and_conf$tip_and_node_rec_conf, args$tree)
-  tree_conf                   <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
-  tree_conf_ordered_by_edges  <- reorder_tips_and_nodes_to_edges(tree_conf, args$tree)
-  short_edges                 <- identify_short_edges(args$tree)
+  all_hi_conf <- prepare_high_confidence_objects(tr = args$tree,
+                                                 pheno_tip_node_recon_conf = AR$pheno_recon_and_conf$tip_and_node_rec_conf,
+                                                 boot_threshold = args$bootstrap_cutoff,
+                                                 geno = genotype,
+                                                 geno_conf_edge  = geno_conf_ordered_by_edges,
+                                                 geno_recon_edge = geno_recon_ordered_by_edges,
+                                                 snps_in_each_gene = geno$snps_per_gene)
 
-
-  high_confidence_edges <- pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3
-  all_high_confidence_edges <- rep(list(0), ncol(genotype))
-
-  # ADD IN GENOTYPE RECONSTRUCTION CONFIDENCE
-  for (k in 1:ncol(genotype)){
-    all_high_confidence_edges[[k]] <- as.numeric(geno_conf_ordered_by_edges[[k]] + high_confidence_edges == 2)
-  }
-
-  # as of 2019-05-15 assign_high_confidence_to_transition_edges is so stringent that no genotype is getting included after this!
-  # TODO check that assign_high_confidence_to_transition_edges is now the not stringent version (ignores parent edges) - if so, remove this and the comment above.
-  # TODO to clean up code can I move all of the results_object$dummy_name <- dummy assignments to a function at the end so as to improve readability of code / remove extra lines
-  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, AR$geno_trans, genotype)
   results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
-  for (i in 1:ncol(genotype)){
-    AR$geno_trans[[i]]$transition <- only_high_conf_geno_trans[[i]]
-  }
-  # how to plot:
-  # plot_tree_with_colored_edges(args$tree, geno_trans, all_high_confidence_edges, "grey", "red", "only new transitions", args$annot, "trans", 2)
-
-  # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#
-  # results_object$high_confidence_trasition_edges <- high_confidence_edges 2019-03-18 this is too simplistic-- updating using assign_high_confidence_to_transition_edges()
-  # TODO follow through on replacing high_confdience_edges as necessary
-  num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(AR$geno_trans, all_high_confidence_edges, colnames(genotype))
-  results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
-
-  # KEEP ONLY GENOTYPES WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES ----#
-  geno_to_keep                  <- keep_at_least_two_high_conf_trans_edges(AR$geno_trans, all_high_confidence_edges)
-  geno_recon_ordered_by_edges   <- geno_recon_ordered_by_edges[geno_to_keep]
-  high_conf_ordered_by_edges    <- all_high_confidence_edges[geno_to_keep]
-  AR$geno_trans                 <- AR$geno_trans[geno_to_keep]
-
-  dropped_genotypes <- get_dropped_genotypes(genotype, geno_to_keep)
   results_object$dropped_genotypes <- dropped_genotypes
 
-  genotype                      <- genotype[ , geno_to_keep, drop = FALSE]
-  geno$snps_per_gene <- geno$snps_per_gene[names(geno$snps_per_gene) %in% colnames(genotype)]
+  # # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
+  # # TREE BOOTSTRAP, PHENOTYPUE RECONSTRUCTION CONFIDENCE, AND EDGE LENGTHS
+  # pheno_conf_ordered_by_edges <- reorder_tips_and_nodes_to_edges(AR$pheno_recon_and_conf$tip_and_node_rec_conf, args$tree)
+  # tree_conf                   <- get_bootstrap_confidence(args$tree, args$bootstrap_cutoff)
+  # tree_conf_ordered_by_edges  <- reorder_tips_and_nodes_to_edges(tree_conf, args$tree)
+  # short_edges                 <- identify_short_edges(args$tree)
+  #
+  #
+  # high_confidence_edges <- pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3
+  # all_high_confidence_edges <- rep(list(0), ncol(genotype))
+  #
+  # # ADD IN GENOTYPE RECONSTRUCTION CONFIDENCE
+  # for (k in 1:ncol(genotype)){
+  #   all_high_confidence_edges[[k]] <- as.numeric(geno_conf_ordered_by_edges[[k]] + high_confidence_edges == 2)
+  # }
+  #
+  # # as of 2019-05-15 assign_high_confidence_to_transition_edges is so stringent that no genotype is getting included after this!
+  # # TODO check that assign_high_confidence_to_transition_edges is now the not stringent version (ignores parent edges) - if so, remove this and the comment above.
+  # # TODO to clean up code can I move all of the results_object$dummy_name <- dummy assignments to a function at the end so as to improve readability of code / remove extra lines
+  # only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(args$tree, all_high_confidence_edges, AR$geno_trans, genotype)
+  # results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
+  # for (i in 1:ncol(genotype)){
+  #   AR$geno_trans[[i]]$transition <- only_high_conf_geno_trans[[i]]
+  # }
+  # # how to plot:
+  # # plot_tree_with_colored_edges(args$tree, geno_trans, all_high_confidence_edges, "grey", "red", "only new transitions", args$annot, "trans", 2)
+  #
+  # # SAVE FILE WITH NUMBER OF HIGH CONFIDENCE TRANSITION EDGES PER GENOTYPE-----#
+  # # results_object$high_confidence_trasition_edges <- high_confidence_edges 2019-03-18 this is too simplistic-- updating using assign_high_confidence_to_transition_edges()
+  # # TODO follow through on replacing high_confdience_edges as necessary
+  # num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(AR$geno_trans, all_high_confidence_edges, colnames(genotype))
+  # results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
+  #
+  # # KEEP ONLY GENOTYPES WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES ----#
+  # geno_to_keep                  <- keep_at_least_two_high_conf_trans_edges(AR$geno_trans, all_high_confidence_edges)
+  # geno_recon_ordered_by_edges   <- geno_recon_ordered_by_edges[geno_to_keep]
+  # high_conf_ordered_by_edges    <- all_high_confidence_edges[geno_to_keep]
+  # AR$geno_trans                 <- AR$geno_trans[geno_to_keep]
+  #
+  # dropped_genotypes <- get_dropped_genotypes(genotype, geno_to_keep)
+  # results_object$dropped_genotypes <- dropped_genotypes
+  #
+  # genotype                      <- genotype[ , geno_to_keep, drop = FALSE]
+  # geno$snps_per_gene <- geno$snps_per_gene[names(geno$snps_per_gene) %in% colnames(genotype)]
 
   # TODO break following if else into two seperate functions
   if (args$discrete_or_continuous == "continuous"){
