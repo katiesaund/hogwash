@@ -128,7 +128,6 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
   counter <- 0 # TODO can I get rid of counter now? 2019-02-25
   for (j in 1:nrow(pval_all_transition$hit_pvals)){
     if (pval_all_transition$hit_pvals[j, 1] < fdr){
-      print("making significant plots")
       counter <- counter + 1
       par(mfrow = c(3, 3))
       par(mgp   = c(3, 1, 0))
@@ -685,28 +684,58 @@ discrete_plots <- function(tr, dir, name, fdr,
   }
 
 
-  ann_colors = list(
-    locus = c(not_sig = "white", sig = "blue"),
-    pheno_presence = c( na = "grey", absence = "white", presence = "red")
-  )
 
-  ordered_by_p_val      <-           g_recon_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_recon_mat))]
+
+  ordered_by_p_val      <-           g_recon_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_recon_mat)), drop = FALSE]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
 
-  # reconstruction loci summary heat maps
-  pheatmap( # Plot the heatmap
-    ordered_by_p_val,
-    main          = paste0("Edges:\n Genotype transition with phenotype presence/absence"),
-    cluster_cols  = FALSE,
-    na_col = "grey",
-    cluster_rows  = FALSE,
-    show_rownames = FALSE,
-    color = c("white", "black"),
-    annotation_col = column_annot_ordered_by_p_val,
-    annotation_row = phenotype_annotation,
-    annotation_colors = ann_colors,
-    show_colnames = TRUE,
-    cellwidth = cell_width_value)
+  # TODO: make sure this kind of annotation steps gets generalized to more locatoins -- I think I wrote a function like this somewhere else. Double check!
+  if (length(unique(phenotype_annotation[ ,1])) == 3){
+    pheno_presence_col = c( na = "grey", absence = "white", presence = "red")
+  } else if (length(unique(phenotype_annotation[ ,1])) == 2){
+    if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 0)) == 2){
+      pheno_presence_col = c(na = "grey", absence = "white")
+    } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 1)) == 2){
+      pheno_presence_col = c( na = "grey", presence = "red")
+    } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(1, 0)) == 2){
+      pheno_presence_col = c(absence = "white", presence = "red")
+    }
+  } else if (length(unique(phenotype_annotation[ ,1])) == 1){
+    pheno_presence_col = c(presence = "red")
+    if (unique(phenotype_annotation[ ,1]) == -1){
+      pheno_presence_col = c(na = "grey")
+    } else if (unique(phenotype_annotation[ ,1]) == 0){
+      pheno_presence_col = c(absence = "white")
+    }
+  }
+
+  if (length(unique(column_annot_ordered_by_p_val[ ,1])) == 2){
+    locus_col = c(not_sig = "white", sig = "blue")
+  } else if (length(unique(column_annot_ordered_by_p_val[ ,1])) == 1){
+    locus_col = c(sig = "blue")
+    if (unique(column_annot_ordered_by_p_val[ ,1]) == "not_sig"){
+      locus_col = c(not_sig = "white")
+    }
+  }
+
+  ann_colors = list(locus = locus_col, pheno_presence = pheno_presence_col)
+  plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
+  if (plotting_logical){
+    # reconstruction loci summary heat maps
+    pheatmap( # Plot the heatmap
+      ordered_by_p_val,
+      main          = paste0("Edges:\n Genotype transition with phenotype presence/absence"),
+      cluster_cols  = FALSE,
+      na_col = "grey",
+      cluster_rows  = FALSE,
+      show_rownames = FALSE,
+      color = c("white", "black"),
+      annotation_col = column_annot_ordered_by_p_val,
+      annotation_row = phenotype_annotation,
+      annotation_colors = ann_colors,
+      show_colnames = TRUE,
+      cellwidth = cell_width_value)
+  }
 
   # loop through reconstruction sig hits:
   pheno_as_list <- list(p_recon_edges)
@@ -816,27 +845,28 @@ discrete_plots <- function(tr, dir, name, fdr,
     pheno_transitions = c( na = "grey", no_transition = "white", transition = "red")
   )
 
-  ordered_by_p_val      <-           g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_trans_mat))]
+  ordered_by_p_val      <-           g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_trans_mat)), drop = FALSE]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
 
-  print(ordered_by_p_val)
-  print(column_annot_ordered_by_p_val)
-  print(phenotype_annotation)
 
-  # Transition loci summary heat maps
-  pheatmap( # Plot the heatmap
-    ordered_by_p_val,
-    main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
-    cluster_cols  = FALSE,
-    na_col = "grey",
-    cluster_rows  = FALSE,
-    show_rownames = FALSE,
-    color = c("white", "black"),
-    annotation_col = column_annot_ordered_by_p_val,
-    annotation_row = phenotype_annotation,
-    annotation_colors = ann_colors,
-    show_colnames = TRUE,
-    cellwidth = cell_width_value)
+  can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
+  if (can_be_plotted){
+    # Transition loci summary heat maps
+    pheatmap( # Plot the heatmap
+      ordered_by_p_val,
+      main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
+      cluster_cols  = FALSE,
+      na_col = "grey",
+      cluster_rows  = FALSE,
+      show_rownames = FALSE,
+      color = c("white", "black"),
+      annotation_col = column_annot_ordered_by_p_val,
+      annotation_row = phenotype_annotation,
+      annotation_colors = ann_colors,
+      show_colnames = TRUE,
+      cellwidth = cell_width_value)
+  }
+
 
   # loop through transition sig hits:
   for (j in 1:nrow(trans_hit_vals)){
