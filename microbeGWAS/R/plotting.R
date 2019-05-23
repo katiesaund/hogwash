@@ -819,6 +819,10 @@ discrete_plots <- function(tr, dir, name, fdr,
   ordered_by_p_val      <-           g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_trans_mat))]
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
 
+  print(ordered_by_p_val)
+  print(column_annot_ordered_by_p_val)
+  print(phenotype_annotation)
+
   # Transition loci summary heat maps
   pheatmap( # Plot the heatmap
     ordered_by_p_val,
