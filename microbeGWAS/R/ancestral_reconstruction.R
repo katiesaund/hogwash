@@ -162,6 +162,7 @@ discrete_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_met
   # Function -------------------------------------------------------------------
   set.seed(1)
   recon_model <- pick_recon_model(mat, tr, disc_cont, num, recon_method)
+  set.seed(1)
   reconstruction <- ace(mat[ , num, drop = TRUE],
                         tr,
                         model = recon_model,
