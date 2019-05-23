@@ -1,4 +1,5 @@
 library(ape)
+library(phytools)
 set.seed(1)
 tree <- rtree(7)
 tree$edge.length <- rep(sum(tree$edge.length)/Nedge(tree), Nedge(tree))
@@ -7,6 +8,11 @@ tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 discrete_phenotype <- matrix(c(0, 1, 1, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
 row.names(discrete_phenotype) <- tree$tip.label
 colnames(discrete_phenotype) <- "resistance"
+
+set.seed(1)
+continuous_phenotype <- as.matrix(fastBM(tree))
+row.names(continuous_phenotype) <- tree$tip.label
+colnames(continuous_phenotype) <- "growth"
 
 genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
 genotype2 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
@@ -27,5 +33,6 @@ snp_gene_key[ , 2] <- c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "G
 
 write.table(genotype, file = "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/grouped_genotype.tsv", sep = "\t", quote = FALSE, row.names = TRUE, col.names = TRUE)
 write.table(discrete_phenotype, file = "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/discrete_phenotype.tsv", sep = "\t", quote = FALSE, row.names = TRUE, col.names = TRUE)
+write.table(continuous_phenotype, file = "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/continuous_phenotype_grouped_genotype/continuous_phenotype.tsv", sep = "\t", quote = FALSE, row.names = TRUE, col.names = TRUE)
 write.table(snp_gene_key, file = "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/snp_gene_key.tsv", sep = "\t", quote = FALSE, row.names = TRUE, col.names = TRUE)
 write.tree(tree, file = "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/tree.tree")
