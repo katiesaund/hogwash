@@ -674,7 +674,7 @@ discrete_plots <- function(tr, dir, name, fdr,
   significant_loci <- data.frame("locus" = rep("not_sig", ncol(g_recon_mat)), stringsAsFactors = FALSE)
   row.names(significant_loci) <- row.names(recon_hit_vals)
   log_p_value <- data.frame(-log(recon_hit_vals))
-  significant_loci[log_p_value > -log(a)] <- "sig"
+  significant_loci[log_p_value > -log(fdr)] <- "sig"
 
   if (!is.null(snp_in_gene)){
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
@@ -745,7 +745,6 @@ discrete_plots <- function(tr, dir, name, fdr,
       colnames(g_mat) <- "genotype_transition"
       temp_g_mat <- cbind(g_mat, phenotype_annotation)
       g_mat <- temp_g_mat[order(temp_g_mat[,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
-
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
 
       if (plotting_logical){
