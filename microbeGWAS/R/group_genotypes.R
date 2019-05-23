@@ -315,7 +315,7 @@ format_and_name_grouped_transitions <- function(genotype_transition){
 
 group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, genotype_transisition_con, genotype_transition_orig, lookup, uni_genes){
   geno_recon_and_confidence_tip_node <- build_gene_anc_recon_and_conf_from_snp(tr, geno, genotype_reconstruction_and_confidence, lookup)
-  genotype_transisition_con <- build_gene_trans_from_snp_trans(tr, geno, z, lookup)
+  genotype_transisition_con <- build_gene_trans_from_snp_trans(tr, geno, genotype_transisition_con, lookup)
   genotype_transition_orig    <- build_gene_trans_from_snp_trans(tr, geno, genotype_transition_orig, lookup)
 
   # make new geno (just at the tips, from the snps)
