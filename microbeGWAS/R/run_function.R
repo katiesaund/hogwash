@@ -20,10 +20,8 @@ run_phyc <- function(args){
     unique_genes <- unique(gene_snp_lookup[ , 2])
     snps_per_gene <- table(gene_snp_lookup[ , 2])
   }
-  check_if_phenotype_normal(args$phenotype, args$discrete_or_continuous)
-  check_if_convergence_occurs(args$phenotype, args$tree, args$discrete_or_continuous)
-  phenotype_vector <- convert_matrix_to_vector(args$phenotype) # TODO add check that it's possible to have phenotype convergence
-  check_convergence_possible(phenotype_vector, args$discrete_or_continuous)
+
+  phenotype_vector <- prepare_phenotype(args$phenotype, args$discrete_or_continuous, args$tree)
 
   # ---------------------------------------------------------------------------#
   # PHYC
@@ -198,7 +196,7 @@ run_phyc <- function(args){
     discrete_plots(tr = args$tree, # add a test to check that p_recon_edges and g_recon_edges have Nedge(tree)
                    dir = args$output_dir,
                    name = args$output_name,
-                   a = args$fdr,
+                   fdr = args$fdr,
                    annot = args$annot,
                    num_perm = args$perm,
                    recon_hit_vals = corrected_pvals_recon$hit_pvals,

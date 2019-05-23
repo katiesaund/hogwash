@@ -62,4 +62,40 @@ create_test_data <- function(){
   results <- list("tree" = tree, "phenotype" = phenotype_matrix, "genotype" = genotype_matrix)
   return(results)
 } # end create_test_data()
+
+prepare_phenotype <- function(pheno, disc_cont, tr){
+  # Function description -------------------------------------------------------
+  # Prepare phenotype for downstream analysese.
+  # Convert phenotype matrix to phenotype vector.
+  # Check if the continuous phenotype is normally distributed.
+  # Check if convergence is possible in the phenotype given the tree.
+  #
+  # Inputs:
+  # pheno. Matrix with 1 column.
+  # disc_cont. String. Either "discrete" or "continuous"
+  # tr. Phylo. Ntip = nrow(pheno).
+  #
+  # Outputs:
+  # pheno_vector. Vector. Length = Ntip(tr).
+  #
+  # Check input ----------------------------------------------------------------
+  check_for_root_and_bootstrap(tr)
+  check_dimensions(pheno, exact_rows = Ntip(tr), exact_cols = 1, min_rows = 1, min_cols = 1)
+  check_str_is_discrete_or_continuous(disc_cont)
+
+  # Function -------------------------------------------------------------------
+  check_if_phenotype_normal(pheno, disc_cont)
+  check_if_convergence_occurs(pheno, tr, disc_cont)
+  pheno_vector <- convert_matrix_to_vector(pheno)
+  check_convergence_possible(pheno_vector, disc_cont)
+
+  # Check and return output --------------------------------------------------------------
+  if (length(pheno_vector) != Ntip(tr)){
+    stop("Length mismatch")
+  }
+
+  return(pheno_vector)
+} # end prepare_phenotype
+
+
 # END OF SCRIPT ---------------------------------------------------------------#
