@@ -612,9 +612,9 @@ test_that("check_if_g_mat_can_be_plotted returns an error for a non-binary matri
   expect_error(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
-test_that("check_if_g_mat_can_be_plotted returns an error for a binary dataframe of 2x2", {
+test_that("check_if_g_mat_can_be_plotted doesn't return an error for a binary dataframe of 2x2", {
   temp_mat <- as.data.frame(matrix(c(0, 1, 0, 1), nrow = 2, ncol = 2))
-  expect_error(check_if_g_mat_can_be_plotted(temp_mat))
+  expect_error(check_if_g_mat_can_be_plotted(temp_mat), NA)
 })
 
 test_that("check_if_g_mat_can_be_plotted returns FALSE for a binary matrix of all zeroes", {

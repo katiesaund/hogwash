@@ -454,15 +454,20 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
   # plot_logical. Logical. TRUE or FALSE.
   #
   # Check input ----------------------------------------------------------------
-  if (nrow(geno_matrix) < 1 | ncol(geno_matrix) < 2){
-    plot_logical <- FALSE
-  } else {
-    check_dimensions(geno_matrix, min_rows = 1, min_cols = 2)
-
-    if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0) != 0){
-      stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
+  if (class(geno_matrix) != "data.frame"){
+    if (class(geno_matrix) != "matrix"){
+      plot_logical <- FALSE
     }
+  }
 
+  if (class(geno_matrix) == "data.frame" | class(geno_matrix) == "matrix") {
+    if (nrow(geno_matrix) < 1 | ncol(geno_matrix) < 2){
+    plot_logical <- FALSE
+    } else {
+      if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0) != 0){
+        stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
+      }
+    }
     # Function -----------------------------------------------------------------
     ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
     zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
