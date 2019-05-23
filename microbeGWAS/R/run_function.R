@@ -5,21 +5,9 @@ run_phyc <- function(args){
   results_object <- NULL
   results_object$log <- capture.output(sessionInfo()) # log session info
 
-  if (!args$group_genotype) {
-    simplified_genotype <- reduce_redundancy(args$genotype, args$tree) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
-    genotype <- simplified_genotype$mat
-    results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
-    snps_per_gene <- NULL
-  } else {
-    genotypes_to_drop_because_not_present <- c(colnames(args$genotype)[colSums(args$genotype) == 0], colnames(args$genotype)[colSums(args$genotype) == nrow(args$genotype)])
-    genotype <- args$genotype[ , colSums(args$genotype) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
-    genotype <- genotype[ , colSums(genotype) < nrow(genotype)] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that occur in all isolates for ace to work.
-    # TODO replace the magic numbers in the next four lines. Group into a function?
-    gene_snp_lookup <- args$gene_snp_lookup[!(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
-    gene_snp_lookup <- gene_snp_lookup[gene_snp_lookup[ , 1] %in% colnames(genotype), , drop = FALSE]
-    unique_genes <- unique(gene_snp_lookup[ , 2])
-    snps_per_gene <- table(gene_snp_lookup[ , 2])
-  }
+  geno <- prepare_genotype(args$group_genotype, args$genotype, args$tree, args$gene_snp_lookup)
+  genotype <- geno$genotype
+  results_object$convergence_not_possible_genotypes <- geno$convergence_not_possible_genotypes
 
   AR <- prepare_ancestral_reconstructions(args$tree, args$phenotype, genotype, args$discrete_or_continuous)
 
@@ -43,20 +31,20 @@ run_phyc <- function(args){
     # TODO change this if statement into a function
     # CONVERT SNPS INTO GENES HERE
     # tip_and_node_ancestral_reconstruction
-    temp_results <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, AR$geno_recon_and_conf, gene_snp_lookup)
+    temp_results <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, AR$geno_recon_and_conf, geno$gene_snp_lookup)
     geno_recon_and_confidence_tip_node_recon <- temp_results$tip_node_recon
     geno_recon_and_confidence_tip_node_confidence <- temp_results$tip_node_conf
 
     # edge based transition
-    AR$geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, AR$geno_trans, gene_snp_lookup)
+    AR$geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, AR$geno_trans, geno$gene_snp_lookup)
 
     # make new genotype (just at the tips, from the snps)
-    genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup)
+    genotype <- build_gene_genotype_from_snps(genotype, geno$gene_snp_lookup)
 
     simplified_genotype <- reduce_redundancy(genotype, args$tree) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
     genotype <- simplified_genotype$mat
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
-    genes_to_keep_in_consideration <- !(unique_genes %in% simplified_genotype$dropped_genotype_names)
+    genes_to_keep_in_consideration <- !(geno$unique_genes %in% simplified_genotype$dropped_genotype_names)
 
     # remove redundancy from geno trans, geno_recon_and_confdience_tip_node_recon, and node_confidence
     AR$geno_trans <- AR$geno_trans[genes_to_keep_in_consideration]
@@ -128,7 +116,7 @@ run_phyc <- function(args){
   results_object$dropped_genotypes <- dropped_genotypes
 
   genotype                      <- genotype[ , geno_to_keep, drop = FALSE]
-  snps_per_gene <- snps_per_gene[names(snps_per_gene) %in% colnames(genotype)]
+  geno$snps_per_gene <- geno$snps_per_gene[names(geno$snps_per_gene) %in% colnames(genotype)]
 
   # TODO break following if else into two seperate functions
   if (args$discrete_or_continuous == "continuous"){
@@ -192,7 +180,7 @@ run_phyc <- function(args){
                    geno_conf = high_conf_ordered_by_edges,
                    g_trans_edges = genotype_transition_edges,
                    p_trans_edges = pheno_trans$transition,
-                   snp_in_gene = snps_per_gene)
+                   snp_in_gene = geno$snps_per_gene)
 
     save_results_as_r_object(args$output_dir, args$output_name, results_object)
   }
