@@ -11,8 +11,9 @@ run_phyc <- function(args){
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
     snps_per_gene <- NULL
   } else {
-    genotypes_to_drop_because_not_present <- colnames(args$genotype)[colSums(args$genotype) == 0]
+    genotypes_to_drop_because_not_present <- c(colnames(args$genotype)[colSums(args$genotype) == 0], colnames(args$genotype)[colSums(args$genotype) == nrow(args$genotype)])
     genotype <- args$genotype[ , colSums(args$genotype) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
+    genotype <- genotype[ , colSums(genotype) < nrow(genotype)] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that occur in all isolates for ace to work.
     # TODO replace the magic numbers in the next four lines. Group into a function?
     gene_snp_lookup <- args$gene_snp_lookup[!(args$gene_snp_lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
     gene_snp_lookup <- gene_snp_lookup[gene_snp_lookup[ , 1] %in% colnames(genotype), , drop = FALSE]
