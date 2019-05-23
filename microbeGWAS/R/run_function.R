@@ -11,8 +11,8 @@ run_phyc <- function(args){
 
   AR <- prepare_ancestral_reconstructions(args$tree, args$phenotype, genotype, args$discrete_or_continuous)
 
-  geno_trans_disc_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT).
-  geno_trans_disc_original <- prepare_genotype_transitions_for_original_discrete_test(args$discrete_or_continuous, genotype, AR$geno_trans) # Keep only WT -> mutant transitions.
+  geno_trans_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For discrete concomitant and continuous tests.
+  geno_trans_original    <- prepare_genotype_transitions_for_original_discrete_test(args$discrete_or_continuous, genotype, AR$geno_trans) # Keep only WT -> mutant transitions.
 
   # if (args$discrete_or_continuous == "discrete"){ #when we're doing original phyc
   #   # TODO this if statement is incorrect:
@@ -34,33 +34,30 @@ run_phyc <- function(args){
     # TODO change this if statement into a function
     # CONVERT SNPS INTO GENES HERE
     # tip_and_node_ancestral_reconstruction
-    temp_results <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, AR$geno_recon_and_conf, geno$gene_snp_lookup)
-    geno_recon_and_confidence_tip_node_recon <- temp_results$tip_node_recon
-    geno_recon_and_confidence_tip_node_confidence <- temp_results$tip_node_conf
+    geno_recon_and_confidence_tip_node <- build_gene_anc_recon_and_conf_from_snp(args$tree, genotype, AR$geno_recon_and_conf, geno$gene_snp_lookup)
 
-    # edge based transition
-    AR$geno_trans <- build_gene_trans_from_snp_trans(args$tree, genotype, AR$geno_trans, geno$gene_snp_lookup)
+    # AR$geno_trans        <- build_gene_trans_from_snp_trans(args$tree, genotype, AR$geno_trans, geno$gene_snp_lookup)
+    geno_trans_concomitant <- build_gene_trans_from_snp_trans(args$tree, genotype, geno_trans_concomitant, geno$gene_snp_lookup)
+    geno_trans_original    <- build_gene_trans_from_snp_trans(args$tree, genotype, geno_trans_original, geno$gene_snp_lookup)
+
 
     # make new genotype (just at the tips, from the snps)
     genotype <- build_gene_genotype_from_snps(genotype, geno$gene_snp_lookup)
-
     simplified_genotype <- reduce_redundancy(genotype, args$tree) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
     genotype <- simplified_genotype$mat
     results_object$convergence_not_possible_genotypes <- simplified_genotype$dropped_genotype_names
     genes_to_keep_in_consideration <- !(geno$unique_genes %in% simplified_genotype$dropped_genotype_names)
 
     # remove redundancy from geno trans, geno_recon_and_confdience_tip_node_recon, and node_confidence
-    AR$geno_trans <- AR$geno_trans[genes_to_keep_in_consideration]
+    # AR$geno_trans <- AR$geno_trans[genes_to_keep_in_consideration]
+    geno_trans_concomitant <- geno_trans_concomitant[genes_to_keep_in_consideration]
+    geno_trans_original    <- geno_trans_original[genes_to_keep_in_consideration]
 
-    dummy <- AR$geno_trans
-    AR$geno_trans <- rep(list(NULL), length(dummy))
-    for (i in 1:length(dummy)){
-      AR$geno_trans[[i]]$transition <- as.numeric(as.character(unlist((dummy[i]))))
-    }
+    geno_trans_concomitant <- format_and_name_grouped_transitions(geno_trans_concomitant)
+    geno_trans_original    <- format_and_name_grouped_transitions(geno_trans_original)
 
-    geno_recon_and_confidence_tip_node_recon <- geno_recon_and_confidence_tip_node_recon[genes_to_keep_in_consideration]
-    geno_recon_and_confidence_tip_node_confidence <- geno_recon_and_confidence_tip_node_confidence[genes_to_keep_in_consideration]
-
+    geno_recon_and_confidence_tip_node_recon      <- geno_recon_and_confidence_tip_node$tip_node_recon[genes_to_keep_in_consideration]
+    geno_recon_and_confidence_tip_node_confidence <- geno_recon_and_confidence_tip_node$tip_node_conf[ genes_to_keep_in_consideration]
     geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)){
       geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_recon[[k]],      args$tree)
