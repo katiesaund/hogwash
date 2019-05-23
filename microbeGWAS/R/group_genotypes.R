@@ -310,3 +310,39 @@ format_and_name_grouped_transitions <- function(genotype_transition){
   }
   return(genotype_transition)
 } # end format_and_name_grouped_transitions()
+
+
+
+group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, genotype_transisition_con, genotype_transition_orig, lookup, uni_genes){
+  geno_recon_and_confidence_tip_node <- build_gene_anc_recon_and_conf_from_snp(tr, geno, genotype_reconstruction_and_confidence, lookup)
+  genotype_transisition_con <- build_gene_trans_from_snp_trans(tr, geno, z, lookup)
+  genotype_transition_orig    <- build_gene_trans_from_snp_trans(tr, geno, genotype_transition_orig, lookup)
+
+  # make new geno (just at the tips, from the snps)
+  geno <- build_gene_genotype_from_snps(geno, lookup)
+  simplified_genotype <- reduce_redundancy(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
+  geno <- simplified_genotype$mat
+  genes_to_keep_in_consideration <- !(uni_genes %in% simplified_genotype$dropped_genotype_names)
+
+  # remove redundancy from geno trans, geno_recon_and_confdience_tip_node_recon, and node_confidence
+  genotype_transisition_con <- genotype_transisition_con[genes_to_keep_in_consideration]
+  genotype_transition_orig  <- genotype_transition_orig[genes_to_keep_in_consideration]
+
+  genotype_transisition_con <- format_and_name_grouped_transitions(genotype_transisition_con)
+  genotype_transition_orig  <- format_and_name_grouped_transitions(genotype_transition_orig)
+
+  geno_recon_and_confidence_tip_node_recon      <- geno_recon_and_confidence_tip_node$tip_node_recon[genes_to_keep_in_consideration]
+  geno_recon_and_confidence_tip_node_confidence <- geno_recon_and_confidence_tip_node$tip_node_conf[ genes_to_keep_in_consideration]
+  geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(geno))
+  for (k in 1:ncol(geno)){
+    geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_recon[[k]],      tr)
+    geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_confidence[[k]], tr)
+  }
+  results <- list("geno_recon_ordered_by_edges" = geno_recon_ordered_by_edges,
+                  "geno_conf_ordered_by_edges" = geno_conf_ordered_by_edges,
+                  "geno_trans_concomitant" = genotype_transisition_con,
+                  "geno_trans_original" = genotype_transition_orig,
+                  "convergence_not_possible_genotypes" = simplified_genotype$dropped_genotype_names,
+                  "genotype" = geno)
+  return(results)
+} # end group_genotypes()
