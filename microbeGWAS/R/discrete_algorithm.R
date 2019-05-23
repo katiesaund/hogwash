@@ -317,18 +317,30 @@ count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, 
   if (length(pheno_vec) != ncol(permuted_mat)){
     stop("input dimension mismatch")
   }
+  if (length(pheno_vec) != length(as.logical(hi_conf_edge[[index]]))){
+    stop("phenotype vs confidence dimension mismatch")
+  }
+
+  # temp
+  print(length(pheno_vec))
+  print(length(as.logical(hi_conf_edge[[index]])))
+  print(length(pheno_vec[as.logical(hi_conf_edge[[index]])]))
+  print(length(permuted_mat[1, ]))
+  print(length(permuted_mat[2, ]))
+  print(dim(permuted_mat))
 
   # Function -------------------------------------------------------------------
   result <- sapply(1:nrow(permuted_mat), function(x) {
     sum(pheno_vec[as.logical(hi_conf_edge[[index]])] + permuted_mat[x, ] == 2)
   })
 
+  print(result)
   # Check and return output ----------------------------------------------------
   if (nrow(permuted_mat) != length(result)){
     stop("result dimension mismatch")
   }
   return(result)
-}
+} # end count_empirical_both_present()
 
 count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
   # Function description -------------------------------------------------------
@@ -360,3 +372,4 @@ count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
 
   return(result)
 } # end count_empirical_only_geno_present()
+
