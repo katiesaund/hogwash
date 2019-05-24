@@ -31,16 +31,19 @@ run_phyc <- function(args){
     }
   }
 
-  all_hi_conf <- prepare_high_confidence_objects(tr = args$tree,
-                                                 pheno_tip_node_recon_conf = AR$pheno_recon_and_conf$tip_and_node_rec_conf,
-                                                 boot_threshold = args$bootstrap_cutoff,
-                                                 geno = genotype,
-                                                 geno_conf_edge  = geno_conf_ordered_by_edges,
-                                                 geno_recon_edge = geno_recon_ordered_by_edges,
-                                                 snps_in_each_gene = geno$snps_per_gene)
+  hi_conf_concomitant <- prepare_high_confidence_objects(geno_trans_concomitant, args$tree, AR$pheno_recon_and_conf$tip_and_node_rec_conf, args$bootstrap_cutoff, genotype, geno_conf_ordered_by_edges, geno_recon_ordered_by_edges, geno$snps_per_gene)
+  results_object$concomitant_high_confidence_trasition_edges     <- hi_conf_concomitant$only_high_conf_geno_trans
+  results_object$concomitant_num_high_confidence_trasition_edges <- hi_conf_concomitant$num_high_confidence_trasition_edges
+  results_object$concomitant_dropped_genotypes <- hi_conf_concomitant$dropped_genotypes
+  hi_conf_original <- NULL
 
-  results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
-  results_object$dropped_genotypes <- dropped_genotypes
+  if (args$discrete_or_continuous == "discrete"){
+    hi_conf_original <- prepare_high_confidence_objects(geno_trans_original,     args$tree, AR$pheno_recon_and_conf$tip_and_node_rec_conf, args$bootstrap_cutoff, genotype, geno_conf_ordered_by_edges, geno_recon_ordered_by_edges, geno$snps_per_gene)
+    results_object$original_high_confidence_trasition_edges     <- hi_conf_original$only_high_conf_geno_trans
+    results_object$original_num_high_confidence_trasition_edges <- hi_conf_original$num_high_confidence_trasition_edges
+    results_object$original_dropped_genotypes                   <- hi_conf_original$dropped_genotypes
+  }
+
 
   # # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
   # # TREE BOOTSTRAP, PHENOTYPUE RECONSTRUCTION CONFIDENCE, AND EDGE LENGTHS
@@ -88,6 +91,13 @@ run_phyc <- function(args){
   # geno$snps_per_gene <- geno$snps_per_gene[names(geno$snps_per_gene) %in% colnames(genotype)]
 
   # TODO break following if else into two seperate functions
+  convergence_algorithm_and_plotting <- function(args$tree, args$perm, args$fdr, args$phenotype, args$phenotype, args$output_dir, args$output_name, args$annotation,
+                                                 AR, hi_conf_concomitant, hi_conf_original, results_object)
+
+
+    # Do discrete first -- if it exists it's stuff can be added to the save results object step
+
+
   if (args$discrete_or_continuous == "continuous"){
     pheno_recon_edge_mat  <- AR$pheno_recon_and_conf$recon_edge_mat
     # RUN PERMUTATION TEST ------------------------------------------------------#
@@ -98,7 +108,7 @@ run_phyc <- function(args){
     # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES
     all_transitions_sig_hits <- keep_hits_with_more_change_on_trans_edges(results_all_transitions, corrected_pvals_all_transitions, args$fdr)
     # SAVE AND PLOT RESULTS -----------------------------------------------------#
-    phenotype_vector <- prepare_phenotype(args$phenotype, args$discrete_or_continuous, args$tree)
+    phenotype_vector <- prepare_phenotype(args$phenotype, args$phenotype, args$tree)
     trans_mat_results <- plot_significant_hits("continuous", args$tree, args$fdr, args$output_dir, args$output_name, corrected_pvals_all_transitions, phenotype_vector, args$annotation, args$perm, results_all_transitions, AR$pheno_recon_and_conf$node_anc_rec, geno_recon_ordered_by_edges, high_conf_ordered_by_edges, AR$geno_trans, genotype, pheno_recon_edge_mat, high_confidence_edges, all_transitions_sig_hits)
     # move next five lines into a function
     results_object$genotype_transition_edge_matrix <- trans_mat_results$trans_dir_edge_mat
