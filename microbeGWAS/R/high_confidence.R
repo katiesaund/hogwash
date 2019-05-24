@@ -172,7 +172,8 @@ assign_high_confidence_to_transition_edges <- function(tr,
 } # end assign_high_confidence_to_transition_edges()
 
 
-prepare_high_confidence_objects <- function(tr, pheno_tip_node_recon_conf,
+prepare_high_confidence_objects <- function(genotype_transition, tr,
+                                            pheno_tip_node_recon_conf,
                                             boot_threshold, geno, geno_conf_edge,
                                             geno_recon_edge, snps_in_each_gene){
   # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
@@ -192,25 +193,18 @@ prepare_high_confidence_objects <- function(tr, pheno_tip_node_recon_conf,
   for (k in 1:ncol(geno)){
     all_high_confidence_edges[[k]] <- as.numeric(geno_conf_edge[[k]] + high_confidence_edges == 2)
   }
-
-  # transition section -- do once for concomitant transitions and once for original (if necessary)
-
-  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(tr, all_high_confidence_edges, AR$geno_trans, geno)
+  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(tr, all_high_confidence_edges, genotype_transition, geno)
   for (i in 1:ncol(geno)){
-    AR$geno_trans[[i]]$transition <- only_high_conf_geno_trans[[i]]
+    genotype_transition[[i]]$transition <- only_high_conf_geno_trans[[i]]
   }
 
   # results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
-  num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(AR$geno_trans, all_high_confidence_edges, colnames(geno))
-  results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
+  num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(genotype_transition, all_high_confidence_edges, colnames(geno))
+  # results_object$num_high_confidence_trasition_edges <- num_high_confidence_trasition_edges
 
   # KEEP ONLY genoS WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES ----#
-  geno_to_keep                  <- keep_at_least_two_high_conf_trans_edges(AR$geno_trans, all_high_confidence_edges)
-  AR$geno_trans                 <- AR$geno_trans[geno_to_keep]
-
-
-  # end transition section
-
+  geno_to_keep                <- keep_at_least_two_high_conf_trans_edges(genotype_transition, all_high_confidence_edges)
+  genotype_transition         <- genotype_transition[geno_to_keep]
   geno_recon_edge             <- geno_recon_edge[geno_to_keep]
   high_conf_ordered_by_edges  <- all_high_confidence_edges[geno_to_keep]
   dropped_genotypes           <- get_dropped_genotypes(geno, geno_to_keep)
@@ -220,7 +214,11 @@ prepare_high_confidence_objects <- function(tr, pheno_tip_node_recon_conf,
   results = list(c("dropped_genotypes" = dropped_genotypes,
                    "high_confidence_trasition_edges" = only_high_conf_geno_trans,
                    "genotype" = geno,
-                   "snps_per_gene" = snps_in_each_gene))
+                   "snps_per_gene" = snps_in_each_gene,
+                   "genotype_transition" = genotype_transition,
+                   "geno_recon_edge" = geno_recon_edge,
+                   "high_conf_ordered_by_edges" = high_conf_ordered_by_edges,
+                   "num_high_confidence_trasition_edges" = num_high_confidence_trasition_edges))
   return(results)
 
 } # end prepare_high_confidence_objects()
