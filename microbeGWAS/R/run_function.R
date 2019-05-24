@@ -91,8 +91,9 @@ run_phyc <- function(args){
   # geno$snps_per_gene <- geno$snps_per_gene[names(geno$snps_per_gene) %in% colnames(genotype)]
 
   # TODO break following if else into two seperate functions
-  convergence_algorithm_and_plotting <- function(args$tree, args$perm, args$fdr, args$phenotype, args$phenotype, args$output_dir, args$output_name, args$annotation,
-                                                 AR, hi_conf_concomitant, hi_conf_original, results_object)
+  convergence_algorithm_and_plotting <- function(args$tree, args$perm, args$fdr, args$phenotype, args$phenotype, args$output_dir, args$output_name, args$annotation, AR, hi_conf_concomitant, hi_conf_original, results_object){
+
+  }
 
 
     # Do discrete first -- if it exists it's stuff can be added to the save results object step
