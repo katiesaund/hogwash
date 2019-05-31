@@ -1,6 +1,5 @@
 # TODO: go through script line by and line and write unit tests for any untested functions.
 # TODO clean up script flow to make process more clear. Replace if / else with functions? How else to improve it?
-# Stopped active development of this function on 5/31 -- instead split phyC into three functions that are easier to work with / less likely to make a mistake
 run_phyc <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
@@ -94,10 +93,10 @@ run_phyc <- function(args){
   # TODO break following if else into two seperate functions
   #convergence_algorithm_and_plotting <- function(args$tree, args$perm, args$fdr, args$phenotype, args$phenotype, args$output_dir, args$output_name, args$annotation, AR, hi_conf_concomitant, hi_conf_original, results_object){
 
-#  }
+  #  }
 
 
-    # Do discrete first -- if it exists it's stuff can be added to the save results object step
+  # Do discrete first -- if it exists it's stuff can be added to the save results object step
 
 
   if (args$discrete_or_continuous == "continuous"){
