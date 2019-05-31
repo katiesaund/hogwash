@@ -72,3 +72,10 @@ test_that("assign_high_confidence_to_transition_edges returns the edges that are
   foo <- assign_high_confidence_to_transition_edges(temp_tree, temp_confidence, temp_trans, temp_geno)
   expect_equal(foo[[1]], expected_result[[1]])
 })
+
+
+# test prepare_high_confidence_objects()
+test_that("prepare_high_confidence_objects returns objects of expected sizes for continuous data", {
+
+
+})

@@ -176,10 +176,73 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
                                             pheno_tip_node_recon_conf,
                                             boot_threshold, geno, geno_conf_edge,
                                             geno_recon_edge, snps_in_each_gene){
-  # IDENTIFY HIGH CONFIDENCE EDGES (BOOTSTRAP, PHENOTYPE RECON, LENGTH, GENOTYPE RECONSTRUCTION)
-  # TREE BOOTSTRAP, PHENOTYPUE RECONSTRUCTION CONFIDENCE, AND EDGE LENGTHS
 
+  # Function description -------------------------------------------------------
+  # Identify high confidence edges (considering: tree bootstrap values,
+  # phenotype reconstruction, tree edge lengths, and ancestral reconstruction of
+  # genotype).
+  #
+  # Inputs:
+  # genotype_transition. List of lists.
+  #                      Number of lists = number of genotypes.
+  #                      Each list is made of a $transition and $trans_dir list.
+  #                      Length(transition) == Length(trans_dir) == Nedge(tree)
+  # tr. Phylo.
+  # pheno_tip_node_recon_conf. List of confidence values. Binary.
+  #                            Length(list) == Ntip() + Nedge()
+  # boot_threshold. Numeric. Between 0 and 1.
+  # geno. Matrix. Binary. Nrow = Ntip(tree). Ncol = Number of genotypes.
+  # geno_conf_edge. List of lists.
+  #                 Binary.
+  #                 Number of lists = number of genotypes.
+  #                 Length(each individual list) == Nedge(Tree)
+  # geno_recon_edge. List of lists.
+  #                  Binary.
+  #                  Number of lists = number of genotypes.
+  #                  Length(each individual list) == Nedge(Tree)
+  # TODO Fill in descript and checks for snps_in_each_gene!
+  # snps_in_each_gene. Either NULL or ?????.
+  #
+  # TODO Add descripts for each output.
+  # Outputs:
+  # list(c("dropped_genotypes" = dropped_genotypes,
+  # "high_confidence_trasition_edges" = only_high_conf_geno_trans,
+  # "genotype" = geno,
+  # "snps_per_gene" = snps_in_each_gene,
+  # "genotype_transition" = genotype_transition,
+  # "geno_recon_edge" = geno_recon_edge,
+  # "high_conf_ordered_by_edges" = high_conf_ordered_by_edges,
+  # "num_high_confidence_trasition_edges" = num_high_confidence_trasition_edges))
+  #
+  # Check input ----------------------------------------------------------------
+  if (length(genotype_transition) != ncol(geno)){
+    stop("Need 1 genotype transition for each genotype")
+  }
+  if (length(genotype_transition[[1]]$transition) != Nedge(tr)){
+    stop("Need genotype transition information for each tree edge.")
+  }
+  check_for_root_and_bootstrap(tr)
+  if (length(pheno_tip_node_recon_conf) != c(Ntip(tr) + Nnode(tr))){
+    stop("Phenotype confidence list should correspond to each tip and node of tree.")
+  }
+  check_num_between_0_and_1(boot_threshold)
+  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
+  if (length(geno_conf_edge) != ncol(geno)){
+    stop("Need 1 genotype transition for each genotype")
+  }
+  if (length(geno_conf_edge[[1]]) != Nedge(tr)){
+    stop("Need genotype transition information for each tree edge.")
+  }
+  if (length(geno_recon_edge) != ncol(geno)){
+    stop("Need 1 genotype transition for each genotype")
+  }
+  if (length(geno_recon_edge[[1]]) != Nedge(tr)){
+    stop("Need genotype transition information for each tree edge.")
+  }
+  check_if_binary_vector(geno_conf_edge[[1]])
+  check_if_binary_vector(geno_recon_edge[[1]])
 
+  # Function -------------------------------------------------------------------
   pheno_conf_ordered_by_edges <- reorder_tips_and_nodes_to_edges(pheno_tip_node_recon_conf, tr)
   tree_conf                   <- get_bootstrap_confidence(tr, boot_threshold)
   tree_conf_ordered_by_edges  <- reorder_tips_and_nodes_to_edges(tree_conf, tr)
@@ -211,6 +274,7 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
   geno                        <- geno[ , geno_to_keep, drop = FALSE]
   snps_in_each_gene           <- snps_in_each_gene[names(snps_in_each_gene) %in% colnames(geno)]
 
+  # Return output --------------------------------------------------------------
   results = list(c("dropped_genotypes" = dropped_genotypes,
                    "high_confidence_trasition_edges" = only_high_conf_geno_trans,
                    "genotype" = geno,
