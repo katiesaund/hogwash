@@ -258,7 +258,6 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
     all_high_confidence_edges[[k]] <- as.numeric(geno_conf_edge[[k]] + high_confidence_edges == 2)
   }
   only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(tr, all_high_confidence_edges, genotype_transition, geno) # here
-  print(only_high_conf_geno_trans)
   for (i in 1:ncol(geno)){
     genotype_transition[[i]]$transition <- only_high_conf_geno_trans[[i]]
   }

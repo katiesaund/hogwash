@@ -2,7 +2,7 @@ library(microbeGWAS)
 context("Run continuous") #----------------------------------------------------#
 
 test_that("run_continuous() doesn't give any errors when given a continuous phenotype and snps (do not group into genes)" ,{
-  test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/temp_results/"
+  test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_nongrouped_genotype/temp_results/"
   test_pheno <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/continuous_phenotype_grouped_genotype/continuous_phenotype.tsv"
   test_tree  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/tree.tree"
   test_geno  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/grouped_genotype.tsv"

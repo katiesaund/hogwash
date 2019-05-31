@@ -2,16 +2,12 @@ run_continuous <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
   results_object$log <- capture.output(sessionInfo()) # log session info
-
   geno <- prepare_genotype(args$group_genotype, args$genotype, args$tree, args$gene_snp_lookup)
-
   genotype <- geno$genotype
   results_object$convergence_not_possible_genotypes <- geno$convergence_not_possible_genotypes
-
   AR <- prepare_ancestral_reconstructions(args$tree, args$phenotype, genotype, args$discrete_or_continuous)
-
   geno_trans_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For discrete concomitant and continuous tests.
-  geno_trans_original    <- prepare_genotype_transitions_for_original_discrete_test(args$discrete_or_continuous, genotype, AR$geno_trans) # Keep only WT -> mutant transitions.
+  geno_trans_original    <- prepare_genotype_transitions_for_original_discrete_test(args$discrete_or_continuous, genotype, geno_trans_concomitant) # Keep only WT -> mutant transitions.
 
   if (args$group_genotype){
     grouped_geno                <- group_genotypes(args$tree, genotype, AR$geno_recon_and_conf, geno_trans_concomitant, geno_trans_original, geno$gene_snp_lookup, geno$unique_genes)
@@ -27,7 +23,6 @@ run_continuous <- function(args){
       geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
     }
   }
-
   hi_conf_concomitant <- prepare_high_confidence_objects(geno_trans_concomitant, args$tree, AR$pheno_recon_and_conf$tip_and_node_rec_conf, args$bootstrap_cutoff, genotype, geno_conf_ordered_by_edges, geno_recon_ordered_by_edges, geno$snps_per_gene)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
