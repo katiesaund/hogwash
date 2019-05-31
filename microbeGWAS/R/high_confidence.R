@@ -79,7 +79,7 @@ assign_high_confidence_to_transition_edges_including_parent_info  <- function(tr
   # This function used to be called: assign_high_confidence_to_transition_edges
   # but on 2019-05-15 I figured out that this is waaay too stringent and was dropping
   # all or nearly all of my genotypes. I rewrote the function to only look at the
-  # end in question and to ignore the parent edge.
+  # edge in question and to ignore the parent edge.
   # I don't know if this function will ever get used for anything.
 
   # Function description -------------------------------------------------------
@@ -148,7 +148,7 @@ assign_high_confidence_to_transition_edges <- function(tr,
   # geno. Matrix. Binary.
   #
   # Outputs:
-  # edge_and_parent_confident_and_trans_edge. List of vector. Each vector is binary. Length(list) == number of genomes.
+  # edge_confident_and_trans_edge. List of vector. Each vector is binary. Length(list) == number of genomes.
   #
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
@@ -250,13 +250,15 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
 
 
   high_confidence_edges <- pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3
+  if (length(high_confidence_edges) != Nedge(tr)){stop("Confidence should correspond to each tree edge")}
   all_high_confidence_edges <- rep(list(0), ncol(geno))
 
-  # ADD IN geno RECONSTRUCTION CONFIDENCE
+  # ADD IN GENO RECONSTRUCTION CONFIDENCE
   for (k in 1:ncol(geno)){
     all_high_confidence_edges[[k]] <- as.numeric(geno_conf_edge[[k]] + high_confidence_edges == 2)
   }
-  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(tr, all_high_confidence_edges, genotype_transition, geno)
+  only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(tr, all_high_confidence_edges, genotype_transition, geno) # here
+  print(only_high_conf_geno_trans)
   for (i in 1:ncol(geno)){
     genotype_transition[[i]]$transition <- only_high_conf_geno_trans[[i]]
   }
@@ -275,14 +277,14 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
   snps_in_each_gene           <- snps_in_each_gene[names(snps_in_each_gene) %in% colnames(geno)]
 
   # Return output --------------------------------------------------------------
-  results = list(c("dropped_genotypes" = dropped_genotypes,
-                   "high_confidence_trasition_edges" = only_high_conf_geno_trans,
-                   "genotype" = geno,
-                   "snps_per_gene" = snps_in_each_gene,
-                   "genotype_transition" = genotype_transition,
-                   "geno_recon_edge" = geno_recon_edge,
-                   "high_conf_ordered_by_edges" = high_conf_ordered_by_edges,
-                   "num_high_confidence_trasition_edges" = num_high_confidence_trasition_edges))
+  results = list("dropped_genotypes" = dropped_genotypes,
+                  "high_confidence_trasition_edges" = only_high_conf_geno_trans,
+                  "genotype" = geno,
+                  "snps_per_gene" = snps_in_each_gene,
+                  "genotype_transition" = genotype_transition,
+                  "geno_recon_edge" = geno_recon_edge,
+                  "high_conf_ordered_by_edges" = high_conf_ordered_by_edges,
+                  "num_high_confidence_trasition_edges" = num_high_confidence_trasition_edges)
   return(results)
 
 } # end prepare_high_confidence_objects()
