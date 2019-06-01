@@ -1,9 +1,9 @@
 library(microbeGWAS)
 context("Group genotypes") -------------------------------------------#
 
-test_that("build_gene_anc_recon_and_conf_from_snp does ",{
-
-})
+#test_that("build_gene_anc_recon_and_conf_from_snp does ",{
+#
+# })
 
 
 #

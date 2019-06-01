@@ -234,9 +234,6 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   if(length(genotype_transition_list[[1]]$transition) != Nedge(tr)){
     stop("genotype$transition incorrectly formatted")
   }
-  if(length(genotype_transition_list[[1]]$trans_dir) != Nedge(tr)){
-    stop("genotype$trans_dir incorrectly formatted")
-  }
   if(length(genotype_transition_list) != ncol(mat)){
     stop("genotype transition doesn't a list for each genotype")
   }

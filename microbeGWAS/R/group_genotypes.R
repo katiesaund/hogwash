@@ -373,13 +373,10 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
   if (length(genotype_transition_orig) != ncol(geno)){
     stop("Genotype transitions for original test should correspond to each genotype")
   }
-  if (length(genotype_transisition_orig[[1]]$transition) != Nedge(tr)){
+  if (length(genotype_transition_orig[[1]]$transition) != Nedge(tr)){
     stop("Genotype transitions should correspond to each edge on the tree.")
   }
   check_dimensions(lookup, exact_rows = ncol(geno), min_rows = ncol(geno), exact_cols = 2, min_cols = 2)
-  if (length(uni_genes) != unique(lookup[ , 2])){
-    stop("Unique genes incorrect.")
-  }
 
   # Function -------------------------------------------------------------------
 

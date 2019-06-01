@@ -260,6 +260,8 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
   only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(tr, all_high_confidence_edges, genotype_transition, geno) # here
   for (i in 1:ncol(geno)){
     genotype_transition[[i]]$transition <- only_high_conf_geno_trans[[i]]
+    # TODO add:
+    genotype_transition[[i]]$trans_dir # <- # SOMETHING!
   }
 
   # results_object$high_confidence_trasition_edges <- only_high_conf_geno_trans
