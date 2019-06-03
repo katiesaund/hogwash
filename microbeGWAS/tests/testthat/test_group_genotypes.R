@@ -125,22 +125,22 @@ context("Group genotypes") -------------------------------------------#
 
 test_that("build_gene_trans_from_snp_trans does X given Y", {
   set.seed(1)
-  tree <- rtree(7)
-  tree$edge.length <- rep(sum(tree$edge.length)/Nedge(tree), Nedge(tree))
-  tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
+  temp_tree <- rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
-  genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
-  genotype2 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
-  genotype5 <- matrix(c(0, 1, 1, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
-  genotype6 <- matrix(c(0, 1, 1, 1, 1, 0, 0), nrow = Ntip(tree), ncol = 1)
-  genotype7 <- matrix(c(0, 1, 0, 0, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
-  genotype8 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
+  genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype2 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype5 <- matrix(c(0, 1, 1, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype6 <- matrix(c(0, 1, 1, 1, 1, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype7 <- matrix(c(0, 1, 0, 0, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype8 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
   genotype <- cbind(genotype1, genotype2, genotype5, genotype6, genotype7, genotype8)
-  row.names(genotype) <- tree$tip.label
+  row.names(genotype) <- temp_tree$tip.label
   colnames(genotype) <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
 
   set.seed(1)
-  continuous_phenotype <- as.matrix(fastBM(tree))
+  continuous_phenotype <- as.matrix(fastBM(temp_tree))
   row.names(continuous_phenotype) <- tree$tip.label
   colnames(continuous_phenotype) <- "growth"
 
@@ -150,89 +150,22 @@ test_that("build_gene_trans_from_snp_trans does X given Y", {
   snp_gene_key[ , 1] <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
   snp_gene_key[ , 2] <- c("GENE1", "GENE2", "GENE5", "GENE6", "GENE7", "GENE7")
 
-  AR <- prepare_ancestral_reconstructions(tree, continuous_phenotype, genotype, "continuous")
+  AR <- prepare_ancestral_reconstructions(temp_tree, continuous_phenotype, genotype, "continuous")
 
-  temp_results <- build_gene_trans_from_snp_trans(tree, genotype, AR$geno_trans, snp_gene_key)
+  temp_results <- build_gene_trans_from_snp_trans(temp_tree, genotype, AR$geno_trans, snp_gene_key)
 
   expect_true(length(temp_results) == length(unique(snp_gene_key[ , 2])))
-  expect_equal(unname(temp_results$GENE1), AR$geno_trans[[1]]$transition)
-  expect_equal(unname(temp_results$GENE2), AR$geno_trans[[2]]$transition)
-  expect_equal(unname(temp_results$GENE5), AR$geno_trans[[3]]$transition)
-  expect_equal(unname(temp_results$GENE6), AR$geno_trans[[4]]$transition)
-  expect_equal(unname(temp_results$GENE7), AR$geno_trans[[5]]$transition + AR$geno_trans[[6]]$transition)
+  expect_equal(temp_results[[1]]$transition, AR$geno_trans[[1]]$transition)
+  expect_equal(temp_results[[2]]$transition, AR$geno_trans[[2]]$transition)
+  expect_equal(temp_results[[3]]$transition, AR$geno_trans[[3]]$transition)
+  expect_equal(temp_results[[4]]$transition, AR$geno_trans[[4]]$transition)
+  expect_equal(temp_results[[5]]$transition, AR$geno_trans[[5]]$transition + AR$geno_trans[[6]]$transition)
+
+  expect_equal(length(temp_results[[1]]$transition), Nedge(temp_tree))
+  expect_equal(length(temp_results[[1]]$trans_dir), Nedge(temp_tree))
+
 })
 
-# build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_snp_lookup_table){
-#   # Function description -------------------------------------------------------
-#   # TODO
-#   # Compute ancestral reconstruction from a continuous or discrete input.
-#   #
-#   # Inputs:
-#   # Varname. Var class. Description.
-#   #
-#   # Outputs:
-#   # "anc_rec" = ML_anc_rec. Vector. Description.
-#   #
-#   # Check input ----------------------------------------------------------------
-#
-#   # Function -------------------------------------------------------------------
-#
-#   # Return output --------------------------------------------------------------
-#
-#   # VALIDATE INPUTS -----------------------------------------------------------#
-#   check_for_root_and_bootstrap(tr)
-#   check_if_binary_matrix(geno)
-#   check_dimensions(geno, Ntip(tr), 2, NULL, 2)
-#   if (length(geno_transition) != ncol(geno)){
-#     stop("wrong input")
-#   }
-#   check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
-#   check_if_binary_vector_numeric(geno_transition[[1]]$transition)
-#
-#   # FUNCTION ------------------------------------------------------------------#
-#
-#   edges_by_snp_mat <- matrix(0, nrow = Nedge(tr), ncol = ncol(geno))
-#   if (nrow(edges_by_snp_mat) != length(geno_transition[[1]]$transition)){
-#     stop("mismatch in size")
-#   }
-#   for (k in 1:ncol(geno)){
-#     edges_by_snp_mat[ , k] <- geno_transition[[k]]$transition
-#   }
-#   row.names(edges_by_snp_mat) <- c(1:nrow(edges_by_snp_mat))
-#   colnames(edges_by_snp_mat) <- colnames(geno)
-#
-#   if (nrow(gene_to_snp_lookup_table) != ncol(edges_by_snp_mat)){
-#     stop("mismatch")
-#   }
-#
-#   edges_by_snp_mat_with_gene_id <- rbind(edges_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
-#   if (nrow(edges_by_snp_mat_with_gene_id) != (nrow(edges_by_snp_mat) + 1)){
-#     stop("rbind didn't work")
-#   }
-#
-#   unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
-#   gene_mat_built_from_snps <- matrix(0, nrow = nrow(edges_by_snp_mat), ncol = length(unique_genes))
-#   for (j in 1:length(unique_genes)){
-#     temp_mat <- edges_by_snp_mat_with_gene_id[1:(nrow(edges_by_snp_mat_with_gene_id) - 1) , edges_by_snp_mat_with_gene_id[nrow(edges_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
-#     class(temp_mat) <- "numeric"
-#     temp_column <- rowSums(temp_mat)
-#     gene_mat_built_from_snps[ , j] <- temp_column
-#   }
-#
-#   gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
-#   class(gene_mat_built_from_snps) <- "numeric"
-#
-#   colnames(gene_mat_built_from_snps) <- unique_genes
-#   row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
-#
-#   gene_list_built_from_snps <- rep(list(0), length(unique_genes))
-#   for (m in 1:length(unique_genes)){
-#     gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
-#   }
-#   names(gene_list_built_from_snps) <- unique_genes
-#
-#   return(gene_list_built_from_snps)
-# } # end build_gene_trans_from_snp_trans()
 #
 #
 # build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
@@ -396,4 +329,54 @@ test_that("prepare_grouped_genotype", {
   expect_equal(temp_result$gene_snp_lookup, temp_lookup[c(1, 2, 5, 6, 7, 8), ])
   expect_equal(as.numeric(unname(temp_result$snps_per_gene)), c(1, 1, 1, 1, 2))
   expect_equal(temp_result$unique_genes, c("GENE1", "GENE2", "GENE5", "GENE6", "GENE7"))
+})
+
+
+# test group_genotypes()
+test_that("group_genotypes does X given Y", {
+  set.seed(1)
+  temp_tree <- rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
+
+  set.seed(1)
+  temp_pheno <- as.matrix(fastBM(temp_tree))
+  row.names(temp_pheno) <- temp_tree$tip.label
+  colnames(temp_pheno) <- "growth"
+  temp_continuous <- "continuous"
+
+  genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype2 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype3 <- matrix(c(0, 0, 0, 0, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype4 <- matrix(c(1, 1, 1, 1, 1, 1, 1), nrow = Ntip(temp_tree), ncol = 1)
+  genotype5 <- matrix(c(0, 1, 1, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype6 <- matrix(c(0, 1, 1, 1, 1, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype7 <- matrix(c(0, 1, 0, 0, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype8 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  temp_geno <- cbind(genotype1, genotype2, genotype3, genotype4, genotype5, genotype6, genotype7, genotype8)
+  row.names(temp_geno) <- temp_tree$tip.label
+  colnames(temp_geno) <- c("SNP1", "SNP2", "SNP3", "SNP4", "SNP5", "SNP6", "SNP7", "SNP8")
+
+  temp_lookup <- matrix(NA, nrow = ncol(temp_geno), ncol = 2)
+  colnames(temp_lookup) <- c("SNP", "GENE")
+  temp_lookup[ , 1] <- c("SNP1", "SNP2", "SNP3", "SNP4", "SNP5", "SNP6", "SNP7", "SNP8")
+  temp_lookup[ , 2] <- c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "GENE7", "GENE7")
+
+  temp_group_logical <- TRUE
+
+  geno <- prepare_genotype(temp_group_logical, temp_geno, temp_tree, temp_lookup)
+  genotype <- geno$genotype
+  AR <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, genotype, temp_continuous)
+  geno_trans_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For discrete concomitant and continuous tests.
+  geno_trans_original    <- prepare_genotype_transitions_for_original_discrete_test(genotype, geno_trans_concomitant) # Keep only WT -> mutant transitions.
+
+  temp_results <- group_genotypes(temp_tree, genotype, AR$geno_recon_and_conf, geno_trans_concomitant, geno_trans_original, geno$gene_snp_lookup, geno$unique_genes)
+  expect_equal(length(temp_results$geno_recon_ordered_by_edges), ncol(temp_results$genotype))
+  expect_identical(row.names(temp_results$genotype), temp_tree$tip.label)
+  expect_equal(length(temp_results$geno_trans_concomitant[[1]]$transition), Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_orig[[1]]$transition), Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_concomitant[[1]]$trans_dir), Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_orig[[1]]$trans_dir), Nedge(temp_tree))
+
+
 })
