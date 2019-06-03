@@ -158,7 +158,7 @@ prepare_genotype_transitions_for_original_discrete_test <- function(geno, genoty
   # 1) Version based on the original phyC
   # 2) Version for requiring concomitant transition state change phenotype
   #    and genotype.
-  # This function converstions geno_trans$transition from the object created
+  # This function converts geno_trans$transition from the object created
   # for concomitant test to the version required for the original test.
   #
   # Note: for original phyC prepare genotype transition as below: keep only
@@ -175,6 +175,8 @@ prepare_genotype_transitions_for_original_discrete_test <- function(geno, genoty
   if (length(genotype_transition) != ncol(geno)){
     stop("Must have transition information for each genotype")
   }
+  check_if_binary_vector(genotype_transition$transition)
+
   # Function -------------------------------------------------------------------
   for (k in 1:ncol(geno)){
     parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child

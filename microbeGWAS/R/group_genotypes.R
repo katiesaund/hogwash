@@ -151,7 +151,7 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, exact_cols =  nrow(gene_to_snp_lookup_table), min_cols = 1)
-  check_if_binary_matrix(geno).
+  check_if_binary_matrix(geno)
   if (length(geno_transition) != ncol(geno)){
     stop("Must have a transition vector for each genotype")
   }
