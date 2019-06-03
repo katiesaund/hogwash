@@ -241,7 +241,7 @@ test_that("prepare_ancestral_reconstructions gives expected ancestral results gi
 
   set.seed(1)
   temp_pheno <- as.matrix(fastBM(temp_tree))
-  row.names(temp_pheno) <- tree$tip.label
+  row.names(temp_pheno) <- temp_tree$tip.label
   colnames(temp_pheno) <- "growth"
 
   genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
