@@ -280,9 +280,9 @@ prepare_ungrouped_genotype <- function(geno, tr, group_logical){
   # Outputs:
   # pheno_vector. Vector. Length = Ntip(tr).
   #
-  # Check input --------------------------------------------------------------
+  # Check input ----------------------------------------------------------------
   #
-  # Function
+  # Function -------------------------------------------------------------------
   simplified_genotype <- reduce_redundancy(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
   snps_per_gene <- NULL
 
@@ -294,6 +294,28 @@ prepare_ungrouped_genotype <- function(geno, tr, group_logical){
 } # end prepare_ungrouped_genotype()
 
 prepare_genotype <- function(group_logical, geno, tr, lookup){
+  # Function description -------------------------------------------------------
+  # Funnel the genotype to be prepared for downstream use. The preparation
+  # depends on if the genotype is going to be grouped or not.
+  #
+  # Inputs:
+  # group_logical. Logical.
+  # geno. Genotype matrix. Binary. Nrow = Ntip(tr). Ncol = number of ungrouped genotypes.
+  # tr. phylo.
+  # lookup. Matrix. Ncol = 2.
+  #
+  # Outputs:
+  # prepped_geno. ?
+  #
+  # Check input ----------------------------------------------------------------
+  if (!is.logical(group_logical)){
+    stop("Input must be either TRUE or FALSE")
+  }
+  check_for_root_and_bootstrap(tr)
+  check_dimensions(lookup, exact_cols = 2, min_cols = 2, min_rows = 1)
+  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, min_cols = 1)
+  #
+  # Function -------------------------------------------------------------------
   if (group_logical){
     prepped_geno <- prepare_grouped_genotype(geno, lookup)
   } else {
