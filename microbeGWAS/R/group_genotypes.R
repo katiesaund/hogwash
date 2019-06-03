@@ -246,42 +246,68 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 } # end build_gene_genotype_from_snps()
 
 
-prepare_grouped_genotype <- function(geno, lookup, group_logical){
-    genotypes_to_drop_because_not_present <- c(colnames(geno)[colSums(geno) == 0], colnames(geno)[colSums(geno) == nrow(geno)])
-    genotype <- geno[ , colSums(geno) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
-    genotype <- genotype[ , colSums(genotype) < nrow(genotype)] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that occur in all isolates for ace to work.
-    # TODO replace the magic numbers in the next four lines. Group into a function?
-    gene_snp_lookup <- lookup[!(lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
-    gene_snp_lookup <- gene_snp_lookup[gene_snp_lookup[ , 1] %in% colnames(genotype), , drop = FALSE]
-    unique_genes <- unique(gene_snp_lookup[ , 2])
-    snps_per_gene <- table(gene_snp_lookup[ , 2])
-
-    # Check and return output ----------------------------------------------------
-    results <- list("snps_per_gene" = snps_per_gene,
-                    "unique_genes" = unique_genes,
-                    "gene_snp_lookup" = gene_snp_lookup,
-                    "genotype" = genotype)
-    return(results)
-} # end prepare_grouped_genotype()
-
-prepare_ungrouped_genotype <- function(geno, tr, group_logical){
+prepare_grouped_genotype <- function(geno, lookup){
   # Function description -------------------------------------------------------
-  # Remove genotypes that are too common or rare for ancestral reconstruction to work.
-  # Given that this genotype is not grouped return NULL for the variable snps_per_gene.
-  # Keep track of which genotypes got removed (convergence_not_possible_genotypes).
+  # Remove genotypes that are too common (omnipresent) or rare (completely
+  # absent) for ancestral reconstruction to work from both the genotype and the
+  # lookup key.
   #
   # Inputs:
-  # tr. Phylo. Ntip = nrow(pheno).
-  # pheno. Matrix. Nrow = Ntip(tr). Ncol = 1.
-  # geno. Matrix. Binary.
-  # disc_cont. String. Either "discrete" or "continuous"
-  #
+  # geno. Matrix. Binary. Nrow = Ntip(tr). Ncol = number of original genotypes.
+  # lookup. Matrix. Ncol = 2. Nrow = number of genotypes.
   #
   # Outputs:
-  # pheno_vector. Vector. Length = Ntip(tr).
+  # List of objects.
+  #   $snp_per_gene. Named table. Names are genotypes. Values are number of not-yet-grouped-genotypes that go into the grouped genotype.
+  #   $unique_genes. Character vector. Vector of genotype names.
+  #   $gene_snp_lookup. Character matrix. Ncol = 2. Nrow = number of genotypes that are neither omni-present or completely absent.
+  #   $genotype. Matrix.
   #
   # Check input ----------------------------------------------------------------
+  check_dimensions(lookup, min_rows = 1, exact_cols = 2, min_cols = 2)
+  check_dimensions(geno, min_cols = 1, min_rows = 1)
+  check_if_binary_matrix(geno)
+
+  # Function -------------------------------------------------------------------
+  genotypes_to_drop_because_not_present <- c(colnames(geno)[colSums(geno) == 0], colnames(geno)[colSums(geno) == nrow(geno)])
+  genotype <- geno[ , colSums(geno) > 0] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that don't occur for ace to work.
+  genotype <- genotype[ , colSums(genotype) < nrow(genotype)] # we don't want to remove snps that are too rare or too common until snps are grouped into genes, then run on the grouped genes. But we need to remove SNPs that occur in all isolates for ace to work.
+  # TODO replace the magic numbers in the next four lines. Group into a function?
+  gene_snp_lookup <- lookup[!(lookup[ , 1] %in% genotypes_to_drop_because_not_present), , drop = FALSE]
+  gene_snp_lookup <- gene_snp_lookup[gene_snp_lookup[ , 1] %in% colnames(genotype), , drop = FALSE]
+  unique_genes <- unique(gene_snp_lookup[ , 2])
+  snps_per_gene <- table(gene_snp_lookup[ , 2])
+
+  # Check and return output ----------------------------------------------------
+  results <- list("snps_per_gene" = snps_per_gene,
+                  "unique_genes" = unique_genes,
+                  "gene_snp_lookup" = gene_snp_lookup,
+                  "genotype" = genotype)
+  return(results)
+} # end prepare_grouped_genotype()
+
+prepare_ungrouped_genotype <- function(geno, tr){
+  # Function description -------------------------------------------------------
+  # Remove genotypes that are too common or rare for ancestral reconstruction to
+  # work. Given that this genotype is not grouped return NULL for the variable
+  # snps_per_gene. Keep track of which genotypes got removed in
+  # convergence_not_possible_genotypes.
   #
+  # Inputs:
+  # tr. Phylo.
+  # geno. Matrix. Binary. Ncol = number of genotypes. Nrow = Ntip(tr).
+  #
+  # Outputs:
+  # List of objects:
+  #   $snp_per_gene. Object of NULL.
+  #   $genotype. Matrix.
+  #   $convergene_not_possible_genotypes. Character vector. Vector of genotype names.
+  #
+  # Check input ----------------------------------------------------------------
+  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, min_col = 1)
+  check_if_binary_matrix(geno)
+  check_for_root_and_bootstrap(tr)
+
   # Function -------------------------------------------------------------------
   simplified_genotype <- reduce_redundancy(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
   snps_per_gene <- NULL
