@@ -233,4 +233,40 @@ test_that("convert_to_edge_mat gives an error when given vector or wrong dimensi
   expect_error(convert_to_edge_mat(temp_tree, not_the_reconstruction))
 })
 
+test_that("prepare_ancestral_reconstructions gives expected ancestral results given continuous input", {
+  set.seed(1)
+  temp_tree <- rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
+
+  set.seed(1)
+  temp_pheno <- as.matrix(fastBM(temp_tree))
+  row.names(temp_pheno) <- tree$tip.label
+  colnames(temp_pheno) <- "growth"
+
+  genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype2 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype5 <- matrix(c(0, 1, 1, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype6 <- matrix(c(0, 1, 1, 1, 1, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype7 <- matrix(c(0, 1, 0, 0, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype8 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  temp_geno <- cbind(genotype1, genotype2, genotype5, genotype6, genotype7, genotype8)
+  row.names(temp_geno) <- temp_tree$tip.label
+  colnames(temp_geno) <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
+
+  temp_continuous <- "continuous"
+
+  temp_AR <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, temp_geno, temp_continuous)
+
+  expect_equal(length(temp_AR$geno_trans), ncol(temp_geno))
+  expect_equal(length(temp_AR$geno_trans[[1]]$transition), Nedge(temp_tree))
+  expect_equal(length(temp_AR$geno_trans[[1]]$trans_dir), Nedge(temp_tree))
+  expect_equal(length(temp_AR$geno_recon_and_conf[[1]]$tip_and_node_rec_conf), (Ntip(temp_tree) + Nnode(temp_tree)))
+  expect_equal(length(temp_AR$geno_recon_and_conf[[1]]$tip_and_node_recon), (Ntip(temp_tree) + Nnode(temp_tree)))
+  expect_equal(length(temp_AR$geno_recon_and_conf[[1]]$node_anc_rec), Nnode(temp_tree))
+  expect_equal(nrow(temp_AR$geno_recon_and_conf[[1]]$recon_edge_mat), Nedge(temp_tree))
+  expect_equal(ncol(temp_AR$geno_recon_and_conf[[1]]$recon_edge_mat), 2)
+
+})
+
 # End script
