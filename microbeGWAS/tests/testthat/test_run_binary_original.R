@@ -2,7 +2,7 @@ library(microbeGWAS)
 context("Run binary original") #-----------------------------------------------#
 
 
-test_that("run_phyC() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
+test_that("run_binary_original() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
   test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/temp_results/"
   test_pheno <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/discrete_phenotype.tsv"
   test_tree  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/tree.tree"
@@ -34,10 +34,10 @@ test_that("run_phyC() doesn't give any errors when given a discrete phenotype an
   } else {
     args$gene_snp_lookup <- NULL
   }
-  expect_error(run_phyc(args), NA)
+  expect_error(run_binary_original(args), NA)
 })
 
-test_that("run_phyC() doesn't give any errors when given a discrete phenotype and snps (do not group into genes)" ,{
+test_that("run_binary_original() doesn't give any errors when given a discrete phenotype and snps (do not group into genes)" ,{
   test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/temp_results/"
   test_pheno <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/discrete_phenotype.tsv"
   test_tree  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/tree.tree"

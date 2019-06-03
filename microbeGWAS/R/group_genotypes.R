@@ -328,7 +328,7 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
   # group_logical. Logical.
   # geno. Genotype matrix. Binary. Nrow = Ntip(tr). Ncol = number of ungrouped genotypes.
   # tr. phylo.
-  # lookup. Matrix. Ncol = 2.
+  # lookup. Either NULL or a Matrix. Ncol = 2.
   #
   # Outputs:
   # prepped_geno. List of multiple objects. Content depends on value of group_logical.
@@ -348,7 +348,9 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
     stop("Input must be either TRUE or FALSE")
   }
   check_for_root_and_bootstrap(tr)
-  check_dimensions(lookup, exact_cols = 2, min_cols = 2, min_rows = 1)
+  if (!is.null(lookup)){
+    check_dimensions(lookup, exact_cols = 2, min_cols = 2, min_rows = 1)
+  }
   check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, min_cols = 1)
   #
   # Function -------------------------------------------------------------------
