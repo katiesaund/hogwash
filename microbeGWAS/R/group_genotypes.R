@@ -305,7 +305,17 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
   # lookup. Matrix. Ncol = 2.
   #
   # Outputs:
-  # prepped_geno. ?
+  # prepped_geno. List of multiple objects. Content depends on value of group_logical.
+  #   For grouped genotypes output includes:
+  #   $snp_per_gene. Named table. Names are genotypes. Values are number of not-yet-grouped-genotypes that go into the grouped genotype.
+  #   $unique_genes. Character vector. Vector of genotype names.
+  #   $gene_snp_lookup. Character matrix. Ncol = 2. Nrow = number of genotypes that are neither omni-present or completely absent.
+  #   $genotype. Matrix.
+  #
+  #   For not grouped genotypes output includes:
+  #   $snp_per_gene. Object of NULL.
+  #   $genotype. Matrix.
+  #   $convergene_not_possible_genotypes. Character vector. Vector of genotype names.
   #
   # Check input ----------------------------------------------------------------
   if (!is.logical(group_logical)){
