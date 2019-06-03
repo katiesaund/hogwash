@@ -175,7 +175,7 @@ prepare_genotype_transitions_for_original_discrete_test <- function(geno, genoty
   if (length(genotype_transition) != ncol(geno)){
     stop("Must have transition information for each genotype")
   }
-  check_if_binary_vector(genotype_transition$transition)
+  check_if_binary_vector(genotype_transition[[1]]$transition)
 
   # Function -------------------------------------------------------------------
   for (k in 1:ncol(geno)){
