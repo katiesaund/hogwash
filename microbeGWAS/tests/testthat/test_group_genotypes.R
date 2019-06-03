@@ -122,6 +122,46 @@ context("Group genotypes") -------------------------------------------#
 # } # end build_node_anc_recon_from_gene_list()
 #
 #
+
+test_that("build_gene_trans_from_snp_trans does X given Y", {
+  set.seed(1)
+  tree <- rtree(7)
+  tree$edge.length <- rep(sum(tree$edge.length)/Nedge(tree), Nedge(tree))
+  tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
+
+  genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
+  genotype2 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
+  genotype5 <- matrix(c(0, 1, 1, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
+  genotype6 <- matrix(c(0, 1, 1, 1, 1, 0, 0), nrow = Ntip(tree), ncol = 1)
+  genotype7 <- matrix(c(0, 1, 0, 0, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
+  genotype8 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(tree), ncol = 1)
+  genotype <- cbind(genotype1, genotype2, genotype5, genotype6, genotype7, genotype8)
+  row.names(genotype) <- tree$tip.label
+  colnames(genotype) <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
+
+  set.seed(1)
+  continuous_phenotype <- as.matrix(fastBM(tree))
+  row.names(continuous_phenotype) <- tree$tip.label
+  colnames(continuous_phenotype) <- "growth"
+
+
+  snp_gene_key <- matrix(NA, nrow = ncol(genotype), ncol = 2)
+  colnames(snp_gene_key) <- c("SNP", "GENE")
+  snp_gene_key[ , 1] <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
+  snp_gene_key[ , 2] <- c("GENE1", "GENE2", "GENE5", "GENE6", "GENE7", "GENE7")
+
+  AR <- prepare_ancestral_reconstructions(tree, continuous_phenotype, genotype, "continuous")
+
+  temp_results <- build_gene_trans_from_snp_trans(tree, genotype, AR$geno_trans, snp_gene_key)
+
+  expect_true(length(temp_results) == length(unique(snp_gene_key[ , 2])))
+  expect_equal(unname(temp_results$GENE1), AR$geno_trans[[1]]$transition)
+  expect_equal(unname(temp_results$GENE2), AR$geno_trans[[2]]$transition)
+  expect_equal(unname(temp_results$GENE5), AR$geno_trans[[3]]$transition)
+  expect_equal(unname(temp_results$GENE6), AR$geno_trans[[4]]$transition)
+  expect_equal(unname(temp_results$GENE7), AR$geno_trans[[5]]$transition + AR$geno_trans[[6]]$transition)
+})
+
 # build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_snp_lookup_table){
 #   # Function description -------------------------------------------------------
 #   # TODO

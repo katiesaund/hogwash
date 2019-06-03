@@ -75,7 +75,7 @@ test_that("assign_high_confidence_to_transition_edges returns the edges that are
 
 
 # test prepare_high_confidence_objects()
-# test_that("prepare_high_confidence_objects returns objects of expected sizes for continuous data", {
-#
-#
-#})
+test_that("prepare_high_confidence_objects returns objects of expected sizes for continuous data", {
+
+
+})

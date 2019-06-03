@@ -138,29 +138,30 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   # Compute ancestral reconstruction from a continuous or discrete input.
   #
   # Inputs:
-  # Varname. Var class. Description.
+  # tr. phylo.
+  # geno. Matrix. Nrow = Ntip(tr). Ncol = Number of ungrouped genotypes. Binary.
+  # geno_transition. List of named vectors. Length == number of ungrouped genotypes.
+  #   $transition. Length = Nedge(tr). Values or 0 or 1.
+  #   $trans_dir. Length = Nedge(tr). Values -1, 0, or 1.
+  # gene_to_snp_lookup_table. Matrix. Ncol = 2. Nrow = number of ungrouped genotypes.
   #
   # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
+  # gene_list_built_from_snps. Vector
   #
   # Check input ----------------------------------------------------------------
+  check_for_root_and_bootstrap(tr)
+  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, exact_cols =  nrow(gene_to_snp_lookup_table), min_cols = 1)
+  check_if_binary_matrix(geno).
+  if (length(geno_transition) != ncol(geno)){
+    stop("Must have a transition vector for each genotype")
+  }
+  if (length(geno_transition[[1]]$transition) != Nedge(tr)){
+    stop("Must have transition information for each tree edge.")
+  }
+  check_if_binary_vector_numeric(geno_transition[[1]]$transition)
+  check_dimensions(gene_to_snp_lookup_table, exact_rows = ncol(geno), min_rows = 1, exact_cols = 2, min_cols = 1)
 
   # Function -------------------------------------------------------------------
-
-  # Return output --------------------------------------------------------------
-
-  # VALIDATE INPUTS -----------------------------------------------------------#
-  check_for_root_and_bootstrap(tr)
-  check_if_binary_matrix(geno)
-  check_dimensions(geno, Ntip(tr), 2, NULL, 2)
-  if (length(geno_transition) != ncol(geno)){
-    stop("wrong input")
-  }
-  check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
-  check_if_binary_vector_numeric(geno_transition[[1]]$transition)
-
-  # FUNCTION ------------------------------------------------------------------#
-
   edges_by_snp_mat <- matrix(0, nrow = Nedge(tr), ncol = ncol(geno))
   if (nrow(edges_by_snp_mat) != length(geno_transition[[1]]$transition)){
     stop("mismatch in size")
@@ -200,7 +201,7 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
     gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
   }
   names(gene_list_built_from_snps) <- unique_genes
-
+  # Return output --------------------------------------------------------------
   return(gene_list_built_from_snps)
 } # end build_gene_trans_from_snp_trans()
 
@@ -379,34 +380,33 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
   check_dimensions(lookup, exact_rows = ncol(geno), min_rows = ncol(geno), exact_cols = 2, min_cols = 2)
 
   # Function -------------------------------------------------------------------
-
-  # Return output --------------------------------------------------------------
-
-
   geno_recon_and_confidence_tip_node <- build_gene_anc_recon_and_conf_from_snp(tr, geno, genotype_reconstruction_and_confidence, lookup)
-  genotype_transition_con <- build_gene_trans_from_snp_trans(tr, geno, genotype_transition_con, lookup)
-  genotype_transition_orig    <- build_gene_trans_from_snp_trans(tr, geno, genotype_transition_orig, lookup)
+  genotype_transition_con            <- build_gene_trans_from_snp_trans(tr, geno, genotype_transition_con, lookup)
+  genotype_transition_orig           <- build_gene_trans_from_snp_trans(tr, geno, genotype_transition_orig, lookup)
 
   # make new geno (just at the tips, from the snps)
-  geno <- build_gene_genotype_from_snps(geno, lookup)
-  simplified_genotype <- reduce_redundancy(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
-  geno <- simplified_genotype$mat
+  geno                           <- build_gene_genotype_from_snps(geno, lookup)
+  simplified_genotype            <- reduce_redundancy(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
+  geno                           <- simplified_genotype$mat
   genes_to_keep_in_consideration <- !(uni_genes %in% simplified_genotype$dropped_genotype_names)
 
   # remove redundancy from geno trans, geno_recon_and_confdience_tip_node_recon, and node_confidence
-  genotype_transition_con <- genotype_transition_con[genes_to_keep_in_consideration]
-  genotype_transition_orig  <- genotype_transition_orig[genes_to_keep_in_consideration]
+  genotype_transition_con  <- genotype_transition_con[genes_to_keep_in_consideration]
+  genotype_transition_orig <- genotype_transition_orig[genes_to_keep_in_consideration]
 
-  genotype_transition_con <- format_and_name_grouped_transitions(genotype_transition_con)
-  genotype_transition_orig  <- format_and_name_grouped_transitions(genotype_transition_orig)
+  genotype_transition_con  <- format_and_name_grouped_transitions(genotype_transition_con)
+  genotype_transition_orig <- format_and_name_grouped_transitions(genotype_transition_orig)
 
   geno_recon_and_confidence_tip_node_recon      <- geno_recon_and_confidence_tip_node$tip_node_recon[genes_to_keep_in_consideration]
   geno_recon_and_confidence_tip_node_confidence <- geno_recon_and_confidence_tip_node$tip_node_conf[ genes_to_keep_in_consideration]
+
   geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(geno))
   for (k in 1:ncol(geno)){
     geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_recon[[k]],      tr)
     geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_confidence[[k]], tr)
   }
+
+  # Return output --------------------------------------------------------------
   results <- list("geno_recon_ordered_by_edges" = geno_recon_ordered_by_edges,
                   "geno_conf_ordered_by_edges" = geno_conf_ordered_by_edges,
                   "geno_trans_concomitant" = genotype_transition_con,
