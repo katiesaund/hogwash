@@ -1,6 +1,6 @@
 # TODO: go through script line by and line and write unit tests for any untested functions.
 # TODO clean up script flow to make process more clear. Replace if / else with functions? How else to improve it?
-run_phyc <- function(args){
+run_binary_original <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
   results_object$log <- capture.output(sessionInfo()) # log session info
@@ -164,4 +164,4 @@ run_phyc <- function(args){
 
     save_results_as_r_object(args$output_dir, args$output_name, results_object)
   }
-}
+} # end run_binary_original()

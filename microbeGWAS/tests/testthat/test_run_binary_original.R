@@ -69,6 +69,6 @@ test_that("run_phyC() doesn't give any errors when given a discrete phenotype an
   } else {
     args$gene_snp_lookup <- NULL
   }
-  expect_error(run_phyc(args), NA)
+  expect_error(run_binary_original(args), NA)
 })
 
