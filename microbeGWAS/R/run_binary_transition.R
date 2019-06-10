@@ -1,5 +1,4 @@
-# TODO: go through script line by and line and write unit tests for any untested functions.
-run_phyc <- function(args){
+run_binary_transition <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
   results_object$log <- capture.output(sessionInfo()) # log session info
@@ -29,9 +28,7 @@ run_phyc <- function(args){
       geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
     }
   }
-
   hi_conf_concomitant <- prepare_high_confidence_objects(geno_trans_concomitant, args$tree, AR$pheno_recon_and_conf$tip_and_node_rec_conf, args$bootstrap_cutoff, genotype, geno_conf_ordered_by_edges, geno_recon_ordered_by_edges, geno$snps_per_gene)
-
   genotype_transition_edges <- rep(list(0), ncol(hi_conf_concomitant$genotype))
   for (k in 1:ncol(hi_conf_concomitant$genotype)){
     genotype_transition_edges[[k]] <- hi_conf_concomitant$genotype_transition[[k]]$transition
@@ -47,7 +44,6 @@ run_phyc <- function(args){
   corrected_pvals_trans <- get_sig_hits_while_correcting_for_multiple_testing(disc_trans_results$hit_pvals, args$fdr)
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
-
   discrete_plot_trans(tr = args$tree, dir = args$output_dir,
                      name = args$output_name, fdr = args$fdr,
                      annot = args$annot, num_perm = args$perm,
@@ -66,21 +62,5 @@ run_phyc <- function(args){
   results_object$concomitant_num_high_confidence_trasition_edges <- hi_conf_concomitant$num_high_confidence_trasition_edges
   results_object$concomitant_dropped_genotypes <- hi_conf_concomitant$dropped_genotypes
   save_results_as_r_object(args$output_dir, args$output_name, results_object)
-}
-
-
-# discrete_plot_orig(tr = args$tree, dir = args$output_dir,
-#                    name = args$output_name, fdr = args$fdr,
-#                    annot = args$annot, num_perm = args$perm,
-#                    recon_hit_vals = corrected_pvals_recon$hit_pvals,
-#                    trans_hit_vals = corrected_pvals_trans$hit_pvals,
-#                    p_recon_edges = pheno_recon_ordered_by_edges,
-#                    g_recon_edges = genotype_transition_edges,
-#                    recon_perm_obs_results = disc_recon_results,
-#                    trans_perm_obs_results = disc_trans_results,
-#                    tr_and_pheno_hi_conf = hi_conf_original$tr_and_pheno_hi_conf,
-#                    geno_conf = hi_conf_original$high_conf_ordered_by_edges,
-#                    g_trans_edges = genotype_transition_edges,
-#                    p_trans_edges = pheno_trans$transition,
-#                    snp_in_gene = geno$snps_per_gene)
+} # end run_binary_transition()
 
