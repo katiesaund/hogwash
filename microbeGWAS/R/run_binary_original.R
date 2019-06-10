@@ -48,24 +48,17 @@ run_binary_original <- function(args){
 
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
-  #discrete_plots(tr = args$tree, # add a test to check that p_recon_edges and g_recon_edges have Nedge(tree)
-  #               dir = args$output_dir,
-  #               name = args$output_name,
-  #               fdr = args$fdr,
-  #               annot = args$annot,
-  #               num_perm = args$perm,
-  #               recon_hit_vals = corrected_pvals_recon$hit_pvals,
-  #               trans_hit_vals = corrected_pvals_trans$hit_pvals,
-  #               p_recon_edges = pheno_recon_ordered_by_edges,
-                 # g_recon_edges = geno_recon_ordered_by_edges,
-  #               g_recon_edges = genotype_transition_edges,
-  #               recon_perm_obs_results = disc_recon_results,
-  #               trans_perm_obs_results = disc_trans_results,
-  #               tr_and_pheno_hi_conf = hi_conf_original$tr_and_pheno_hi_conf,
-  #               geno_conf = hi_conf_original$high_conf_ordered_by_edges,
-  #               g_trans_edges = genotype_transition_edges,
-  #               p_trans_edges = pheno_trans$transition,
-  #               snp_in_gene = geno$snps_per_gene)
+  discrete_plot_orig(tr = args$tree, dir = args$output_dir,
+                     name = args$output_name, fdr = args$fdr,
+                     annot = args$annot, num_perm = args$perm,
+                     recon_hit_vals = corrected_pvals_recon$hit_pvals,
+                     p_recon_edges = pheno_recon_ordered_by_edges,
+                     recon_perm_obs_results = disc_recon_results,
+                     tr_and_pheno_hi_conf = hi_conf_original$tr_and_pheno_hi_conf,
+                     geno_conf = hi_conf_original$high_conf_ordered_by_edges,
+                     g_trans_edges = genotype_transition_edges,
+                     p_trans_edges = pheno_trans$transition,
+                     snp_in_gene = geno$snps_per_gene)
 
   results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, hi_conf_original$genotype)
   results_object$hit_pvals_reconstruction <- corrected_pvals_recon$hit_pvals
