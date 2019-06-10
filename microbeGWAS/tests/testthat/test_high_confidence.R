@@ -59,8 +59,6 @@ test_that("assign_high_confidence_to_transition_edges returns the edges that are
   num_samples <- 5
   temp_tree <- rtree(num_samples)
   temp_tree$node.label <- rep(100, Nnode(temp_tree))
-  plot(temp_tree)
-  edgelabels()
   temp_trans <- temp_confidence <- expected_result <- rep(list(NULL), num_samples)
   for (i in 1:num_samples){
     temp_trans[[i]]$transition <- c(0, 0, 0, 1, 0, 1, 1, 0)
@@ -76,6 +74,41 @@ test_that("assign_high_confidence_to_transition_edges returns the edges that are
 
 # test prepare_high_confidence_objects()
 test_that("prepare_high_confidence_objects returns objects of expected sizes for continuous data", {
+  set.seed(1)
+  num_samples <- 11
+  temp_pheno <- as.matrix(c(1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1), ncol = 1)
+  temp_tree <- rtree(num_samples)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_trans <- expected_result <- rep(list(NULL), num_samples)
+  for (i in 1:num_samples){
+    temp_trans[[i]]$transition <- c(0, 0, 0, 1, 0, 1, 1, 1,  1,  1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    temp_trans[[i]]$trans_dir  <- c(0, 0, 0, 1, 0, 1, 1, 1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+  }
+  temp_geno <- matrix(c(0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1), ncol = num_samples, nrow = num_samples) # FYI this geno does not match up with the fake transitions I made up
+  temp_tree$tip.label <- row.names(temp_geno) <- letters[1:num_samples]
+  colnames(temp_geno) <- as.character(c(1:11))
+  temp_discrete <- "discrete"
+  temp_AR <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, temp_geno, temp_discrete)
 
+  for (i in 1:num_samples){
+    temp_AR$geno_recon_and_conf[[i]]$tip_and_node_rec_conf <- rep(1, Ntip(temp_tree) + Nnode(temp_tree))
+  }
+
+  temp_trans_original <- prepare_genotype_transitions_for_original_discrete_test(temp_geno, temp_trans) # Keep only WT -> mutant transitions.
+
+  temp_bootstrap <- 0.5
+  temp_snps_per_gene <- NULL
+
+  temp_geno_conf_ordered_by_edges <- temp_geno_recon_ordered_by_edges <- rep(list(0), ncol(temp_geno))
+  for (k in 1:ncol(temp_geno)){
+    temp_geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(temp_AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, temp_tree)
+    temp_geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(temp_AR$geno_recon_and_conf[[k]]$tip_and_node_recon,    temp_tree)
+  }
+
+  temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf <- rep(1, Nnode(temp_tree) + Ntip(temp_tree))
+
+  temp_hi_conf_orig <- prepare_high_confidence_objects(temp_trans_original, temp_tree, temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf, temp_bootstrap, temp_geno, temp_geno_conf_ordered_by_edges, temp_geno_recon_ordered_by_edges, temp_snps_per_gene)
+  expect_equal(temp_hi_conf_orig$genotype_transition[[1]]$transition, temp_hi_conf_orig$genotype_transition[[1]]$trans_dir)
+  expect_equal(temp_hi_conf_orig$genotype_transition[[1]]$transition, c(0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 
 })
