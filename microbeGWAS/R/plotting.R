@@ -1145,11 +1145,6 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   log_p_value <- data.frame(-log(recon_hit_vals))
   significant_loci[log_p_value > -log(fdr)] <- "sig"
 
-  print("recon, sig, log")
-  print(recon_hit_vals)
-  print(significant_loci)
-  print(log_p_value)
-
   if (!is.null(snp_in_gene)){
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
     colnames(snp_in_gene) <- "SNPs in gene"
@@ -1286,10 +1281,9 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
 # TODO update discrete_plot_trans variable names
 discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
-                                 trans_hit_vals, p_recon_edges,
-                                 trans_perm_obs_results, tr_and_pheno_hi_conf,
-                                 geno_confidence, g_trans_edges, p_trans_edges,
-                                 snp_in_gene){
+                                 trans_hit_vals, trans_perm_obs_results,
+                                 tr_and_pheno_hi_conf, geno_confidence,
+                                 g_trans_edges, p_trans_edges, snp_in_gene){
   # Function description -------------------------------------------------------
   # Plot the discrete test results.
   #
@@ -1302,7 +1296,6 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   # annot. ??
   # num_perm. Numeric. Number of permutations.
   # trans_hit_vals. Dataframe. Nrows = number of genotypes. Ncol = 1. Corrected p-values for each genotype tested.
-  # p_recon_edges. Vector. Length = Nedge(tree). Reconstruction of phenotype.
   # trans_perm_obs_results. List of many results.
   #     $hit_pvals. Character. P-val for each genotype. Length = number of tested genotypes.
   #     $permuted_count. List of vectors. 1 vector for each tested genotype. Length of each vector = number of permuations.
@@ -1325,9 +1318,6 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   if (ncol(trans_hit_vals) != 1 | nrow(trans_hit_vals) != length(geno_confidence)){
     stop("Dimensions of hit p-values dataframe are incorrect.")
   }
-  if (length(p_recon_edges) != Nedge(tr)){
-    stop("phenotype reconstruction needs to have a value for each tree edge.")
-  }
   if (!is.null(snp_in_gene)){
     if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer"){
       stop("snp_in_gene should be a table of integers")
@@ -1344,8 +1334,8 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   }
   check_if_binary_vector(geno_confidence[[1]])
   check_if_binary_vector(p_trans_edges)
-  check_if_binary_vector(g_trans_edges)
-  if (length(tr_and_pheno_hi_conf.) != Nedge(tr)){
+  check_if_binary_vector(g_trans_edges[[1]])
+  if (length(tr_and_pheno_hi_conf) != Nedge(tr)){
     stop("Tree and phenotype confidence needs to have a value for each tree edge.")
   }
   if (length(trans_perm_obs_results$permuted_count[[1]]) != num_perm){
@@ -1431,6 +1421,8 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   ann_colors = list(locus = locus_col, pheno_presence = pheno_presence_col)
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted){
+    cell_width_value <- image_width / ncol(ordered_by_p_val)
+
     # Transition loci summary heat maps
     pheatmap( # Plot the heatmap
       ordered_by_p_val,
