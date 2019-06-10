@@ -96,6 +96,9 @@ test_that("prepare_genotype_transitions_for_original_discrete_test returns a $tr
   temp_results <- prepare_genotype_transitions_for_original_discrete_test(temp_geno, temp_AR$geno_trans)
 
   expect_equal(temp_results[[1]]$transition, c(0, 1, 0, 0, 0, 0, 0, 1))
+  expect_equal(temp_results[[1]]$trans_dir, c(0, 1, 0, 0, 0, 0, 0, 1))
+  expect_equal(temp_results[[2]]$transition, c(0, 1, 0, 0, 0, 0, 0, 0))
+  expect_equal(temp_results[[2]]$trans_dir, c(0, 1, 0, 0, 0, 0, 0, 0))
   expect_equal(temp_AR$geno_trans[[1]]$transition, c(1, 1, 0, 0, 0, 1, 0, 1))
   expect_equal(temp_AR$geno_trans[[1]]$trans_dir, c(-1, 1, 0, 0, 0, -1, 0, 1))
 })
