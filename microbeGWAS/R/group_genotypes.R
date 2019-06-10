@@ -235,7 +235,7 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   print("gene_trans_dir_list_built_from_snps")
   print(gene_trans_dir_list_built_from_snps)
 
-  temp_results <- rep(list(), length(unique_genes))
+  temp_results <- rep(list(list()), length(unique_genes))
   for (i in 1:length(unique_genes)){
     print("i")
     print(i)
@@ -244,6 +244,9 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
     temp_results[[i]]$transition <- unname(gene_transition_list_built_from_snps[i])
     temp_results[[i]]$trans_dir <- unname(gene_trans_dir_list_built_from_snps[i])
   }
+
+  print("resluts")
+  print(temp_results)
 
   # Return output --------------------------------------------------------------
   return(temp_results)
@@ -408,6 +411,7 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
 
 
 format_and_name_grouped_transitions <- function(genotype_transition){
+  # I think this isn't needed for anything based on updates 2019-06-09
   dummy <- genotype_transition
   genotype_transition <- rep(list(NULL), length(dummy))
   for (i in 1:length(dummy)){
@@ -488,6 +492,12 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
   genotype_transition_con            <- build_gene_trans_from_snp_trans(tr, geno, genotype_transition_con, lookup)
   genotype_transition_orig           <- build_gene_trans_from_snp_trans(tr, geno, genotype_transition_orig, lookup)
 
+  print("A")
+  print("genotype_transition_con")
+  print(genotype_transition_con)
+  print("genotype_transition_orig")
+  print(genotype_transition_orig)
+
   # make new geno (just at the tips, from the snps)
   geno                           <- build_gene_genotype_from_snps(geno, lookup)
   simplified_genotype            <- reduce_redundancy(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
@@ -498,8 +508,14 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
   genotype_transition_con  <- genotype_transition_con[genes_to_keep_in_consideration]
   genotype_transition_orig <- genotype_transition_orig[genes_to_keep_in_consideration]
 
-  genotype_transition_con  <- format_and_name_grouped_transitions(genotype_transition_con)
-  genotype_transition_orig <- format_and_name_grouped_transitions(genotype_transition_orig)
+  print("B")
+  print("genotype_transition_con")
+  print(genotype_transition_con)
+  print("genotype_transition_orig")
+  print(genotype_transition_orig)
+
+  #genotype_transition_con  <- format_and_name_grouped_transitions(genotype_transition_con)
+  #genotype_transition_orig <- format_and_name_grouped_transitions(genotype_transition_orig)
 
   geno_recon_and_confidence_tip_node_recon      <- geno_recon_and_confidence_tip_node$tip_node_recon[genes_to_keep_in_consideration]
   geno_recon_and_confidence_tip_node_confidence <- geno_recon_and_confidence_tip_node$tip_node_conf[ genes_to_keep_in_consideration]

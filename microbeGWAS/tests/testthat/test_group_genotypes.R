@@ -141,7 +141,7 @@ test_that("build_gene_trans_from_snp_trans does X given Y", {
 
   set.seed(1)
   continuous_phenotype <- as.matrix(fastBM(temp_tree))
-  row.names(continuous_phenotype) <- tree$tip.label
+  row.names(continuous_phenotype) <- temp_tree$tip.label
   colnames(continuous_phenotype) <- "growth"
 
 
