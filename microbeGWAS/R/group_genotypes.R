@@ -158,51 +158,95 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   if (length(geno_transition[[1]]$transition) != Nedge(tr)){
     stop("Must have transition information for each tree edge.")
   }
+  if (length(geno_transition[[1]]$trans_dir) != Nedge(tr)){
+    stop("Must have transition direction information for each tree edge.")
+  }
   check_if_binary_vector_numeric(geno_transition[[1]]$transition)
   check_dimensions(gene_to_snp_lookup_table, exact_rows = ncol(geno), min_rows = 1, exact_cols = 2, min_cols = 1)
 
   # Function -------------------------------------------------------------------
-  edges_by_snp_mat <- matrix(0, nrow = Nedge(tr), ncol = ncol(geno))
-  if (nrow(edges_by_snp_mat) != length(geno_transition[[1]]$transition)){
-    stop("mismatch in size")
-  }
+  transition_edges_by_snp_mat <- trans_dir_edges_by_snp_mat <- matrix(0, nrow = Nedge(tr), ncol = ncol(geno))
+
   for (k in 1:ncol(geno)){
-    edges_by_snp_mat[ , k] <- geno_transition[[k]]$transition
+    transition_edges_by_snp_mat[ , k] <- geno_transition[[k]]$transition
+    trans_dir_edges_by_snp_mat[ ,  k] <- geno_transition[[k]]$trans_dir
   }
-  row.names(edges_by_snp_mat) <- c(1:nrow(edges_by_snp_mat))
-  colnames(edges_by_snp_mat) <- colnames(geno)
+  row.names(transition_edges_by_snp_mat) <- row.names(trans_dir_edges_by_snp_mat) <- c(1:nrow(transition_edges_by_snp_mat))
+  colnames(transition_edges_by_snp_mat) <- colnames(trans_dir_edges_by_snp_mat) <- colnames(geno)
 
-  if (nrow(gene_to_snp_lookup_table) != ncol(edges_by_snp_mat)){
-    stop("mismatch")
-  }
+  print("transition_edges_by_snp_mat")
+  print(transition_edges_by_snp_mat)
 
-  edges_by_snp_mat_with_gene_id <- rbind(edges_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
-  if (nrow(edges_by_snp_mat_with_gene_id) != (nrow(edges_by_snp_mat) + 1)){
-    stop("rbind didn't work")
-  }
+  print("trans_dir_edges_by_snp_mat")
+  print(trans_dir_edges_by_snp_mat)
+
+  transition_edges_by_snp_mat_with_gene_id <- rbind(transition_edges_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
+  trans_dir_edges_by_snp_mat_with_gene_id <- rbind(trans_dir_edges_by_snp_mat, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
+  print("transition_edges_by_snp_mat_with_gene_id")
+  print(transition_edges_by_snp_mat_with_gene_id)
+  print("trans_dir_edges_by_snp_mat_with_gene_id")
+  print(trans_dir_edges_by_snp_mat_with_gene_id)
 
   unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
-  gene_mat_built_from_snps <- matrix(0, nrow = nrow(edges_by_snp_mat), ncol = length(unique_genes))
+  gene_transition_mat_built_from_snps <- gene_trans_dir_mat_built_from_snps <- matrix(0, nrow = nrow(transition_edges_by_snp_mat), ncol = length(unique_genes))
   for (j in 1:length(unique_genes)){
-    temp_mat <- edges_by_snp_mat_with_gene_id[1:(nrow(edges_by_snp_mat_with_gene_id) - 1) , edges_by_snp_mat_with_gene_id[nrow(edges_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    temp_mat <- transition_edges_by_snp_mat_with_gene_id[1:(nrow(transition_edges_by_snp_mat_with_gene_id) - 1) , transition_edges_by_snp_mat_with_gene_id[nrow(transition_edges_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
-    gene_mat_built_from_snps[ , j] <- temp_column
+    gene_transition_mat_built_from_snps[ , j] <- temp_column
+
+
+    temp_dir_mat <- trans_dir_edges_by_snp_mat_with_gene_id[1:(nrow(trans_dir_edges_by_snp_mat_with_gene_id) - 1) , trans_dir_edges_by_snp_mat_with_gene_id[nrow(trans_dir_edges_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    class(temp_dir_mat) <- "numeric"
+    temp_dir_column <- rowSums(temp_dir_mat)
+    gene_trans_dir_mat_built_from_snps[ , j] <- temp_dir_column
   }
 
-  gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
-  class(gene_mat_built_from_snps) <- "numeric"
+  gene_transition_mat_built_from_snps <- gene_transition_mat_built_from_snps > 0
+  class(gene_transition_mat_built_from_snps) <- "numeric"
+  colnames(gene_transition_mat_built_from_snps) <- unique_genes
+  row.names(gene_transition_mat_built_from_snps) <- c(1:nrow(gene_transition_mat_built_from_snps))
 
-  colnames(gene_mat_built_from_snps) <- unique_genes
-  row.names(gene_mat_built_from_snps) <- c(1:nrow(gene_mat_built_from_snps))
+  gene_trans_dir_mat_built_from_snps <- gene_trans_dir_mat_built_from_snps > 0
+  class(gene_trans_dir_mat_built_from_snps) <- "numeric"
+  colnames(gene_trans_dir_mat_built_from_snps) <- unique_genes
+  row.names(gene_trans_dir_mat_built_from_snps) <- c(1:nrow(gene_trans_dir_mat_built_from_snps))
 
-  gene_list_built_from_snps <- rep(list(0), length(unique_genes))
+  print("gene_transition_mat_built_from_snps")
+  print(gene_transition_mat_built_from_snps)
+  print("gene_trans_dir_mat_built_from_snps")
+  print(gene_trans_dir_mat_built_from_snps)
+
+  gene_transition_list_built_from_snps <- rep(list(0), length(unique_genes))
   for (m in 1:length(unique_genes)){
-    gene_list_built_from_snps[[m]] <- gene_mat_built_from_snps[ , m, drop = TRUE]
+    gene_transition_list_built_from_snps[[m]] <- gene_transition_mat_built_from_snps[ , m, drop = TRUE]
   }
-  names(gene_list_built_from_snps) <- unique_genes
+  names(gene_transition_list_built_from_snps) <- unique_genes
+
+  gene_trans_dir_list_built_from_snps <- rep(list(0), length(unique_genes))
+  for (m in 1:length(unique_genes)){
+    gene_trans_dir_list_built_from_snps[[m]] <- gene_trans_dir_mat_built_from_snps[ , m, drop = TRUE]
+  }
+  names(gene_trans_dir_list_built_from_snps) <- unique_genes
+
+
+  print("gene_transition_list_built_from_snps")
+  print(gene_transition_list_built_from_snps)
+  print("gene_trans_dir_list_built_from_snps")
+  print(gene_trans_dir_list_built_from_snps)
+
+  temp_results <- rep(list(), length(unique_genes))
+  for (i in 1:length(unique_genes)){
+    print("i")
+    print(i)
+    print("unname gene_transition_list_built_from_snps[i]")
+    print(unname(gene_transition_list_built_from_snps[i]))
+    temp_results[[i]]$transition <- unname(gene_transition_list_built_from_snps[i])
+    temp_results[[i]]$trans_dir <- unname(gene_trans_dir_list_built_from_snps[i])
+  }
+
   # Return output --------------------------------------------------------------
-  return(gene_list_built_from_snps)
+  return(temp_results)
 } # end build_gene_trans_from_snp_trans()
 
 
