@@ -181,8 +181,9 @@ prepare_genotype_transitions_for_original_discrete_test <- function(geno, genoty
   for (k in 1:ncol(geno)){
     parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
     parent_mutant_child_WT <- -1
+    no_transition <- 0
     genotype_transition[[k]]$transition <- as.numeric(genotype_transition[[k]]$trans_dir == parent_WT_child_mutant)
-    genotype_transition[[k]]$trans_dir[genotype_transition[[k]]$trans_dir == parent_mutant_child_WT] <- 0 # erase transitions in the opposite direction
+    genotype_transition[[k]]$trans_dir[genotype_transition[[k]]$trans_dir == parent_mutant_child_WT] <- no_transition # erase transitions in the opposite direction
   }
 
   # Return output --------------------------------------------------------------
