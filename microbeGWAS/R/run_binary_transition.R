@@ -143,25 +143,41 @@ run_phyc <- function(args){
     results_object$sig_pvals_transition     <- corrected_pvals_trans$sig_pvals
     results_object$sig_pvals_reconstruction <- corrected_pvals_recon$sig_pvals
 
-    discrete_plots(tr = args$tree, # add a test to check that p_recon_edges and g_recon_edges have Nedge(tree)
-                   dir = args$output_dir,
-                   name = args$output_name,
-                   fdr = args$fdr,
-                   annot = args$annot,
-                   num_perm = args$perm,
-                   recon_hit_vals = corrected_pvals_recon$hit_pvals,
-                   trans_hit_vals = corrected_pvals_trans$hit_pvals,
-                   p_recon_edges = pheno_recon_ordered_by_edges,
-                   # g_recon_edges = geno_recon_ordered_by_edges,
-                   g_recon_edges = genotype_transition_edges,
-                   recon_perm_obs_results = disc_recon_results,
-                   trans_perm_obs_results = disc_trans_results,
-                   tr_and_pheno_hi_conf = high_confidence_edges,
-                   geno_conf = high_conf_ordered_by_edges,
-                   g_trans_edges = genotype_transition_edges,
-                   p_trans_edges = pheno_trans$transition,
-                   snp_in_gene = geno$snps_per_gene)
+    # discrete_plots(tr = args$tree, # add a test to check that p_recon_edges and g_recon_edges have Nedge(tree)
+    #                dir = args$output_dir,
+    #                name = args$output_name,
+    #                fdr = args$fdr,
+    #                annot = args$annot,
+    #                num_perm = args$perm,
+    #                recon_hit_vals = corrected_pvals_recon$hit_pvals,
+    #                trans_hit_vals = corrected_pvals_trans$hit_pvals,
+    #                p_recon_edges = pheno_recon_ordered_by_edges,
+    #                # g_recon_edges = geno_recon_ordered_by_edges,
+    #                g_recon_edges = genotype_transition_edges,
+    #                recon_perm_obs_results = disc_recon_results,
+    #                trans_perm_obs_results = disc_trans_results,
+    #                tr_and_pheno_hi_conf = high_confidence_edges,
+    #                geno_conf = high_conf_ordered_by_edges,
+    #                g_trans_edges = genotype_transition_edges,
+    #                p_trans_edges = pheno_trans$transition,
+    #                snp_in_gene = geno$snps_per_gene)
 
     save_results_as_r_object(args$output_dir, args$output_name, results_object)
   }
 }
+
+
+# discrete_plot_orig(tr = args$tree, dir = args$output_dir,
+#                    name = args$output_name, fdr = args$fdr,
+#                    annot = args$annot, num_perm = args$perm,
+#                    recon_hit_vals = corrected_pvals_recon$hit_pvals,
+#                    trans_hit_vals = corrected_pvals_trans$hit_pvals,
+#                    p_recon_edges = pheno_recon_ordered_by_edges,
+#                    g_recon_edges = genotype_transition_edges,
+#                    recon_perm_obs_results = disc_recon_results,
+#                    trans_perm_obs_results = disc_trans_results,
+#                    tr_and_pheno_hi_conf = hi_conf_original$tr_and_pheno_hi_conf,
+#                    geno_conf = hi_conf_original$high_conf_ordered_by_edges,
+#                    g_trans_edges = genotype_transition_edges,
+#                    p_trans_edges = pheno_trans$transition,
+#                    snp_in_gene = geno$snps_per_gene)
