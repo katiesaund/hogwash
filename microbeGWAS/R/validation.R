@@ -550,7 +550,7 @@ check_equal <- function(first_number, second_number){
   check_is_number(second_number)
 
   # Function -------------------------------------------------------------------
-  if (first_thing != second_thing){
+  if (first_number != second_number){
     stop("Inputs are not equal")
   }
 }
