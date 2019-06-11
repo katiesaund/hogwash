@@ -118,47 +118,29 @@ test_that("ancestral_reconstruction_by_ML with discrete input produce ancestral 
   expect_identical(length(dummy_geno$tip_and_node_recon), expected_length)
 })
 
-test_that("ancestral_reconstruction_by_ML with continuous input produce ancestral reconstruction with a value for each tip and node.", {
+test_that("ancestral_reconstruction_by_ML with continuous input produce ancestral reconstructions with correct dimensions.", {
   set.seed(1)
-  tree <- rtree(9, rooted = TRUE)
-  tree$node.label <- rep(100, Nnode(tree))
+  temp_tree <- rtree(9, rooted = TRUE)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
   num_col <- 9
-  num_cells <- num_col * Ntip(tree)
-  test_mat <- matrix(rnorm(num_cells, mean = 0, sd = 10), nrow = Ntip(tree), ncol = num_col)
-  dummy_pheno <- ancestral_reconstruction_by_ML(tree, test_mat, 1, "continuous")
-  dummy_geno <-  ancestral_reconstruction_by_ML(tree, test_mat, 2, "continuous")
-  expected_length <- Ntip(tree) + Nnode(tree)
-  expect_identical(length(dummy_pheno$tip_and_node_recon), expected_length)
-  expect_identical(length(dummy_geno$tip_and_node_recon), expected_length)
-})
+  num_cells <- num_col * Ntip(temp_tree)
+  test_mat <- matrix(rnorm(num_cells, mean = 0, sd = 10), nrow = Ntip(temp_tree), ncol = num_col)
+  test_pheno_mat_1 <- test_mat[ , 1, drop = FALSE]
+  test_pheno_mat_2 <- test_mat[ , 2, drop = FALSE]
+  dummy_pheno1 <- ancestral_reconstruction_by_ML(temp_tree, test_pheno_mat_1, 1, "continuous")
+  dummy_pheno2 <-  ancestral_reconstruction_by_ML(temp_tree, test_pheno_mat_2, 1, "continuous")
+  expected_length <- Ntip(temp_tree) + Nnode(temp_tree)
+  expect_identical(length(dummy_pheno1$tip_and_node_recon), expected_length)
+  expect_identical(length(dummy_pheno2$tip_and_node_recon), expected_length)
 
-test_that("ancestral_reconstruction_by_ML with continuous input produce ancestral reconstruction with a value for node.", {
-  set.seed(1)
-  tree <- rtree(9, rooted = TRUE)
-  tree$node.label <- rep(100, Nnode(tree))
-  num_col <- 9
-  num_cells <- num_col * Ntip(tree)
-  test_mat <- matrix(rnorm(num_cells, mean = 0, sd = 10), nrow = Ntip(tree), ncol = num_col)
-  dummy_pheno <- ancestral_reconstruction_by_ML(tree, test_mat, 1, "continuous")
-  dummy_geno <-  ancestral_reconstruction_by_ML(tree, test_mat, 2, "continuous")
-  expected_length <- Nnode(tree)
-  expect_identical(length(dummy_pheno$node_anc_rec), expected_length)
-  expect_identical(length(dummy_geno$node_anc_rec), expected_length)
-})
+  expected_length <- Nnode(temp_tree)
+  expect_identical(length(dummy_pheno1$node_anc_rec), expected_length)
+  expect_identical(length(dummy_pheno2$node_anc_rec), expected_length)
 
-test_that("ancestral_reconstruction_by_ML with continuous input produce ancestral reconstruction matrix with same dimensions as tree$edge matrix.", {
-  set.seed(1)
-  tree <- rtree(9, rooted = TRUE)
-  tree$node.label <- rep(100, Nnode(tree))
-  num_col <- 9
-  num_cells <- num_col * Ntip(tree)
-  test_mat <- matrix(rnorm(num_cells, mean = 0, sd = 10), nrow = Ntip(tree), ncol = num_col)
-  dummy_pheno <- ancestral_reconstruction_by_ML(tree, test_mat, 1, "continuous")
-  dummy_geno <-  ancestral_reconstruction_by_ML(tree, test_mat, 2, "continuous")
-  expected_rows <- nrow(tree$edge)
-  expected_columns <- ncol(tree$edge)
-  expect_identical(nrow(dummy_pheno$recon_edge_mat), expected_rows)
-  expect_identical(ncol(dummy_geno$recon_edge_mat), expected_columns)
+  expected_rows <- nrow(temp_tree$edge)
+  expected_columns <- ncol(temp_tree$edge)
+  expect_identical(nrow(dummy_pheno1$recon_edge_mat), expected_rows)
+  expect_identical(ncol(dummy_pheno1$recon_edge_mat), expected_columns)
 })
 
 test_that("ancestral_reconstruction_by_ML with discrete input produces ancestral reconstruction with this known result.", {
