@@ -720,50 +720,69 @@ test_that("check_is_number gives an error when x = Inf", {
 
 # test check_node_is_in_tree ---------------------------------------------------
 test_that("check_node_is_in_tree doesn't give an error when node = 1", {
+  # Set up
   temp <- rtree(10)
   temp$node.label <- c(1:Nnode(temp))
+
+  # Test
   expect_error(check_node_is_in_tree(node_val = 1, tr = temp), NA)
 })
 
 test_that("check_node_is_in_tree doesn't give an error when node = Nnode(tree)", {
-  temp = rtree(10)
+  # Set up
+  temp <- rtree(10)
   temp$node.label <- c(1:Nnode(temp))
+
+  # Test
   expect_error(check_node_is_in_tree(node_val = Nnode(temp), tr = temp), NA)
 })
 
 test_that("check_node_is_in_tree gives an error when node = 0", {
-  temp = rtree(10)
+  # Set up
+  temp <- rtree(10)
   temp$node.label <- c(1:Nnode(temp))
+
+  # Test
   expect_error(check_node_is_in_tree(node_val = 0, tr = temp))
 })
 
 test_that("check_node_is_in_tree gives an error when node = -1", {
-  temp = rtree(10)
+  # Set up
+  temp <- rtree(10)
   temp$node.label <- c(1:Nnode(temp))
+
+  # Test
   expect_error(check_node_is_in_tree(node_val = -1, tr = temp))
 })
 
 test_that("check_node_is_in_tree gives an error when node = Nnode + Ntip + 1", {
-  temp = rtree(10)
+  # Set up
+  temp <- rtree(10)
   temp$node.label <- c(1:Nnode(temp))
+
+  # Test
   expect_error(check_node_is_in_tree(node_val = Nnode(temp) + Ntip(temp) + 1, tr = temp))
 })
 
 test_that("check_node_is_in_tree gives an error when node = 1.5", {
-  temp = rtree(10)
+  # Set up
+  temp <- rtree(10)
   temp$node.label <- c(1:Nnode(temp))
+
+  # Test
   expect_error(check_node_is_in_tree(node_val = 1.5, tr = temp))
 })
 
-
 # test check_tree_is_valid -----------------------------------------------------
 test_that("check_tree_is_valid returns true for randomly generated trees where Ntip is between 2 and 10", {
+  # Test
   for (i in 2:10){
     expect_error(check_tree_is_valid(rtree(i)), NA)
   }
 })
 
 test_that("check_tree_is_invalid throws an error when tree edge index is greater than Nedge(tree)", {
+  # Set up
   invalid_tree <- rtree(10)
   for (j in 1:Nedge(invalid_tree)){
     if (invalid_tree$edge[j, 2] == 1){
@@ -771,73 +790,104 @@ test_that("check_tree_is_invalid throws an error when tree edge index is greater
       break
     }
   }
+
+  # Test
   expect_error(check_tree_is_valid(invalid_tree))
 })
 
 # test check_convergence_possible ----------------------------------------------
 test_that("check_convergence_possible gives an error 'discrete' and all values = 0", {
+  # Set up
   disc_cont <- "discrete"
   temp_vec <- c(0,0,0,0,0,0,0,0)
+
+  # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
 })
 
 test_that("check_convergence_possible doesn't give an error 'discrete' and values= c(1,0,1,0,1,0,1,0)", {
+  # Set up
   disc_cont <- "discrete"
   temp_vec <- c(1,0,1,0,1,0,1,0)
+
+  # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec), NA)
 })
 
 test_that("check_convergence_possible gives an error 'continuous' and all values = 0", {
+  # Set up
   disc_cont <- "continuous"
   temp_vec <- c(0,0,0,0,0,0,0,0)
+
+  # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
 })
 
 test_that("check_convergence_possible gives an error 'discrete' and values= c(0, 0.1, 0.2)", {
+  # Set up
   disc_cont <- "discrete"
   temp_vec <- c(0, 0.1, 0.2)
+
+  # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
 })
 
-
 test_that("check_convergence_possible gives an error 'discrete' and all values = 'a'", {
+  # Set up
   disc_cont <- "discrete"
   temp_vec <- rep('a', 10)
+
+  # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
 })
 
 # test is_tip ------------------------------------------------------------------
 test_that("is_tip returns TRUE when given a tree and the node = 1 (a tip)", {
+  # Set up
   temp_tree <- rtree(10)
   temp_tree$node.labels <- rep(100, Nnode(temp_tree))
   temp_node <- 1
+
+  # Test
   expect_true(is_tip(temp_node, temp_tree))
 })
 
 test_that("is_tip returns FALSE when given a tree and the node = Ntip(temp_tree) + 1 (not a tip)", {
+  # Set up
   temp_tree <- rtree(10)
   temp_tree$node.labels <- rep(100, Nnode(temp_tree))
   temp_node <- Ntip(temp_tree) + 1
+
+  # Test
   expect_false(is_tip(temp_node, temp_tree))
 })
 
 test_that("is_tip gives an error when given a tree and the node = 12.5", {
+  # Set up
   temp_tree <- rtree(10)
   temp_tree$node.labels <- rep(100, Nnode(temp_tree))
   temp_node <- 12.5
+
+  # Test
   expect_error(is_tip(temp_node, temp_tree))
 })
 
 test_that("is_tip gives an error when given a tree and the node = NA", {
+  # Set up
   temp_tree <- rtree(10)
   temp_tree$node.labels <- rep(100, Nnode(temp_tree))
   temp_node <- NA
+
+  # Test
   expect_error(is_tip(temp_node, temp_tree))
 })
 
 test_that("is_tip gives an error when given a matrix and a node", {
+  # Set up
   temp_tree <- matrix(10, 10, 1)
   temp_node <- 5
+
+  # Test
   expect_error(is_tip(temp_node, temp_tree))
 })
 
@@ -862,43 +912,11 @@ test_that("check_if_g_mat_can_be_plotted returns FALSE for a binary matrix of al
   expect_false(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
-# check_if_g_mat_can_be_plotted <- function(geno_matrix){
-#   # Function description -------------------------------------------------------
-#   # TODO
-#   # In order to make a heatmap there need to be 1) at least two columns, 2)
-#   # two different values within the matrix (0 and 1).
-#   # There can be NAs in the matrix.
-#   #
-#   # Inputs:
-#   # geno_matrix. Matrix. 1, 0, and/or NA.
-#   #
-#   # Outputs:
-#   # plot_logical. Logical. TRUE or FALSE.
-#   #
-#   # Check input ----------------------------------------------------------------
-#   check_dimensions(geno_matrix, min_rows = 1, min_cols = 2)
-#
-#   if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 == 0) != 0){
-#     stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
-#   }
-#
-#   # Function -------------------------------------------------------------------
-#   ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
-#   zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
-#   nas <- sum(is.na(geno_matrix)) > 1
-#
-#   plot_logical <- FALSE #
-#   if (ones == 1 && zeros == 1 && nas == 0) {
-#     plot_logical <- TRUE
-#   }
-#   if (ones + zeros + nas == 3) {
-#     plot_logical <- TRUE
-#   }
-#
-#   # Return output --------------------------------------------------------------
-#   if(!is.logical(plot_logical)){stop("Output must be a logical")}
-#   return(plot_logical)
-# }
+test_that("check_if_g_mat_can_be_plotted returns an error for a binary matrix of 2x1", {
+  temp_mat <- matrix(c(0, 1), nrow = 2, ncol = 1)
+  expect_error(check_if_g_mat_can_be_plotted(temp_mat))
+})
+
 
 
 # test check_str_is_discrete_or_continuous

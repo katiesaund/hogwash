@@ -353,7 +353,7 @@ check_node_is_in_tree <- function(node_val, tr){
   check_for_root_and_bootstrap(tr)
   check_is_number(node_val)
 
-  if (node_val > Nnode(tr)){
+  if (node_val > Nnode(tr) + Ntip(tr)){
     stop("Node number is too high; not found in tree.")
   }
   if (node_val < 1 | node_val %% 1 != 0){
@@ -362,12 +362,14 @@ check_node_is_in_tree <- function(node_val, tr){
 } # end check_node_is_in_tree()
 
 check_tree_is_valid <- function(tr){
-  #`
   # Function description ------------------------------------------------------#
-  # Test if a tree is valid- based on number of Nodes and Tips.
+  # Test if a tree has valid structure. Each tree node should touch either three
+  # edges (internal node) or two edges (root node). This function checks if a
+  # phylogenetic tree is structured correctly so that later functions will work
+  # as expected.
   #
   # Inputs:
-  # tr: phylogenetic tree.
+  # tr: Phylo.
   #
   # Output:
   # None.
@@ -398,8 +400,8 @@ check_convergence_possible <- function(vec, discrete_or_continuous){
   # at leaset twice in the vector.
   #
   # Inputs:
-  # vec. Vector. A vector of numbers. If "discrete" then vector must be binary.
-  # discrete_or_continuous. Character. Either "discrete" or "continuous."
+  # vec: Vector. A vector of numbers. If "discrete" then vector must be binary.
+  # discrete_or_continuous: Character. Either "discrete" or "continuous."
   #
   # Output:
   # None.
@@ -426,11 +428,11 @@ check_convergence_possible <- function(vec, discrete_or_continuous){
 
 is_tip <- function(node_num, tr){
   # Function description ------------------------------------------------------#
-  # Test if a node is a tip or an internal node.
+  # Test if a node is a tree tip. An internal node should return false.
   #
   # Inputs:
   # node_num: Integer. Index of node.
-  # tr: phylogenetic tree.
+  # tr: Phylo.
   #
   # Output:
   # Logical. TRUE OR FALSE.
@@ -438,7 +440,7 @@ is_tip <- function(node_num, tr){
   # Check input ---------------------------------------------------------------#
   check_tree_is_valid(tr)
   check_is_number(node_num)
-  if (node_num < 1 ||node_num %% 1 != 0){
+  if (node_num < 1 || node_num %% 1 != 0){
     stop("Node number must be a positive integer")
   }
   check_node_is_in_tree(node_num, tr)
@@ -450,10 +452,9 @@ is_tip <- function(node_num, tr){
 
 check_if_g_mat_can_be_plotted <- function(geno_matrix){
   # Function description -------------------------------------------------------
-  # TODO
-  # In order to make a heatmap there need to be 1) at least two columns, 2)
-  # two different values within the matrix (0 and 1).
-  # There can be NAs in the matrix.
+  # The program cannot plot all results. In order to plot the heatmap results
+  # there needs to be 1) at least two columns in the matrix, 2) two different
+  # values within the matrix (0 and 1). There can be NAs in the matrix.
   #
   # Inputs:
   # geno_matrix. Matrix. 1, 0, and/or NA.
@@ -466,32 +467,27 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
     if (class(geno_matrix) != "matrix"){
       plot_logical <- FALSE
     }
-  }
-
-  if (class(geno_matrix) == "data.frame" | class(geno_matrix) == "matrix") {
+  } else if (class(geno_matrix) == "data.frame" | class(geno_matrix) == "matrix") {
     if (nrow(geno_matrix) < 1 | ncol(geno_matrix) < 2){
-    plot_logical <- FALSE
-    } else {
+      plot_logical <- FALSE
+    }
+  } else {
       if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0) != 0){
         stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
       }
-    }
-    # Function -----------------------------------------------------------------
-    ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
-    zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
-    nas <- sum(is.na(geno_matrix)) > 1
+      ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
+      zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
+      nas <- sum(is.na(geno_matrix)) > 1
 
-    plot_logical <- FALSE #
-    if (ones == 1 && zeros == 1 && nas == 0) {
-      plot_logical <- TRUE
-    }
-    if (ones + zeros + nas == 3) {
-      plot_logical <- TRUE
-    }
-
+      plot_logical <- FALSE #
+      if (ones == 1 && zeros == 1 && nas == 0) {
+        plot_logical <- TRUE
+      }
+      if (ones + zeros + nas == 3) {
+        plot_logical <- TRUE
+      }
   }
   # Return output --------------------------------------------------------------
-  if(!is.logical(plot_logical)){stop("Output must be a logical")}
   return(plot_logical)
 } # end check_if_g_mat_can_be_plotted()
 
