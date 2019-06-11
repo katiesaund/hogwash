@@ -479,7 +479,7 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
       zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
       nas <- sum(is.na(geno_matrix)) > 1
 
-      plot_logical <- FALSE #
+      plot_logical <- FALSE
       if (ones == 1 && zeros == 1 && nas == 0) {
         plot_logical <- TRUE
       }
