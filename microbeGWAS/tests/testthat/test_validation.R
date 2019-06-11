@@ -1,20 +1,29 @@
 library(microbeGWAS)
-context("Validation functions") #----------------------------------------------#
+context("Validation") #--------------------------------------------------------#
 
 # test check_dimensions --------------------------------------------------------
 test_that("check_dimensions gives an error for when given a dataframe instead of a matrix", {
+  # Set up
   temp_mat <- as.data.frame(matrix(1:100, nrow = 10, ncol = 10))
+
+  # Test
   expect_error(check_dimensions(temp_mat, 10, 1, 10, 1))
 })
 
 test_that("check_dimensions gives an error for when given a vector instead of a matrix", {
+  # Set up
   temp_vector <- c(1:100)
+
+  # Test
   expect_error(check_dimensions(temp_vector, 10, 1, 10, 1))
 })
 
 test_that("check_dimensions gives an error for when given min_rows is too large", {
+  # Set up
   num_row <- 10
   temp_mat <- matrix(rep("A", 100), nrow = num_row, ncol = 10)
+
+  # Test
   expect_error(check_dimensions(mat = temp_mat,
                                 exact_rows = 10,
                                 min_rows = num_row + 99,
@@ -23,8 +32,11 @@ test_that("check_dimensions gives an error for when given min_rows is too large"
 })
 
 test_that("check_dimensions gives an error for when given a min_cols it too large", {
+  # Set up
   num_col <- 10
   temp_mat <- matrix(rep("A", 100), nrow = 10, ncol = num_col)
+
+  # Test
   expect_error(check_dimensions(mat = temp_mat,
                                 exact_rows = NULL,
                                 min_rows = 1,
@@ -33,8 +45,11 @@ test_that("check_dimensions gives an error for when given a min_cols it too larg
 })
 
 test_that("check_dimensions gives an error for when given exact_cols that is smaller or larger than ncol()", {
+  # Set up
   num_col <- 10
   temp_mat <- matrix(rep("A", 100), nrow = 2, ncol = num_col)
+
+  # Test
   expect_error(check_dimensions(mat = temp_mat,
                                 exact_rows = NULL,
                                 min_rows = 1,
@@ -48,8 +63,11 @@ test_that("check_dimensions gives an error for when given exact_cols that is sma
 })
 
 test_that("check_dimensions gives an error for when given exact_rows that is smaller or larger than nrow()", {
+  # Set up
   num_row <- 10
   temp_mat <- matrix(rep("A", 100), nrow = num_row, ncol = 1)
+
+  # Test
   expect_error(check_dimensions(mat = temp_mat,
                                 exact_rows = num_row - 1,
                                 min_rows = 1,
@@ -61,426 +79,648 @@ test_that("check_dimensions gives an error for when given exact_rows that is sma
 })
 
 test_that("check_dimensions gives an error for when given NULL instead of a matrix", {
+  # Set up
   temp_vector <- NULL
+
+  # Test
   expect_error(check_dimensions(temp_vector, 10, 1, 10, 1))
 })
 
 test_that("check_dimensions gives an error for when given NA instead of a matrix", {
-  temp_vector <- NULL
+  # Set up
+  temp_vector <- NA
+
+  # Test
   expect_error(check_dimensions(temp_vector, 10, 1, 10, 1))
 })
 
 test_that("check_dimensions doesn't give an error for when given a valid matrix", {
+  # Set up
   temp_matrix <- matrix(0, nrow = 10, ncol = 5)
+
+  # Test
   expect_error(check_dimensions(temp_vector, 10, 1, 5, 1))
 })
 
-# test check_if_alpha_valid ----------------------------------------------------
-test_that("check_if_alpha_valid gives an error alpha = 5", {
-  temp_alpha <- 5
-  expect_error(check_if_alpha_valid(temp_alpha))
+# test check_num_between_0_and_1 -----------------------------------------------
+test_that("check_num_between_0_and_1 gives errors for negative numbers", {
+  # Test
+  expect_error(check_num_between_0_and_1(-1))
+  expect_error(check_num_between_0_and_1(-Inf))
+  expect_error(check_num_between_0_and_1(-.0000001))
 })
 
-test_that("check_if_alpha_valid gives an error alpha = -0.1", {
-  temp_alpha <- -0.1
-  expect_error(check_if_alpha_valid(temp_alpha))
+test_that("check_num_between_0_and_1 does not give errors for valid inputs", {
+  # Test
+  expect_error(check_num_between_0_and_1(0), NA)
+  expect_error(check_num_between_0_and_1(1), NA)
+  expect_error(check_num_between_0_and_1(1/2), NA)
+  expect_error(check_num_between_0_and_1(0.00000001), NA)
 })
 
-test_that("check_if_alpha_valid gives an error alpha = 'A'", {
-  temp_alpha <- 'A'
-  expect_error(check_if_alpha_valid(temp_alpha))
+test_that("check_num_between_0_and_1 gives errors for numbers larger than 1", {
+  # Test
+  expect_error(check_num_between_0_and_1(1.00000001))
+  expect_error(check_num_between_0_and_1(Inf))
+  expect_error(check_num_between_0_and_1(100000))
 })
 
-test_that("check_if_alpha_valid gives an error when alpha is a matrix", {
-  temp_alpha <- matrix(0.5)
-  expect_error(check_if_alpha_valid(temp_alpha))
+test_that("check_num_between_0_and_1 gives errors for non-numeric inputs", {
+  # Test
+  expect_error(check_num_between_0_and_1("1"))
+  expect_error(check_num_between_0_and_1(NA))
+  expect_error(check_num_between_0_and_1(NULL))
+  expect_error(check_num_between_0_and_1(matrix(1, ncol = 10, nrow = 10)))
+  expect_error(check_num_between_0_and_1(rep(1, 10)))
 })
-
 
 # test check_if_dir_exists -----------------------------------------------------
 test_that("check_if_dir_exists gives an error when dir doesn't exist", {
+  # Set up
   temp_dir <- "/fake/directory/"
+
+  # Test
   expect_error(check_if_dir_exists(temp_dir))
 })
 
 test_that("check_if_dir_exists doesn't give an error when dir does exist", {
+  # Set up
   temp_dir <- "."
+
+  # Test
   expect_error(check_if_dir_exists(temp_dir), NA)
 })
 
 # test check_if_permutation_num_valid ------------------------------------------
-test_that("check_if_permutation_num_valid gives an error whem perm = 1.5", {
+test_that("check_if_permutation_num_valid gives an error for a positive, non-integer perm = 1.5", {
+  # Set up
   temp_perm <- 1.5
+
+  # Test
   expect_error(check_if_permutation_num_valid(temp_perm))
 })
 
-test_that("check_if_permutation_num_valid gives an error whem perm = -1.5", {
-  temp_perm <- -1.5
+test_that("check_if_permutation_num_valid gives an error for a negative integer perm = -15", {
+  # Set up
+  temp_perm <- -15
+
+  # Test
   expect_error(check_if_permutation_num_valid(temp_perm))
 })
 
 test_that("check_if_permutation_num_valid gives an error whem perm = 0", {
+  # Set up
   temp_perm <- 0
+
+  # Test
   expect_error(check_if_permutation_num_valid(temp_perm))
 })
 
-test_that("check_if_permutation_num_valid gives an error whem perm = '20' (a char)", {
+test_that("check_if_permutation_num_valid gives an error whem perm = '20' (a character)", {
+  # Set up
   temp_perm <- '20'
+
+  # Test
   expect_error(check_if_permutation_num_valid(temp_perm))
 })
 
 test_that("check_if_permutation_num_valid gives an error whem perm = NA", {
+  # Set up
   temp_perm <- NA
+
+  # Test
   expect_error(check_if_permutation_num_valid(temp_perm))
 })
 
 test_that("check_if_permutation_num_valid gives an error whem perm = NULL", {
+  # Set up
   temp_perm <- NULL
+
+  # Test
   expect_error(check_if_permutation_num_valid(temp_perm))
 })
 
 test_that("check_if_permutation_num_valid doesn't give an error perm = 10000", {
+  # Set up
   temp_perm <- 10000
+
+  # Test
   expect_error(check_if_permutation_num_valid(temp_perm), NA)
 })
 
 # test check_is_string ---------------------------------------------------------
 test_that("check_is_string gives an error when x = 100 (numeric)", {
+  # Set up
   temp <- 100
+
+  # Test
   expect_error(check_is_string(temp))
 })
 
 test_that("check_is_string gives an error when x = NA", {
+  # Set up
   temp <- NA
+
+  # Test
   expect_error(check_is_string(temp))
 })
 
 test_that("check_is_string gives an error when x = NULL", {
+  # Set up
   temp <- NULL
+
+  # Test
   expect_error(check_is_string(temp))
 })
 
 test_that("check_is_string doesn't give an error when x = 'this is a string'", {
+  # Set up
   temp <- 'this is a string'
-  expect_error(check_is_string(temp), NA)
-})
 
-
-test_that("check_is_string doesn't give an error when x = 'this is a string'", {
-  temp <- 'this is a string'
+  # Test
   expect_error(check_is_string(temp), NA)
 })
 
 # test check_if_vector ---------------------------------------------------------
 test_that("check_if_vector doesn't give an error when x = c(1:10)", {
+  # Set up
   temp <- c(1:10)
+
+  # Test
   expect_error(check_if_vector(temp), NA)
 })
 
 test_that("check_if_vector doesn't give an error when x = letters[1:5]", {
+  # Set up
   temp <- letters[1:5]
+
+  # Test
   expect_error(check_if_vector(temp), NA)
 })
 
 test_that("check_if_vector gives an error when x = matrix(0, 10, 10)", {
+  # Set up
   temp <- matrix(0, 10, 10)
+
+  # Test
   expect_error(check_if_vector(temp))
 })
 
 test_that("check_if_vector gives an error when x = NULL", {
+  # Set up
   temp <- NULL
+
+  # Test
   expect_error(check_if_vector(temp))
 })
 
 # test check_for_NA_and_inf ----------------------------------------------------
 test_that("check_for_NA_and_inf gives an error when x is a dataframe", {
+  # Set up
   temp <- as.data.frame(matrix(0, 10, 10))
+
+  # Test
   expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf gives an error when x is a matrix containing NA", {
+  # Set up
   temp <- matrix(NA, 10, 10)
+
+  # Test
   expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf gives an error when x is NULL", {
+  # Set up
   temp <- NULL
+
+  # Test
   expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf gives an error when x is a matrix containing -Inf", {
+  # Set up
   temp <- matrix(-Inf, 10, 10)
+
+  # Test
   expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf gives an error when x is a matrix containing +Inf", {
+  # Set up
   temp <- matrix(Inf, 10, 10)
+
+  # Test
   expect_error(check_for_NA_and_inf(temp))
 })
 
 test_that("check_for_NA_and_inf doesn't give an error when x is a matrix of zeroes", {
+  # Set up
   temp <- matrix(0, 10, 10)
+
+  # Test
   expect_error(check_for_NA_and_inf(temp), NA)
 })
 
 # test check_for_root_and_bootstrap
 test_that("check_for_root_and_bootstrap doesn't give an error when x is rooted tree with node values of 100", {
+  # Set up
   temp_tree <- rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+
+  # Tree
   expect_error(check_for_root_and_bootstrap(temp_tree), NA)
 })
 
 test_that("check_for_root_and_bootstrap gives an error when x is unrooted tree with node values of 100", {
+  # Set up
   temp_tree <- rtree(20, rooted = FALSE)
   temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+
+  # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node values of -100", {
+  # Set up
   temp_tree <- rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(-100, Nnode(temp_tree))
+
+  # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with too few node values", {
+  # Set up
   temp_tree <- rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(-100, Nnode(temp_tree) - 1)
+
+  # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with too many node values", {
+  # Set up
   temp_tree <- rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(-100, Nnode(temp_tree) + 1)
+
+  # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node values of NA", {
+  # Set up
   temp_tree <- rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(NA, Nnode(temp_tree))
+
+  # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node.labels = NULL", {
+  # Set up
   temp_tree <- rtree(20, rooted = TRUE)
   temp_tree$node.labels <- NULL
+
+  # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
 # test check_if_binary_vector --------------------------------------------------
 test_that("check_if_binary_vector gives an error when x is rep(NA, 10)", {
+  # Set up
   temp <- rep(NA, 10)
+
+  # Test
   expect_error(check_if_binary_vector(temp))
 })
 
 test_that("check_if_binary_vector gives an error when x is NULL", {
+  # Set up
   temp <- NULL
+
+  # Test
   expect_error(check_if_binary_vector(temp))
 })
 
 test_that("check_if_binary_vector gives an error when x is letters[1:10]", {
+  # Set up
   temp <- letters[1:10]
+
+  # Test
   expect_error(check_if_binary_vector(temp))
 })
 
 test_that("check_if_binary_vector gives an error when x is dataframe(matrix(0, 10, 10))", {
+  # Set up
   temp <- as.data.frame(matrix(0, 10, 10))
+
+  # Test
   expect_error(check_if_binary_vector(temp))
 })
 
 test_that("check_if_binary_vector gives an error when x is matrix(0, 10, 10)", {
+  # Set up
   temp <- as.data.frame(matrix(0, 10, 10))
+
+  # Test
   expect_error(check_if_binary_vector(temp))
 })
 
 test_that("check_if_binary_vector doesn't give an error when x is c(1, 0, 1, 0)", {
+  # Set up
   temp <- c(1, 0, 1, 0)
+
+  # Test
   expect_error(check_if_binary_vector(temp), NA)
 })
 
 test_that("check_if_binary_vector doesn't give an error when x is c(0, 0, 0, 0)", {
+  # Set up
   temp <- c(0, 0, 0, 0)
+
+  # Test
   expect_error(check_if_binary_vector(temp), NA)
 })
 
 test_that("check_if_binary_vector doesn't give an error when x is c(1)", {
+  # Set up
   temp <- c(1)
+
+  # Test
   expect_error(check_if_binary_vector(temp), NA)
 })
 
 # test check_if_binary_vector_numeric ------------------------------------------
 test_that("check_if_binary_vector_numeric gives an error when x is rep(NA, 10)", {
+  # Set up
   temp <- rep(NA, 10)
+
+  # Test
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
 test_that("check_if_binary_vector_numeric gives an error when x is NULL", {
+  # Set up
   temp <- NULL
+
+  # Test
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
 test_that("check_if_binary_vector_numeric gives an error when x is letters[1:10]", {
+  # Set up
   temp <- letters[1:10]
+
+  # Test
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
 test_that("check_if_binary_vector_numeric gives an error when x is dataframe(matrix(0, 10, 10))", {
+  # Set up
   temp <- as.data.frame(matrix(0, 10, 10))
+
+  # Test
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
 test_that("check_if_binary_vector_numeric gives an error when x is matrix(0, 10, 10)", {
+  # Set up
   temp <- as.data.frame(matrix(0, 10, 10))
+
+  # Test
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
 test_that("check_if_binary_vector_numeric doesn't give an error when x is c(1, 0, 1, 0)", {
+  # Set up
   temp <- c(1, 0, 1, 0)
+
+  # Test
   expect_error(check_if_binary_vector_numeric(temp), NA)
 })
 
 test_that("check_if_binary_vector_numeric doesn't give an error when x is c(0, 0, 0, 0)", {
+  # Set up
   temp <- c(0, 0, 0, 0)
+
+  # Test
   expect_error(check_if_binary_vector_numeric(temp), NA)
 })
 
 test_that("check_if_binary_vector_numeric doesn't give an error when x is c(1)", {
+  # Set up
   temp <- c(1)
+
+  # Test
   expect_error(check_if_binary_vector_numeric(temp), NA)
 })
 
 # test check_if_binary_matrix --------------------------------------------------
 test_that("check_if_binary_matrix doesn't give an error when x is matrix(c(0, 1), 2, 1)", {
+  # Set up
   temp <- matrix(c(0, 1), 2, 1)
+
+  # Test
   expect_error(check_if_binary_matrix(temp), NA)
 })
 
 test_that("check_if_binary_matrix gives an error when x is matrix(NA, 2, 1)", {
+  # Set up
   temp <- matrix(NA, 2, 1)
+
+  # Test
   expect_error(check_if_binary_matrix(temp))
 })
 
 test_that("check_if_binary_matrix gives an error when x is matrix(Inf, 2, 1)", {
+  # Set up
   temp <- matrix(Inf, 2, 1)
+
+  # Test
   expect_error(check_if_binary_matrix(temp))
 })
 
 test_that("check_if_binary_matrix gives an error when x is NULL", {
+  # Set up
   temp <- NULL
+
+  # Test
   expect_error(check_if_binary_matrix(temp))
 })
 
 test_that("check_if_binary_matrix gives an error when x is matrix(c(1.5, 2.5), 2, 1)", {
+  # Set up
   temp <- matrix(c(1.5, 2.5), 2, 1)
+
+  # Test
   expect_error(check_if_binary_matrix(temp))
 })
 
 test_that("check_if_binary_matrix gives an error when x is matrix(3, 2, 1)", {
+  # Set up
   temp <- matrix(3, 2, 1)
+
+  # Test
   expect_error(check_if_binary_matrix(temp))
 })
 
 test_that("check_if_binary_matrix gives an error when x is as.data.frame(matrix(0, 2, 1))", {
+  # Set up
   temp <- as.data.frame(matrix(0, 2, 1))
+
+  # Test
   expect_error(check_if_binary_matrix(temp))
 })
 
 # test check_file_exists -------------------------------------------------------
 test_that("check_file_exists gives an error when x is 'fake_file_name.txt'", {
+  # Set up
   temp <- 'fake_file_name.txt'
+
+  # Test
   expect_error(check_file_exists(temp))
 })
 
 test_that("check_file_exists doesn't give an error when x is 'test_validation.R'", {
+  # Set up
   temp <- 'test_validation.R'
+
+  # Test
   expect_error(check_file_exists(temp), NA)
 })
 
 # test check_rownames ----------------------------------------------------------
 test_that("check_rownames doesn't give an error when tree$tip.label <- row.names(mat) <- letters[1:10]", {
+  # Set up
   temp_tree <- rtree(10)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
   temp_tree$tip.label <- row.names(temp_mat) <- letters[1:10]
+
+  # Test
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree), NA)
 })
 
 test_that("check_rownames gives an error when tree$tip.label <- letters[11:20],  row.names(mat) <- letters[1:10]", {
+  # Set up
   temp_tree <- rtree(10)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
   temp_tree$tip.label <- letters[11:20]
   row.names(temp_mat) <- letters[1:10]
+
+  # Test
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
 })
 
 test_that("check_rownames gives an error when Ntip(tree) != nrow(mat)", {
+  # Setup
   temp_tree <- rtree(10)
   temp_mat  <- matrix(1:8, nrow = 1, ncol = 8)
+
+  # Test
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
 
+  # Set up
   temp_tree <- rtree(2)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
-  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
 
+  # Test
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
 })
 
 # test check_is_number ---------------------------------------------------------
 test_that("check_is_number doesn't give an error when x = 5", {
-  temp = 5
+  # Set up
+  temp <- 5
+
+  # Test
   expect_error(check_is_number(temp), NA)
 })
 
 test_that("check_is_number doesn't give an error when x = 5.5", {
-  temp = 5.5
+  # Set up
+  temp <- 5.5
+
+  # Test
   expect_error(check_is_number(temp), NA)
 })
 
 test_that("check_is_number doesn't give an error when x = pi", {
-  temp = pi
+  # Set up
+  temp <- pi
+
+  # Test
   expect_error(check_is_number(temp), NA)
 })
 
 test_that("check_is_number doesn't give an error when x = -1/7", {
-  temp = -1/7
+  # Set up
+  temp <- -1/7
+
+  # Test
   expect_error(check_is_number(temp), NA)
 })
 
 test_that("check_is_number gives an error when x = 'a'", {
-  temp = 'a'
+  # Set up
+  temp <- 'a'
+
+  # Test
   expect_error(check_is_number(temp))
 })
 
 test_that("check_is_number gives an error when x = matrix(0, 10, 10)", {
-  temp = matrix(0, 10, 10)
+  # Set up
+  temp <- matrix(0, 10, 10)
+
+  # Test
   expect_error(check_is_number(temp))
 })
 
 test_that("check_is_number gives an error when x = matrix(0, 1, 1)", {
-  temp = matrix(0, 10, 10)
+  # Set up
+  temp <- matrix(0, 10, 10)
+
+  # Test
   expect_error(check_is_number(temp))
 })
 
 test_that("check_is_number gives an error when x = c(0, 1, 1)", {
-  temp = c(0, 1, 1)
+  # Set up
+  temp <- c(0, 1, 1)
+
+  # Test
   expect_error(check_is_number(temp))
 })
 
 test_that("check_is_number gives an error when x = NA", {
-  temp = NA
+  # Set up
+  temp <- NA
+
+  # Test
   expect_error(check_is_number(temp))
 })
 
 test_that("check_is_number gives an error when x = NULL", {
-  temp = NULL
+  # Set up
+  temp <- NULL
+
+  # Test
   expect_error(check_is_number(temp))
 })
 
 test_that("check_is_number gives an error when x = Inf", {
-  temp = Inf
+  # Set up
+  temp <- Inf
+
+  # Test
   expect_error(check_is_number(temp))
 })
 
 # test check_node_is_in_tree ---------------------------------------------------
 test_that("check_node_is_in_tree doesn't give an error when node = 1", {
-  temp = rtree(10)
+  temp <- rtree(10)
   temp$node.label <- c(1:Nnode(temp))
   expect_error(check_node_is_in_tree(node_val = 1, tr = temp), NA)
 })

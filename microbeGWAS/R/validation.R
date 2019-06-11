@@ -1,18 +1,17 @@
 # Library of all functions that "check" or "assert" that something is true.
-# If any functions get added to this file, be sure to add test() to test_validation.R
 
 # TODO Add function description for check_if_g_mat_can_be_plotted
-
 check_dimensions <- function(mat, exact_rows = NULL, min_rows, exact_cols = NULL, min_cols){
   # Function description -------------------------------------------------------
-  # Check that the matrix is of the specified dimensions.
+  # Check that the main input is a matrix and that said matrix is of the
+  # specified dimensions.
   #
   # Input:
-  # mat:        Matrix.
-  # exact_rows. Numeric. Describes expected number of rows in matrix. Default is NULL.
-  # min_rows.   Numeric. Describes minimum number of rows in matrix. Must be specified.
-  # exact_cols. Numeric. Describes expected number of columns in matrix. Default NULL.
-  # min_cols.   Numeric. Describes minimum number of columns in matrix. Must be specified.
+  # mat: Matrix.
+  # exact_rows: Numeric. Describes expected number of rows in matrix. Default is NULL.
+  # min_rows: Numeric. Describes minimum number of rows in matrix. Must be specified.
+  # exact_cols: Numeric. Describes expected number of columns in matrix. Default NULL.
+  # min_cols: Numeric. Describes minimum number of columns in matrix. Must be specified.
   #
   # Output:
   # None.
@@ -43,21 +42,23 @@ check_dimensions <- function(mat, exact_rows = NULL, min_rows, exact_cols = NULL
   }
 } # end check_dimensions()
 
-check_num_between_0_and_1 <- function(foo){
+check_num_between_0_and_1 <- function(num){
   # Function description -------------------------------------------------------
-  # Check that the input is within a valid range (0 < foo < 1).
+  # Check that the input is within a the expected range (0 < num < 1).
+  # To be used to check values such as alpha (p-value) and  bootstrap confidence
+  # which is typically ~0.70.
   #
   # Input:
-  # foo. Numeric.
+  # num: Number.
   #
   # Output:
   # None.
   #
   # Check input ----------------------------------------------------------------
-  check_is_number(foo)
+  check_is_number(num)
 
   # Function -------------------------------------------------------------------
-  if (foo > 1 | foo < 0){
+  if (num > 1 | num < 0){
     stop("Provide a value between 0 and 1.")
   }
 } # end check_num_between_0_and_1()
@@ -67,7 +68,7 @@ check_if_dir_exists <- function(dir){
   # Check that output directory exists so data can be saved in it.
   #
   # Input:
-  # dir. Character. Path to output directory.
+  # dir: Character. Path to output directory.
   #
   # Output:
   # None.
@@ -83,10 +84,12 @@ check_if_dir_exists <- function(dir){
 
 check_if_permutation_num_valid <- function(perm){
   # Function description -------------------------------------------------------
-  # Check that the permutation number inidicated is valid (1 <= perm).
+  # Check that the permutation number indicated is valid (1 <= perm). A typical
+  # choice is 10,000.
   #
   # Input:
-  # perm. Number. Times to shuffle the data on the tree to create a null distribution for the permutation test.
+  # perm: Integer. Number of times to shuffle the data on the tree to create a
+  #       null distribution for the permutation test.
   #
   # Output:
   # None.
@@ -105,7 +108,7 @@ check_is_string <- function(char){
   # Check that the input is a character string.
   #
   # Input:
-  # char. Character.
+  # char: Character.
   #
   # Output:
   # None.
@@ -121,8 +124,8 @@ check_if_vector <- function(vector){
   # Check that input is a vector.
   #
   # Input:
-  # vector. Vector.
-
+  # vector: Vector.
+  #
   # Output:
   # None.
   #
@@ -137,7 +140,7 @@ check_for_NA_and_inf <- function(mat){
   # Check that matrix contains no NAs and no +/- infinities.
   #
   # Input:
-  # mat. Matrix.
+  # mat: Matrix.
   #
   # Output:
   # None.
@@ -159,10 +162,13 @@ check_for_NA_and_inf <- function(mat){
 
 check_for_root_and_bootstrap <- function(tr){
   # Function description -------------------------------------------------------
-  # Check that phylogenetic tree is rooted and contains bootstrap values in the node labels.
+  # Check that phylogenetic tree is rooted and contains bootstrap values in the
+  # node labels. Trees need to have roots for the ancestral reconstruction
+  # function ape::ace() to work properly. Trees need to have bootstrap values so
+  # that confidence in the tree edges can be measured.
   #
   # Input:
-  # tr. Phylo.
+  # tr: Phylo.
   #
   # Output:
   # None.
@@ -182,7 +188,7 @@ check_for_root_and_bootstrap <- function(tr){
 
   }
   for (i in 2:length(tr$node.label)){
-    check_is_number(tr$node.label[i]) # Node lables must be bootstrap values
+    check_is_number(tr$node.label[i]) # Node labels must be bootstrap values
     if (tr$node.label[i] < 0){
       stop("Tree bootstrap values must be >= 0")
     }
@@ -191,10 +197,11 @@ check_for_root_and_bootstrap <- function(tr){
 
 check_if_binary_vector <- function(vec){
   # Function description -------------------------------------------------------
-  # Check that the matrix only contains values 1 or 0.
+  # Check that the matrix only contains values 1 or 0. Useful for checking
+  # things for binary phenotypes, confidence, $transition, etc...
   #
   # Input:
-  # vec. Vector.
+  # vec: Vector.
   #
   # Output:
   # None.
@@ -215,7 +222,7 @@ check_if_binary_vector_numeric <- function(vec){
   # Check that the matrix only contains values 1 or 0.
   #
   # Input:
-  # vec. Vector.
+  # vec: Vector.
   #
   # Output:
   # None.
@@ -229,20 +236,21 @@ check_if_binary_vector_numeric <- function(vec){
 
 check_if_binary_matrix <- function(mat){
   # Function description -------------------------------------------------------
-  # Check that the matrix only contains values 1 or 0.
+  # Check that the matrix only contains values 1 or 0. Useful for binary
+  # phenotype matrix or genotype matrix.
   #
   # Input:
-  # mat. Matrix.
+  # mat: Matrix.
   #
   # Output:
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (sum(!(mat %in% c(0, 1))) > 0 | class(mat) != "matrix"){
-    stop("Genotype matrix should be only 1s and 0s")
-  }
   if (is.null(dim(mat))){
     stop("Must be a matrix")
+  }
+  if (sum(!(mat %in% c(0, 1))) > 0 | class(mat) != "matrix"){
+    stop("Genotype matrix should be only 1s and 0s")
   }
   if (nrow(mat) == 0 | ncol(mat) == 0){
     stop("matrix must have columns and rows.")
@@ -254,7 +262,7 @@ check_file_exists <- function(file_name){
   # Check that the file exists.
   #
   # Input:
-  # file_name. Character.
+  # file_name: Character.
   #
   # Output:
   # None.
@@ -270,8 +278,8 @@ check_rownames <- function(mat, tr){
   # Check that phylogenetic tree tip labels are identical to the matrix row.names.
   #
   # Input:
-  # mat. Matrix.
-  # tr. Phylo.
+  # mat: Matrix. Nrow(mat) == Ntip(tr).
+  # tr: Phylo.
   #
   # Output:
   # None.
@@ -280,6 +288,7 @@ check_rownames <- function(mat, tr){
   if (class(mat) != "matrix" | class(tr) != "phylo"){
     stop("Inputs are incorrectly formatted.")
   }
+  check_dimensions(mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
 
   # Function -------------------------------------------------------------------
   if(is.null(row.names(mat))){
@@ -302,7 +311,7 @@ check_is_number <- function(num){
   # Check that the input is a single number.
   #
   # Input:
-  # num. Number. Could be numeric, double, or integer.
+  # num: Number. Could be numeric, double, or integer.
   #
   # Output:
   # None.
@@ -335,7 +344,7 @@ check_node_is_in_tree <- function(node_val, tr){
   #
   # Inputs:
   # node_val: Integer. Index of node.
-  # tr: phylogenetic tree.
+  # tr: Phylo.
   #
   # Output:
   # None.
@@ -350,7 +359,6 @@ check_node_is_in_tree <- function(node_val, tr){
   if (node_val < 1 | node_val %% 1 != 0){
     stop("Node must be positive integer")
   }
-
 } # end check_node_is_in_tree()
 
 check_tree_is_valid <- function(tr){
