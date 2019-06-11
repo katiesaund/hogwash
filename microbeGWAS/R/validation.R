@@ -462,30 +462,37 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
   # Outputs:
   # plot_logical. Logical. TRUE or FALSE.
   #
-  # Check input ----------------------------------------------------------------
-  if (class(geno_matrix) != "data.frame"){
-    if (class(geno_matrix) != "matrix"){
-      plot_logical <- FALSE
-    }
-  } else if (class(geno_matrix) == "data.frame" | class(geno_matrix) == "matrix") {
-    if (nrow(geno_matrix) < 1 | ncol(geno_matrix) < 2){
-      plot_logical <- FALSE
-    }
+  # Check input & function -----------------------------------------------------
+  if (sum(class(geno_matrix) != "data.frame", class(geno_matrix) != "matrix") == 2){
+    # Neither matrix nor dataframe
+    plot_logical <- FALSE
   } else {
+    # Either a matrix or dataframe
+    if (nrow(geno_matrix) < 1 | ncol(geno_matrix) < 2){
+      # Matrix/dataframe is too small for heatmap to plot
+      plot_logical <- FALSE
+    } else {
+      # Matrix/dataframe is big enough for heatmap to plot
       if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0) != 0){
+        # Matrix/dataframe contains invalid values
         stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
       }
+      # Matrix/dataframe contains only valid values
       ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
       zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
       nas <- sum(is.na(geno_matrix)) > 1
-
       plot_logical <- FALSE
       if (ones == 1 && zeros == 1 && nas == 0) {
+        # Has at least two values to plot
         plot_logical <- TRUE
-      }
-      if (ones + zeros + nas == 3) {
+      } else if (ones + zeros + nas == 3) {
+        # Has at least two values to plot
         plot_logical <- TRUE
+      } else {
+        # Does not have at least two values to plot
+        plot_logical <- FALSE
       }
+    }
   }
   # Return output --------------------------------------------------------------
   return(plot_logical)
