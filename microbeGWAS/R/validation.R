@@ -529,3 +529,28 @@ check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
     stop("Reconstruction methods for ape::ace must be either: ML, REML, pic, or GLS.")
   }
 } # end check_if_ancestral_reconstruction_method_compatible_with_ape()
+
+
+check_equal <- function(first_number, second_number){
+  # Function description
+  # This function simply replaces the if(){stop()} statements for asserting that
+  # two things are equal.
+  # Example: check_equal(nrow(genotype_matrix), Ntip(tree)) should not give any
+  # warnings.
+  #
+  # Inputs:
+  # first_number Number.
+  # second_number. Number.
+  #
+  # Output:
+  # None.
+  #
+  # Check inputs ---------------------------------------------------------------
+  check_is_number(first_number)
+  check_is_number(second_number)
+
+  # Function -------------------------------------------------------------------
+  if (first_thing != second_thing){
+    stop("Inputs are not equal")
+  }
+}
