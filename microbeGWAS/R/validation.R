@@ -353,7 +353,7 @@ check_node_is_in_tree <- function(node_val, tr){
   check_for_root_and_bootstrap(tr)
   check_is_number(node_val)
 
-  if (node_val > Nnode(tr) + Ntip(tr)){
+  if (node_val > Nnode(tr)){
     stop("Node number is too high; not found in tree.")
   }
   if (node_val < 1 | node_val %% 1 != 0){
