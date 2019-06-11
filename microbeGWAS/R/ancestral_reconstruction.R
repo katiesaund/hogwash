@@ -1,9 +1,9 @@
-# All of the functions necessary to perform the ancestral reconstruction of traits.
+# Perform the ancestral reconstruction of binary and continuous traits.
 
-# General note on ape::ace() setting:
-# Marginal = FALSE means that the marginal is in fact calculated. Do not set
-# marginal to TRUE, because this only does the condition (only downstream edges
-# considered). ace never calculates the joint.
+# Note on the marginal setting in the function ape::ace():
+#   Marginal = FALSE means that the marginal is in fact calculated. Do not set
+#   marginal to TRUE, because this only does the condition (only downstream
+#   edges considered). Ace never calculates the joint.
 
 pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # Function description -------------------------------------------------------
@@ -13,13 +13,17 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # likelihood ratio test and difference in AIC.
   #
   # Inputs:
-  # mat. Matrix. Genotype or phenotype binary matrix. (Only discrete phenotype)
-  # tr. Phylo.
-  # num. Number. Column index for matrix.
-  # disc_cont. String. "discrete" or "continuous".
+  # mat: Matrix. Genotype or phenotype binary matrix. (Only discrete phenotype).
+  #      Dim: genotype: ncol = ntip(tree) x nrow = number of genotypes.
+  #           phenotype: ncol = ntip(tree) x nrow = 1.
+  # tr: Phylo.
+  # num: Number. Column index for matrix.
+  # disc_cont: String. "discrete" or "continuous."
   #
   # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
+  # best_model: Character string. Either 'ER' or 'ARD'. These two options are
+  #             strings indicating a model choice to be used downstream in the
+  #             ape::ace function.
   #
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
@@ -29,13 +33,14 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   check_is_string(recon_method)
   check_if_ancestral_reconstruction_method_compatible_with_ape(recon_method)
   if (disc_cont != "discrete"){
-    stop("Only pick recon model for discrete characters. Continuous characters must be BM.")
+    stop("Only pick recon model for discrete characters. Continuous characters must use BM.")
   }
   if (num > ncol(mat)){
     stop("Index must be 1 <= index <= ncol(matrix)")
   }
+  check_dimensions(mat = mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
 
-  # Function ------------------------------------------------------------------#
+  # Function -------------------------------------------------------------------
   # Note, SYMreconstruction removed because SYM == ER for binary inputs.
   # Use this function to choose the best model for reconstruction.
 
@@ -43,13 +48,16 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   alpha <- 0.05 # For likelihood test
   significant_difference_in_AIC <- 2
 
-  # Reference for model testing: https://www.r-phylo.org/wiki/HowTo/Ancestral_State_Reconstruction & http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
+  # Reference for model testing:
+  # https://www.r-phylo.org/wiki/HowTo/Ancestral_State_Reconstruction &
+  # http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
   # Test ER vs ARD
   set.seed(1)
   ERreconstruction  <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ER")
 
-  # Some ARD models don't work well with the data and given a warning message like:  "In sqrt(diag(solve(h))) : NaNs produced"
-  # To ensure the ER model is prefered in this case use the following warning catching:
+  # Some ARD models don't work well with the data and given a warning message
+  # like:  "In sqrt(diag(solve(h))) : NaNs produced".  To ensure the ER model is
+  # preferred in this case use the following warning catching:
   error_msg <- "ARD_bad_fit"
   set.seed(1)
   ARDreconstruction <- tryCatch(ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ARD"), warning = function(x) {error_msg})
@@ -63,24 +71,28 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
       best_model <- "ARD"
     }
   }
+
+  # Return output --------------------------------------------------------------
   return(best_model)
 } # end pick_recon_model()
 
 continuous_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_method){
-  # Function Description -------------------------------------------------------
+  # Function description -------------------------------------------------------
   # Perform ancestral state reconstruction using ape::ace() function on
-  # continuous input data.
+  # continuous phenotype.
   #
   # Inputs:
-  # mat. Matrix. Genotype or phenotype binary matrix. (Only discrete phenotype)
-  # tr. Phylo.
-  # num. Number. Column index for matrix.
-  # disc_cont. String. "discrete" or "continuous".
-  # recon_method. String. "ML", "REML", "pic", or "GLS."
+  # mat: Matrix. Continuous phenotype. Dim: nrow = Ntip(tr) x ncol = 1.
+  # tr: Phylo.
+  # num: Number. Column index for matrix.
+  # disc_cont: Character string. Must be "continuous."
+  # recon_method: Character string. Either "ML", "REML", "pic", or "GLS."
   #
   # Outputs:
-  # "ML_anc_rec" Vector. Reconstruction (numeric) at node values only.
-  # "tip_and_node_recon" = tip_and_node_recon. A vector with the tip values followed by the node ancestral reconstruction.
+  # ML_anc_rec: Vector. Reconstruction values for each node.
+  # tip_and_node_recon: Vector. Phenotype values for each tip followed by the
+  #                     ancestral reconstruction at each node.
+  #                     Length = Ntip(tr) + Nnode(tr).
   #
   # Check inputs ---------------------------------------------------------------
   check_if_ancestral_reconstruction_method_compatible_with_ape(recon_method)
@@ -89,7 +101,7 @@ continuous_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_m
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
   check_is_number(num)
-  if (class(mat) != "matrix"){stop("Ancestral reconstruction input must be a matrix")}
+  check_dimensions(mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = 1, min_cols = 1)
 
   # Function -------------------------------------------------------------------
   set.seed(1)
@@ -111,16 +123,19 @@ continuous_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_m
 continuous_get_recon_confidence <- function(recon_vector){
   # Function description -------------------------------------------------------
   # Given a vector of a continuous trait reconstruction, generate a dummy
-  # onfidence vector. Ancestral reconstruction for continuous values only gives
+  # confidence vector. Ancestral reconstruction for continuous values only gives
   # back a 95% CI. We can't use any of this information to decide which nodes
   # are low confidence so treat all reconstructed values as high confidence,
-  # which we stores as a value 1.
+  # which is stored as a value 1.
   #
   # Input:
-  # recon_vector. Vector. Numeric. Length of Ntip(tr) + Nnode(tr).
+  # recon_vector: Numeric vector. Values of the reconstruction. Length ==
+  #               Ntip(tr) + Nnode(tr).
   #
   # Output:
-  # tip_and_node_anc_rec_confidence. Vector of 1s; length of Ntip(tr) + Nnode(tr).
+  # tip_and_node_anc_rec_confidence: Vector of all 1s, indicating 'high'
+  #                                  confidence. Length == Ntip(tr) + Nnode(tr).
+  #                                  Tips folowed by nodes.
   #
   # Check input ----------------------------------------------------------------
   if(!is.vector(recon_vector)){stop("input must be a vector")}
@@ -133,21 +148,26 @@ continuous_get_recon_confidence <- function(recon_vector){
 } # end continuous_get_recon_confidence()
 
 discrete_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_method){
-  # Function Description -------------------------------------------------------
+  # Function description -------------------------------------------------------
   # Perform ancestral state reconstruction using ape::ace() function on
-  # continuous input data.
+  # discrete phenotype or genotype. The best model to describe the probabilities
+  # of state changes is decided by the subfunction: pick_recon_model(), which
+  # chooses either 'ARD', all rates different, or 'ER', equal rates.
   #
   # Inputs:
-  # mat. Matrix. Genotype or phenotype binary matrix. (Only discrete phenotype)
-  # tr. Phylo.
-  # num. Number. Column index for matrix.
-  # disc_cont. String. "discrete".
-  # recon_method. String. "ML", "REML", "pic", or "GLS."
+  # mat: Matrix. Genotype or discrete phenotype matrix.
+  # tr: Phylo.
+  # num: Number. Column index for matrix.
+  # disc_cont: Character string. In this case should always be "discrete."
+  # recon_method: Character string. Either "ML", "REML", "pic", or "GLS."
   #
   # Outputs:
-  # "ML_anc_rec" Vector. Reconstruction (numeric) at node values only.
-  # "tip_and_node_recon" = tip_and_node_recon. A vector with the tip values followed by the node ancestral reconstruction.
-  # "reconstruction" = Ape::ace() object. Contains multiple piecs of information.
+  # ML_anc_rec: Vector. Reconstruction (numeric) at node values only. Length =
+  #             Nnode(tr).
+  # tip_and_node_recon: A vector with the tip values followed by the node
+  #                     ancestral reconstruction. Length = Nnode(tr) + Ntip(tr).
+  # reconstruction: Ape::ace() object. Contains multiple pieces of information.
+  # TODO add better description of reconstruction ape object.
 
   # Check inputs ---------------------------------------------------------------
   check_if_ancestral_reconstruction_method_compatible_with_ape(recon_method)
@@ -182,15 +202,25 @@ discrete_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_met
 
 discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
   # Function description -------------------------------------------------------
-  # Compute ancestral reconstruction from a continuous or discrete input (genotype or phenotype matrix).
+  # Given the ancestral reconstruction identify which nodes are high confidence
+  # based on the maximum likelihood of the reconstruction and the confidence
+  # treshold (0.875; a ratio of about 7:1; based on ML literature). Confidence
+  # at the tips is assigned 1 because these values were measured and therefore
+  # have total confidence in the value.
   #
   # Inputs:
-  # tre:       Phylo.     Rooted phylogenetic tree.
-  # ML_cutoff: Numeric.   Indicating the row of the matrix from which the ancestral reconstruction is to be built.
-  # recon: Ape reconstruction object
+  # tr: Phylo.
+  # ML_cutoff: Number between 0 and 1. If the maximum likelihood of the
+  #            reconstruction is above this number it's considered a high
+  #            confidence reconstruction, otherwise it's a low confidence
+  #            reconstruction.
+  # recon: Ape reconstruction object.
+  # TODO add a check and description of an ape reconstruction object.
   #
   # Outputs:
-  # "tip_and_node_rec_conf" = tip_and_node_anc_rec_confidence. A vector with a 1 for each tip with the node ancestral reconstruction confidence appended.
+  # tip_and_node_rec_conf: A vector with a 1 for each tip with the node
+  #                        ancestral reconstruction confidence appended.
+  #                        Length = Ntip(tr) + Nnode(tr).
 
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -209,19 +239,29 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
 
 ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   # Function description -------------------------------------------------------
-  # Compute ancestral reconstruction from a continuous or discrete input (genotype or phenotype matrix).
+  # Compute ancestral reconstruction from a continuous phenotype or discrete
+  # genotype or phenotype.
   #
   # Inputs:
-  # tree:      Phylo.     Rooted phylogenetic tree.
-  # mat:       Matrix.    Either the phenotype matrix or the genotype matrix.
-  # num:       Numeric.   Indicating the row of the matrix from which the ancestral reconstruction is to be built.
-  # disc_cont: Character. Either "discrete" or "continuous".
+  # tree. Phylo. Rooted phylogenetic tree.
+  # mat: Matrix. Either the phenotype matrix or the genotype matrix. Dim:
+  #      nrow = Ntip(tr) x ncol = {1 if phenotype or number of genotypes}.
+  # num: Numeric. Indicating the row of the matrix from which the
+  #               ancestral reconstruction is to be built.
+  # disc_cont: Character. Either "discrete" or "continuous."
   #
   # Outputs:
-  # "node_anc_rec" = ML_anc_rec. Vector. Ancestral reconstruction for each node.
-  # "tip_and_node_rec_conf" = tip_and_node_anc_rec_confidence. A vector with a 1 for each tip with the node ancestral reconstruction confidence appended.
-  # "recon_edge_mat" = reconstruction_as_edge_mat. Matrix. Ancestral reconstruction configured into the edge matrix.
-  # "tip_and_node_recon" = tip_and_node_recon. A vector with the tip values followed by the node ancestral reconstruction.
+  # node_anc_rec: Vector. Ancestral reconstruction for each node.
+  #               Length = Nnode(tr).
+  # tip_and_node_rec_conf: A vector with a 1 for each tip with the node
+  #                        ancestral reconstruction confidence appended.
+  #                        Length = Nnode(tr) + Ntip(tr).
+  # recon_edge_mat: Matrix. Ancestral reconstruction configured into the edge
+  #                 matrix. Dim: nrow = Nedge(tr) x ncol = 2.
+  #                 1st column == parent node. 2nd column == child node.
+  # tip_and_node_recon: A vector with the tip values followed by the node
+  #                     ancestral reconstruction.
+  #                     Length == Ntip(tr) + Nnode(tr).
   #
   # Check input ----------------------------------------------------------------
   check_is_string(disc_cont)
@@ -230,18 +270,21 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   check_is_number(num)
   if (class(mat) != "matrix"){stop("Ancestral reconstruction input must be a matrix")}
   check_str_is_discrete_or_continuous(disc_cont)
+
   # Function -------------------------------------------------------------------
   # Compute ancestral reconstruction
   recon_method <- "ML" # ML == Maximum Likelihood.
   ML_significance_threshold <- .875 # ML literature suggests that a ratio of 7:1 suggests a high confidence ancestral reconstruction per node .875/.125 = 7
 
   if (disc_cont == "continuous"){
+    # This is only for a continuous phenotype
     cont_results <- continuous_ancestral_reconstruction(tr, mat, num, disc_cont, recon_method) # RECONSTRUCTION
     ML_anc_rec <- cont_results$ML_anc_rec
     tip_and_node_recon <- cont_results$tip_and_node_recon
     tip_and_node_anc_rec_confidence <- continuous_get_recon_confidence(tip_and_node_recon) # CONFIDENCE IN RECONSTRUCTION
 
   } else if (disc_cont == "discrete"){
+    # This is always the choice for genotypes and discrete phenotypes
     discrete_results <- discrete_ancestral_reconstruction(tr, mat, num, disc_cont, recon_method) # RECONSTRUCTION
     ML_anc_rec <- discrete_results$ML_anc_rec
     tip_and_node_recon <- discrete_results$tip_and_node_recon
@@ -254,6 +297,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
                   "tip_and_node_rec_conf" = tip_and_node_anc_rec_confidence,
                   "recon_edge_mat" = reconstruction_as_edge_mat,
                   "tip_and_node_recon" = tip_and_node_recon)
+  # TODO move all of these tests outside of the function and into a unit test
   if (class(reconstruction_as_edge_mat) != "matrix"){stop("reconstruction_as_edge_mat must be a matrix")}
   if (ncol(reconstruction_as_edge_mat) != ncol(tr$edge)){stop("reconstruction_as_edge_mat must have same dim as tr$edge")}
   if (nrow(reconstruction_as_edge_mat) != nrow(tr$edge)){stop("reconstruction_as_edge_mat must have same dim as tr$edge")}
@@ -267,21 +311,24 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
   # Function description -------------------------------------------------------
   # Convert the reconstruction to be in the same format at tree$edge, where each
   # row is an edge. This format will make it much easier to calculate the
-  # phenotype change on each edge for the continuous phenotype GWAS.
+  # phenotype change on each edge for continuous phenotypes.
   #
   # Inputs:
-  # tr. Phylo.
-  # tip_and_node_reconstruction. Vector. Ordered by tips then by nodes.
+  # tr: Phylo.
+  # tip_and_node_reconstruction: Vector. Ordered by tips then by nodes.
+  #                              Length = Ntip(tr) = Nnode(tr).
+  #                              Observed values at each tip and ancestral
+  #                              reconstruction values at each node.
   #
   # Outputs:
-  # reconstruction_as_edge_mat. Matrix.
+  # reconstruction_as_edge_mat: Matrix. Dim = nrow = Ntip(tr) x ncol = 2. 1st
+  #                             column = parent node. 2nd column = child node.
+  #                             Ancestral reconstruction values for each node.
   #
   # Check inputs ---------------------------------------------------------------
   check_tree_is_valid(tr)
   check_for_root_and_bootstrap(tr)
-  if (length(tip_and_node_reconstruction) != Nnode(tr) + Ntip(tr)){
-    stop("Reconstruction incorrectly formatted.")
-  }
+  check_equal(length(tip_and_node_reconstruction), Nnode(tr) + Ntip(tr))
 
   # Function -------------------------------------------------------------------
   reconstruction_as_edge_mat <- tr$edge
@@ -296,17 +343,54 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
 
 prepare_ancestral_reconstructions <- function(tr, pheno, geno, disc_cont){
   # Function description -------------------------------------------------------
-  # Run ancestral reconstructions for phenotype and genotypes.
+  # Run ancestral reconstructions for phenotype and genotypes. Return ancestral
+  # reconstruction values at each tip, edge, and node in the tree for both
+  # the genotype(s) and phenotype. Additionally, for genotype(s) and binary
+  # phenotypes identify each edge in the tree as either a transition (values at
+  # edge-defining nodes unequal) or not a transition (values at edge-defining
+  # nodes equal).
   #
   # Inputs:
-  # tr. Phylo. Ntip = nrow(pheno).
-  # pheno. Matrix. Nrow = Ntip(tr). Ncol = 1.
-  # geno. Matrix. Binary.
-  # disc_cont. String. Either "discrete" or "continuous"
-  #
+  # tr: Phylo.
+  # pheno: Matrix. Dim: nrow = Ntip(tr) x ncol = 1.
+  # geno: Matrix. Binary. Dim: nrow = Ntip(tr) x ncol = number of genotypes.
+  # disc_cont: Character string. Either "discrete" or "continuous."
   #
   # Outputs:
-  # pheno_vector. Vector. Length = Ntip(tr).
+  # pheno_recon_and_conf: List of multiple objects.
+  #   $node_anc_rec: The values of the ancestral reconstruction of the phenotype
+  #                  at each internal node. Length = Nnode(tr).
+  #   $tip_and_node_rec_conf: A binary numeric vector. Each entry corresponds to
+  #                           a tip or node in the tree. 1 indicates high
+  #                           confidence in the ancestral reconstruction of the
+  #                           phenotype, while 0 incidates low confidence.
+  #                           Length = Ntip(tr) + Nnode(tr). Ordered by tips
+  #                           then by nodes.
+  #   $recon_edge_mat: Matrix. Dim: nrow = Nedge(tr) x ncol = 2. Parent (older)
+  #                    node is 1st column. Child (younger) node is the 2nd
+  #                    column. Ancestral reconstruction value of each node.
+  #   $tip_and_node_recon: Numeric vector. Observed value at each tip followed
+  #                        ancestral reconstruction value at each tree node.
+  #                        Length = Ntip(tr) + Nnode(tr).
+  # geno_recon_and_conf: List of lists. 1 list per genotype in the genotype
+  #                      matrix. Each sublist has the same four objects as
+  #                      pheno_recon_and_conf above: $node_anc_rec,
+  #                      $tip_and_node_rec_conf, $recon_edge_mat, and
+  #                      $tip_and_node_recon.
+  #
+  # geno_trans: List of vectors. One list entry for each genotype.Each list
+  #             entry has two vectors.
+  #             $transition: Length = Nedge(tr). Binary, numeric vector. 0
+  #                          indicates no transition (parent and child node
+  #                          equal). 1 indicates a transition across the edge
+  #                          (parent node != child node).
+  #             $trans_dir: Length = Nedge(tr). Numeric vector. Values should be
+  #                         -1, 0, or 1. -1 0 indicate no transition and
+  #                         therefore no direction of the transition. 1
+  #                         indicates the parent is less than the child
+  #                         (discrete case: parent == 0 & child == 1). 0
+  #                         indicates the parent is greater than the child
+  #                         (discrete case: parent == 1 & child == 0).
   #
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -325,7 +409,7 @@ prepare_ancestral_reconstructions <- function(tr, pheno, geno, disc_cont){
     geno_trans[[k]] <- identify_transition_edges(tr, geno, k, geno_recon_and_conf[[k]]$node_anc_rec, "discrete")
   }
 
-  # Check and return output ----------------------------------------------------
+  # Return output --------------------------------------------------------------
   results <- list("pheno_recon_and_conf" = pheno_recon_and_conf, "geno_recon_and_conf" = geno_recon_and_conf, "geno_trans" = geno_trans)
   return(results)
 } # end prepare_ancestral_reconstructions
