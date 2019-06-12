@@ -9,7 +9,7 @@ run_continuous <- function(args){
   geno_trans_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For discrete concomitant and continuous tests.
   geno_trans_original    <- prepare_genotype_transitions_for_original_discrete_test(genotype, geno_trans_concomitant) # Keep only WT -> mutant transitions.
 
-  if (args$group_genotype){
+  if (args$group_genotype) {
     grouped_geno                <- group_genotypes(args$tree, genotype, AR$geno_recon_and_conf, geno_trans_concomitant, geno_trans_original, geno$gene_snp_lookup, geno$unique_genes)
     genotype                    <- grouped_geno$genotype
     geno_recon_ordered_by_edges <- grouped_geno$geno_recon_ordered_by_edges
@@ -18,7 +18,7 @@ run_continuous <- function(args){
     results_object$convergence_not_possible_genotypes <- grouped_geno$convergence_not_possible_genotypes
   } else {
     geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
-    for (k in 1:ncol(genotype)){
+    for (k in 1:ncol(genotype)) {
       geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
       geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
     }

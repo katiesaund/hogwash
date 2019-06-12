@@ -26,7 +26,9 @@ read_in_tsv_matrix <- function(mat){
   temp <- as.matrix(temp)
 
   # Check and return output ----------------------------------------------------
-  if (class(temp) != "matrix"){stop("matrix is incorrectly formatted")}
+  if (class(temp) != "matrix") {
+    stop("matrix is incorrectly formatted")
+  }
   return(temp)
 } # end read_in_tsv_matrix()
 
@@ -51,8 +53,8 @@ read_in_arguments <- function(args){
   # annotation
   #
   # Check inputs, function, & check and return outputs -------------------------
-  if (length(args) == 2){
-    if (args[1] == "test"){
+  if (length(args) == 2) {
+    if (args[1] == "test") {
       test <- TRUE
     } else {
       stop("The first argument for a test run should be \"test.\"")
@@ -75,11 +77,11 @@ read_in_arguments <- function(args){
                     "discrete_or_continuous" = discrete_or_continuous,
                     "annotation" = annotation)
     return(results)
-  } else if (length(args) == 9){
+  } else if (length(args) == 9) {
     test                   <- FALSE
     phenotype              <- read_in_tsv_matrix(args[1])
     tree                   <- read.tree(args[2])
-    if (!is.rooted(tree)){
+    if (!is.rooted(tree)) {
       tree <- midpoint(tree)
     }
     genotype               <- read_in_tsv_matrix(args[3])
@@ -96,12 +98,12 @@ read_in_arguments <- function(args){
                     "discrete_or_continuous" = discrete_or_continuous,
                     "annotation" = annotation, "bootstrap_cutoff" = bootstrap_cutoff)
     return(results)
-  } else if (length(args) == 8){
+  } else if (length(args) == 8) {
     test                   <- FALSE
     phenotype              <- read_in_tsv_matrix(args[1])
     tree                   <- read.tree(args[2])
     # added is.rooted if statement on 2018-09-25 to deal with odd midpoint rooting issue for PSM dataset.
-    if (!is.rooted(tree)){
+    if (!is.rooted(tree)) {
       tree <- midpoint(tree)
     }
     # End of section added on 2018-09-25
@@ -158,7 +160,7 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr, annot){
   check_if_dir_exists(dir)
   check_if_permutation_num_valid(perm)
   check_num_between_0_and_1(fdr)
-  if (!is.null(annot)){
+  if (!is.null(annot)) {
     check_dimensions(annot, Ntip(tr), 2, 2, 2)
   }
 
@@ -172,22 +174,23 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr, annot){
 
 
 new_read_in_arguments <- function(){
-  INPUTS ----------------------------------------------------------------------#
-    # Set up arguments
-    inputs     <- list(make_option(c("-p", "--phenotype"),        type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"),
-                       make_option(c("-t", "--tree"),             type = "character", default = NULL, help = "path to phylogenetic tree .tre file",       metavar = "character"),
-                       make_option(c("-r", "--roary"),            type = "character", default = NULL, help = "path to roary pangenome .Rtab file",        metavar = "character"),
-                       make_option(c("-q", "--gene_stop"),        type = "character", default = NULL, help = "path to SNPeff high gene matrix .rda file", metavar = "character"),
-                       make_option(c("-i", "--gene_high"),        type = "character", default = NULL, help = "path to stop gene matrix .rda file",        metavar = "character"),
-                       make_option(c("-n", "--gene_ns"),          type = "character", default = NULL, help = "path to gene nonsynonymous .rda file",      metavar = "character"),
-                       make_option(c("-s", "--snp"),              type = "character", default = NULL, help = "path to simple SNP matrix .rda file",       metavar = "character"),
-                       make_option(c("-g", "--generic_genotype"), type = "character", default = NULL, help = "path to a generic genotype .tsv file",      metavar = "character"),
-                       make_option(c("-f", "--generic_filename"), type = "character", default = NULL, help = "name of generic genotype",                  metavar = "character"),
-                       make_option(c("-o", "--out"),              type = "character", default = NULL, help = "output directory",                          metavar = "character"))
-    opt_parser <- OptionParser(option_list=inputs)
-    opt        <- parse_args(opt_parser)
-
-    if (!is.null(opt$snp)){
-      if (file.exists(opt$snp)){
-        snp      <- local(get(load(opt$snp)))}}
+  #INPUTS ----------------------------------------------------------------------#
+  # Set up arguments
+  inputs     <- list(make_option(c("-p", "--phenotype"),        type = "character", default = NULL, help = "path to phenotype matrix .tsv file",         metavar = "character"),
+                     make_option(c("-t", "--tree"),             type = "character", default = NULL, help = "path to phylogenetic tree .tre file",       metavar = "character"),
+                     make_option(c("-r", "--roary"),            type = "character", default = NULL, help = "path to roary pangenome .Rtab file",        metavar = "character"),
+                     make_option(c("-q", "--gene_stop"),        type = "character", default = NULL, help = "path to SNPeff high gene matrix .rda file", metavar = "character"),
+                     make_option(c("-i", "--gene_high"),        type = "character", default = NULL, help = "path to stop gene matrix .rda file",        metavar = "character"),
+                     make_option(c("-n", "--gene_ns"),          type = "character", default = NULL, help = "path to gene nonsynonymous .rda file",      metavar = "character"),
+                     make_option(c("-s", "--snp"),              type = "character", default = NULL, help = "path to simple SNP matrix .rda file",       metavar = "character"),
+                     make_option(c("-g", "--generic_genotype"), type = "character", default = NULL, help = "path to a generic genotype .tsv file",      metavar = "character"),
+                     make_option(c("-f", "--generic_filename"), type = "character", default = NULL, help = "name of generic genotype",                  metavar = "character"),
+                     make_option(c("-o", "--out"),              type = "character", default = NULL, help = "output directory",                          metavar = "character"))
+  opt_parser <- OptionParser(option_list=inputs)
+  opt        <- parse_args(opt_parser)
+  if (!is.null(opt$snp)) {
+    if (file.exists(opt$snp)) {
+      snp <- local(get(load(opt$snp)))
+    }
+  }
 }
