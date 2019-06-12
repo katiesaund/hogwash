@@ -1,6 +1,5 @@
 # Library of all functions that "check" or "assert" that something is true.
 
-# TODO Add function description for check_if_g_mat_can_be_plotted
 check_dimensions <- function(mat, exact_rows = NULL, min_rows, exact_cols = NULL, min_cols){
   # Function description -------------------------------------------------------
   # Check that the main input is a matrix and that said matrix is of the
@@ -498,13 +497,12 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
   return(plot_logical)
 } # end check_if_g_mat_can_be_plotted()
 
-
 check_str_is_discrete_or_continuous <- function(input){
   # Function description -------------------------------------------------------
-  # Check if the string is either "discrete" or "continuous"
+  # Check if the string is either "discrete" or "continuous."
   #
   # Inputs:
-  # input. String. "discrete" or "continuous"
+  # input: String. "discrete" or "continuous"
   #
   # Outputs:
   # None.
@@ -523,14 +521,16 @@ check_str_is_discrete_or_continuous <- function(input){
 check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
   # Function description -------------------------------------------------------
   # Check that the reconstruction method that is being fed to ape::ace() is
-  # one of the four acceptable methods.
+  # one of the four acceptable methods. The four methods are: "ML", "REML",
+  # "pic", and "GLS." For the intial implementation of this package the default
+  # (hard-coded) option is always maximum likelihood ("ML").
   #
   # Inputs:
-  # input. String.
+  # input: String. Either "ML", "REML", "pic", or "GLS."
   #
   # Output:
   # none.
-
+  #
   # Check inputs -------------------------------------------------------------
   check_is_string(input)
 
@@ -540,7 +540,6 @@ check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
     stop("Reconstruction methods for ape::ace must be either: ML, REML, pic, or GLS.")
   }
 } # end check_if_ancestral_reconstruction_method_compatible_with_ape()
-
 
 check_equal <- function(first_number, second_number){
   # Function description
@@ -565,3 +564,5 @@ check_equal <- function(first_number, second_number){
     stop("Inputs are not equal")
   }
 }
+
+# End of script ----------------------------------------------------------------

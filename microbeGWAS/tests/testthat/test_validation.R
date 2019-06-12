@@ -942,30 +942,75 @@ test_that("check_if_g_mat_can_be_plotted returns FALSE for non-matrix, non-dataf
   expect_false(check_if_g_mat_can_be_plotted("temp"))
 })
 
-
-
 # test check_str_is_discrete_or_continuous -------------------------------------
 test_that("check_str_is_discrete_or_continuous gives no error when given 'discrete'", {
+  # Set up
   input <- 'discrete'
+
+  # Test
   expect_error(check_str_is_discrete_or_continuous(input), NA)
 })
 
 test_that("check_str_is_discrete_or_continuous gives no error when given 'continuous'", {
+  # Set up
   input <- 'continuous'
+
+  # Test
   expect_error(check_str_is_discrete_or_continuous(input), NA)
 })
 
 test_that("check_str_is_discrete_or_continuous gives an error when given 'foobar'", {
+  # Set up
   input <- 'foobar'
+
+  # Test
   expect_error(check_str_is_discrete_or_continuous(input))
 })
 
 test_that("check_str_is_discrete_or_continuous gives an error when given NA", {
+  # Set up
   input <- NA
+
+  # Test
   expect_error(check_str_is_discrete_or_continuous(input))
 })
 
 test_that("check_str_is_discrete_or_continuous gives an error when given NULL", {
+  # Set up
   input <- NULL
+
+  # Test
   expect_error(check_str_is_discrete_or_continuous(input))
+})
+
+# test check_if_ancestral_reconstruction_method_compatible_with_ape ------------
+test_that("check_if_ancestral_reconstruction_method_compatible_with_ape doesn't throw an error when given the acceptable inputs", {
+  # Test
+  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("ML"), NA)
+  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("REML"), NA)
+  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("pic"), NA)
+  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("GLS"), NA)
+})
+
+test_that("check_if_ancestral_reconstruction_method_compatible_with_ape throws error when given the unacceptable inputs", {
+  # Test
+  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("other"))
+  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape(10))
+  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape(matrix(0, 10, 10)))
+  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape(letters[1:10]))
+})
+
+# test check_equal -------------------------------------------------------------
+test_that("check_equal doesn't throw errors when given two equal numbers", {
+  # Test
+  expect_error(check_equal(1, 1), NA)
+  expect_error(check_equal(length(letters), 26), NA)
+  expect_error(check_equal(20, 4 * 5), NA)
+})
+
+test_that("check_equal throws errors when given two not equal numbers", {
+  # Test
+  expect_error(check_equal(1, 0))
+  expect_error(check_equal(length(letters), -26))
+  expect_error(check_equal(20, 20.00000000001))
 })
