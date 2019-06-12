@@ -37,7 +37,7 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
   check_dimensions(geno, Ntip(tr), 2, NULL, 2)
-  if (length(g_reconstruction_and_confidence) != ncol(geno)){
+  if (length(g_reconstruction_and_confidence) != ncol(geno)) {
     stop("wrong input")
   }
   check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
@@ -46,10 +46,10 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
 
   # FUNCTION ------------------------------------------------------------------#
   tip_nodes_by_snp_mat_recon <- tip_nodes_by_snp_mat_confi <- matrix(0, nrow = (Nnode(tr) + Ntip(tr)), ncol = ncol(geno))
-  if (nrow(tip_nodes_by_snp_mat_recon) != length(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)){
+  if (nrow(tip_nodes_by_snp_mat_recon) != length(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)) {
     stop("mismatch in size")
   }
-  for (k in 1:ncol(geno)){
+  for (k in 1:ncol(geno)) {
     tip_nodes_by_snp_mat_recon[ , k] <- g_reconstruction_and_confidence[[k]]$tip_and_node_recon
     tip_nodes_by_snp_mat_confi[ , k] <- g_reconstruction_and_confidence[[k]]$tip_and_node_rec_conf
   }
@@ -57,7 +57,7 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
   row.names(tip_nodes_by_snp_mat_recon) <- row.names(tip_nodes_by_snp_mat_confi) <- c(1:nrow(tip_nodes_by_snp_mat_recon))
   colnames(tip_nodes_by_snp_mat_recon) <- colnames(tip_nodes_by_snp_mat_confi) <- colnames(geno)
 
-  if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat_recon)){
+  if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat_recon)) {
     stop("mismatch")
   }
 
@@ -66,21 +66,21 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
   tip_nodes_by_snp_mat_confi_with_gene_id <- rbind(tip_nodes_by_snp_mat_confi, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
   recon_times_confi_with_gene_id          <- rbind(recon_times_confi,          unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
 
-  if (nrow(tip_nodes_by_snp_mat_recon_with_gene_id) != (nrow(tip_nodes_by_snp_mat_recon) + 1)){
+  if (nrow(tip_nodes_by_snp_mat_recon_with_gene_id) != (nrow(tip_nodes_by_snp_mat_recon) + 1)) {
     stop("rbind didn't work")
   }
   unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
 
   gene_mat_built_from_snps <- gene_presence_confidence <- gene_absence_confidence <- matrix(0, nrow = nrow(tip_nodes_by_snp_mat_recon), ncol = length(unique_genes))
-  for (j in 1:length(unique_genes)){
+  for (j in 1:length(unique_genes)) {
 
     # Matrix of just the SNPs found in gene "j"
     temp_mat               <- tip_nodes_by_snp_mat_recon_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_recon_with_gene_id) - 1), tip_nodes_by_snp_mat_recon_with_gene_id[nrow(tip_nodes_by_snp_mat_recon_with_gene_id), ] == unique_genes[j], drop = FALSE]
     temp_recon_times_confi <-          recon_times_confi_with_gene_id[1:(nrow(recon_times_confi_with_gene_id)          - 1),           recon_times_confi_with_gene_id[nrow(recon_times_confi_with_gene_id)        , ] == unique_genes[j], drop = FALSE]
     temp_conf              <- tip_nodes_by_snp_mat_confi_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_confi_with_gene_id) - 1), tip_nodes_by_snp_mat_confi_with_gene_id[nrow(tip_nodes_by_snp_mat_confi_with_gene_id), ] == unique_genes[j], drop = FALSE]
     class(temp_mat) <- class(temp_recon_times_confi) <- class(temp_conf) <- "numeric"
-    for (r in 1:nrow(gene_presence_confidence)){
-      if (rowSums(temp_mat)[r] == 0 & rowSums(temp_conf)[r] > 0){
+    for (r in 1:nrow(gene_presence_confidence)) {
+      if (rowSums(temp_mat)[r] == 0 & rowSums(temp_conf)[r] > 0) {
         gene_absence_confidence[r, j] <- 1
       }
     }
@@ -97,8 +97,8 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
   colnames(gene_mat_built_from_snps)  <- colnames(gene_all_confidence)  <- unique_genes
   row.names(gene_mat_built_from_snps) <- row.names(gene_all_confidence) <- c(1:nrow(gene_mat_built_from_snps))
 
-  gene_list_built_from_snps <- gene_conf_list_built_from_snps<- rep(list(0), length(unique_genes))
-  for (m in 1:length(unique_genes)){
+  gene_list_built_from_snps <- gene_conf_list_built_from_snps <- rep(list(0), length(unique_genes))
+  for (m in 1:length(unique_genes)) {
     gene_list_built_from_snps[[m]]      <- gene_mat_built_from_snps[ , m, drop = TRUE]
     gene_conf_list_built_from_snps[[m]] <- gene_all_confidence[      , m, drop = TRUE]
   }
@@ -125,7 +125,7 @@ build_node_anc_recon_from_gene_list <- function(gene_list, tr){
   # Return output --------------------------------------------------------------
   # TODO test this function works.
   gene_list_built_from_snps_just_node_anc_rec <- rep(list(0), length(gene_list$tip_and_node_recon))
-  for (m in 1:length(gene_list$tip_and_node_recon)){
+  for (m in 1:length(gene_list$tip_and_node_recon)) {
     gene_list_built_from_snps_just_node_anc_rec[[m]] <- gene_list[[m]]$tip_and_node_recon[(Ntip(tr) + 1):(Ntip(tr) + Nedge(tr))]
   }
   return(gene_list_built_from_snps_just_node_anc_rec)
@@ -152,13 +152,13 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   check_for_root_and_bootstrap(tr)
   check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, exact_cols =  nrow(gene_to_snp_lookup_table), min_cols = 1)
   check_if_binary_matrix(geno)
-  if (length(geno_transition) != ncol(geno)){
+  if (length(geno_transition) != ncol(geno)) {
     stop("Must have a transition vector for each genotype")
   }
-  if (length(geno_transition[[1]]$transition) != Nedge(tr)){
+  if (length(geno_transition[[1]]$transition) != Nedge(tr)) {
     stop("Must have transition information for each tree edge.")
   }
-  if (length(geno_transition[[1]]$trans_dir) != Nedge(tr)){
+  if (length(geno_transition[[1]]$trans_dir) != Nedge(tr)) {
     stop("Must have transition direction information for each tree edge.")
   }
   check_if_binary_vector_numeric(geno_transition[[1]]$transition)
@@ -167,7 +167,7 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   # Function -------------------------------------------------------------------
   transition_edges_by_snp_mat <- trans_dir_edges_by_snp_mat <- matrix(0, nrow = Nedge(tr), ncol = ncol(geno))
 
-  for (k in 1:ncol(geno)){
+  for (k in 1:ncol(geno)) {
     transition_edges_by_snp_mat[ , k] <- geno_transition[[k]]$transition
     trans_dir_edges_by_snp_mat[ ,  k] <- geno_transition[[k]]$trans_dir
   }
@@ -179,7 +179,7 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
 
   unique_genes <- unique(gene_to_snp_lookup_table[ , 2])
   gene_transition_mat_built_from_snps <- gene_trans_dir_mat_built_from_snps <- matrix(0, nrow = nrow(transition_edges_by_snp_mat), ncol = length(unique_genes))
-  for (j in 1:length(unique_genes)){
+  for (j in 1:length(unique_genes)) {
     temp_mat <- transition_edges_by_snp_mat_with_gene_id[1:(nrow(transition_edges_by_snp_mat_with_gene_id) - 1) , transition_edges_by_snp_mat_with_gene_id[nrow(transition_edges_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
@@ -203,19 +203,19 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   row.names(gene_trans_dir_mat_built_from_snps) <- c(1:nrow(gene_trans_dir_mat_built_from_snps))
 
   gene_transition_list_built_from_snps <- rep(list(0), length(unique_genes))
-  for (m in 1:length(unique_genes)){
+  for (m in 1:length(unique_genes)) {
     gene_transition_list_built_from_snps[[m]] <- gene_transition_mat_built_from_snps[ , m, drop = TRUE]
   }
   names(gene_transition_list_built_from_snps) <- unique_genes
 
   gene_trans_dir_list_built_from_snps <- rep(list(0), length(unique_genes))
-  for (m in 1:length(unique_genes)){
+  for (m in 1:length(unique_genes)) {
     gene_trans_dir_list_built_from_snps[[m]] <- gene_trans_dir_mat_built_from_snps[ , m, drop = TRUE]
   }
   names(gene_trans_dir_list_built_from_snps) <- unique_genes
 
   temp_results <- rep(list(list()), length(unique_genes))
-  for (i in 1:length(unique_genes)){
+  for (i in 1:length(unique_genes)) {
     temp_results[[i]]$transition <- unname(unlist(gene_transition_list_built_from_snps[i]))
     temp_results[[i]]$trans_dir <- unname(unlist(gene_trans_dir_list_built_from_snps[i]))
   }
@@ -248,11 +248,11 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 
 
   snp_geno_with_gene_id <- rbind(geno, unlist(gene_to_snp_lookup_table[ , 2, drop = TRUE]))
-  if (nrow(snp_geno_with_gene_id) != (nrow(geno) + 1)){
+  if (nrow(snp_geno_with_gene_id) != (nrow(geno) + 1)) {
     stop("rbind didn't work")
   }
 
-  for (j in 1:length(unique_genes)){
+  for (j in 1:length(unique_genes)) {
     temp_mat <- snp_geno_with_gene_id[1:(nrow(snp_geno_with_gene_id) - 1) , snp_geno_with_gene_id[nrow(snp_geno_with_gene_id), ] == unique_genes[j], drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
@@ -323,7 +323,7 @@ prepare_ungrouped_genotype <- function(geno, tr){
   #   $convergene_not_possible_genotypes. Character vector. Vector of genotype names.
   #
   # Check input ----------------------------------------------------------------
-  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, min_col = 1)
+  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, min_cols = 1)
   check_if_binary_matrix(geno)
   check_for_root_and_bootstrap(tr)
 
@@ -363,17 +363,17 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
   #   $convergene_not_possible_genotypes. Character vector. Vector of genotype names.
   #
   # Check input ----------------------------------------------------------------
-  if (!is.logical(group_logical)){
+  if (!is.logical(group_logical)) {
     stop("Input must be either TRUE or FALSE")
   }
   check_for_root_and_bootstrap(tr)
-  if (!is.null(lookup)){
+  if (!is.null(lookup)) {
     check_dimensions(lookup, exact_cols = 2, min_cols = 2, min_rows = 1)
   }
   check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, min_cols = 1)
   #
   # Function -------------------------------------------------------------------
-  if (group_logical){
+  if (group_logical) {
     prepped_geno <- prepare_grouped_genotype(geno, lookup)
   } else {
     prepped_geno <- prepare_ungrouped_genotype(geno, tr)
@@ -386,7 +386,7 @@ format_and_name_grouped_transitions <- function(genotype_transition){
   # I think this isn't needed for anything based on updates 2019-06-09
   dummy <- genotype_transition
   genotype_transition <- rep(list(NULL), length(dummy))
-  for (i in 1:length(dummy)){
+  for (i in 1:length(dummy)) {
     genotype_transition[[i]]$transition <- as.numeric(as.character(unlist((dummy[i]))))
   }
   return(genotype_transition)
@@ -430,31 +430,31 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_dimensions(geno, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
-  if (length(genotype_reconstruction_and_confidence) != ncol(geno)){
+  if (length(genotype_reconstruction_and_confidence) != ncol(geno)) {
     stop("Need a reconstruction/confidence list for each genotype in the matrix.")
   }
-  if (length(genotype_reconstruction_and_confidence[[1]]$node_anc_rec) != Nnode(tr)){
+  if (length(genotype_reconstruction_and_confidence[[1]]$node_anc_rec) != Nnode(tr)) {
     stop("Node genotype reconstruction must be length of Nnode(tree)")
   }
-  if (length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_recon) != c(Nnode(tr) + Ntip(tr))){
+  if (length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_recon) != c(Nnode(tr) + Ntip(tr))) {
     stop("Tip & Node genotype reconstruction must be length of Nnode(tree) + Ntip(tree)")
   }
-  if (length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf) != c(Nnode(tr) + Ntip(tr))){
+  if (length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf) != c(Nnode(tr) + Ntip(tr))) {
     stop("Tip & Node genotype confidence must be length of Nnode(tree) + Ntip(tree)")
   }
-  if (nrow(genotype_reconstruction_and_confidence[[1]]$recon_edge_mat) != Nedge(tr)){
+  if (nrow(genotype_reconstruction_and_confidence[[1]]$recon_edge_mat) != Nedge(tr)) {
     stop("Genotype reconstruction matrix must have a row for each tree edge.")
   }
-  if (length(genotype_transition_con) != ncol(geno)){
+  if (length(genotype_transition_con) != ncol(geno)) {
     stop("Genotype transitions for concomitant test should correspond to each genotype")
   }
-  if (length(genotype_transition_con[[1]]$transition) != Nedge(tr)){
+  if (length(genotype_transition_con[[1]]$transition) != Nedge(tr)) {
     stop("Genotype transitions should correspond to each edge on the tree.")
   }
-  if (length(genotype_transition_orig) != ncol(geno)){
+  if (length(genotype_transition_orig) != ncol(geno)) {
     stop("Genotype transitions for original test should correspond to each genotype")
   }
-  if (length(genotype_transition_orig[[1]]$transition) != Nedge(tr)){
+  if (length(genotype_transition_orig[[1]]$transition) != Nedge(tr)) {
     stop("Genotype transitions should correspond to each edge on the tree.")
   }
   check_dimensions(lookup, exact_rows = ncol(geno), min_rows = ncol(geno), exact_cols = 2, min_cols = 2)
@@ -478,7 +478,7 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
   geno_recon_and_confidence_tip_node_confidence <- geno_recon_and_confidence_tip_node$tip_node_conf[ genes_to_keep_in_consideration]
 
   geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(geno))
-  for (k in 1:ncol(geno)){
+  for (k in 1:ncol(geno)) {
     geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_recon[[k]],      tr)
     geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_confidence[[k]], tr)
   }

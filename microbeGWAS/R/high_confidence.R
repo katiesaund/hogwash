@@ -12,7 +12,9 @@ discretize_confidence_using_threshold <- function(confidence_vector, threshold){
   #
   # Check inputs ---------------------------------------------------------------
   check_is_number(threshold)
-  if (!is.vector(confidence_vector)){stop("input must be a numeric vector")}
+  if (!is.vector(confidence_vector)) {
+    stop("input must be a numeric vector")
+  }
   check_is_number(confidence_vector[1])
 
   # Function -------------------------------------------------------------------
@@ -49,22 +51,30 @@ report_num_high_confidence_trans_edge <- function(genotype_transition,
   #                                       genotype names.
   #
   # Check input ----------------------------------------------------------------
-  if (length(genotype_transition) != length(geno_names)){
+  if (length(genotype_transition) != length(geno_names)) {
     stop("genotype_transition should have one vector for each genotype")
   }
-  if (length(high_conf_edges) != length(geno_names)){
+  if (length(high_conf_edges) != length(geno_names)) {
     stop("high_conf_edges should have one vector for each genotype")
   }
-  if(!is.vector(genotype_transition[[1]]$transition)){stop("Input must have a vector.")}
-  if(!is.vector(high_conf_edges[[1]])){stop("Input must have a vector.")}
-  if(!is.vector(geno_names)){stop("Input must be a vector.")}
-  if(!is.character(geno_names[1])){stop("Input must be a character vector.")}
+  if (!is.vector(genotype_transition[[1]]$transition)) {
+    stop("Input must have a vector.")
+  }
+  if (!is.vector(high_conf_edges[[1]])) {
+    stop("Input must have a vector.")
+  }
+  if (!is.vector(geno_names)) {
+    stop("Input must be a vector.")
+  }
+  if (!is.character(geno_names[1])) {
+    stop("Input must be a character vector.")
+  }
 
   # Function -------------------------------------------------------------------
 
   # Return output --------------------------------------------------------------
   num_high_confidence_transition_edges <- rep(0, length(high_conf_edges))
-  for (p in 1:length(high_conf_edges)){
+  for (p in 1:length(high_conf_edges)) {
     num_high_confidence_transition_edges[p] <- sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])
   }
 
@@ -98,22 +108,22 @@ assign_high_confidence_to_transition_edges_including_parent_info  <- function(tr
   check_tree_is_valid(tr)
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
-  if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)){
+  if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)) {
     stop("Dimension mismatch")
   }
   check_for_root_and_bootstrap(tr)
-  if (length(all_confidence_by_edge[[1]]) != Nedge(tr)){
+  if (length(all_confidence_by_edge[[1]]) != Nedge(tr)) {
     stop("Dimension mismatch")
   }
   # Function -------------------------------------------------------------------
   # Identify all edges for which the edge and the parent edge are both high confidence
   edge_and_parent_both_confident <- rep(list(rep(0, Nedge(tr))), ncol(geno))
-  for (ge in 1:ncol(geno)){
-    for (ed in 1:Nedge(tr)){
+  for (ge in 1:ncol(geno)) {
+    for (ed in 1:Nedge(tr)) {
       parent_edge <- find_parent_edge(tr, ed)
-      if (!is.na(parent_edge)){
-        if (all_confidence_by_edge[[ge]][ed] == 1){
-          if (all_confidence_by_edge[[ge]][parent_edge] == 1){
+      if (!is.na(parent_edge)) {
+        if (all_confidence_by_edge[[ge]][ed] == 1) {
+          if (all_confidence_by_edge[[ge]][parent_edge] == 1) {
             edge_and_parent_both_confident[[ge]][ed] <- 1
           }
         }
@@ -126,7 +136,7 @@ assign_high_confidence_to_transition_edges_including_parent_info  <- function(tr
 
   # Identify high confidence transition edges by overlapping the above and transitions
   edge_and_parent_confident_and_trans_edge <- rep(list(NULL), ncol(geno))
-  for (k in 1:ncol(geno)){
+  for (k in 1:ncol(geno)) {
     edge_and_parent_confident_and_trans_edge[[k]] <- as.numeric((edge_and_parent_both_confident[[k]] + genotype_transition_by_edges[[k]]$transition) == 2)
   }
 
@@ -154,16 +164,16 @@ assign_high_confidence_to_transition_edges <- function(tr,
   check_tree_is_valid(tr)
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
-  if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)){
+  if (length(genotype_transition_by_edges[[1]]$transition) != Nedge(tr)) {
     stop("Dimension mismatch")
   }
   check_for_root_and_bootstrap(tr)
-  if (length(all_confidence_by_edge[[1]]) != Nedge(tr)){
+  if (length(all_confidence_by_edge[[1]]) != Nedge(tr)) {
     stop("Dimension mismatch")
   }
   # Function -------------------------------------------------------------------
   edge_confident_and_trans_edge <- rep(list(NULL), ncol(geno))
-  for (k in 1:ncol(geno)){
+  for (k in 1:ncol(geno)) {
     edge_confident_and_trans_edge[[k]] <- as.numeric((all_confidence_by_edge[[k]] + genotype_transition_by_edges[[k]]$transition) == 2)
   }
 
@@ -215,28 +225,28 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
   # "num_high_confidence_trasition_edges" = num_high_confidence_trasition_edges))
   #
   # Check input ----------------------------------------------------------------
-  if (length(genotype_transition) != ncol(geno)){
+  if (length(genotype_transition) != ncol(geno)) {
     stop("Need 1 genotype transition for each genotype")
   }
-  if (length(genotype_transition[[1]]$transition) != Nedge(tr)){
+  if (length(genotype_transition[[1]]$transition) != Nedge(tr)) {
     stop("Need genotype transition information for each tree edge.")
   }
   check_for_root_and_bootstrap(tr)
-  if (length(pheno_tip_node_recon_conf) != c(Ntip(tr) + Nnode(tr))){
+  if (length(pheno_tip_node_recon_conf) != c(Ntip(tr) + Nnode(tr))) {
     stop("Phenotype confidence list should correspond to each tip and node of tree.")
   }
   check_num_between_0_and_1(boot_threshold)
   check_dimensions(geno, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
-  if (length(geno_conf_edge) != ncol(geno)){
+  if (length(geno_conf_edge) != ncol(geno)) {
     stop("Need 1 genotype transition for each genotype")
   }
-  if (length(geno_conf_edge[[1]]) != Nedge(tr)){
+  if (length(geno_conf_edge[[1]]) != Nedge(tr)) {
     stop("Need genotype transition information for each tree edge.")
   }
-  if (length(geno_recon_edge) != ncol(geno)){
+  if (length(geno_recon_edge) != ncol(geno)) {
     stop("Need 1 genotype transition for each genotype")
   }
-  if (length(geno_recon_edge[[1]]) != Nedge(tr)){
+  if (length(geno_recon_edge[[1]]) != Nedge(tr)) {
     stop("Need genotype transition information for each tree edge.")
   }
   check_if_binary_vector(geno_conf_edge[[1]])
@@ -250,15 +260,17 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
 
 
   high_confidence_edges <- pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3
-  if (length(high_confidence_edges) != Nedge(tr)){stop("Confidence should correspond to each tree edge")}
+  if (length(high_confidence_edges) != Nedge(tr)) {
+    stop("Confidence should correspond to each tree edge")
+  }
   all_high_confidence_edges <- rep(list(0), ncol(geno))
 
   # ADD IN GENO RECONSTRUCTION CONFIDENCE
-  for (k in 1:ncol(geno)){
+  for (k in 1:ncol(geno)) {
     all_high_confidence_edges[[k]] <- as.numeric(geno_conf_edge[[k]] + high_confidence_edges == 2)
   }
   only_high_conf_geno_trans <- assign_high_confidence_to_transition_edges(tr, all_high_confidence_edges, genotype_transition, geno) # here
-  for (i in 1:ncol(geno)){
+  for (i in 1:ncol(geno)) {
     genotype_transition[[i]]$transition <- only_high_conf_geno_trans[[i]]
     genotype_transition[[i]]$trans_dir <- only_high_conf_geno_trans[[i]] * genotype_transition[[i]]$trans_dir
   }

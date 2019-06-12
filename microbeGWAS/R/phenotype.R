@@ -10,11 +10,13 @@ assign_pheno_type <- function(mat){
 
   # Check input ----------------------------------------------------------------
   check_dimensions(mat, NULL, 1, 1, 1)
-  if (!typeof(mat) %in% c("double", "integer", "numeric")){stop("Must be a numeric matrix")}
+  if (!typeof(mat) %in% c("double", "integer", "numeric")) {
+    stop("Must be a numeric matrix")
+  }
 
   # Function -------------------------------------------------------------------
   type <- "discrete"
-  if (sum(!(mat %in% c(0, 1))) > 0){
+  if (sum(!(mat %in% c(0, 1))) > 0) {
     type <- "continuous"
   }
 
@@ -35,24 +37,24 @@ calculate_phenotype_change_on_edge <- function(edge_list, phenotype_by_edges){
   #
   # Outputs:
   # delta.              Numeric vector.   Length = length(edge_list).
-
+  #
   # Check input ----------------------------------------------------------------
-  if (max(edge_list) > nrow(phenotype_by_edges)){
+  if (max(edge_list) > nrow(phenotype_by_edges)) {
     stop("Cannot calculate phenotype change on edges.")
   }
   check_dimensions(phenotype_by_edges, exact_rows = NULL, min_rows = max(edge_list), exact_cols = NULL, min_cols = 2)
-  if (!is.vector(edge_list)){
+  if (!is.vector(edge_list)) {
     stop("edge_list must be a vector of indices of edges")}
   check_is_number(edge_list[1])
 
   # Function -------------------------------------------------------------------
   delta <- rep(NA, length(unique(edge_list)))
-  for (j in 1:length(edge_list)){
+  for (j in 1:length(edge_list)) {
     delta[j] <- abs(phenotype_by_edges[edge_list[j], 1] - phenotype_by_edges[edge_list[j], 2])
   }
 
   # Check and return output ----------------------------------------------------
-  if (sum(delta < 0) > 0){
+  if (sum(delta < 0) > 0) {
     stop("Delta phenotype should always be recorded as an absolute value.")
   }
 
@@ -73,17 +75,18 @@ calc_raw_diff <- function(edge_list, phenotype_by_edges){
   # delta.              Numeric vector.   Length = length(edge_list).
 
   # Check input ----------------------------------------------------------------
-  if (max(edge_list) > nrow(phenotype_by_edges)){
+  if (max(edge_list) > nrow(phenotype_by_edges)) {
     stop("Cannot calculate phenotype change on edges.")
   }
   check_dimensions(phenotype_by_edges, exact_rows = NULL, min_rows = max(edge_list), exact_cols = NULL, min_cols = 2)
-  if (!is.vector(edge_list)){
-    stop("edge_list must be a vector of indices of edges")}
+  if (!is.vector(edge_list)) {
+    stop("edge_list must be a vector of indices of edges")
+  }
   check_is_number(edge_list[1])
 
   # Function -------------------------------------------------------------------
   delta <- rep(NA, length(unique(edge_list)))
-  for (j in 1:length(edge_list)){
+  for (j in 1:length(edge_list)) {
     delta[j] <- phenotype_by_edges[edge_list[j], 1] - phenotype_by_edges[edge_list[j], 2]
   }
 
@@ -107,17 +110,20 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
   #
   # Check input ----------------------------------------------------------------
   check_dimensions(pheno, NULL, 1, 1, 1)
-  if (!typeof(pheno) %in% c("double", "integer", "numeric")){stop("Must be a numeric matrix")}
+  if (!typeof(pheno) %in% c("double", "integer", "numeric")) {
+    stop("Must be a numeric matrix")
+  }
   check_is_string(continuous_or_discrete)
   check_str_is_discrete_or_continuous(continuous_or_discrete)
 
   # Function -------------------------------------------------------------------
-  if (continuous_or_discrete == "continuous"){
-    if (length(unique(pheno)) == 1){stop("phenotype must have some variability")}
-
+  if (continuous_or_discrete == "continuous") {
+    if (length(unique(pheno)) == 1) {
+      stop("phenotype must have some variability")
+    }
     result <- shapiro.test(unlist(pheno))
     alpha <- 0.05
-    if (result$p < alpha){
+    if (result$p < alpha) {
       print("Please consider normalizing your phenotype so as to not violate assumptions used in the ancestral reconstruction.")
     }
   }
@@ -145,13 +151,13 @@ check_if_convergence_occurs <- function(pheno, tr, continuous_or_discrete){
   check_str_is_discrete_or_continuous(continuous_or_discrete)
 
   # Function -------------------------------------------------------------------
-  if (continuous_or_discrete == "continuous"){
+  if (continuous_or_discrete == "continuous") {
     set.seed(1)
     geiger_BM <- geiger::fitContinuous(tr, pheno, model = "BM")
     geiger_white <- geiger::fitContinuous(tr, pheno, model = "white")
 
     enough_of_a_difference_in_AIC <- 2
-    if (geiger_white$opt$aicc + enough_of_a_difference_in_AIC < geiger_BM$opt$aicc){
+    if (geiger_white$opt$aicc + enough_of_a_difference_in_AIC < geiger_BM$opt$aicc) {
       print("A white noise model better describes phenotype than does a Brownian motion model.")
     }
 

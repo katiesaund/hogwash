@@ -21,13 +21,13 @@ hogwash <- function(pheno,
   args$perm                   <- as.numeric(perm) #typically 10,000
   args$fdr                    <- as.numeric(fdr)
   args$annot                  <- NULL
-  if (!is.null(annotation)){
+  if (!is.null(annotation)) {
    args$annot                 <- read_in_tsv_matrix(annotation)
   }
   args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$fdr, args$annot)
   args$bootstrap_cutoff       <- as.numeric(bootstrap)
   args$group_genotype         <- NULL
-  if (!is.null(args$group_genotype)){
+  if (!is.null(args$group_genotype)) {
     args$gene_snp_lookup      <- read_in_tsv_matrix(group_genotype_key)
   }
   select_test_type(args)

@@ -30,7 +30,7 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
   contingency_table <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)
   row.names(contingency_table) <- c("geno_present", "geno_absent")
   colnames(contingency_table) <- c("pheno_present", "pheno_absent")
-  for (i in 1:length(genotype_by_edges)){
+  for (i in 1:length(genotype_by_edges)) {
     temp_table <- contingency_table
     temp_table[1, 1] <- sum(genotype_by_edges[[i]]  + phenotype_by_edges == 2,  na.rm = TRUE)
     temp_table[2, 2] <- sum(genotype_by_edges[[i]]  + phenotype_by_edges == 0,  na.rm = TRUE)
