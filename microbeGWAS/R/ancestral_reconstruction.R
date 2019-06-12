@@ -42,21 +42,38 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   # Function -------------------------------------------------------------------
   # Compute ancestral reconstruction
   recon_method <- "ML" # ML == Maximum Likelihood.
-  ML_significance_threshold <- .875 # ML literature suggests that a ratio of 7:1 suggests a high confidence ancestral reconstruction per node .875/.125 = 7
+  ML_significance_threshold <- .875 # ML literature suggests that a ratio of 7:1
+                                    # suggests a high confidence ancestral
+                                    # reconstruction per node .875/.125 = 7.
 
   if (disc_cont == "continuous") {
     # This is only for a continuous phenotype
-    cont_results <- continuous_ancestral_reconstruction(tr, mat, num, disc_cont, recon_method) # RECONSTRUCTION
+    # RECONSTRUCTION
+    cont_results <- continuous_ancestral_reconstruction(tr,
+                                                        mat,
+                                                        num,
+                                                        disc_cont,
+                                                        recon_method)
     ML_anc_rec <- cont_results$ML_anc_rec
     tip_and_node_recon <- cont_results$tip_and_node_recon
-    tip_and_node_anc_rec_confidence <- continuous_get_recon_confidence(tip_and_node_recon) # CONFIDENCE IN RECONSTRUCTION
+
+    # CONFIDENCE IN RECONSTRUCTION
+    tip_and_node_anc_rec_confidence <-
+      continuous_get_recon_confidence(tip_and_node_recon)
 
   } else if (disc_cont == "discrete") {
     # This is always the choice for genotypes and discrete phenotypes
-    discrete_results <- discrete_ancestral_reconstruction(tr, mat, num, disc_cont, recon_method) # RECONSTRUCTION
+    # RECONSTRUCTION
+    discrete_results <-
+      discrete_ancestral_reconstruction(tr, mat, num, disc_cont, recon_method)
     ML_anc_rec <- discrete_results$ML_anc_rec
     tip_and_node_recon <- discrete_results$tip_and_node_recon
-    tip_and_node_anc_rec_confidence <- discrete_get_recon_confidence(discrete_results$reconstruction, tr, ML_significance_threshold) # CONFIDENCE IN RECONSTRUCTION
+
+    # CONFIDENCE IN RECONSTRUCTION
+    tip_and_node_anc_rec_confidence <-
+      discrete_get_recon_confidence(discrete_results$reconstruction,
+                                    tr,
+                                    ML_significance_threshold)
   }
   reconstruction_as_edge_mat <- convert_to_edge_mat(tr, tip_and_node_recon)
 
@@ -68,7 +85,11 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   return(results)
 } # end ancestral_reconstruction_by_ML()
 
-continuous_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_method){
+continuous_ancestral_reconstruction <- function(tr,
+                                                mat,
+                                                num,
+                                                disc_cont,
+                                                recon_method){
   # Function description -------------------------------------------------------
   # Perform ancestral state reconstruction using ape::ace() function on
   # continuous phenotype.
@@ -93,7 +114,11 @@ continuous_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_m
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
   check_is_number(num)
-  check_dimensions(mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = 1, min_cols = 1)
+  check_dimensions(mat,
+                   exact_rows = Ntip(tr),
+                   min_rows = Ntip(tr),
+                   exact_cols = 1,
+                   min_cols = 1)
 
   # Function -------------------------------------------------------------------
   set.seed(1)
@@ -103,7 +128,10 @@ continuous_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_m
                         type = disc_cont,
                         method = recon_method,
                         marginal = FALSE)
-  ML_anc_rec <- reconstruction$ace # vector containing reconstruction data for all internal nodes (#51 -99) where tips are 1-50.
+
+  # Vector containing reconstruction data for all internal nodes N+ where tips
+  # are 1-N.
+  ML_anc_rec <- reconstruction$ace
   tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
   names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
 
@@ -168,15 +196,21 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
   # Function -------------------------------------------------------------------
   reconstruction_as_edge_mat <- tr$edge
   for (k in 1:nrow(reconstruction_as_edge_mat)) {
-    reconstruction_as_edge_mat[k, 1] <- tip_and_node_reconstruction[tr$edge[k, 1]]
-    reconstruction_as_edge_mat[k, 2] <- tip_and_node_reconstruction[tr$edge[k, 2]]
+    reconstruction_as_edge_mat[k, 1] <-
+      tip_and_node_reconstruction[tr$edge[k, 1]]
+    reconstruction_as_edge_mat[k, 2] <-
+      tip_and_node_reconstruction[tr$edge[k, 2]]
   }
 
   # Return output --------------------------------------------------------------
   return(reconstruction_as_edge_mat)
 } # end convert_to_edge_mat()
 
-discrete_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_method){
+discrete_ancestral_reconstruction <- function(tr,
+                                              mat,
+                                              num,
+                                              disc_cont,
+                                              recon_method){
   # Function description -------------------------------------------------------
   # Perform ancestral state reconstruction using ape::ace() function on
   # discrete phenotype or genotype. The best model to describe the probabilities
@@ -226,7 +260,12 @@ discrete_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_met
                         type = disc_cont,
                         method = recon_method,
                         marginal = FALSE)
-  ML_anc_rec <- as.numeric(colnames(reconstruction$lik.anc)[apply(reconstruction$lik.anc, 1, which.max)]) # Extract the mostly likely character state using which.max
+
+  # Extract the mostly likely character state using which.max
+  ML_anc_rec <-
+    as.numeric(colnames(reconstruction$lik.anc)[apply(reconstruction$lik.anc,
+                                                      1,
+                                                      which.max)])
   names(ML_anc_rec) <- c((Ntip(tr) + 1):(Ntip(tr) + Nnode(tr)))
   tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
   names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
@@ -270,9 +309,16 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
   check_num_between_0_and_1(ML_cutoff)
   # Function -------------------------------------------------------------------
 
-  anc_rec_confidence <- apply(recon$lik.anc, 1, max) # Get the highest confidence value at each node
-  tip_and_node_anc_rec_confidence <- c(rep(1, Ntip(tr)), anc_rec_confidence) # count all tips as high confidence
-  tip_and_node_anc_rec_confidence <- discretize_confidence_using_threshold(tip_and_node_anc_rec_confidence, ML_cutoff) # Count anything lower than threshold as low confidence
+  # Get the highest confidence value at each node
+  anc_rec_confidence <- apply(recon$lik.anc, 1, max)
+
+  # Count all tips as high confidence
+  tip_and_node_anc_rec_confidence <- c(rep(1, Ntip(tr)), anc_rec_confidence)
+
+  # Count anything lower than threshold as low confidence
+  tip_and_node_anc_rec_confidence <-
+    discretize_confidence_using_threshold(tip_and_node_anc_rec_confidence,
+                                          ML_cutoff)
 
   # Return output --------------------------------------------------------------
   return(tip_and_node_anc_rec_confidence)
@@ -306,12 +352,16 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   check_is_string(recon_method)
   check_if_ancestral_reconstruction_method_compatible_with_ape(recon_method)
   if (disc_cont != "discrete") {
-    stop("Only pick recon model for discrete characters. Continuous characters must use BM.")
+    stop("Only pick recon model for discrete. Continuous must use BM.")
   }
   if (num > ncol(mat)) {
     stop("Index must be 1 <= index <= ncol(matrix)")
   }
-  check_dimensions(mat = mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
+  check_dimensions(mat = mat,
+                   exact_rows = Ntip(tr),
+                   min_rows = Ntip(tr),
+                   exact_cols = NULL,
+                   min_cols = 1)
 
   # Function -------------------------------------------------------------------
   # Note, SYMreconstruction removed because SYM == ER for binary inputs.
@@ -326,21 +376,39 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
   # Test ER vs ARD
   set.seed(1)
-  ERreconstruction  <- ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ER")
+  ERreconstruction  <- ace(mat[ , num, drop = TRUE],
+                           tr,
+                           type = disc_cont,
+                           method = recon_method,
+                           marginal = FALSE,
+                           model = "ER")
 
   # Some ARD models don't work well with the data and given a warning message
   # like:  "In sqrt(diag(solve(h))) : NaNs produced".  To ensure the ER model is
   # preferred in this case use the following warning catching:
   error_msg <- "ARD_bad_fit"
   set.seed(1)
-  ARDreconstruction <- tryCatch(ace(mat[ , num, drop = TRUE], tr, type = disc_cont, method = recon_method, marginal = FALSE, model = "ARD"), warning = function(x) {error_msg})
+  ARDreconstruction <- tryCatch(ace(mat[ , num, drop = TRUE],
+                                    tr,
+                                    type = disc_cont,
+                                    method = recon_method,
+                                    marginal = FALSE,
+                                    model = "ARD"),
+                                warning = function(x) {
+    error_msg
+    }
+  )
   # If ARD gave a warning, pick ER
   best_model <- "ER"
   if (length(ARDreconstruction) == 1) {
     best_model <- "ER"
-  } else {# Pick best of ER and ARD
-    p_ER_ARD  <- 1 - pchisq(2*abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
-    if (p_ER_ARD < alpha & AIC(ERreconstruction) > (significant_difference_in_AIC + AIC(ARDreconstruction))) {
+  } else {
+    # Pick best of ER and ARD
+    p_ER_ARD <-
+      1 - pchisq(2 * abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
+    if (p_ER_ARD < alpha &
+        AIC(ERreconstruction) >
+        (significant_difference_in_AIC + AIC(ARDreconstruction))) {
       best_model <- "ARD"
     }
   }
@@ -403,22 +471,38 @@ prepare_ancestral_reconstructions <- function(tr, pheno, geno, disc_cont){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_str_is_discrete_or_continuous(disc_cont)
-  check_dimensions(pheno, exact_rows = Ntip(tr), min_rows = Ntip(tr), min_cols = 1, exact_cols = 1)
-  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = Ntip(tr), min_cols = 1)
+  check_dimensions(pheno,
+                   exact_rows = Ntip(tr),
+                   min_rows = Ntip(tr),
+                   min_cols = 1,
+                   exact_cols = 1)
+  check_dimensions(geno,
+                   exact_rows = Ntip(tr),
+                   min_rows = Ntip(tr),
+                   min_cols = 1)
   check_if_binary_matrix(geno)
 
   # Function -------------------------------------------------------------------
-  pheno_recon_and_conf  <- ancestral_reconstruction_by_ML(tr, pheno, 1, disc_cont)
+  pheno_recon_and_conf <-
+    ancestral_reconstruction_by_ML(tr, pheno, 1, disc_cont)
   geno_recon_and_conf <- geno_trans <- rep(list(0), ncol(geno))
   for (k in 1:ncol(geno)) {
-    geno_recon_and_conf[[k]] <- ancestral_reconstruction_by_ML(tr, geno, k, "discrete")
+    geno_recon_and_conf[[k]] <-
+      ancestral_reconstruction_by_ML(tr, geno, k, "discrete")
   }
   for (k in 1:ncol(geno)) {
-    geno_trans[[k]] <- identify_transition_edges(tr, geno, k, geno_recon_and_conf[[k]]$node_anc_rec, "discrete")
+    geno_trans[[k]] <-
+      identify_transition_edges(tr,
+                                geno,
+                                k,
+                                geno_recon_and_conf[[k]]$node_anc_rec,
+                                "discrete")
   }
 
   # Return output --------------------------------------------------------------
-  results <- list("pheno_recon_and_conf" = pheno_recon_and_conf, "geno_recon_and_conf" = geno_recon_and_conf, "geno_trans" = geno_trans)
+  results <- list("pheno_recon_and_conf" = pheno_recon_and_conf,
+                  "geno_recon_and_conf" = geno_recon_and_conf,
+                  "geno_trans" = geno_trans)
   return(results)
 } # end prepare_ancestral_reconstructions
 
