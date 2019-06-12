@@ -29,7 +29,7 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$fdr, args$annot)
   args$bootstrap_cutoff       <- as.numeric(test_bootstrap)
   args$group_genotype         <- test_group_genotype
-  if (args$group_genotype ){
+  if (args$group_genotype ) {
     args$gene_snp_lookup      <- read_in_tsv_matrix(test_gene_snp_lookup)
   } else {
     args$gene_snp_lookup <- NULL
@@ -64,7 +64,7 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$fdr, args$annot)
   args$bootstrap_cutoff       <- as.numeric(test_bootstrap)
   args$group_genotype         <- test_group_genotype
-  if (args$group_genotype ){
+  if (args$group_genotype ) {
     args$gene_snp_lookup      <- read_in_tsv_matrix(test_gene_snp_lookup)
   } else {
     args$gene_snp_lookup <- NULL

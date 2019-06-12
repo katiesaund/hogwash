@@ -23,7 +23,7 @@ test_that("identify_transition_edges returns correct transition vector and trans
   row.names(temp_geno) <- temp_tree$tip.label
   temp_recon <- temp_results <- rep(list(0), ncol(temp_geno))
   set.seed(1)
-  for (i in 1:2){
+  for (i in 1:2) {
     temp_recon[[i]] <- ancestral_reconstruction_by_ML(temp_tree, temp_geno, i, "discrete")
     temp_results[[i]] <- identify_transition_edges(temp_tree, temp_geno, i, temp_recon[[i]]$node_anc_rec, "discrete")
   }
@@ -56,13 +56,13 @@ test_that("keep_at_least_two_high_conf_trans_edges returns a vector c(TRUE, FALS
   row.names(temp_geno) <- temp_tree$tip.label
   fake_confidence <- temp_recon <- temp_results <- rep(list(0), ncol(temp_geno))
   set.seed(1)
-  for (i in 1:2){
+  for (i in 1:2) {
     temp_recon[[i]] <- ancestral_reconstruction_by_ML(temp_tree, temp_geno, i, "discrete")
     temp_results[[i]] <- identify_transition_edges(temp_tree, temp_geno, i, temp_recon[[i]]$node_anc_rec, "discrete")
     fake_confidence[[i]] <- rep(1, Nedge(temp_tree))
   }
   expect_equivalent(keep_at_least_two_high_conf_trans_edges(temp_results, fake_confidence), c(TRUE, FALSE))
-  for (i in 1:2){
+  for (i in 1:2) {
     fake_confidence[[i]] <- rep(0, Nedge(temp_tree))
   }
   expect_equivalent(keep_at_least_two_high_conf_trans_edges(temp_results, fake_confidence), c(FALSE, FALSE))

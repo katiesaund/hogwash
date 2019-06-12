@@ -16,26 +16,32 @@ check_dimensions <- function(mat, exact_rows = NULL, min_rows, exact_cols = NULL
   # None.
   #
   # Check input ----------------------------------------------------------------
-  if (!is.null(exact_rows)){check_is_number(exact_rows)}
+  if (!is.null(exact_rows)) {
+    check_is_number(exact_rows)
+  }
   check_is_number(min_rows)
-  if (!is.null(exact_cols)){check_is_number(exact_cols)}
+  if (!is.null(exact_cols)) {
+    check_is_number(exact_cols)
+  }
   check_is_number(min_cols)
-  if (class(mat) != "matrix"){stop("input must be a matrix")}
+  if (class(mat) != "matrix") {
+    stop("input must be a matrix")
+  }
 
   # Function -------------------------------------------------------------------
-  if (nrow(mat) < min_rows){
+  if (nrow(mat) < min_rows) {
     stop("matrix has too few rows")
   }
-  if (ncol(mat) < min_cols){
+  if (ncol(mat) < min_cols) {
     stop("matrix has too few columns")
   }
-  if (!(is.null(exact_rows))){
-    if (nrow(mat) != exact_rows){
+  if (!(is.null(exact_rows))) {
+    if (nrow(mat) != exact_rows) {
       stop("matrix has wrong number of rows")
     }
   }
-  if (!(is.null(exact_cols))){
-    if (ncol(mat) != exact_cols){
+  if (!(is.null(exact_cols))) {
+    if (ncol(mat) != exact_cols) {
       stop("matrix has wrong number of columns")
     }
   }
@@ -57,7 +63,7 @@ check_num_between_0_and_1 <- function(num){
   check_is_number(num)
 
   # Function -------------------------------------------------------------------
-  if (num > 1 | num < 0){
+  if (num > 1 | num < 0) {
     stop("Provide a value between 0 and 1.")
   }
 } # end check_num_between_0_and_1()
@@ -76,7 +82,7 @@ check_if_dir_exists <- function(dir){
   check_is_string(dir)
 
   # Function -------------------------------------------------------------------
-  if (!dir.exists(dir)){
+  if (!dir.exists(dir)) {
     stop("The output directory indicated does not exist.")
   }
 } # end check_if_dir_exists()
@@ -97,7 +103,7 @@ check_if_permutation_num_valid <- function(perm){
   check_is_number(perm)
 
   # Function -------------------------------------------------------------------
-  if (perm < 1 ||perm %% 1 != 0){
+  if (perm < 1 ||perm %% 1 != 0) {
     stop("The permutation number should be a positive integer indicating the number of null distributions to create.")
   }
 } # end check_if_permutation_num_valid()
@@ -113,7 +119,7 @@ check_is_string <- function(char){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (!is.character(char)){
+  if (!is.character(char)) {
     stop("Object must be a character string.")
   }
 } # end check_is_string()
@@ -129,7 +135,7 @@ check_if_vector <- function(vector){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (!is.vector(vector)){
+  if (!is.vector(vector)) {
     stop("Input must be a vector")
   }
 } # end check_if_vector()
@@ -145,16 +151,16 @@ check_for_NA_and_inf <- function(mat){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (class(mat) != "matrix"){
+  if (class(mat) != "matrix")
     stop("Input should be a matrix.")
   }
-  if (sum(is.na(mat)) > 0){
+  if (sum(is.na(mat)) > 0) {
     stop("Input matrices should not have any NA values.")
   }
-  if (sum(mat == -Inf) > 0){
+  if (sum(mat == -Inf) > 0) {
     stop("Inpute matrices should not have any -Inf values.")
   }
-  if (sum(mat == Inf) > 0){
+  if (sum(mat == Inf) > 0) {
     stop("Inpute matrices should not have any -Inf values.")
   }
 } # end check_for_NA_and_inf()
@@ -173,28 +179,28 @@ check_for_root_and_bootstrap <- function(tr){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (class(tr) != "phylo"){
+  if (class(tr) != "phylo") {
     stop("Tree must be phylo object")
   }
-  if (!is.rooted(tr)){
+  if (!is.rooted(tr)) {
     stop("Tree must be rooted")
   }
-  if (is.null(tr$node.label)){
+  if (is.null(tr$node.label)) {
     stop("Tree must have bootstrap values in the nodes")
   }
-  if (length(tr$node.label) != Nnode(tr)){
+  if (length(tr$node.label) != Nnode(tr)) {
     stop("Tree must have bootstrap values for each node")
 
   }
-  for (i in 2:length(tr$node.label)){
+  for (i in 2:length(tr$node.label)) {
     check_is_number(tr$node.label[i]) # Node labels must be bootstrap values
-    if (tr$node.label[i] < 0){
+    if (tr$node.label[i] < 0) {
       stop("Tree bootstrap values must be >= 0")
     }
   }
 } # end check_for_root_and_bootstrap()
 
-check_if_binary_vector <- function(vec){
+check_if_binary_vector <- function(vec) {
   # Function description -------------------------------------------------------
   # Check that the matrix only contains values 1 or 0. Useful for checking
   # things for binary phenotypes, confidence, $transition, etc...
@@ -209,14 +215,14 @@ check_if_binary_vector <- function(vec){
   if (sum(!(vec %in% c(0, 1))) > 0){
     stop("Vector should be only 1s and 0s")
   }
-  if (class(vec) != "integer"){
-    if (class(vec) != "numeric"){
+  if (class(vec) != "integer") {
+    if (class(vec) != "numeric") {
       stop("Vector should be only 1s and 0s")
     }
   }
 } # end check_if_binary_vector()
 
-check_if_binary_vector_numeric <- function(vec){
+check_if_binary_vector_numeric <- function(vec) {
   # Function description -------------------------------------------------------
   # Check that the matrix only contains values 1 or 0.
   #
@@ -227,13 +233,13 @@ check_if_binary_vector_numeric <- function(vec){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "numeric"){
+  if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "numeric") {
     stop("Vector should be only 1s and 0s")
   }
 } # end check_if_binary_vector_numeric()
 
 
-check_if_binary_matrix <- function(mat){
+check_if_binary_matrix <- function(mat) {
   # Function description -------------------------------------------------------
   # Check that the matrix only contains values 1 or 0. Useful for binary
   # phenotype matrix or genotype matrix.
@@ -245,18 +251,18 @@ check_if_binary_matrix <- function(mat){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (is.null(dim(mat))){
+  if (is.null(dim(mat))) {
     stop("Must be a matrix")
   }
-  if (sum(!(mat %in% c(0, 1))) > 0 | class(mat) != "matrix"){
+  if (sum(!(mat %in% c(0, 1))) > 0 | class(mat) != "matrix") {
     stop("Genotype matrix should be only 1s and 0s")
   }
-  if (nrow(mat) == 0 | ncol(mat) == 0){
+  if (nrow(mat) == 0 | ncol(mat) == 0) {
     stop("matrix must have columns and rows.")
   }
 } # end check_if_binary_matrix()
 
-check_file_exists <- function(file_name){
+check_file_exists <- function(file_name) {
   # Function description -------------------------------------------------------
   # Check that the file exists.
   #
@@ -267,12 +273,12 @@ check_file_exists <- function(file_name){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (!file.exists(file_name)){
+  if (!file.exists(file_name)) {
     stop("File does not exist")
   }
 } # end check_file_exists()
 
-check_rownames <- function(mat, tr){
+check_rownames <- function(mat, tr) {
   # Function description -------------------------------------------------------
   # Check that phylogenetic tree tip labels are identical to the matrix row.names.
   #
@@ -284,22 +290,22 @@ check_rownames <- function(mat, tr){
   # None.
   #
   # Check input ----------------------------------------------------------------
-  if (class(mat) != "matrix" | class(tr) != "phylo"){
+  if (class(mat) != "matrix" | class(tr) != "phylo") {
     stop("Inputs are incorrectly formatted.")
   }
   check_dimensions(mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
 
   # Function -------------------------------------------------------------------
-  if(is.null(row.names(mat))){
+  if (is.null(row.names(mat))) {
     stop("Matrix must have row.names()")
   }
-  if(is.null(tr$tip.label)){
+  if (is.null(tr$tip.label))  {
     stop("Tree must have tip labels")
   }
-  if (sum(row.names(mat) != tr$tip.label) != 0){
+  if (sum(row.names(mat) != tr$tip.label) != 0) {
     stop("Matrix must be formatted with samples in matrix in the same order as tree$tip.label.")
   }
-  if (sum(row.names(mat) == tr$tip.label) != Ntip(tr)){
+  if (sum(row.names(mat) == tr$tip.label) != Ntip(tr)) {
     stop("Matrix must be formatted with samples in matrix in the same order as tree$tip.label.")
   }
 } # end check_rownames()
@@ -316,23 +322,23 @@ check_is_number <- function(num){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (!is.numeric(num)){
-    if (!is.integer(num)){
-      if (!is.double(num)){
+  if (!is.numeric(num)) {
+    if (!is.integer(num)) {
+      if (!is.double(num)) {
         stop("Must be a number")
       }
     }
   }
-  if (is.data.frame(num)){
+  if (is.data.frame(num)) {
     stop("Number can't be a dataframe")
   }
-  if (is.matrix(num)){
+  if (is.matrix(num)) {
     stop("Number can't be a matrix")
   }
-  if (length(num) != 1){
+  if (length(num) != 1) {
     stop("Must be a single number")
   }
-  if (num == Inf | num == -Inf){
+  if (num == Inf | num == -Inf) {
     stop("This can't handle infinity.")
   }
 } # end check_is_number()
@@ -352,10 +358,10 @@ check_node_is_in_tree <- function(node_val, tr){
   check_for_root_and_bootstrap(tr)
   check_is_number(node_val)
 
-  if (node_val > Nnode(tr) + Ntip(tr)){
+  if (node_val > Nnode(tr) + Ntip(tr)) {
     stop("Node number is too high; not found in tree.")
   }
-  if (node_val < 1 | node_val %% 1 != 0){
+  if (node_val < 1 | node_val %% 1 != 0) {
     stop("Node must be positive integer")
   }
 } # end check_node_is_in_tree()
@@ -374,19 +380,19 @@ check_tree_is_valid <- function(tr){
   # None.
   #
   # Check input & function ----------------------------------------------------#
-  if (class(tr) != 'phylo'){
+  if (class(tr) != 'phylo') {
     stop('Input must be a phylogenetic tree (object with class phylo)')
   }
 
   num_edges_for_node <- table(tr$edge)
 
-  for (i in 1:Ntip(tr)){
-    if (num_edges_for_node[i] != 1){
+  for (i in 1:Ntip(tr)) {
+    if (num_edges_for_node[i] != 1) {
       stop(paste("Tip node", i, "has", num_edges_for_node[i], "edges. Should have 1 edge"))
     }
   }
-  for (i in (Ntip(tr) + 1):(Nnode(tr) + Ntip(tr))){
-    if (num_edges_for_node[i] != 2 && num_edges_for_node[i] != 3){
+  for (i in (Ntip(tr) + 1):(Nnode(tr) + Ntip(tr))) {
+    if (num_edges_for_node[i] != 2 && num_edges_for_node[i] != 3) {
       stop(paste("Internal node", i, "has", num_edges_for_node[i], "edges. Should have 2(root) or 3 edge"))
     }
   }
@@ -406,20 +412,20 @@ check_convergence_possible <- function(vec, discrete_or_continuous){
   # None.
   #
   # Check input & function ----------------------------------------------------#
-  if (discrete_or_continuous != "discrete"){
-    if (discrete_or_continuous != "continuous"){
+  if (discrete_or_continuous != "discrete") {
+    if (discrete_or_continuous != "continuous") {
       stop("discrete_or_continuous must be a string 'discrete' or 'continuous.'")
     }
   }
 
-  if (discrete_or_continuous == "discrete"){
+  if (discrete_or_continuous == "discrete") {
     check_if_binary_vector(vec)
-    if (sum(vec) >= (length(vec)-1) | sum(vec) <= 1){
+    if (sum(vec) >= (length(vec)-1) | sum(vec) <= 1) {
       stop("Convergence is not possible for this phenotype")
     }
 
-  } else if (discrete_or_continuous == "continuous"){
-    if (length(unique(vec)) == 1){
+  } else if (discrete_or_continuous == "continuous") {
+    if (length(unique(vec)) == 1) {
       stop("Convergence is not possible for this phenotype")
     }
   }
@@ -439,7 +445,7 @@ is_tip <- function(node_num, tr){
   # Check input ---------------------------------------------------------------#
   check_tree_is_valid(tr)
   check_is_number(node_num)
-  if (node_num < 1 || node_num %% 1 != 0){
+  if (node_num < 1 || node_num %% 1 != 0) {
     stop("Node number must be a positive integer")
   }
   check_node_is_in_tree(node_num, tr)
@@ -462,17 +468,17 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
   # plot_logical. Logical. TRUE or FALSE.
   #
   # Check input & function -----------------------------------------------------
-  if (sum(class(geno_matrix) != "data.frame", class(geno_matrix) != "matrix") == 2){
+  if (sum(class(geno_matrix) != "data.frame", class(geno_matrix) != "matrix") == 2) {
     # Neither matrix nor dataframe
     plot_logical <- FALSE
   } else {
     # Either a matrix or dataframe
-    if (nrow(geno_matrix) < 1 | ncol(geno_matrix) < 2){
+    if (nrow(geno_matrix) < 1 | ncol(geno_matrix) < 2) {
       # Matrix/dataframe is too small for heatmap to plot
       plot_logical <- FALSE
     } else {
       # Matrix/dataframe is big enough for heatmap to plot
-      if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0) != 0){
+      if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0) != 0) {
         # Matrix/dataframe contains invalid values
         stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
       }
@@ -511,36 +517,12 @@ check_str_is_discrete_or_continuous <- function(input){
   check_is_string(input)
 
   # Function -------------------------------------------------------------------
-  if (input != "discrete"){
-    if (input != "continuous"){
+  if (input != "discrete") {
+    if (input != "continuous") {
       stop("Input must be either 'discrete' or 'continuous'.")
     }
   }
 } # end check_str_is_discrete_or_continuous()
-
-check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
-  # Function description -------------------------------------------------------
-  # Check that the reconstruction method that is being fed to ape::ace() is
-  # one of the four acceptable methods. The four methods are: "ML", "REML",
-  # "pic", and "GLS." For the intial implementation of this package the default
-  # (hard-coded) option is always maximum likelihood ("ML").
-  #
-  # Inputs:
-  # input: String. Either "ML", "REML", "pic", or "GLS."
-  #
-  # Output:
-  # none.
-  #
-  # Check inputs -------------------------------------------------------------
-  check_is_string(input)
-  check_equal(length(input), 1)
-
-  # Function -----------------------------------------------------------------
-  acceptable_methods <- c("ML", "REML", "pic", "GLS")
-  if (!input %in% acceptable_methods){
-    stop("Reconstruction methods for ape::ace must be either: ML, REML, pic, or GLS.")
-  }
-} # end check_if_ancestral_reconstruction_method_compatible_with_ape()
 
 check_equal <- function(first_number, second_number){
   # Function description
@@ -561,9 +543,33 @@ check_equal <- function(first_number, second_number){
   check_is_number(second_number)
 
   # Function -------------------------------------------------------------------
-  if (first_number != second_number){
+  if (first_number != second_number) {
     stop("Inputs are not equal")
   }
 }
+
+check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
+  # Function description -------------------------------------------------------
+  # Check that the reconstruction method that is being fed to ape::ace() is
+  # one of the four acceptable methods. The four methods are: "ML", "REML",
+  # "pic", and "GLS." For the intial implementation of this package the default
+  # (hard-coded) option is always maximum likelihood ("ML").
+  #
+  # Inputs:
+  # input: String. Either "ML", "REML", "pic", or "GLS."
+  #
+  # Output:
+  # none.
+  #
+  # Check inputs -------------------------------------------------------------
+  check_is_string(input)
+  check_equal(length(input), 1)
+
+  # Function -----------------------------------------------------------------
+  acceptable_methods <- c("ML", "REML", "pic", "GLS")
+  if (!input %in% acceptable_methods) {
+    stop("Reconstruction methods for ape::ace must be either: ML, REML, pic, or GLS.")
+  }
+} # end check_if_ancestral_reconstruction_method_compatible_with_ape()
 
 # End of script ----------------------------------------------------------------

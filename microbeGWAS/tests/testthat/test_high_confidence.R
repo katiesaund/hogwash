@@ -19,7 +19,7 @@ test_that("discretize_confidence_using_threshold should give this expected resul
 test_that("report_num_high_confidence_trans_edge returns expected outcome for this test set", {
   fake_geno_names <- letters[1:3]
   fake_trans <- fake_hi_conf_edges <- rep(list(NULL), length(fake_geno_names))
-  for (i in 1:length(fake_geno_names)){
+  for (i in 1:length(fake_geno_names)) {
     fake_trans[[i]]$transition <- c(1,1,1)
     fake_hi_conf_edges[[i]] <- c(1, 0, 1)
   }
@@ -40,7 +40,7 @@ test_that("assign_high_confidence_to_transition_edges_including_parent_info retu
   plot(temp_tree)
   edgelabels()
   temp_trans <- temp_confidence <- expected_result <- rep(list(NULL), num_samples)
-  for (i in 1:num_samples){
+  for (i in 1:num_samples) {
     temp_trans[[i]]$transition <- c(0, 0, 0, 1, 0, 1, 1, 0)
     temp_confidence[[i]] <- c(0, 0, 0, 0, 0, 1, 1, 0)
     expected_result[[i]] <- c(0, 0, 0, 0, 0, 0, 1, 0)
@@ -60,7 +60,7 @@ test_that("assign_high_confidence_to_transition_edges returns the edges that are
   temp_tree <- rtree(num_samples)
   temp_tree$node.label <- rep(100, Nnode(temp_tree))
   temp_trans <- temp_confidence <- expected_result <- rep(list(NULL), num_samples)
-  for (i in 1:num_samples){
+  for (i in 1:num_samples) {
     temp_trans[[i]]$transition <- c(0, 0, 0, 1, 0, 1, 1, 0)
     temp_confidence[[i]] <- c(0, 0, 0, 0, 0, 1, 1, 0)
     expected_result[[i]] <- c(0, 0, 0, 0, 0, 1, 1, 0)
@@ -80,7 +80,7 @@ test_that("prepare_high_confidence_objects returns objects of expected sizes for
   temp_tree <- rtree(num_samples)
   temp_tree$node.label <- rep(100, Nnode(temp_tree))
   temp_trans <- expected_result <- rep(list(NULL), num_samples)
-  for (i in 1:num_samples){
+  for (i in 1:num_samples) {
     temp_trans[[i]]$transition <- c(0, 0, 0, 1, 0, 1, 1, 1,  1,  1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     temp_trans[[i]]$trans_dir  <- c(0, 0, 0, 1, 0, 1, 1, 1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   }
@@ -90,7 +90,7 @@ test_that("prepare_high_confidence_objects returns objects of expected sizes for
   temp_discrete <- "discrete"
   temp_AR <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, temp_geno, temp_discrete)
 
-  for (i in 1:num_samples){
+  for (i in 1:num_samples) {
     temp_AR$geno_recon_and_conf[[i]]$tip_and_node_rec_conf <- rep(1, Ntip(temp_tree) + Nnode(temp_tree))
   }
 
@@ -100,7 +100,7 @@ test_that("prepare_high_confidence_objects returns objects of expected sizes for
   temp_snps_per_gene <- NULL
 
   temp_geno_conf_ordered_by_edges <- temp_geno_recon_ordered_by_edges <- rep(list(0), ncol(temp_geno))
-  for (k in 1:ncol(temp_geno)){
+  for (k in 1:ncol(temp_geno)) {
     temp_geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(temp_AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, temp_tree)
     temp_geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(temp_AR$geno_recon_and_conf[[k]]$tip_and_node_recon,    temp_tree)
   }

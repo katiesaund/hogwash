@@ -52,14 +52,14 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
   both_parent_and_child_are_one <- 2
 
 
-  for (i in 1:Nedge(tr)){
-    if (is_tip(tr$edge[i, older], tr)){
+  for (i in 1:Nedge(tr)) {
+    if (is_tip(tr$edge[i, older], tr)) {
       stop("tree invalid")
     }
     parent_node[i] <- node_recon[tr$edge[i, older] - Ntip(tr)]   # Assign node value
-    if (is_tip(tr$edge[i, younger], tr)){ # child is a tip
+    if (is_tip(tr$edge[i, younger], tr)) { # child is a tip
       child_node[i]  <- mat[ , num][tr$edge[i, younger]]           # Assign tip value
-    } else {  # child is internal nodes
+    } else {# child is internal nodes
       child_node[i]  <- node_recon[tr$edge[i, younger] - Ntip(tr)] # Assign node value
     }
 
@@ -67,13 +67,13 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
     # transition[i] is either 0, 1, or 2 for discrete traits
     # transition[i] is not to be used when the trait is continuous because all, or very nearly all edges are transition edges.
 
-    if (parent_node[i] > child_node[i]){
+    if (parent_node[i] > child_node[i]) {
       transition_direction[i] <- parent_1_child_0
-    } else if (parent_node[i] < child_node[i]){
+    } else if (parent_node[i] < child_node[i]) {
       transition_direction[i] <- parent_0_child_1
     }
 
-    if (disc_cont == "discrete"){
+    if (disc_cont == "discrete") {
       transition[transition == both_parent_and_child_are_one] <- parent_equals_child # If parent_node and child_node had same value (1) then no transition occured.
     } else {
       transition <- NA # transition[i] is not to be used when the trait is continuous because all, or very nearly all edges are transition edges.
@@ -105,18 +105,18 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotyp
   #                                                    == lenght(genotype_confidence)
   #
   # Check inputs ---------------------------------------------------------------
-  if (length(genotype_transition) != length(genotype_confidence)){
+  if (length(genotype_transition) != length(genotype_confidence)) {
     stop("Both transition and confidence should have length corresponding to number of genotypes.")
   }
-  if(!is.vector(genotype_transition[[1]]$transition)){
+  if(!is.vector(genotype_transition[[1]]$transition)) {
     stop("Genotype transition should have a vector called 'transition'.")
   }
   check_if_binary_vector(genotype_confidence[[1]])
 
   # Function -------------------------------------------------------------------
   has_at_least_two_high_confidence_transition_edges <- rep(FALSE, length(genotype_transition))
-  for (p in 1:length(genotype_transition)){
-    if (sum(genotype_transition[[p]]$transition * genotype_confidence[[p]]) > 1){
+  for (p in 1:length(genotype_transition)) {
+    if (sum(genotype_transition[[p]]$transition * genotype_confidence[[p]]) > 1) {
       has_at_least_two_high_confidence_transition_edges[p] <- TRUE
     }
   }
@@ -186,13 +186,13 @@ prepare_genotype_transitions_for_original_discrete_test <- function(geno, genoty
   #
   # Check inputs ---------------------------------------------------------------
   check_if_binary_matrix(geno)
-  if (length(genotype_transition) != ncol(geno)){
+  if (length(genotype_transition) != ncol(geno)) {
     stop("Must have transition information for each genotype")
   }
   check_if_binary_vector(genotype_transition[[1]]$transition)
 
   # Function -------------------------------------------------------------------
-  for (k in 1:ncol(geno)){
+  for (k in 1:ncol(geno)) {
     parent_WT_child_mutant <- 1 # 1 implies parent < child, -1 implies parent > child, 0 implies parent == child
     parent_mutant_child_WT <- -1
     no_transition <- 0

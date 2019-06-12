@@ -842,7 +842,7 @@ test_that("check_node_is_in_tree gives an error when node = 1.5", {
 # test check_tree_is_valid -----------------------------------------------------
 test_that("check_tree_is_valid returns true for randomly generated trees where Ntip is between 2 and 10", {
   # Test
-  for (i in 2:10){
+  for (i in 2:10) {
     expect_error(check_tree_is_valid(rtree(i)), NA)
   }
 })
@@ -850,8 +850,8 @@ test_that("check_tree_is_valid returns true for randomly generated trees where N
 test_that("check_tree_is_invalid throws an error when tree edge index is greater than Nedge(tree)", {
   # Set up
   invalid_tree <- rtree(10)
-  for (j in 1:Nedge(invalid_tree)){
-    if (invalid_tree$edge[j, 2] == 1){
+  for (j in 1:Nedge(invalid_tree)) {
+    if (invalid_tree$edge[j, 2] == 1) {
       invalid_tree$edge[j, 2] <- Nedge(invalid_tree) + 1
       break
     }
