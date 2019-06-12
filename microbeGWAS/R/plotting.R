@@ -380,38 +380,22 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   if (ncol(recon_hit_vals) != 1 | nrow(recon_hit_vals) != length(geno_confidence)) {
     stop("Dimensions of hit p-values dataframe are incorrect.")
   }
-  if (length(p_recon_edges) != Nedge(tr)) {
-    stop("phenotype reconstruction needs to have a value for each tree edge.")
-  }
+  check_equal(length(p_recon_edges), Nedge(tr))
   if (!is.null(snp_in_gene)) {
     if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
       stop("snp_in_gene should be a table of integers")
     }
   }
-  if (length(p_trans_edges) != Nedge(tr)) {
-    stop("Phenotype transition needs to have a value for each tree edge.")
-  }
-  if (length(geno_confidence[[1]]) != Nedge(tr)) {
-    stop("Genotype confidence needs to have a value for each tree edge.")
-  }
-  if (length(g_trans_edges[[1]]) != Nedge(tr)) {
-    stop("Genotype transition needs to have a value for each tree edge.")
-  }
+  check_equal(length(p_trans_edges), Nedge(tr))
+  check_equal(length(geno_confidence[[1]]), Nedge(tr))
+  check_equal(length(g_trans_edges[[1]]), Nedge(tr))
   check_if_binary_vector(geno_confidence[[1]])
   check_if_binary_vector(p_trans_edges)
   check_if_binary_vector(g_trans_edges[[1]])
-  if (length(tr_and_pheno_hi_conf) != Nedge(tr)) {
-    stop("Tree and phenotype confidence needs to have a value for each tree edge.")
-  }
-  if (length(recon_perm_obs_results$permuted_count[[1]]) != num_perm) {
-    stop("There should be a value for each permutation.")
-  }
-  if (class(recon_perm_obs_results$hit_pvals) != "character") {
-    stop("Hit pvals incorrectly formatted")
-  }
-  if (class(recon_perm_obs_results$observed_overlap) != "integer") {
-    stop("Observed overlap should be integers.")
-  }
+  check_equal(length(tr_and_pheno_hi_conf), Nedge(tr))
+  check_equal(length(recon_perm_obs_results$permuted_count[[1]]), num_perm)
+  check_class(recon_perm_obs_results$hit_pvals, "character")
+  check_class(recon_perm_obs_results$observed_overlap, "integer")
 
   # Function -------------------------------------------------------------------
   image_width <- 250

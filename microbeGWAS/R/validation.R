@@ -572,4 +572,25 @@ check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
   }
 } # end check_if_ancestral_reconstruction_method_compatible_with_ape()
 
+check_class <- function(obj, cls){
+  # Function description -------------------------------------------------------
+  # Check that object has expected class.
+  #
+  # Inputs:
+  # obj: Any R object.
+  # cls: Character string. Describes a class type, e.g. "matrix", "list",
+  #      "vector", etc...
+  #
+  # Output:
+  # none.
+  #
+  # Check inputs -------------------------------------------------------------
+  check_is_string(cls)
+
+  # Function -----------------------------------------------------------------
+  if (class(obj) != cls) {
+    stop("Object does not have expected class.")
+  }
+} # end check_class()
+
 # End of script ----------------------------------------------------------------
