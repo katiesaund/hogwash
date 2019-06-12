@@ -38,7 +38,6 @@ test_that("ancestral_reconstruction_by_ML with discrete input produce ancestral 
   expect_identical(ncol(dummy_pheno$recon_edge_mat), expected_columns)
   expect_identical(nrow(dummy_geno$recon_edge_mat), expected_rows)
   expect_identical(ncol(dummy_geno$recon_edge_mat), expected_columns)
-
 })
 
 test_that("ancestral_reconstruction_by_ML with continuous input produce ancestral reconstructions with correct dimensions.", {
@@ -97,6 +96,17 @@ test_that("ancestral_reconstruction_by_ML with discrete input produces ancestral
   expect_equivalent(dummy_geno$recon_edge_mat[ , 2, drop = TRUE], c(0, 0, 0, 0, 0, 1, 1, 1))
 })
 
+
+test_that("ancestral_reconstruction_by_ML with discrete input produce errors given bogus input", {
+  # Set up
+  set.seed(1)
+  temp_tree <- rtree(9, rooted = TRUE)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+
+  # Test
+  expect_error(ancestral_reconstruction_by_ML(temp_tree, "foobar", 1, "discrete"))
+})
+
 # test continuous_ancestral_reconstruction -------------------------------------
 test_that("continuous_ancestral_reconstruction gives no erroes when given valid inputs", {
   # Set up
@@ -138,6 +148,13 @@ test_that("continuous_get_recon_confidence gives a vector of all ones with expec
 
   # Test
   expect_identical(temp_conf, rep(1, length(temp_reconstruction_vector)))
+})
+
+test_that("continuous_get_recon_confidence throws error when not given a numeric vector", {
+  # Test
+  expect_error(continuous_get_recon_confidence(matrix(1, 10, 10)))
+  expect_error(continuous_get_recon_confidence("foobar"))
+  expect_error(continuous_get_recon_confidence(NA))
 })
 
 # test convert_to_edge_mat -----------------------------------------------------
@@ -247,6 +264,22 @@ test_that("discrete_ancestral_reconstruction gives results of expected size", {
   expect_equal(ncol(dummy_pheno$reconstruction$lik.anc), 2)
 })
 
+test_that("discrete_ancestral_reconstruction throws error given bogus inputs", {
+  # Set up
+  set.seed(1)
+  temp_tree <- rtree(9, rooted = TRUE)
+  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  num_col <- 9
+  num_cells <- num_col * Ntip(temp_tree)
+  test_mat <- matrix(rep(c(1, 0), num_cells), nrow = Ntip(temp_tree), ncol = num_col)
+  reconstruction_method <- "ML"
+
+  # Test
+  expect_error(discrete_ancestral_reconstruction(temp_tree, test_mat, 1, "foobar", reconstruction_method))
+  expect_error(discrete_ancestral_reconstruction(temp_tree, "foobar", 2, "discrete", reconstruction_method))
+
+})
+
 
 # test pick_recon_model --------------------------------------------------------
 test_that("pick_recon_model gives an error when it claims to have a discrete phenotype, but continuous phenotype is given", {
@@ -293,6 +326,22 @@ test_that("pick_recon_model gives an error when it is given a continuous phenoty
   # Test
   expect_error(pick_recon_model(test_mat, tree, discrete_or_continuous, index, reconstruction_method))
 })
+
+test_that("pick_recon_model gives an error when it is given a discrete phenotype, but told it's continuous ", {
+  # Set up
+  num_col <- 9
+  tree <- rtree(num_col, rooted = TRUE)
+  tree$node.label <- rep(100, Nnode(tree))
+  num_cells <- num_col * Ntip(tree)
+  test_mat <- matrix(0, nrow = Ntip(tree), ncol = num_col)
+  discrete_or_continuous <- "continuous"
+  index <- 1
+  reconstruction_method <- "ML"
+
+  # Test
+  expect_error(pick_recon_model(test_mat, tree, discrete_or_continuous, index, reconstruction_method))
+})
+
 
 test_that("pick_recon_model gives an error when it is a bad reconstruction method", {
   # Set up

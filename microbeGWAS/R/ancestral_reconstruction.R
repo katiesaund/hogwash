@@ -131,6 +131,7 @@ continuous_get_recon_confidence <- function(recon_vector){
   #
   # Check input ----------------------------------------------------------------
   if(!is.vector(recon_vector)){stop("input must be a vector")}
+  check_is_number(recon_vector[1])
 
   # Function -------------------------------------------------------------------
   tip_and_node_anc_rec_confidence <- rep(1, length(recon_vector))
