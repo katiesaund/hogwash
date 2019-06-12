@@ -93,7 +93,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
   fname <- create_file_name(dir, name, paste("summary_and_sig_hit_results.pdf", sep = "")) # 2019-02-25 removed counter from pdf file name because combining.
   pdf(fname, width = 16, height = 20)
 
-  make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, fdr, "transition")
+  make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, fdr, "continuous")
   cell_width_value <- 1.5
   if (ncol(ordered_by_p_val) < 50) {
     cell_width_value <- 10
@@ -234,12 +234,11 @@ make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
   colnames(neg_log_p_with_num)[1] <- "locus"
   sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[ , 2] > -log(alpha))
   ymax <- max(-log(0.01), neg_log_p_with_num[ , 2, drop = TRUE])
-  #pdf(paste0(outdir, "/phyc_", trans_or_recon, "_", geno_pheno_name, "_manhattan_plot.pdf"))
   with(neg_log_p_with_num,
        plot(x = neg_log_p_with_num[ , 1],
             y = neg_log_p_with_num[ , 2, drop = TRUE],
             type = "p",
-            main = paste(trans_or_recon, "phyC", geno_pheno_name, sep = " "),
+            main = paste(trans_or_recon, geno_pheno_name, sep = " "),
             col = rgb(0, 0, 0, 0.3),
             pch = 19,
             xlab = "Genetic locus",
@@ -399,11 +398,10 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
   # Function -------------------------------------------------------------------
   image_width <- 250
-  pdf(paste0(dir, "/original_discrete_test_",  name, ".pdf"))
+  pdf(paste0(dir, "/phyc_",  name, ".pdf"))
 
-  # reconstruction first
   par(mfrow = c(1,1))
-  make_manhattan_plot(dir, name, recon_hit_vals, fdr, "reconstruction")
+  make_manhattan_plot(dir, name, recon_hit_vals, fdr, "phyc")
 
   g_trans_mat <- matrix(0, nrow = Nedge(tr), ncol = length(g_trans_edges))
 
@@ -422,10 +420,6 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   g_trans_mat <- temp_g_trans_mat[order(temp_g_trans_mat[,1], na.last = FALSE, decreasing = FALSE ), 2:ncol(temp_g_trans_mat), drop = FALSE]
   colnames(g_trans_mat) <- row.names(recon_hit_vals)
 
-  #cell_width_value <- 1.5
-  #if (ncol(g_trans_mat) < 50){
-  #3  cell_width_value <- 10
-#  }
   cell_width_value <- image_width / ncol(g_trans_mat)
 
   significant_loci <- data.frame("locus" = rep("not_sig", ncol(g_trans_mat)), stringsAsFactors = FALSE)
@@ -477,7 +471,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (plotting_logical) {
-    # reconstruction loci summary heat maps
+    # phyc loci summary heat maps
     pheatmap( # Plot the heatmap
       ordered_by_p_val,
       main          = paste0("Edges:\n Genotype transition with phenotype presence/absence"),
@@ -513,7 +507,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
            border = FALSE,
            ylab = "Count",
            xlab = "# edges with genotype transition & phenotype presence",
-           main = paste0("Overlap of genotype transition edge\n& phenotype presence \npval=", round(recon_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = ""))
+           main = paste0("Phyc: Overlap of genotype transition edge\n& phenotype presence \npval=", round(recon_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = ""))
       abline(v = recon_perm_obs_results$observed_overlap[j], col = "red")
 
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1 # should be NA but it won't work correctedly TODO
@@ -536,7 +530,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
         if (!is.null(snp_in_gene)) {
           num_snps <- snp_in_gene[row.names(recon_hit_vals)[j], , drop = FALSE]
           row.names(num_snps) <- "genotype_transition"
-          colnames(num_snps) <- "SNPs_in_gene"
+          colnames(num_snps) <- "# grouped genotypes"
           ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
         } else {
           num_snps <- NULL
@@ -566,8 +560,6 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   dev.off()
 } # end discrete_plot_orig()
 
-
-# TODO update discrete_plot_trans variable names
 discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
                                  trans_hit_vals, trans_perm_obs_results,
                                  tr_and_pheno_hi_conf, geno_confidence,
@@ -611,37 +603,23 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
       stop("snp_in_gene should be a table of integers")
     }
   }
-  if (length(p_trans_edges) != Nedge(tr)) {
-    stop("Phenotype transition needs to have a value for each tree edge.")
-  }
-  if (length(geno_confidence[[1]]) != Nedge(tr)) {
-    stop("Genotype confidence needs to have a value for each tree edge.")
-  }
-  if (length(g_trans_edges[[1]]) != Nedge(tr)) {
-    stop("Genotype transition needs to have a value for each tree edge.")
-  }
+  check_equal(length(p_trans_edges), Nedge(tr))
+  check_equal(length(geno_confidence[[1]]), Nedge(tr))
+  check_equal(length(g_trans_edges[[1]]), Nedge(tr))
   check_if_binary_vector(geno_confidence[[1]])
   check_if_binary_vector(p_trans_edges)
   check_if_binary_vector(g_trans_edges[[1]])
-  if (length(tr_and_pheno_hi_conf) != Nedge(tr)) {
-    stop("Tree and phenotype confidence needs to have a value for each tree edge.")
-  }
-  if (length(trans_perm_obs_results$permuted_count[[1]]) != num_perm) {
-    stop("There should be a value for each permutation.")
-  }
-  if (class(trans_perm_obs_results$hit_pvals) != "character") {
-    stop("Hit pvals incorrectly formatted")
-  }
-  if (class(trans_perm_obs_results$observed_overlap) != "integer") {
-    stop("Observed overlap should be integers.")
-  }
+  check_equal(length(tr_and_pheno_hi_conf), Nedge(tr))
+  check_equal(length(trans_perm_obs_results$permuted_count[[1]]), num_perm)
+  check_class(trans_perm_obs_results$hit_pvals, "character")
+  check_class(trans_perm_obs_results$observed_overlap,"integer")
 
   # Function -------------------------------------------------------------------
   image_width <- 250
-  pdf(paste0(dir, "/transition_discrete_test_",  name, ".pdf"))
+  pdf(paste0(dir, "/synchronous_",  name, ".pdf"))
 
   par(mfrow = c(1,1))
-  make_manhattan_plot(dir, name, trans_hit_vals, fdr, "transition")
+  make_manhattan_plot(dir, name, trans_hit_vals, fdr, "synchronous")
 
   # heatmaps
   g_trans_mat <- matrix(0, nrow = Nedge(tr), ncol = length(g_trans_edges))
@@ -668,7 +646,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
-    colnames(snp_in_gene) <- "SNPs in gene"
+    colnames(snp_in_gene) <- "# grouped genotypes"
     snp_in_gene <- snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), , drop = FALSE]
     column_annot <- cbind(significant_loci, log_p_value, snp_in_gene) # TODO add a test to make sure order doesn't matter here
   } else {
@@ -774,7 +752,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
         if (!is.null(snp_in_gene)) {
           num_snps <- snp_in_gene[row.names(trans_hit_vals)[j], , drop = FALSE]
           row.names(num_snps) <- "genotype_transition"
-          colnames(num_snps) <- "SNPs_in_gene"
+          colnames(num_snps) <- "# grouped genotypes"
           ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
         }
         cell_width_value <- image_width / ncol(g_mat)
