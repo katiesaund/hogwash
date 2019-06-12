@@ -387,6 +387,12 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
+test_that("check_for_root_and_bootstrap gives an error when not given a tree object", {
+  # Test
+  expect_error(check_for_root_and_bootstrap("tree"))
+  expect_error(check_for_root_and_bootstrap(10))
+})
+
 # test check_if_binary_vector --------------------------------------------------
 test_that("check_if_binary_vector gives an error when x is rep(NA, 10)", {
   # Set up
@@ -614,7 +620,7 @@ test_that("check_rownames gives an error when tree$tip.label <- letters[11:20], 
 })
 
 test_that("check_rownames gives an error when Ntip(tree) != nrow(mat)", {
-  # Setup
+  # Set up
   temp_tree <- rtree(10)
   temp_mat  <- matrix(1:8, nrow = 1, ncol = 8)
 
@@ -624,6 +630,58 @@ test_that("check_rownames gives an error when Ntip(tree) != nrow(mat)", {
   # Set up
   temp_tree <- rtree(2)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
+
+  # Test
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
+})
+
+
+test_that("check_rownames gives an error when not given a tree object or not given matrix", {
+  # Set up
+  temp_tree <- rtree(10)
+  fake_tree <- "tree"
+  temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
+  row.names(temp_mat) <- temp_tree$tip.label
+  fake_mat <- as.data.frame(temp_mat)
+
+  # Test
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree), NA)
+  expect_error(check_rownames(mat = temp_mat, tr = fake_tree))
+  expect_error(check_rownames(mat = fake_mat, tr = temp_tree))
+})
+
+test_that("check_rownames gives an error when given a matrix without rownames", {
+  # Set up
+  temp_tree <- rtree(10)
+  temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
+  # Test
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
+
+  # Set up
+  row.names(temp_mat) <- NULL
+
+  # Test
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
+})
+
+test_that("check_rownames gives an error when given a tree without tip.labels", {
+  # Set up
+  temp_tree <- rtree(10)
+  temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
+  temp_tree$tip.label <- NULL
+  # Test
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
+})
+
+
+test_that("check_rownames gives an error when tree$tip.label doesn't perfectly match matrix rownames", {
+  # Set up
+  set.seed(1)
+  temp_tree <- rtree(10)
+  temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
+  row.names(temp_mat) <- temp_tree$tip.label
+  row.names(temp_mat)[1] <- "t6"
+  row.names(temp_mat)[2] <- "t10"
 
   # Test
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
@@ -678,9 +736,17 @@ test_that("check_is_number gives an error when x = matrix(0, 10, 10)", {
   expect_error(check_is_number(temp))
 })
 
-test_that("check_is_number gives an error when x = matrix(0, 1, 1)", {
+test_that("check_is_number gives an error when x = matrix(0, 10, 10)", {
   # Set up
   temp <- matrix(0, 10, 10)
+
+  # Test
+  expect_error(check_is_number(temp))
+})
+
+test_that("check_is_number gives an error when x = data.frame(0, 10, 10)", {
+  # Set up
+  temp <- as.data.frame(matrix(0, 10, 10))
 
   # Test
   expect_error(check_is_number(temp))
@@ -812,6 +878,16 @@ test_that("check_convergence_possible doesn't give an error 'discrete' and value
 
   # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec), NA)
+})
+
+
+test_that("check_convergence_possible throws error given 'foobar' but valid values= c(1,0,1,0,1,0,1,0)", {
+  # Set up
+  disc_cont <- "foobar"
+  temp_vec <- c(1,0,1,0,1,0,1,0)
+
+  # Test
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
 })
 
 test_that("check_convergence_possible gives an error 'continuous' and all values = 0", {
