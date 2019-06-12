@@ -213,9 +213,7 @@ discrete_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_met
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
   check_is_number(num)
-  if (class(mat) != "matrix") {
-    stop("Ancestral reconstruction input must be a matrix")
-  }
+  check_class(mat, "matrix")
   if (disc_cont != "discrete") {
     stop("Discrete ancestral reconstruction only")
   }

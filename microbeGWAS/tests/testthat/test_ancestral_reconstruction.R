@@ -452,7 +452,6 @@ test_that("prepare_ancestral_reconstructions gives expected ancestral results gi
   expect_equal(length(temp_AR$pheno_recon_and_conf$node_anc_rec), Nnode(temp_tree))
   expect_equal(nrow(temp_AR$pheno_recon_and_conf$recon_edge_mat), Nedge(temp_tree))
   expect_equal(ncol(temp_AR$pheno_recon_and_conf$recon_edge_mat), 2)
-
   expect_equal(temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf, rep(1, Ntip(temp_tree) + Nnode(temp_tree)))
   expect_equal(unname(temp_AR$pheno_recon_and_conf$tip_and_node_recon[1:Ntip(temp_tree)]), unname(temp_pheno[ , 1, drop = TRUE]))
 })

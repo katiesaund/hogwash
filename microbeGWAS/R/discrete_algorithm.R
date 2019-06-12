@@ -53,16 +53,10 @@ count_hits_on_edges <- function(genotype_transition_edges, phenotype_reconstruct
   check_is_number(genotype_transition_edges[[1]][1])
   check_is_number(high_confidence_edges[[1]][1])
   check_is_number(phenotype_reconstruction[1])
+  check_equal(length(genotype_transition_edges[[1]]), Nedge(tr))
+  check_equal(length(phenotype_reconstruction), Nedge(tr))
+  check_equal(length(high_confidence_edges[[1]]), Nedge(tr))
 
-  if (length(genotype_transition_edges[[1]]) != Nedge(tr)) {
-    stop("Genotype transition edge vector must have an entry for each tree edge.")
-  }
-  if (length(phenotype_reconstruction) != Nedge(tr)) {
-    stop("Phenotype transition or reconstruction edge vector must have an entry for each tree edge.")
-  }
-  if (length(high_confidence_edges[[1]]) != Nedge(tr)) {
-    stop("Reconstruction confidence and must have an entry for each tree edge.")
-  }
   # Function -------------------------------------------------------------------
   both_present <- sapply(1:length(high_confidence_edges), function(x) {
     sum(phenotype_reconstruction[as.logical(high_confidence_edges[[x]])] + genotype_transition_edges[[x]][as.logical(high_confidence_edges[[x]])] == 2)
@@ -110,28 +104,16 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   # "observed_overlap" = both_present.
   #
   # Check input ----------------------------------------------------------------
-  if (ncol(mat) != length(genotype_transition_edges)) {
-    stop("Genotype transition edges should have a vector for each genotype")
-  }
-  if (length(genotype_transition_edges[[1]]) != Nedge(tr)) {
-    stop("Genotype transition edges should be made of vectors of length == Nedge(tree)")
-  }
-  if (length(phenotype_reconstruction) != Nedge(tr)) {
-    stop("Phenotype reconstruction or transition vector should have length == Nedge(tree)")
-  }
+  check_equal(ncol(mat), length(genotype_transition_edges))
+  check_equal(length(genotype_transition_edges[[1]]), Nedge(tr))
+  check_equal(length(phenotype_reconstruction), Nedge(tr))
   check_if_permutation_num_valid(permutations)
   check_for_root_and_bootstrap(tr)
   check_num_between_0_and_1(fdr)
-  if (ncol(mat) != length(high_confidence_edges)) {
-    stop("Confidence list should have a vector for each genotype.")
-  }
-  if (length(high_confidence_edges[[1]]) != Nedge(tr)) {
-    stop("Confidence list should be made of vectors of length == Nedge(tree)")
-  }
-
+  check_equal(ncol(mat), length(high_confidence_edges))
+  check_equal(length(high_confidence_edges[[1]]), Nedge(tr))
 
   # Function -------------------------------------------------------------------
-
   # Calculate observed values
   # (Convergence of 0 -> 1 on phenotype present edges (variable: both present)
   # versus phenotype absent edges (only_geno_present)).
@@ -141,11 +123,9 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   both_present      <- observed_result$both_present
   only_geno_present <- observed_result$only_geno_present
 
-
   # initialize some values
   num_genotypes                         <- ncol(mat)
   num_edges_with_geno_trans             <- both_present + only_geno_present
-  distribution_of_hits_from_permutation <- rep(0, num_genotypes)
   hit_pvals                             <- rep(NA, num_genotypes)
   num_hi_conf_edges                     <- sapply(high_confidence_edges, function(x) sum(x))
   list_of_all_edges                     <- c(1:Nedge(tr))
@@ -200,40 +180,6 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   return(results)
 } # end discrete_calculate_pvals
 
-
-# 2019-05-15 why the heck are the pvals so weird for discrete?
-# weird_pval <- function(temp_pval, permutations){
-#
-#   pval <- NA
-#   if (temp_pval == 0 | temp_pval == 1){
-#     pval <- 2/(permutations + 1)
-#   } else if (temp_pval > 0.5){
-#     pval <- ((1 - temp_pval)  * 2)
-#   } else if (temp_pval <= 0.5){
-#     pval <- (temp_pval * 2)
-#   }
-#   return(pval)
-# }
-#
-#
-# pval_seq <- seq(from = 0, to  = 1, by = 0.01)
-#
-# weird_value <- rep(NA, length(pval_seq))
-# for (i in 1:length(pval_seq)){
-#   weird_value[i] <- weird_pval(pval_seq[i], 10000)
-# }
-#
-# plot(weird_value, pval_seq, xlab = "output p-value", ylab = "input p-value")
-#
-# pval <- rep(NA, 1000)
-# for (j in 1:1000){
-#   pval[j] <- (j + 1)/(1000 + 1)
-# }
-# plot(pval)
-#
-# plot(weird_value)
-
-
 discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, number_hi_conf_edges, number_edges, high_conf_edges, index){
   # Function description -------------------------------------------------------
   # Perform a permutation of the edges selected to be genotype transition edges.
@@ -261,9 +207,7 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
   check_is_number(number_edges)
   check_is_number(index)
   check_is_number(high_conf_edges[[index]][1])
-  if (number_edges != Nedge(tr)) {
-    stop("num edges is wrong")
-  }
+  check_equal(number_edges, Nedge(tr))
   if (index < 1) {
     stop("loop index must be positive")
   }
@@ -314,12 +258,8 @@ count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, 
   # Check input ----------------------------------------------------------------
   check_is_number(index)
   check_if_binary_matrix(permuted_mat)
-  if (length(pheno_vec) != ncol(permuted_mat)) {
-    stop("input dimension mismatch")
-  }
-  if (length(pheno_vec) != length(as.logical(hi_conf_edge[[index]]))) {
-    stop("phenotype vs confidence dimension mismatch")
-  }
+  check_equal(length(pheno_vec),ncol(permuted_mat))
+  check_equal(length(pheno_vec), length(as.logical(hi_conf_edge[[index]])))
 
   # Function -------------------------------------------------------------------
   result <- sapply(1:nrow(permuted_mat), function(x) {
@@ -348,9 +288,7 @@ count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
   #
   # Check input ----------------------------------------------------------------
   check_if_binary_matrix(permuted_mat)
-  if (length(emp_both_present) != nrow(permuted_mat)) {
-    stop("Input dimension mismatch")
-  }
+  check_equal(length(emp_both_present), nrow(permuted_mat))
 
   # Function -------------------------------------------------------------------
   result <- sapply(1:nrow(permuted_mat), function(x) {
