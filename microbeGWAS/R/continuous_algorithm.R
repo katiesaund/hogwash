@@ -21,17 +21,23 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   #   $pheno_non_trans_delta. Numeric vector. The value of the delta of the phenotype on all non-transition edges.
   #
   # Check input ----------------------------------------------------------------
-  if (length(t_index) < 1 | length(non_t_index) < 1){
+  if (length(t_index) < 1 | length(non_t_index) < 1) {
     stop("Not enough high confidence transition edges to use for KS test.")
   }
-
-  if (!is.vector(t_index)){stop("Transition index must be a vector")}
+  if (!is.vector(t_index)) {
+    stop("Transition index must be a vector")
+  }
   check_is_number(t_index[1])
-  if (max(t_index) > nrow(phenotype_by_edges)){stop("Transition index must represent a tree edge")}
-
-  if (!is.vector(non_t_index)){stop("Non-transition index must be a vector")}
+  if (max(t_index) > nrow(phenotype_by_edges)) {
+    stop("Transition index must represent a tree edge")
+  }
+  if (!is.vector(non_t_index)) {
+    stop("Non-transition index must be a vector")
+  }
   check_is_number(non_t_index[1])
-  if (max(non_t_index) > nrow(phenotype_by_edges)){stop("Non-transition index must represent a tree edge")}
+  if (max(non_t_index) > nrow(phenotype_by_edges)) {
+    stop("Non-transition index must represent a tree edge")
+  }
 
 
   # Function -------------------------------------------------------------------
@@ -41,7 +47,7 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   # withCalligHandlers suppresses the warning message: 'cannot compute exact p-value with ties'
   set.seed(1)
   ks_results <-  withCallingHandlers(ks.test(p_trans_delta, p_non_trans_delta),
-                      warning=function(w) {
+                      warning = function(w) {
                         if (grepl("cannot compute exact p-value with ties", w$message))
                           invokeRestart("muffleWarning")
                       } )
@@ -78,11 +84,11 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
   #                                        not a transition and high confidence.
   #
   # Check input ----------------------------------------------------------------
-  if (length(geno_tran) != length(geno_conf)){
+  if (length(geno_tran) != length(geno_conf)) {
     stop("One genotype should correspond to each entry of geno_tran and geno_conf")
   }
   check_is_number(index)
-  if (index > length(geno_tran) | index < 1){
+  if (index > length(geno_tran) | index < 1) {
     stop("Index is a counter from 1:number of genomes.")
   }
   check_tree_is_valid(tr)
@@ -133,7 +139,7 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   check_if_permutation_num_valid(perm)
   check_if_binary_vector(geno_conf[[1]])
   check_is_number(num_i)
-  if (length(geno_conf[[1]]) != Nedge(tr)){
+  if (length(geno_conf[[1]]) != Nedge(tr)) {
     stop("geno_conf is incorrectly formatted")
   }
 
@@ -150,12 +156,12 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   list_of_all_edges        <- c(1:Nedge(tr))
   hi_conf_edges            <- list_of_all_edges[as.logical(geno_conf[[num_i]])]
   num_hi_conf_edges        <- sum(geno_conf[[num_i]])
-  if (num_hi_conf_edges != length(hi_conf_edges)){
+  if (num_hi_conf_edges != length(hi_conf_edges)) {
     stop("these should be the same")
   }
   permuted_trans_index_mat <- matrix(nrow = perm, ncol = num_trans_edges)
   set.seed(1) # for reproducability of the sample() function
-  for (j in 1:perm){  # create a random sample of the tr
+  for (j in 1:perm) {  # create a random sample of the tr
     permuted_trans_index_mat[j, ] <- sample(1:num_hi_conf_edges,
                                         size = num_trans_edges,
                                         replace = TRUE,
@@ -184,7 +190,7 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
 calculate_empirical_pheno_delta <- function(perm, permuted_trans_mat, hi_conf_edge_nums, pheno_by_edges){
   # Calculate permuted (aka empirical) pheno deltas
   empirical_ks_stat <- rep(NA, perm)
-  for (k in 1:perm){
+  for (k in 1:perm) {
     permuted_trans_index     <- unique(permuted_trans_mat[k, ])
     permuted_non_trans_index <- c(1:length(hi_conf_edge_nums))[!(c(1:length(hi_conf_edge_nums)) %in% unique(permuted_trans_mat[k, ]))]
     empirical_results        <- run_ks_test(permuted_trans_index, permuted_non_trans_index, pheno_by_edges)
@@ -231,13 +237,13 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   check_if_binary_vector(genotype_confidence[[1]])
   check_dimensions(mat = mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
   check_dimensions(mat = pheno_recon_ordered_by_edges, exact_rows = Nedge(tr), min_rows = Nedge(tr), exact_cols = 2, min_cols = 2)
-  if(length(genotype_transition_list[[1]]$transition) != Nedge(tr)){
+  if(length(genotype_transition_list[[1]]$transition) != Nedge(tr)) {
     stop("genotype$transition incorrectly formatted")
   }
-  if(length(genotype_transition_list) != ncol(mat)){
+  if(length(genotype_transition_list) != ncol(mat)) {
     stop("genotype transition doesn't a list for each genotype")
   }
-  if (length(genotype_confidence[[1]]) != Nedge(tr)){
+  if (length(genotype_confidence[[1]]) != Nedge(tr)) {
     stop("genotype_confidence is incorrectly formatted")
   }
 
@@ -247,7 +253,7 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   names(pvals) <- colnames(mat)
   empirical_ks_stat_list <- observed_pheno_trans_delta <- observed_pheno_non_trans_delta <- rep(list(0), num_genotypes)
 
-  for (i in 1:num_genotypes){
+  for (i in 1:num_genotypes) {
     indices <- get_hi_conf_tran_indices(genotype_transition_list, genotype_confidence, i, tr)
 
     # Run KS test to find out if the phenotype change on transition edges is significantly different from phenotype change on non-transition edges

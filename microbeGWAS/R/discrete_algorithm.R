@@ -14,7 +14,7 @@ calculate_permutation_based_p_value <- function(empirical_statistic, observed_st
   # pval = Number. Length = 1. Value between 0 and 1.
   #
   # Check input ----------------------------------------------------------------
-  if (length(empirical_statistic) != num_perm){
+  if (length(empirical_statistic) != num_perm) {
     stop("Number of empirical test statistics should be equal to the number of permutations")
   }
   check_is_number(observed_statistic)
@@ -54,13 +54,13 @@ count_hits_on_edges <- function(genotype_transition_edges, phenotype_reconstruct
   check_is_number(high_confidence_edges[[1]][1])
   check_is_number(phenotype_reconstruction[1])
 
-  if(length(genotype_transition_edges[[1]]) != Nedge(tr)){
+  if (length(genotype_transition_edges[[1]]) != Nedge(tr)) {
     stop("Genotype transition edge vector must have an entry for each tree edge.")
   }
-  if(length(phenotype_reconstruction) != Nedge(tr)){
+  if (length(phenotype_reconstruction) != Nedge(tr)) {
     stop("Phenotype transition or reconstruction edge vector must have an entry for each tree edge.")
   }
-  if(length(high_confidence_edges[[1]]) != Nedge(tr)){
+  if (length(high_confidence_edges[[1]]) != Nedge(tr)) {
     stop("Reconstruction confidence and must have an entry for each tree edge.")
   }
   # Function -------------------------------------------------------------------
@@ -110,22 +110,22 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   # "observed_overlap" = both_present.
   #
   # Check input ----------------------------------------------------------------
-  if (ncol(mat) != length(genotype_transition_edges)){
+  if (ncol(mat) != length(genotype_transition_edges)) {
     stop("Genotype transition edges should have a vector for each genotype")
   }
-  if (length(genotype_transition_edges[[1]]) != Nedge(tr)){
+  if (length(genotype_transition_edges[[1]]) != Nedge(tr)) {
     stop("Genotype transition edges should be made of vectors of length == Nedge(tree)")
   }
-  if (length(phenotype_reconstruction) != Nedge(tr)){
+  if (length(phenotype_reconstruction) != Nedge(tr)) {
     stop("Phenotype reconstruction or transition vector should have length == Nedge(tree)")
   }
   check_if_permutation_num_valid(permutations)
   check_for_root_and_bootstrap(tr)
   check_num_between_0_and_1(fdr)
-  if (ncol(mat) != length(high_confidence_edges)){
+  if (ncol(mat) != length(high_confidence_edges)) {
     stop("Confidence list should have a vector for each genotype.")
   }
-  if (length(high_confidence_edges[[1]]) != Nedge(tr)){
+  if (length(high_confidence_edges[[1]]) != Nedge(tr)) {
     stop("Confidence list should be made of vectors of length == Nedge(tree)")
   }
 
@@ -152,17 +152,17 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   hi_conf_edges                        <- list(rep(0, num_genotypes))
 
   # 1. Subset tr edges to those with high confidence (as determined by phenotype & genotype reconstructions as well as tr bootstrap values).
-  for (i in 1:num_genotypes){
+  for (i in 1:num_genotypes) {
     hi_conf_edges[[i]] <- list_of_all_edges[as.logical(high_confidence_edges[[i]])]
   }
 
   # 2. For each genotype from the genotype_matrix:
   record_of_redistributed_both_present <- rep(list(0), num_genotypes)
-  for (i in 1:num_genotypes){ # looping over each genotype in the genotype_matrix
-    if (num_edges_with_geno_trans[i] > num_hi_conf_edges[i]){
+  for (i in 1:num_genotypes) { # looping over each genotype in the genotype_matrix
+    if (num_edges_with_geno_trans[i] > num_hi_conf_edges[i]) {
       stop("Too many hits on the branches")
     }
-    if((both_present[[i]] + only_geno_present[[i]]) < 2){
+    if((both_present[[i]] + only_geno_present[[i]]) < 2) {
       # If there are 1 or 0 high confidence edges with the genotype present then the p-value should be reported as 1.0;
       # both_present and only_geno_present are made up of only high confidence branches as defined in count_hits_on_edges
       # which isn't quite true but will indicate that we cannot calculate a p-value because we cannot detect any
@@ -261,13 +261,13 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
   check_is_number(number_edges)
   check_is_number(index)
   check_is_number(high_conf_edges[[index]][1])
-  if (number_edges != Nedge(tr)){
+  if (number_edges != Nedge(tr)) {
     stop("num edges is wrong")
   }
-  if (index < 1){
+  if (index < 1) {
     stop("loop index must be positive")
   }
-  if (max(high_conf_edges[[index]]) > Nedge(tr) | number_hi_conf_edges[index] > Nedge(tr) | number_edges_with_geno_trans[index] > Nedge(tr)){
+  if (max(high_conf_edges[[index]]) > Nedge(tr) | number_hi_conf_edges[index] > Nedge(tr) | number_edges_with_geno_trans[index] > Nedge(tr)) {
     stop("max value should be Nedge(tr")
   }
 
@@ -276,7 +276,7 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
   permuted_geno_trans_mat <- matrix(nrow = num_perm, ncol = number_edges_with_geno_trans[index])
   redistributed_hits   <- matrix(0, nrow = num_perm, ncol = number_edges)
   set.seed(1)
-  for(j in 1:num_perm){
+  for (j in 1:num_perm) {
     permuted_geno_trans_mat[j, ] <- sample(1:number_hi_conf_edges[index],
                                            size = number_edges_with_geno_trans[index],
                                            replace = TRUE,
@@ -284,11 +284,11 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
   }
 
   #this if statement deals with situation when number_edges_with_geno_trans = 1; which should never happen now that we prefilter genotypes.
-  if(nrow(permuted_geno_trans_mat) != num_perm){
+  if (nrow(permuted_geno_trans_mat) != num_perm) {
     permuted_geno_trans_mat <- t(permuted_geno_trans_mat)
   }
 
-  for (m in 1:nrow(permuted_geno_trans_mat)){ # or 1:nrow(permuted_geno_trans_mat) is the same as 1:permutations
+  for (m in 1:nrow(permuted_geno_trans_mat)) {# or 1:nrow(permuted_geno_trans_mat) is the same as 1:permutations
     redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
   }
   # Check and return output ----------------------------------------------------
@@ -314,10 +314,10 @@ count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, 
   # Check input ----------------------------------------------------------------
   check_is_number(index)
   check_if_binary_matrix(permuted_mat)
-  if (length(pheno_vec) != ncol(permuted_mat)){
+  if (length(pheno_vec) != ncol(permuted_mat)) {
     stop("input dimension mismatch")
   }
-  if (length(pheno_vec) != length(as.logical(hi_conf_edge[[index]]))){
+  if (length(pheno_vec) != length(as.logical(hi_conf_edge[[index]]))) {
     stop("phenotype vs confidence dimension mismatch")
   }
 
@@ -327,7 +327,7 @@ count_empirical_both_present <- function(permuted_mat, pheno_vec, hi_conf_edge, 
   })
 
   # Check and return output ----------------------------------------------------
-  if (nrow(permuted_mat) != length(result)){
+  if (nrow(permuted_mat) != length(result)) {
     stop("result dimension mismatch")
   }
   return(result)
@@ -348,7 +348,7 @@ count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
   #
   # Check input ----------------------------------------------------------------
   check_if_binary_matrix(permuted_mat)
-  if (length(emp_both_present) != nrow(permuted_mat)){
+  if (length(emp_both_present) != nrow(permuted_mat)) {
     stop("Input dimension mismatch")
   }
 
@@ -357,7 +357,7 @@ count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
     sum(permuted_mat[x, ]) - emp_both_present[x]
   })
   # Check & return output --------------------------------------------------------------
-  if (nrow(permuted_mat) != length(result)){
+  if (nrow(permuted_mat) != length(result)) {
     stop("result dimension mismatch")
   }
 
