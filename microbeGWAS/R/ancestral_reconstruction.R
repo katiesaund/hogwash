@@ -216,7 +216,7 @@ discrete_ancestral_reconstruction <- function(tr, mat, num, disc_cont, recon_met
   if (class(mat) != "matrix") {
     stop("Ancestral reconstruction input must be a matrix")
   }
-  if(disc_cont != "discrete") {
+  if (disc_cont != "discrete") {
     stop("Discrete ancestral reconstruction only")
   }
 

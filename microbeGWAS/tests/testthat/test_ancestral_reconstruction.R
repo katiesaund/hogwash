@@ -1,12 +1,5 @@
 library(microbeGWAS)
-context("Ancestral reconstruction") -------------------------------------------#
-
-
-#discrete_ancestral_reconstruction
-#discrete_get_recon_confidence
-#pick_recon_model
-#prepare_ancestral_reconstructions
-
+context("Ancestral reconstruction") #------------------------------------------#
 
 # test ancestral_reconstruction_by_ML ------------------------------------------
 test_that("ancestral_reconstruction_by_ML with discrete input produce ancestral reconstructions with correct dimensions.", {

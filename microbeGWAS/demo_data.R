@@ -20,7 +20,7 @@ dataset <- 0 # Discrete, FQR, group SNPs into genes
 # dataset <- 4 # Continuous, toxin, STOP SNP
 # dataset <- 5  # Discrete, severity, STOP snp
 
-if (dataset == 0){
+if (dataset == 0) {
   # Discrete, FQR, group SNPs into genes
   test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/fqR_pheno.tsv"
   test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/fqR.tree"
@@ -32,7 +32,7 @@ if (dataset == 0){
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_group_genotype <- TRUE
-} else if (dataset == 1){
+} else if (dataset == 1) {
   # Discrete, FQR, gene test (not grouped from SNPs)
   test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/fqR_pheno.tsv"
   test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/fqR.tree"
@@ -44,7 +44,7 @@ if (dataset == 0){
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_group_genotype <- FALSE
-} else if (dataset == 2){
+} else if (dataset == 2) {
   # Continuous, toxin, group SNPs into genes
   test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/log_toxin_pheno.tsv"
   test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/log_toxin.tree"
@@ -56,7 +56,7 @@ if (dataset == 0){
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_group_genotype <- TRUE
-} else if (dataset == 3){
+} else if (dataset == 3) {
   # Continuous, toxin, gene test (not grouped from SNPs)
   test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/log_toxin_pheno.tsv"
   test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/log_toxin.tree"
@@ -68,7 +68,7 @@ if (dataset == 0){
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv"
   test_group_genotype <- FALSE
-} else if (dataset == 4){
+} else if (dataset == 4) {
   # Continuous, toxin, STOP SNP
   test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/log_toxin_pheno.tsv"
   test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/log_toxin.tree"
@@ -80,7 +80,7 @@ if (dataset == 0){
   test_bootstrap <- "0.7"
   test_gene_snp_lookup <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-01-22_parse_code_snpmat/data/2019-03-05_stop_snp_gene_lookup.tsv" # TODO update this to be null
   test_group_genotype <- FALSE
-} else if (dataset == 5){
+} else if (dataset == 5) {
   # Discrete, severity, STOP snp
   test_pheno <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/severity_pheno.tsv"
   test_tree  <- "/nfs/esnitkin/Project_Cdiff/Analysis/Hanna_paper/2019-03-28_format_data_for_gwas/data/2019-03-28_gwas_formatted_data/severity.tree"
@@ -109,15 +109,15 @@ args$annotation             <- NULL #read_in_tsv_matrix(test_annot)
 args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$fdr, args$annot)
 args$bootstrap_cutoff       <- as.numeric(test_bootstrap)
 args$group_genotype        <- test_group_genotype
-if (args$group_genotype ){
+if (args$group_genotype ) {
   args$gene_snp_lookup        <- read_in_tsv_matrix(test_gene_snp_lookup)
 } else {
   args$gene_snp_lookup <- NULL
 }
 
 
-if (dataset == 5){
+if (dataset == 5) {
   args$genotype <- args$genotype[ , 1:500]
 }
 
-run_phyc(args)
+select_test_type(args)

@@ -19,6 +19,6 @@ library(microbeGWAS)
 # READ IN ARGUMENTS -----------------------------------------------------------#
 args <- commandArgs(trailingOnly = TRUE) # Grab arguments from the PBS script
 args <- read_in_arguments(args)
-run_phyc(args)
+select_test_type(args)
 
 # END OF PHYC -----------------------------------------------------------------#

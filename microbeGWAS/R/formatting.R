@@ -45,7 +45,7 @@ create_test_data <- function(){
 
   # Create genotypes
   genotype_matrix <- matrix(NA, nrow = tips, ncol = 100)
-  for (i in 1:ncol(genotype_matrix)){
+  for (i in 1:ncol(genotype_matrix)) {
     genotype_matrix[ , i] <- rbinom(tips, 1, 0.5)
   }
   row.names(genotype_matrix)  <- tree$tip.label
@@ -90,7 +90,7 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   check_convergence_possible(pheno_vector, disc_cont)
 
   # Check and return output --------------------------------------------------------------
-  if (length(pheno_vector) != Ntip(tr)){
+  if (length(pheno_vector) != Ntip(tr)) {
     stop("Length mismatch")
   }
 

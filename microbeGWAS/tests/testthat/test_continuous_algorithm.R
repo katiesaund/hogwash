@@ -1,5 +1,5 @@
 library(microbeGWAS)
-context("Continuous algorithm") -----------------------------------------------#
+context("Continuous algorithm") #----------------------------------------------#
 
 # test run_ks_test
 test_that("run_ks_test returns a known test statistic for given data.", {
@@ -43,7 +43,7 @@ test_that("calculate_genotype_significance gives expected results given valid in
   temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
-  for (i in 1:num_loci){
+  for (i in 1:num_loci) {
     temp_geno_trans[[i]]$transition <- c(1,0,1,0,1,0,1,0)
     temp_geno_trans[[i]]$trans_dir <- c(1,0,-1,0,1,0,-1,0)
     temp_conf[[i]] <- c(1, 1, 1, 0, 0, 1, 1, 1)
@@ -74,7 +74,7 @@ test_that("calculate_genotype_significance returns a significant p-value when
   temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
-  for (i in 1:num_loci){
+  for (i in 1:num_loci) {
     temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1, 1, 0)
     temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1, 1, 1)
     temp_conf[[i]]                  <- c(1, 1, 1, 1, 1, 1, 1, 1)
@@ -87,11 +87,11 @@ test_that("calculate_genotype_significance returns a significant p-value when
   results <- calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
   alpha <- 0.06
   expect_true(results$pvals[1] < alpha)
-  expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1]- temp_pheno[ , 2])))
-  expect_equal(results$trans_median[[1]], median(abs(temp_pheno[4:7 , 1]- temp_pheno[4:7 , 2])))
+  expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1] - temp_pheno[ , 2])))
+  expect_equal(results$trans_median[[1]], median(abs(temp_pheno[4:7 , 1] - temp_pheno[4:7 , 2])))
   expect_equal(round(results$observed_ks_stat[1], 2), 1)
-  expect_equal(results$observed_pheno_non_trans_delta[[1]], abs(temp_pheno[c(1:3,8), 1]- temp_pheno[c(1:3,8), 2]))
-  expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:7, 1]- temp_pheno[4:7, 2]))
+  expect_equal(results$observed_pheno_non_trans_delta[[1]], abs(temp_pheno[c(1:3,8), 1] - temp_pheno[c(1:3,8), 2]))
+  expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:7, 1] - temp_pheno[4:7, 2]))
   expect_equal(round(results$ks_statistics[[1]][1:5], 3), c(0.40, 0.50, 1.00, 0.25, 0.25))
 })
 
@@ -105,7 +105,7 @@ test_that("calculate_genotype_significance returns a non-significant p-value whe
   temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
-  for (i in 1:num_loci){
+  for (i in 1:num_loci) {
     temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
     temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
     temp_conf[[i]]                  <- c(1, 1, 1, 1, 1, 1)
@@ -118,11 +118,11 @@ test_that("calculate_genotype_significance returns a non-significant p-value whe
   results <- calculate_genotype_significance(temp_geno, temp_perm, temp_geno_trans, temp_tree, temp_pheno, temp_conf, temp_geno_recon)
   alpha <- 0.01
   expect_true(results$pvals[1] > alpha)
-  expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1]- temp_pheno[ , 2])))
-  expect_equal(results$trans_median[[1]], median(abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2])))
+  expect_equal(results$all_edges_median[[1]], median(abs(temp_pheno[ , 1] - temp_pheno[ , 2])))
+  expect_equal(results$trans_median[[1]], median(abs(temp_pheno[4:6 , 1] - temp_pheno[4:6 , 2])))
   expect_equal(round(results$observed_ks_stat[1], 2), 0)
-  expect_equal(results$observed_pheno_non_trans_delta[[1]], abs(temp_pheno[1:3 , 1]- temp_pheno[1:3 , 2]))
-  expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:6 , 1]- temp_pheno[4:6 , 2]))
+  expect_equal(results$observed_pheno_non_trans_delta[[1]], abs(temp_pheno[1:3 , 1] - temp_pheno[1:3 , 2]))
+  expect_equal(round(results$observed_pheno_trans_delta[[1]], 3), abs(temp_pheno[4:6 , 1] - temp_pheno[4:6 , 2]))
 })
 
 test_that("calculate_genotype_significance returns an error when the only
@@ -136,7 +136,7 @@ test_that("calculate_genotype_significance returns an error when the only
   temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
-  for (i in 1:num_loci){
+  for (i in 1:num_loci) {
     temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
     temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
     temp_conf[[i]]                  <- c(0, 0, 0, 1, 1, 1)
@@ -159,7 +159,7 @@ test_that("get_hi_conf_tran_indices returns only high confidence transition edge
   temp_tree <- rtree(num_isolates)
   temp_tree$node.label <- rep(100, Nnode(temp_tree))
   temp_geno_trans <- temp_conf <- rep(list(NULL), num_loci)
-  for (i in 1:num_loci){
+  for (i in 1:num_loci) {
     temp_geno_trans[[i]]$transition <- c(1,0,1,0,1,0,1,0)
     temp_geno_trans[[i]]$trans_dir <- c(1,0,-1,0,1,0,-1,0)
     temp_conf[[i]] <- c(1, 1, 1, 0, 0, 1, 1, 1)
@@ -179,7 +179,7 @@ test_that("continuous_permutation is gives consistent results with this test set
   temp_tree <- rtree(num_isolates)
   temp_tree$node.label <- rep(100, Nnode(temp_tree))
   temp_conf <- rep(list(NULL), num_loci)
-  for (i in 1:num_loci){
+  for (i in 1:num_loci) {
     temp_conf[[i]] <- rep(c(1, 0), Nedge(temp_tree)/2)
   }
   num <- 1

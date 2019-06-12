@@ -237,10 +237,10 @@ calculate_genotype_significance <- function(mat, permutations, genotype_transiti
   check_if_binary_vector(genotype_confidence[[1]])
   check_dimensions(mat = mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
   check_dimensions(mat = pheno_recon_ordered_by_edges, exact_rows = Nedge(tr), min_rows = Nedge(tr), exact_cols = 2, min_cols = 2)
-  if(length(genotype_transition_list[[1]]$transition) != Nedge(tr)) {
+  if (length(genotype_transition_list[[1]]$transition) != Nedge(tr)) {
     stop("genotype$transition incorrectly formatted")
   }
-  if(length(genotype_transition_list) != ncol(mat)) {
+  if (length(genotype_transition_list) != ncol(mat)) {
     stop("genotype transition doesn't a list for each genotype")
   }
   if (length(genotype_confidence[[1]]) != Nedge(tr)) {

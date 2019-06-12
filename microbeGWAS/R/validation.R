@@ -103,7 +103,7 @@ check_if_permutation_num_valid <- function(perm){
   check_is_number(perm)
 
   # Function -------------------------------------------------------------------
-  if (perm < 1 ||perm %% 1 != 0) {
+  if (perm < 1 || perm %% 1 != 0) {
     stop("The permutation number should be a positive integer indicating the number of null distributions to create.")
   }
 } # end check_if_permutation_num_valid()
@@ -151,7 +151,7 @@ check_for_NA_and_inf <- function(mat){
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (class(mat) != "matrix")
+  if (class(mat) != "matrix") {
     stop("Input should be a matrix.")
   }
   if (sum(is.na(mat)) > 0) {
@@ -212,7 +212,7 @@ check_if_binary_vector <- function(vec) {
   # None.
   #
   # Check input & function -----------------------------------------------------
-  if (sum(!(vec %in% c(0, 1))) > 0){
+  if (sum(!(vec %in% c(0, 1))) > 0) {
     stop("Vector should be only 1s and 0s")
   }
   if (class(vec) != "integer") {
@@ -420,7 +420,7 @@ check_convergence_possible <- function(vec, discrete_or_continuous){
 
   if (discrete_or_continuous == "discrete") {
     check_if_binary_vector(vec)
-    if (sum(vec) >= (length(vec)-1) | sum(vec) <= 1) {
+    if (sum(vec) >= (length(vec) - 1) | sum(vec) <= 1) {
       stop("Convergence is not possible for this phenotype")
     }
 

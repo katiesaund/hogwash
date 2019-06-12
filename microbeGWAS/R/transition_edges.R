@@ -108,7 +108,7 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotyp
   if (length(genotype_transition) != length(genotype_confidence)) {
     stop("Both transition and confidence should have length corresponding to number of genotypes.")
   }
-  if(!is.vector(genotype_transition[[1]]$transition)) {
+  if (!is.vector(genotype_transition[[1]]$transition)) {
     stop("Genotype transition should have a vector called 'transition'.")
   }
   check_if_binary_vector(genotype_confidence[[1]])

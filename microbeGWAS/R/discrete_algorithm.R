@@ -162,7 +162,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
     if (num_edges_with_geno_trans[i] > num_hi_conf_edges[i]) {
       stop("Too many hits on the branches")
     }
-    if((both_present[[i]] + only_geno_present[[i]]) < 2) {
+    if ((both_present[[i]] + only_geno_present[[i]]) < 2) {
       # If there are 1 or 0 high confidence edges with the genotype present then the p-value should be reported as 1.0;
       # both_present and only_geno_present are made up of only high confidence branches as defined in count_hits_on_edges
       # which isn't quite true but will indicate that we cannot calculate a p-value because we cannot detect any

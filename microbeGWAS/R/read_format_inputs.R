@@ -186,7 +186,7 @@ new_read_in_arguments <- function(){
                      make_option(c("-g", "--generic_genotype"), type = "character", default = NULL, help = "path to a generic genotype .tsv file",      metavar = "character"),
                      make_option(c("-f", "--generic_filename"), type = "character", default = NULL, help = "name of generic genotype",                  metavar = "character"),
                      make_option(c("-o", "--out"),              type = "character", default = NULL, help = "output directory",                          metavar = "character"))
-  opt_parser <- OptionParser(option_list=inputs)
+  opt_parser <- OptionParser(option_list = inputs)
   opt        <- parse_args(opt_parser)
   if (!is.null(opt$snp)) {
     if (file.exists(opt$snp)) {
