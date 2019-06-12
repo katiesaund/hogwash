@@ -533,6 +533,7 @@ check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
   #
   # Check inputs -------------------------------------------------------------
   check_is_string(input)
+  check_equal(length(input), 1)
 
   # Function -----------------------------------------------------------------
   acceptable_methods <- c("ML", "REML", "pic", "GLS")
