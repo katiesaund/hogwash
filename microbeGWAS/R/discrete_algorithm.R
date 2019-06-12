@@ -14,9 +14,7 @@ calculate_permutation_based_p_value <- function(empirical_statistic, observed_st
   # pval = Number. Length = 1. Value between 0 and 1.
   #
   # Check input ----------------------------------------------------------------
-  if (length(empirical_statistic) != num_perm) {
-    stop("Number of empirical test statistics should be equal to the number of permutations")
-  }
+  check_equal(length(empirical_statistic), num_perm)
   check_is_number(observed_statistic)
   check_is_number(num_perm)
   check_if_permutation_num_valid(num_perm)

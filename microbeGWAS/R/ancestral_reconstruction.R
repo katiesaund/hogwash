@@ -36,9 +36,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
   check_is_number(num)
-  if (class(mat) != "matrix") {
-    stop("Ancestral reconstruction input must be a matrix")
-  }
+  check_class(mat, "matrix")
   check_str_is_discrete_or_continuous(disc_cont)
 
   # Function -------------------------------------------------------------------

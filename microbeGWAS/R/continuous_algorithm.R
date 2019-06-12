@@ -84,16 +84,13 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
   #                                        not a transition and high confidence.
   #
   # Check input ----------------------------------------------------------------
-  if (length(geno_tran) != length(geno_conf)) {
-    stop("One genotype should correspond to each entry of geno_tran and geno_conf")
-  }
+  check_equal(length(geno_tran), length(geno_conf))
   check_is_number(index)
   if (index > length(geno_tran) | index < 1) {
     stop("Index is a counter from 1:number of genomes.")
   }
   check_tree_is_valid(tr)
   check_for_root_and_bootstrap(tr)
-
 
   # Function -------------------------------------------------------------------
   # GRAB THE IDS OF THE TRANSITION EDGES
@@ -139,13 +136,9 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   check_if_permutation_num_valid(perm)
   check_if_binary_vector(geno_conf[[1]])
   check_is_number(num_i)
-  if (length(geno_conf[[1]]) != Nedge(tr)) {
-    stop("geno_conf is incorrectly formatted")
-  }
+  check_equal(length(geno_conf[[1]]), Nedge(tr))
 
   # Function -------------------------------------------------------------------
-
-
   # Note on implementation of this permutation. I've tested this as a for()
   # loop, an apply statement, and using the replicate() function.
   # for() loop was more than 10x faster than the apply statement.
@@ -184,8 +177,6 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   return(list("hi_conf_edges" = hi_conf_edges,
               "permuted_trans_index_mat" = permuted_trans_index_mat))
 }
-
-# genotype, args$perm, geno_trans, args$tree, pheno_recon_edge_mat, high_conf_ordered_by_edges, geno_recon_ordered_by_edges
 
 calculate_empirical_pheno_delta <- function(perm, permuted_trans_mat, hi_conf_edge_nums, pheno_by_edges){
   # Calculate permuted (aka empirical) pheno deltas

@@ -1,5 +1,3 @@
-# TODO: add description of keepers and write unit tests for get_dropped_genotypes
-
 get_dropped_genotypes <- function(geno, keepers){
   # Function description -------------------------------------------------------
   # Given a matrix with both desirable genotypes (keepers) and undesirable

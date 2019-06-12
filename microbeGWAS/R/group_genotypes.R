@@ -37,9 +37,7 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
   check_dimensions(geno, Ntip(tr), 2, NULL, 2)
-  if (length(g_reconstruction_and_confidence) != ncol(geno)) {
-    stop("wrong input")
-  }
+  check_equal(length(g_reconstruction_and_confidence), ncol(geno))
   check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
   check_if_binary_vector_numeric(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)
   check_if_binary_vector_numeric(g_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf)
@@ -152,15 +150,9 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   check_for_root_and_bootstrap(tr)
   check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, exact_cols =  nrow(gene_to_snp_lookup_table), min_cols = 1)
   check_if_binary_matrix(geno)
-  if (length(geno_transition) != ncol(geno)) {
-    stop("Must have a transition vector for each genotype")
-  }
-  if (length(geno_transition[[1]]$transition) != Nedge(tr)) {
-    stop("Must have transition information for each tree edge.")
-  }
-  if (length(geno_transition[[1]]$trans_dir) != Nedge(tr)) {
-    stop("Must have transition direction information for each tree edge.")
-  }
+  check_equal(length(geno_transition), ncol(geno))
+  check_equal(length(geno_transition[[1]]$transition), Nedge(tr))
+  check_equal(length(geno_transition[[1]]$trans_dir), Nedge(tr))
   check_if_binary_vector_numeric(geno_transition[[1]]$transition)
   check_dimensions(gene_to_snp_lookup_table, exact_rows = ncol(geno), min_rows = 1, exact_cols = 2, min_cols = 1)
 
@@ -430,33 +422,15 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_dimensions(geno, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
-  if (length(genotype_reconstruction_and_confidence) != ncol(geno)) {
-    stop("Need a reconstruction/confidence list for each genotype in the matrix.")
-  }
-  if (length(genotype_reconstruction_and_confidence[[1]]$node_anc_rec) != Nnode(tr)) {
-    stop("Node genotype reconstruction must be length of Nnode(tree)")
-  }
-  if (length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_recon) != c(Nnode(tr) + Ntip(tr))) {
-    stop("Tip & Node genotype reconstruction must be length of Nnode(tree) + Ntip(tree)")
-  }
-  if (length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf) != c(Nnode(tr) + Ntip(tr))) {
-    stop("Tip & Node genotype confidence must be length of Nnode(tree) + Ntip(tree)")
-  }
-  if (nrow(genotype_reconstruction_and_confidence[[1]]$recon_edge_mat) != Nedge(tr)) {
-    stop("Genotype reconstruction matrix must have a row for each tree edge.")
-  }
-  if (length(genotype_transition_con) != ncol(geno)) {
-    stop("Genotype transitions for concomitant test should correspond to each genotype")
-  }
-  if (length(genotype_transition_con[[1]]$transition) != Nedge(tr)) {
-    stop("Genotype transitions should correspond to each edge on the tree.")
-  }
-  if (length(genotype_transition_orig) != ncol(geno)) {
-    stop("Genotype transitions for original test should correspond to each genotype")
-  }
-  if (length(genotype_transition_orig[[1]]$transition) != Nedge(tr)) {
-    stop("Genotype transitions should correspond to each edge on the tree.")
-  }
+  check_equal(length(genotype_reconstruction_and_confidence), ncol(geno))
+  check_equal(length(genotype_reconstruction_and_confidence[[1]]$node_anc_rec), Nnode(tr))
+  check_equal(length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_recon), c(Nnode(tr) + Ntip(tr)))
+  check_equal(length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf), c(Nnode(tr) + Ntip(tr)))
+  check_equal(nrow(genotype_reconstruction_and_confidence[[1]]$recon_edge_mat), Nedge(tr))
+  check_equal(length(genotype_transition_con), ncol(geno))
+  check_equal(length(genotype_transition_con[[1]]$transition), Nedge(tr))
+  check_equal(length(genotype_transition_orig), ncol(geno))
+  check_equal(length(genotype_transition_orig[[1]]$transition), Nedge(tr))
   check_dimensions(lookup, exact_rows = ncol(geno), min_rows = ncol(geno), exact_cols = 2, min_cols = 2)
 
   # Function -------------------------------------------------------------------
