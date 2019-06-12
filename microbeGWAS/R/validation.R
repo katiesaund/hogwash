@@ -1,6 +1,10 @@
 # Library of all functions that "check" or "assert" that something is true.
 
-check_dimensions <- function(mat, exact_rows = NULL, min_rows, exact_cols = NULL, min_cols){
+check_dimensions <- function(mat,
+                             exact_rows = NULL,
+                             min_rows,
+                             exact_cols = NULL,
+                             min_cols){
   # Function description -------------------------------------------------------
   # Check that the main input is a matrix and that said matrix is of the
   # specified dimensions.
@@ -104,7 +108,8 @@ check_if_permutation_num_valid <- function(perm){
 
   # Function -------------------------------------------------------------------
   if (perm < 1 || perm %% 1 != 0) {
-    stop("The permutation number should be a positive integer indicating the number of null distributions to create.")
+    stop("The permutation number should be a positive integer indicating the
+         number of null distributions to create.")
   }
 } # end check_if_permutation_num_valid()
 
@@ -293,7 +298,11 @@ check_rownames <- function(mat, tr) {
   if (class(mat) != "matrix" | class(tr) != "phylo") {
     stop("Inputs are incorrectly formatted.")
   }
-  check_dimensions(mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
+  check_dimensions(mat,
+                   exact_rows = Ntip(tr),
+                   min_rows = Ntip(tr),
+                   exact_cols = NULL,
+                   min_cols = 1)
 
   # Function -------------------------------------------------------------------
   if (is.null(row.names(mat))) {
@@ -303,10 +312,12 @@ check_rownames <- function(mat, tr) {
     stop("Tree must have tip labels")
   }
   if (sum(row.names(mat) != tr$tip.label) != 0) {
-    stop("Matrix must be formatted with samples in matrix in the same order as tree$tip.label.")
+    stop("Matrix must be formatted with samples in matrix in the same order as
+         tree$tip.label.")
   }
   if (sum(row.names(mat) == tr$tip.label) != Ntip(tr)) {
-    stop("Matrix must be formatted with samples in matrix in the same order as tree$tip.label.")
+    stop("Matrix must be formatted with samples in matrix in the same order as
+         tree$tip.label.")
   }
 } # end check_rownames()
 
@@ -380,20 +391,22 @@ check_tree_is_valid <- function(tr){
   # None.
   #
   # Check input & function ----------------------------------------------------#
-  if (class(tr) != 'phylo') {
-    stop('Input must be a phylogenetic tree (object with class phylo)')
+  if (class(tr) != "phylo") {
+    stop("Input must be a phylogenetic tree (object with class phylo)")
   }
 
   num_edges_for_node <- table(tr$edge)
 
   for (i in 1:Ntip(tr)) {
     if (num_edges_for_node[i] != 1) {
-      stop(paste("Tip node", i, "has", num_edges_for_node[i], "edges. Should have 1 edge"))
+      stop(paste("Tip node", i, "has", num_edges_for_node[i],
+                 "edges. Should have 1 edge"))
     }
   }
   for (i in (Ntip(tr) + 1):(Nnode(tr) + Ntip(tr))) {
     if (num_edges_for_node[i] != 2 && num_edges_for_node[i] != 3) {
-      stop(paste("Internal node", i, "has", num_edges_for_node[i], "edges. Should have 2(root) or 3 edge"))
+      stop(paste("Internal node", i, "has", num_edges_for_node[i],
+                 "edges. Should have 2(root) or 3 edge"))
     }
   }
 }
@@ -414,7 +427,8 @@ check_convergence_possible <- function(vec, discrete_or_continuous){
   # Check input & function ----------------------------------------------------#
   if (discrete_or_continuous != "discrete") {
     if (discrete_or_continuous != "continuous") {
-      stop("discrete_or_continuous must be a string 'discrete' or 'continuous.'")
+      stop("discrete_or_continuous must be a string 'discrete' or
+           'continuous.'")
     }
   }
 
@@ -468,7 +482,8 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
   # plot_logical. Logical. TRUE or FALSE.
   #
   # Check input & function -----------------------------------------------------
-  if (sum(class(geno_matrix) != "data.frame", class(geno_matrix) != "matrix") == 2) {
+  if (sum(class(geno_matrix) != "data.frame",
+          class(geno_matrix) != "matrix") == 2) {
     # Neither matrix nor dataframe
     plot_logical <- FALSE
   } else {
@@ -478,9 +493,11 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
       plot_logical <- FALSE
     } else {
       # Matrix/dataframe is big enough for heatmap to plot
-      if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0) != 0) {
+      if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0)
+          != 0) {
         # Matrix/dataframe contains invalid values
-        stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA. (For discrete heatmap plot).")
+        stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA.
+             (For discrete heatmap plot).")
       }
       # Matrix/dataframe contains only valid values
       ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
@@ -568,7 +585,8 @@ check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
   # Function -----------------------------------------------------------------
   acceptable_methods <- c("ML", "REML", "pic", "GLS")
   if (!input %in% acceptable_methods) {
-    stop("Reconstruction methods for ape::ace must be either: ML, REML, pic, or GLS.")
+    stop("Reconstruction methods for ape::ace must be either:
+         ML, REML, pic, or GLS.")
   }
 } # end check_if_ancestral_reconstruction_method_compatible_with_ape()
 

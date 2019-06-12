@@ -22,4 +22,3 @@ select_test_type <- function(args){
   }
 
 } # end select_test_type()
-

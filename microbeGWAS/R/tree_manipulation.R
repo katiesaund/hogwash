@@ -51,10 +51,13 @@ identify_short_edges <- function(tr){
 
   # Function -------------------------------------------------------------------
   short_edges <- rep(1, Nedge(tr))
-  while (max(tr$edge.length[as.logical(short_edges)]) >= (0.1 * sum(tr$edge.length[as.logical(short_edges)]))) {
-    short_edges[tr$edge.length == max(tr$edge.length[as.logical(short_edges)])] <- 0
+  while (max(tr$edge.length[as.logical(short_edges)]) >=
+         (0.1 * sum(tr$edge.length[as.logical(short_edges)]))) {
+    short_edges[tr$edge.length ==
+                  max(tr$edge.length[as.logical(short_edges)])] <- 0
     if (sum(short_edges) == 0) {
-      stop("Tree edge lengths are unreasonably long compared to the other edges.")
+      stop("Tree edge lengths are unreasonably long compared to the other
+           edges.")
     }
   }
 
@@ -99,16 +102,17 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
   check_is_number(confidence_threshold)
   check_num_between_0_and_1(confidence_threshold)
   if (max(tr$node.label) > 100 | min(tr$node.label) < 0) {
-    stop("Tree$node.label are expected to be positive numbers between 0 and 100")
+    stop("Tree$node.label are expected to be positive numbers between 0-100")
   }
 
   # Function -------------------------------------------------------------------
   node_confidence <- tr$node.label
 
   if (max(node_confidence) > 1) {
-    node_confidence <- as.numeric(node_confidence)/100
+    node_confidence <- as.numeric(node_confidence) / 100
   }
-  node_confidence <- discretize_confidence_using_threshold(node_confidence, confidence_threshold)
+  node_confidence <-
+    discretize_confidence_using_threshold(node_confidence, confidence_threshold)
   tree_tip_and_node_confidence <- c(rep(1, Ntip(tr)), node_confidence)
 
   # Check and return output ----------------------------------------------------
@@ -143,5 +147,4 @@ reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
 
   # Return output --------------------------------------------------------------
   return(ordered_by_edges)
-} # end reorder_tips_and_nodes_to_edges()
-
+}# end reorder_tips_and_nodes_to_edges()
