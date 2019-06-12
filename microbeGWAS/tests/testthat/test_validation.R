@@ -893,33 +893,58 @@ test_that("is_tip gives an error when given a matrix and a node", {
 
 # test check_if_g_mat_can_be_plotted -------------------------------------------
 test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of 2x2", {
+  # Set up
   temp_mat <- matrix(c(0, 1, 0, 1), nrow = 2, ncol = 2)
+
+  # Test
+  expect_error(check_if_g_mat_can_be_plotted(temp_mat), NA)
+  expect_true(check_if_g_mat_can_be_plotted(temp_mat))
+})
+
+test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of 3x2 including NAs", {
+  # Set up
+  temp_mat <- matrix(c(0, 1, NA, 0, 1, NA), nrow = 3, ncol = 2)
+
+  # Test
+  expect_error(check_if_g_mat_can_be_plotted(temp_mat), NA)
   expect_true(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
 test_that("check_if_g_mat_can_be_plotted returns an error for a non-binary matrix of 2x2", {
+  # Set up
   temp_mat <- matrix(c(0.5, 1.5, 0, 1), nrow = 2, ncol = 2)
-  expect_error(check_if_g_mat_can_be_plotted(temp_mat))
-})
 
-test_that("check_if_g_mat_can_be_plotted doesn't return an error for a binary dataframe of 2x2", {
-  temp_mat <- as.data.frame(matrix(c(0, 1, 0, 1), nrow = 2, ncol = 2))
-  expect_error(check_if_g_mat_can_be_plotted(temp_mat), NA)
+  # Test
+  expect_error(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
 test_that("check_if_g_mat_can_be_plotted returns FALSE for a binary matrix of all zeroes", {
+  # Set up
   temp_mat <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)
+
+  # Test
   expect_false(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
-test_that("check_if_g_mat_can_be_plotted returns an error for a binary matrix of 2x1", {
+test_that("check_if_g_mat_can_be_plotted returns an FALSE for a binary matrix of 2x1", {
+  # Set up
   temp_mat <- matrix(c(0, 1), nrow = 2, ncol = 1)
-  expect_error(check_if_g_mat_can_be_plotted(temp_mat))
+
+  # Test
+  expect_false(check_if_g_mat_can_be_plotted(temp_mat))
+})
+
+test_that("check_if_g_mat_can_be_plotted returns FALSE for non-matrix, non-dataframe inputs", {
+  # Test
+  expect_false(check_if_g_mat_can_be_plotted(c(0, 1, 0, 1)))
+  expect_false(check_if_g_mat_can_be_plotted(NA))
+  expect_false(check_if_g_mat_can_be_plotted(NULL))
+  expect_false(check_if_g_mat_can_be_plotted("temp"))
 })
 
 
 
-# test check_str_is_discrete_or_continuous
+# test check_str_is_discrete_or_continuous -------------------------------------
 test_that("check_str_is_discrete_or_continuous gives no error when given 'discrete'", {
   input <- 'discrete'
   expect_error(check_str_is_discrete_or_continuous(input), NA)
