@@ -105,9 +105,7 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition, genotyp
   #                                                    == lenght(genotype_confidence)
   #
   # Check inputs ---------------------------------------------------------------
-  if (length(genotype_transition) != length(genotype_confidence)) {
-    stop("Both transition and confidence should have length corresponding to number of genotypes.")
-  }
+  check_equal(length(genotype_transition), length(genotype_confidence))
   if (!is.vector(genotype_transition[[1]]$transition)) {
     stop("Genotype transition should have a vector called 'transition'.")
   }
@@ -186,9 +184,7 @@ prepare_genotype_transitions_for_original_discrete_test <- function(geno, genoty
   #
   # Check inputs ---------------------------------------------------------------
   check_if_binary_matrix(geno)
-  if (length(genotype_transition) != ncol(geno)) {
-    stop("Must have transition information for each genotype")
-  }
+  check_equal(length(genotype_transition), ncol(geno))
   check_if_binary_vector(genotype_transition[[1]]$transition)
 
   # Function -------------------------------------------------------------------

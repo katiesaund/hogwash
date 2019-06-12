@@ -90,10 +90,7 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   check_convergence_possible(pheno_vector, disc_cont)
 
   # Check and return output --------------------------------------------------------------
-  if (length(pheno_vector) != Ntip(tr)) {
-    stop("Length mismatch")
-  }
-
+  check_equal(length(pheno_vector), Ntip(tr))
   return(pheno_vector)
 } # end prepare_phenotype
 
