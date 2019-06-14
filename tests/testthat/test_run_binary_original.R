@@ -3,7 +3,7 @@ context("Run binary original") #-----------------------------------------------#
 
 
 test_that("run_binary_original() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
-  test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/temp_results/"
+  test_dir <- "dummy_data/discrete_phenotype_grouped_genotype/temp_results/"
   test_pheno <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/discrete_phenotype.tsv"
   test_tree  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/tree.tree"
   test_geno  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/grouped_genotype.tsv"
