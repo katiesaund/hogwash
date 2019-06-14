@@ -8,7 +8,7 @@ Description: hogwash contains three methods to identify
     genetic loci associated with either binary or 
     continuous phenotypes while controlling for the 
     clonal nature of bacterial populations.  
-License: MIT 
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
