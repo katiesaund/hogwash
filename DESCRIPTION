@@ -1,12 +1,14 @@
-Package: microbeGWAS
+Package: hogwash
 Type: Package
-Title: microbeGWAS: GWAS for Microbial data 
+Title: hogwash: Genome-wide association study for bacteria 
 Version: 0.1.0
-Author: Katie Saund
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Katie Saund <katiephd@umich.edu>
+Maintainer: Katie Saund <katiephd@umich.edu>
+Description: hogwash contains three methods to identify 
+    genetic loci associated with either binary or 
+    continuous phenotypes while controlling for the 
+    clonal nature of bacterial populations.  
+License: MIT 
 Encoding: UTF-8
 LazyData: true
 Imports: 
