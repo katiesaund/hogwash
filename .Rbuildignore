@@ -1,2 +1,9 @@
+^README\.Rmd$ 
+^NEWS\.md$
+^data/*\.R$
+^\.jpg$
+^data/outputs/\.*$
+^\.png$
+^\.pdf$
 ^.*\.Rproj$
 ^\.Rproj\.user$
