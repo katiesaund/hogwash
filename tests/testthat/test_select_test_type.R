@@ -1,4 +1,3 @@
-library(microbeGWAS)
 context("Select test type") #--------------------------------------------------#
 
 # test select_test_type() ------------------------------------------------------

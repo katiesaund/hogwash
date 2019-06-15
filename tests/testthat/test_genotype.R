@@ -1,30 +1,4 @@
-library(microbeGWAS)
 context("Genotype") #----------------------------------------------#
-
-# test get_dropped_genotypes()
-
-
-
-# get_dropped_genotypes <- function(geno, keepers){
-#   # Function description -------------------------------------------------------
-#   # TODO
-#   # Compute ancestral reconstruction from a continuous or discrete input.
-#   #
-#   # Inputs:
-#   # Varname. Var class. Description.
-#   #
-#   # Outputs:
-#   # "anc_rec" = ML_anc_rec. Vector. Description.
-#   #
-#   # Check input ----------------------------------------------------------------
-#
-#   # Function -------------------------------------------------------------------
-#
-#   # Return output --------------------------------------------------------------
-#   dropped_genotype_names <- colnames(geno)[!keepers]
-#   return(dropped_genotype_names)
-# } # end get_dropped_genotypes
-#
 
 # test reduce_redundancy()
 

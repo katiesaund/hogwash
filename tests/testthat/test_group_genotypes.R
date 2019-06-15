@@ -1,4 +1,3 @@
-library(microbeGWAS)
 context("Group genotypes") #---------------------------------------------------#
 
 # test build_gene_trans_from_snp_trans -----------------------------------------

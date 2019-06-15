@@ -1,4 +1,3 @@
-library(microbeGWAS)
 context("Continuous algorithm") #----------------------------------------------#
 
 # test run_ks_test

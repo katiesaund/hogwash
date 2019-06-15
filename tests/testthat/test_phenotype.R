@@ -1,4 +1,3 @@
-library(microbeGWAS)
 context("Phenotype") #----------------------------------------------#
 
 # test assign_pheno_type()

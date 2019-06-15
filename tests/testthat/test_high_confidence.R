@@ -1,4 +1,3 @@
-library(microbeGWAS)
 context("High confidence") #----------------------------------------------#
 # TODO write unit tests for assign_high_confidence_to_transition_edges
 

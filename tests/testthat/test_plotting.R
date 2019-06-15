@@ -1,2 +1,1 @@
-library(microbeGWAS)
 context("Plots") #----------------------------------------------#

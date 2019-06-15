@@ -1,4 +1,3 @@
-library(microbeGWAS)
 context("Discrete algorithm") #------------------------------------------------#
 
 # test calculate_permutation_based_p_value

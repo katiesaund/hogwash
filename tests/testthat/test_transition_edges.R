@@ -1,4 +1,3 @@
-library(microbeGWAS)
 context("Transition edges") #----------------------------------------------#
 # test identify_transition_edges
 

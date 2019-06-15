@@ -1,4 +1,3 @@
-library(microbeGWAS)
 context("Tree manipulation functions") #---------------------------------------#
 
 # TODO test reorder_tips_and_nodes_to_edges() -- see if this function ever gets used before writing unit tests

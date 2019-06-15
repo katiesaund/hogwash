@@ -1,4 +1,2 @@
 library(testthat)
-library(microbeGWAS)
-
-test_check("microbeGWAS")
+test_check("hogwash")
