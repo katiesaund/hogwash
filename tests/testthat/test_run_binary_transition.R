@@ -1,11 +1,11 @@
 context("Run binary transition") #-----------------------------------------------#
 
 test_that("run_binary_transition() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
-  test_dir <- "./data/discrete_phenotype_grouped_genotype/temp_results/"
-  test_pheno <- "./data/discrete_phenotype_grouped_genotype/discrete_phenotype.tsv"
-  test_tree  <- "./data/discrete_phenotype_grouped_genotype/tree.tree"
-  test_geno  <- "./data/discrete_phenotype_grouped_genotype/grouped_genotype.tsv"
-  test_gene_snp_lookup <- "data/discrete_phenotype_grouped_genotype/snp_gene_key.tsv"
+  test_dir <- "./data/outputs/"
+  test_pheno <- "./data/discrete_phenotype.tsv"
+  test_tree  <- "./data/tree.tree"
+  test_geno  <- "./data/grouped_genotype.tsv"
+  test_gene_snp_lookup <- "./data/snp_gene_key.tsv"
   test_annot <- NULL
   test_name  <- "dummy_group_snps_into_genes"
   test_perm  <- "1000"
@@ -36,10 +36,10 @@ test_that("run_binary_transition() doesn't give any errors when given a discrete
 })
 
 test_that("run_binary_transition() doesn't give any errors when given a discrete phenotype and snps (do not group into genes)" ,{
-  test_dir <- "data/discrete_phenotype_grouped_genotype/temp_results/"
-  test_pheno <- "data/discrete_phenotype_grouped_genotype/discrete_phenotype.tsv"
-  test_tree  <- "data/discrete_phenotype_grouped_genotype/tree.tree"
-  test_geno  <- "data/discrete_phenotype_grouped_genotype/grouped_genotype.tsv"
+  test_dir <- "./data/outputs/"
+  test_pheno <- "./data/discrete_phenotype.tsv"
+  test_tree  <- "./data/tree.tree"
+  test_geno  <- "./data/grouped_genotype.tsv"
   test_gene_snp_lookup <- NULL
   test_annot <- NULL
   test_name  <- "dummy_group_snps_into_genes"
