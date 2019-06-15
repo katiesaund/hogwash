@@ -3,10 +3,10 @@ context("Select test type") #--------------------------------------------------#
 # test select_test_type() ------------------------------------------------------
 test_that("select_test_type doesn't throw error when given valid continuous input", {
   # Set up
-  test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_nongrouped_genotype/temp_results/"
-  test_pheno <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/continuous_phenotype_grouped_genotype/continuous_phenotype.tsv"
-  test_tree  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/tree.tree"
-  test_geno  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/grouped_genotype.tsv"
+  test_dir <- "./data/otuputs/"
+  test_pheno <- "./data/continuous_phenotype.tsv"
+  test_tree  <- "./data/tree.tree"
+  test_geno  <- "./data/grouped_genotype.tsv"
   test_gene_snp_lookup <- NULL
   test_annot <- NULL
   test_name  <- "dummy_group_snps_into_genes"
@@ -41,10 +41,10 @@ test_that("select_test_type doesn't throw error when given valid continuous inpu
 
 test_that("select_test_type doesn't throw error given valid discrete input", {
   # Set up
-  test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/temp_results/"
-  test_pheno <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/discrete_phenotype.tsv"
-  test_tree  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/tree.tree"
-  test_geno  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS/dummy_data/discrete_phenotype_grouped_genotype/grouped_genotype.tsv"
+  test_dir <- "./data/outputs/"
+  test_pheno <- "./discrete_phenotype.tsv"
+  test_tree  <- "./tree.tree"
+  test_geno  <- "./grouped_genotype.tsv"
   test_gene_snp_lookup <- NULL
   test_annot <- NULL
   test_name  <- "dummy_group_snps_into_genes"
