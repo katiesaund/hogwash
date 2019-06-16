@@ -325,7 +325,7 @@ test_that("check_for_NA_and_inf doesn't give an error when x is a matrix of zero
 # test check_for_root_and_bootstrap
 test_that("check_for_root_and_bootstrap doesn't give an error when x is rooted tree with node values of 100", {
   # Set up
-  temp_tree <- ape::ape::rtree(20, rooted = TRUE)
+  temp_tree <- ape::rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
 
   # Tree
