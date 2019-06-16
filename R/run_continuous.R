@@ -114,5 +114,5 @@ run_continuous <- function(args){
   results_object$delta_pheno_list <- trans_mat_results$delta_pheno_list
   results_object$hit_pvals <- corrected_pvals_all_transitions$hit_pvals
   results_object$sig_hits <- all_transitions_sig_hits
-  save_results_as_r_object(args$output_dir, args$output_name, results_object, "continuous")
+  save_results_as_r_object(args$output_dir, args$output_name, results_object, "continuous", args$group_genotype)
 } # end run_continuous()

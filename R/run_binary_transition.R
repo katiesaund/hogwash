@@ -109,5 +109,5 @@ run_binary_transition <- function(args){
     hi_conf_concomitant$num_high_confidence_trasition_edges
   results_object$concomitant_dropped_genotypes <-
     hi_conf_concomitant$dropped_genotypes
-  save_results_as_r_object(args$output_dir, args$output_name, results_object, "synchronous")
+  save_results_as_r_object(args$output_dir, args$output_name, results_object, "synchronous", args$group_genotype)
 } # end run_binary_transition()

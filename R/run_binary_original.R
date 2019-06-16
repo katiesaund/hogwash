@@ -75,5 +75,5 @@ run_binary_original <- function(args){
   results_object$original_high_confidence_trasition_edges     <- hi_conf_original$high_confidence_trasition_edges
   results_object$original_num_high_confidence_trasition_edges <- hi_conf_original$num_high_confidence_trasition_edges
   results_object$original_dropped_genotypes                   <- hi_conf_original$dropped_genotypes
-  save_results_as_r_object(args$output_dir, args$output_name, results_object, "convergence")
+  save_results_as_r_object(args$output_dir, args$output_name, results_object, "convergence", args$group_genotype)
 } # end run_binary_original()
