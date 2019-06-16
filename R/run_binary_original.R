@@ -5,6 +5,8 @@ run_binary_original <- function(args){
   results_object <- NULL
   results_object$log <- capture.output(sessionInfo()) # log session info
 
+  args$tree <- format_tree(args$tree)
+
   geno <- prepare_genotype(args$group_genotype, args$genotype, args$tree, args$gene_snp_lookup)
   genotype <- geno$genotype
   results_object$convergence_not_possible_genotypes <- geno$convergence_not_possible_genotypes

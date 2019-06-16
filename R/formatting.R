@@ -1,3 +1,16 @@
+format_tree <- function(tr){
+  if (!is.rooted(tr)) {
+    tr <- phytools::midpoint.root(tr)
+  }
+  for (i in 1:ape::Nnode(tr)) {
+    if (tr$node.label[i] == ""){
+      tr$node.label[i] <- 0
+    }
+  }
+  tr$node.label <- as.numeric(tr$node.label)
+  return(tr)
+}
+
 convert_matrix_to_vector <- function(mat){
   # Function description -------------------------------------------------------
   # Convert a single column matrix into a vector, retain row names as names of vector.

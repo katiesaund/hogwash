@@ -2,6 +2,8 @@ run_continuous <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
   results_object$log <- capture.output(sessionInfo()) # log session info
+  args$tree <- format_tree(args$tree)
+
   geno <- prepare_genotype(args$group_genotype,
                            args$genotype,
                            args$tree,
