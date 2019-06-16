@@ -36,6 +36,85 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   # No output ------------------------------------------------------------------
 } # end plot_continuous_phenotype()
 
+
+histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, index, non_trans_color, trans_color){
+  trans_index     <- c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
+  non_trans_index <- c(1:ape::Nedge(tr))[!geno_transition[[index]]$transition]
+  hi_conf_trans_index     <- trans_index[    as.logical(geno_confidence[[index]][trans_index    ])]
+  hi_conf_non_trans_index <- non_trans_index[as.logical(geno_confidence[[index]][non_trans_index])]
+  #hi_conf_pheno_trans_delta     <- calculate_phenotype_change_on_edge(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
+  #hi_conf_pheno_non_trans_delta <- calculate_phenotype_change_on_edge(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
+  raw_trans_delta     <- calc_raw_diff(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
+  raw_non_trans_delta <- calc_raw_diff(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
+
+  hist(raw_non_trans_delta,
+       main = paste("Raw delta phenotype on only high confidence edges\n # trans edge= ",
+                    length(raw_trans_delta), "\n# non trans edge =",
+                    length(raw_non_trans_delta), sep = ""),
+       breaks = ape::Nedge(tr)/4,
+       col = non_trans_color,
+       border = FALSE,
+       xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)),
+       ylab = "Count",
+       cex = .8,
+       xlab = "Raw delta phenotype")
+
+  hist(raw_trans_delta,
+       breaks = ape::Nedge(tr)/4,
+       col = trans_color,
+       border = trans_color,
+       add = TRUE,
+       xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)))
+}
+
+histogram_abs_high_confidence_delta_pheno_highlight_transition_edges <- function(results_all_trans, tr, index, non_trans_color, trans_color){
+  par(mar = c(4, 4, 4, 4))
+  hist(results_all_trans$observed_pheno_non_trans_delta[[index]],
+       breaks = ape::Nedge(tr)/4,
+       col = non_trans_color,
+       border = FALSE,
+       ylab = "Count",
+       xlab = "|Delta phenotype|",
+       xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[index]], results_all_trans$observed_pheno_non_trans_delta[[index]])),
+       cex = .8,
+       main = paste("|delta phenotype| on only high confidence edges \n # non-trans edges = ",
+                    length(results_all_trans$observed_pheno_non_trans_delta[[index]]),
+                    "\n # trans edges = ", length(results_all_trans$observed_pheno_trans_delta[[index]]), sep = ""))
+
+
+  hist(results_all_trans$observed_pheno_trans_delta[[index]],
+       breaks = ape::Nedge(tr)/4,
+       col = trans_color,
+       border = trans_color,
+       add = TRUE,
+       xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[index]], results_all_trans$observed_pheno_non_trans_delta[[index]])))
+} # end histogram_abs_high_confidence_delta_pheno_highlight_transition_edges()
+
+histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_trans_mat, geno_confidence, tr, index){
+  edge_num <- length(unlist(p_trans_mat))
+  hi_edge_num <- length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
+  title <- paste("|delta phenotype| on all edges \n Light Green: all edges = ", edge_num, "\n Grey: high confidence edges = ", hi_edge_num, sep = "")
+  delta_phenotype_on_all_edges <- as.numeric(unlist(p_trans_mat))
+  hist(delta_phenotype_on_all_edges,
+       breaks = ape::Nedge(tr)/4,
+       col = rgb(0, 0.5, 0, 0.25),
+       border = FALSE,
+       ylab = "Count",
+       xlab = "Delta phenotype",
+       main = title)
+
+  delta_phenotype_on_high_confidence_edges <- as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
+  hist(delta_phenotype_on_high_confidence_edges, # plot phenotype transition only high confidence edges for this genotype
+       breaks = ape::Nedge(tr)/4,
+       col = rgb(0, 0, 0, 0.25),
+       border = FALSE,
+       ylab = "Count",
+       add = TRUE)
+} # end histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno()
+
+
+
+
 #' Plot continuous phenotype results.
 #'
 #' @param disc_cont
