@@ -37,7 +37,7 @@ create_test_data <- function(){
   # Create tree
   set.seed(1)
   tips            <- 50
-  tree            <- rtree(n = tips, rooted = TRUE)
+  tree            <- ape::rtree(n = tips, rooted = TRUE)
   tree$node.label <- rtruncnorm(n = Nnode(tree), sd = 10, mean = 85, a = 0, b = 100) # dummy tree bootstrap values
 
   # Create continous phenotype
@@ -53,8 +53,8 @@ create_test_data <- function(){
 
   # Check and return output ----------------------------------------------------
   check_for_root_and_bootstrap(tree)
-  check_dimensions(phenotype_matrix, Ntip(tree), 2, 1, 1)
-  check_dimensions(genotype_matrix, Ntip(tree), 2, NULL, 1)
+  check_dimensions(phenotype_matrix, ape::Ntip(tree), 2, 1, 1)
+  check_dimensions(genotype_matrix, ape::Ntip(tree), 2, NULL, 1)
   check_if_binary_matrix(genotype_matrix)
   check_rownames(phenotype_matrix, tree)
   check_rownames(genotype_matrix, tree)
@@ -80,7 +80,7 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   #
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
-  check_dimensions(pheno, exact_rows = Ntip(tr), exact_cols = 1, min_rows = 1, min_cols = 1)
+  check_dimensions(pheno, exact_rows = ape::Ntip(tr), exact_cols = 1, min_rows = 1, min_cols = 1)
   check_str_is_discrete_or_continuous(disc_cont)
 
   # Function -------------------------------------------------------------------
@@ -90,7 +90,7 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   check_convergence_possible(pheno_vector, disc_cont)
 
   # Check and return output --------------------------------------------------------------
-  check_equal(length(pheno_vector), Ntip(tr))
+  check_equal(length(pheno_vector), ape::Ntip(tr))
   return(pheno_vector)
 } # end prepare_phenotype
 
