@@ -1,6 +1,10 @@
 # TODO rewrite check_input_format() and read_in_arguments()! They're very outdated.
 # TODO write unit tests for them both.
 # Note: they get called in phyc_run.R in this dir: /nfs/esnitkin/bin_group/pipeline/Github/gwas/microbeGWAS
+
+#' Read in a tsv matrix
+#'
+#' @export
 read_in_tsv_matrix <- function(mat){
   # Function description -------------------------------------------------------
   # Read in the standardized GWAS matrix format: rows correspond to samples, columns correspond to genotypes/phenotypes.

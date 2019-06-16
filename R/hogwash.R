@@ -1,3 +1,7 @@
+#' Main hogwash function
+#'
+#' @export
+
 hogwash <- function(pheno,
                     geno,
                     tree,
@@ -19,7 +23,7 @@ hogwash <- function(pheno,
   args$annot <- NULL
   args$gene_snp_lookup <- group_genotype_key
   group_genotype <- FALSE
-  if (!is.null(group_genotype_key)){
+  if (!is.null(group_genotype_key)) {
     group_genotype <- TRUE
   }
   args$discrete_or_continuous <- check_input_format(args$phenotype, args$tree, args$genotype, args$output_name, args$output_dir, args$perm, args$fdr, args$annot)
