@@ -1,4 +1,3 @@
-libary(ape)
 context("Group genotypes") #---------------------------------------------------#
 
 # test build_gene_trans_from_snp_trans -----------------------------------------
@@ -19,7 +18,7 @@ test_that("build_gene_trans_from_snp_trans does X given Y", {
   colnames(genotype) <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
 
   set.seed(1)
-  continuous_phenotype <- as.matrix(fastBM(temp_tree))
+  continuous_phenotype <- as.matrix(phytools::fastBM(temp_tree))
   row.names(continuous_phenotype) <- temp_tree$tip.label
   colnames(continuous_phenotype) <- "growth"
 
@@ -174,7 +173,7 @@ test_that("group_genotypes does X given Y", {
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   set.seed(1)
-  temp_pheno <- as.matrix(fastBM(temp_tree))
+  temp_pheno <- as.matrix(phytools::fastBM(temp_tree))
   row.names(temp_pheno) <- temp_tree$tip.label
   colnames(temp_pheno) <- "growth"
   temp_continuous <- "continuous"

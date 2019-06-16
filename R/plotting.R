@@ -131,7 +131,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
   if (ncol(ordered_by_p_val) < 50) {
     cell_width_value <- 10
   }
-  pheatmap( # Plot the heatmap
+  pheatmap::pheatmap( # Plot the heatmap
     ordered_by_p_val,
     main          = paste0("Edges:\n hi conf trans vs delta pheno"),
     cluster_cols  = FALSE,
@@ -145,7 +145,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
     show_colnames = TRUE,
     cellwidth = cell_width_value)
 
-  pheatmap( # Plot the heatmap
+  pheatmap::pheatmap( # Plot the heatmap
     sorted_trans_edge_mat,
     main          = paste0("Edges:\n hi conf trans vs delta pheno"),
     cluster_cols  = TRUE,
@@ -184,7 +184,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
            xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])), log(results_all_trans$ks_statistics[[j]])), 0))
       abline(v = log(as.numeric(results_all_trans$observed_ks_stat[j])), col = "red")
 
-      pheatmap(
+      pheatmap::pheatmap(
         sorted_trans_edge_mat[ , j, drop = FALSE],
         main          = paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Tree edges: hi conf trans vs delta pheno"),
         cluster_cols  = FALSE,
@@ -555,7 +555,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (plotting_logical) {
     # phyc loci summary heat maps
-    pheatmap( # Plot the heatmap
+    pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
       main          = paste0("Edges:\n Genotype transition with phenotype presence/absence"),
       cluster_cols  = FALSE,
@@ -621,7 +621,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
         cell_width_value <- image_width / ncol(g_mat)
 
-        pheatmap(
+        pheatmap::pheatmap(
           mat               = g_mat,
           main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type\n Genotype transition edge\n & phenotype present edge"),
           cluster_cols      = FALSE,
@@ -792,7 +792,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
     cell_width_value <- image_width / ncol(ordered_by_p_val)
 
     # Transition loci summary heat maps
-    pheatmap( # Plot the heatmap
+    pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
       main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
       cluster_cols  = FALSE,
@@ -859,7 +859,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
         }
         cell_width_value <- image_width / ncol(g_mat)
 
-        pheatmap(
+        pheatmap::pheatmap(
           g_mat,
           main              = paste0(row.names(trans_hit_vals)[j], "\n Tree edges: genotype & phenotype transitions"),
           cluster_cols      = FALSE,

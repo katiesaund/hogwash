@@ -1,14 +1,14 @@
 format_tree <- function(tr){
   check_class(tr, "phylo")
-  if (is.null(tr$node.label)){
+  if (is.null(tr$node.label)) {
     stop("trees must have support values at the nodes")
   }
 
-  if (!is.rooted(tr)) {
+  if (!ape::is.rooted(tr)) {
     tr <- phytools::midpoint.root(tr)
   }
   for (i in 1:ape::Nnode(tr)) {
-    if (tr$node.label[i] == ""){
+    if (tr$node.label[i] == "") {
       tr$node.label[i] <- 0
     }
   }
@@ -60,10 +60,10 @@ create_test_data <- function(){
   set.seed(1)
   tips            <- 50
   tree            <- ape::rtree(n = tips, rooted = TRUE)
-  tree$node.label <- rtruncnorm(n = Nnode(tree), sd = 10, mean = 85, a = 0, b = 100) # dummy tree bootstrap values
+  tree$node.label <- truncnorm::rtruncnorm(n = ape::Nnode(tree), sd = 10, mean = 85, a = 0, b = 100) # dummy tree bootstrap values
 
   # Create continous phenotype
-  phenotype_matrix <- as.matrix(fastBM(tree))
+  phenotype_matrix <- as.matrix(phytools::fastBM(tree))
 
   # Create genotypes
   genotype_matrix <- matrix(NA, nrow = tips, ncol = 100)

@@ -130,7 +130,7 @@ test_that("continuous_ancestral_reconstruction gives no erroes when given valid 
   expect_identical(unname(dummy_pheno1$tip_and_node_recon[1:ape::Ntip(temp_tree)]), test_pheno_mat_1[ , 1, drop = TRUE])
 
   # node reconstruction should be included in tip and node reconstruction
-  expect_identical(dummy_pheno1$tip_and_node_recon[(ape::Ntip(temp_tree) + 1):(Nape::tip(temp_tree) + ape::Nnode(temp_tree))], dummy_pheno1$ML_anc_rec)
+  expect_identical(dummy_pheno1$tip_and_node_recon[(ape::Ntip(temp_tree) + 1):(ape::Ntip(temp_tree) + ape::Nnode(temp_tree))], dummy_pheno1$ML_anc_rec)
 })
 
 # test continuous_get_recon_confidence -----------------------------------------
@@ -422,7 +422,7 @@ test_that("prepare_ancestral_reconstructions gives expected ancestral results gi
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   set.seed(1)
-  temp_pheno <- as.matrix(fastBM(temp_tree))
+  temp_pheno <- as.matrix(phytools::fastBM(temp_tree))
   row.names(temp_pheno) <- temp_tree$tip.label
   colnames(temp_pheno) <- "growth"
 
@@ -447,7 +447,7 @@ test_that("prepare_ancestral_reconstructions gives expected ancestral results gi
   expect_equal(length(temp_AR$geno_recon_and_conf[[1]]$node_anc_rec), ape::Nnode(temp_tree))
   expect_equal(nrow(temp_AR$geno_recon_and_conf[[1]]$recon_edge_mat), ape::Nedge(temp_tree))
   expect_equal(ncol(temp_AR$geno_recon_and_conf[[1]]$recon_edge_mat), 2)
-  expect_equal(length(temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf), (Nape::tip(temp_tree) + ape::Nnode(temp_tree)))
+  expect_equal(length(temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf), (ape::Ntip(temp_tree) + ape::Nnode(temp_tree)))
   expect_equal(length(temp_AR$pheno_recon_and_conf$tip_and_node_recon), (ape::Ntip(temp_tree) + ape::Nnode(temp_tree)))
   expect_equal(length(temp_AR$pheno_recon_and_conf$node_anc_rec), ape::Nnode(temp_tree))
   expect_equal(nrow(temp_AR$pheno_recon_and_conf$recon_edge_mat), ape::Nedge(temp_tree))

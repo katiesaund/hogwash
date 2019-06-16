@@ -1,7 +1,7 @@
 context("Run continuous") #----------------------------------------------------#
 
 test_that("run_continuous() doesn't give any errors when given a continuous phenotype and snps (do not group into genes)" ,{
-  test_dir <- "../../data/temp_results/"
+  test_dir <- "../../data/outputs/"
   test_pheno <- "../../data/continuous_phenotype.tsv"
   test_tree  <- "../../data/tree.tree"
   test_geno  <- "../../data/grouped_genotype.tsv"
@@ -36,7 +36,7 @@ test_that("run_continuous() doesn't give any errors when given a continuous phen
 })
 
 test_that("run_continuous() doesn't give any errors when given a continuous phenotype and snps are grouped into genes" ,{
-  test_dir <- "../../data/temp_results/"
+  test_dir <- "../../data/outputs/"
   test_pheno <- "../../data/continuous_phenotype.tsv"
   test_tree  <- "../../data/tree.tree"
   test_geno  <- "../../data/grouped_genotype.tsv"
