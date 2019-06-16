@@ -1,4 +1,9 @@
 format_tree <- function(tr){
+  check_class(tr, "phylo")
+  if (is.null(tr$node.label)){
+    stop("trees must have support values at the nodes")
+  }
+
   if (!is.rooted(tr)) {
     tr <- phytools::midpoint.root(tr)
   }
@@ -8,6 +13,10 @@ format_tree <- function(tr){
     }
   }
   tr$node.label <- as.numeric(tr$node.label)
+
+  check_for_root_and_bootstrap(tr)
+  check_tree_is_valid(tr)
+
   return(tr)
 }
 

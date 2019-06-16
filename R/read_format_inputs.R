@@ -157,8 +157,6 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr, annot){
   check_rownames(pheno, tr) # Phenotype rownames should be in the same order as the tr$tip.label
   check_for_NA_and_inf(geno)
   check_for_NA_and_inf(pheno)
-  check_for_root_and_bootstrap(tr)
-  check_tree_is_valid(tr)
   check_if_binary_matrix(geno)
   check_is_string(name)
   check_if_dir_exists(dir)
