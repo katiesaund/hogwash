@@ -210,6 +210,9 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
   if (ncol(ordered_by_p_val) < 50) {
     cell_width_value <- 10
   }
+
+  colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
+
   pheatmap::pheatmap( # Plot the heatmap
     ordered_by_p_val,
     main          = paste0("Edges:\n hi conf trans vs delta pheno"),
@@ -222,7 +225,10 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
     annotation_row = p_trans_mat,
     annotation_colors = ann_colors,
     show_colnames = TRUE,
+    fontsize = 8,
     cellwidth = cell_width_value)
+
+  colnames(sorted_trans_edge_mat) <- substr(colnames(sorted_trans_edge_mat), 1, 20)
 
   pheatmap::pheatmap( # Plot the heatmap
     sorted_trans_edge_mat,
@@ -235,6 +241,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
     annotation_row = p_trans_mat,
     annotation_colors = ann_colors,
     show_colnames = TRUE,
+    fontsize = 8,
     cellwidth = cell_width_value,
     na_col = "grey")
 
@@ -263,6 +270,8 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
            xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])), log(results_all_trans$ks_statistics[[j]])), 0))
       abline(v = log(as.numeric(results_all_trans$observed_ks_stat[j])), col = "red")
 
+      colnames(sorted_trans_edge_mat) <- substr(colnames(sorted_trans_edge_mat), 1, 20)
+
       pheatmap::pheatmap(
         sorted_trans_edge_mat[ , j, drop = FALSE],
         main          = paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Tree edges: hi conf trans vs delta pheno"),
@@ -273,6 +282,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
         color = c("white", "black"),
         annotation_row = p_trans_mat,
         show_colnames = TRUE,
+        fontsize = 8,
         cellwidth = 20)
     }
   }
@@ -634,6 +644,9 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (plotting_logical) {
     # phyc loci summary heat maps
+    colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
+
+
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
       main          = paste0("Edges:\n Genotype transition with phenotype presence/absence"),
@@ -646,6 +659,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
       annotation_row = phenotype_annotation,
       annotation_colors = ann_colors,
       show_colnames = TRUE,
+      fontsize = 8,
       cellwidth = cell_width_value)
   }
 
@@ -700,6 +714,9 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
         cell_width_value <- image_width / ncol(g_mat)
 
+        colnames(g_mat) <- substr(colnames(g_mat), 1, 20)
+
+
         pheatmap::pheatmap(
           mat               = g_mat,
           main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type\n Genotype transition edge\n & phenotype present edge"),
@@ -714,6 +731,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
           annotation_colors = ann_colors,
           show_colnames     = TRUE,
           legend            = TRUE,
+          fontsize = 8,
           cellwidth         = cell_width_value)
       }
     }
@@ -869,6 +887,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {
     cell_width_value <- image_width / ncol(ordered_by_p_val)
+    colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
 
     # Transition loci summary heat maps
     pheatmap::pheatmap( # Plot the heatmap
@@ -882,6 +901,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
       annotation_col = column_annot_ordered_by_p_val,
       annotation_row = phenotype_annotation,
       annotation_colors = ann_colors,
+      fontsize = 8,
       show_colnames = TRUE,
       cellwidth = cell_width_value)
   }
@@ -938,6 +958,8 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
         }
         cell_width_value <- image_width / ncol(g_mat)
 
+        colnames(g_mat) <- substr(colnames(g_mat), 1, 20)
+
         pheatmap::pheatmap(
           g_mat,
           main              = paste0(row.names(trans_hit_vals)[j], "\n Tree edges: genotype & phenotype transitions"),
@@ -952,6 +974,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
           annotation_legend = TRUE,
           show_colnames     = TRUE,
           legend            = FALSE,
+          fontsize = 8,
           cellwidth         = cell_width_value)
       }
     }
