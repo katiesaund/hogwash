@@ -1,10 +1,10 @@
 context("Run continuous") #----------------------------------------------------#
 
 test_that("run_continuous() doesn't give any errors when given a continuous phenotype and snps (do not group into genes)" ,{
-  test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/temp_results/"
-  test_pheno <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/continuous_phenotype.tsv"
-  test_tree  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/tree.tree"
-  test_geno  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/grouped_genotype.tsv"
+  test_dir <- "../../data/temp_results/"
+  test_pheno <- "../../data/continuous_phenotype.tsv"
+  test_tree  <- "../../data/tree.tree"
+  test_geno  <- "../../data/grouped_genotype.tsv"
   test_gene_snp_lookup <- NULL
   test_annot <- NULL
   test_name  <- "dummy_group_snps_into_genes"
@@ -36,11 +36,11 @@ test_that("run_continuous() doesn't give any errors when given a continuous phen
 })
 
 test_that("run_continuous() doesn't give any errors when given a continuous phenotype and snps are grouped into genes" ,{
-  test_dir <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/temp_results/"
-  test_pheno <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/continuous_phenotype.tsv"
-  test_tree  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/tree.tree"
-  test_geno  <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/grouped_genotype.tsv"
-  test_gene_snp_lookup <- "/nfs/esnitkin/bin_group/pipeline/Github/gwas/hogwash/data/snp_gene_key.tsv"
+  test_dir <- "../../data/temp_results/"
+  test_pheno <- "../../data/continuous_phenotype.tsv"
+  test_tree  <- "../../data/tree.tree"
+  test_geno  <- "../../data/grouped_genotype.tsv"
+  test_gene_snp_lookup <- "../../data/snp_gene_key.tsv"
   test_annot <- NULL
   test_name  <- "dummy_group_snps_into_genes"
   test_perm  <- "1000"
