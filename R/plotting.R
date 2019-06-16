@@ -1,3 +1,12 @@
+#' Plot the continuous phenotype on tree with the phenotype coloring the branches.
+#'
+#' @param tr
+#' @param pheno_vector
+#' @param pheno_anc_rec
+#'
+#' @return
+#'
+#' @examples
 plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   # Function description -------------------------------------------------------
   # TODO
@@ -27,6 +36,30 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   # No output ------------------------------------------------------------------
 } # end plot_continuous_phenotype()
 
+#' Plot continuous phenotype results.
+#'
+#' @param disc_cont
+#' @param tr
+#' @param fdr
+#' @param dir
+#' @param name
+#' @param pval_all_transition
+#' @param pheno_vector
+#' @param annot
+#' @param perm
+#' @param results_all_trans
+#' @param pheno_anc_rec
+#' @param geno_reconstruction
+#' @param geno_confidence
+#' @param geno_transition
+#' @param geno
+#' @param pheno_recon_ordered_by_edges
+#' @param tr_and_pheno_hi_conf
+#' @param all_trans_sig_hits
+#'
+#' @return
+#'
+#' @examples
 plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf, all_trans_sig_hits){
   # Function description -------------------------------------------------------
   # Plot continuous phenotype results.
@@ -212,15 +245,23 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
   return(results)
 } # end plot_significant_hits()
 
+#' Create a manhattan plot of GWAS hit p-values.
+#'
+#' @param outdir
+#' @param geno_pheno_name
+#' @param pval_hits
+#' @param alpha
+#' @param trans_or_recon
+#'
+#' @return
+#' @export
+#'
+#' @examples
 make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans_or_recon){
   # Function description -------------------------------------------------------
-  # Create a file name and save results to that file name.
-  #
+  # Create a manhattan plot of GWAS hit p-values.
+  # TODO
   # Inputs:
-  # hits.        Vector. Pvals.
-  # output_dir.  Character.
-  # output_name. Character.
-  # pval_name.   Character.
   #
   # Output:
   # None
@@ -252,10 +293,24 @@ make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
   #dev.off()
 } #end make_manhattan_plot()
 
+#' Plot a phylogenetic tree with certain edges highlighted.
+#'
+#' @param tr
+#' @param edges_to_highlight
+#' @param geno_confidence
+#' @param edge_color_na
+#' @param edge_color_bright
+#' @param title
+#' @param annot
+#' @param trans_or_recon
+#' @param index
+#'
+#' @return
+#'
+#' @examples
 plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence, edge_color_na, edge_color_bright, title, annot, trans_or_recon, index){
   # Function description -------------------------------------------------------
-  # TODO
-  # Compute ancestral reconstruction from a continuous or discrete input.
+  # Plot a phylogenetic tree with certain edges highlighted.
   #
   # Inputs:
   # Varname. Var class. Description.
@@ -299,10 +354,17 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
   }
 } # end plot_tree_with_colored_edges()
 
+#' Create object to annotate columns in the significant hit results.
+#'
+#' @param geno_matrix
+#'
+#' @return
+#' @export
+#'
+#' @examples
 make_ann_colors <- function(geno_matrix){
   # Function description -------------------------------------------------------
-  # TODO
-  # Compute ancestral reconstruction from a continuous or discrete input.
+  # Create object to annotate columns in the significant hit results.
   #
   # Inputs:
   # Varname. Var class. Description.
@@ -339,6 +401,27 @@ make_ann_colors <- function(geno_matrix){
   return(ann_colors)
 }
 
+#' Plot convergence test results.
+#'
+#' @param tr
+#' @param dir
+#' @param name
+#' @param fdr
+#' @param annot
+#' @param num_perm
+#' @param recon_hit_vals
+#' @param p_recon_edges
+#' @param recon_perm_obs_results
+#' @param tr_and_pheno_hi_conf
+#' @param geno_confidence
+#' @param g_trans_edges
+#' @param p_trans_edges
+#' @param snp_in_gene
+#'
+#' @return
+#' @export
+#'
+#' @examples
 discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                                 recon_hit_vals, p_recon_edges,
                                 recon_perm_obs_results, tr_and_pheno_hi_conf,
@@ -560,6 +643,25 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   dev.off()
 } # end discrete_plot_orig()
 
+#' Plot the synchronous test results.
+#'
+#' @param tr
+#' @param dir
+#' @param name
+#' @param fdr
+#' @param annot
+#' @param num_perm
+#' @param trans_hit_vals
+#' @param trans_perm_obs_results
+#' @param tr_and_pheno_hi_conf
+#' @param geno_confidence
+#' @param g_trans_edges
+#' @param p_trans_edges
+#' @param snp_in_gene
+#'
+#' @return
+#'
+#' @examples
 discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
                                  trans_hit_vals, trans_perm_obs_results,
                                  tr_and_pheno_hi_conf, geno_confidence,
@@ -776,5 +878,5 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
     }
   }
   dev.off()
-}
+} # end discrete_plot_trans()
 # End of script ----------------------------------------------------------------

@@ -1,5 +1,12 @@
 # TODO: go through script line by and line and write unit tests for any untested functions.
 # TODO clean up script flow to make process more clear. Replace if / else with functions? How else to improve it?
+#' Run discrete convergence test based on PhyC algorithm.
+#'
+#' @param args
+#'
+#' @return
+#'
+#' @examples
 run_binary_original <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL

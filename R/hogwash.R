@@ -1,5 +1,15 @@
 #' Main hogwash function
 #'
+#' @param pheno
+#' @param geno
+#' @param tree
+#' @param file_name
+#' @param dir
+#' @param perm
+#' @param fdr
+#' @param bootstrap
+#' @param group_genotype_key
+#'
 #' @export
 
 hogwash <- function(pheno,
