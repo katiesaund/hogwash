@@ -20,7 +20,7 @@ test_that("calculate_permutation_based_p_value returns a non-significant p-value
 # test count_hits_on_edges
 test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with genotype given this test data", {
   num_samples <- 6
-  temp_tree <- rtree(num_samples)
+  temp_tree <- ape::rtree(num_samples)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   num_edge <- ape::Nedge(temp_tree)
   temp_geno_recon <- temp_hi_conf_edges <- rep(list(0), num_samples)
@@ -38,7 +38,7 @@ test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with geno
 
 test_that("count_hits_on_edges returns 0 edges shared and 0 edges only with genotype given this all absent genotype", {
   num_samples <- 6
-  temp_tree <- rtree(num_samples)
+  temp_tree <- ape::rtree(num_samples)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   num_edge <- ape::Nedge(temp_tree)
   temp_geno_recon <- temp_hi_conf_edges <- rep(list(0), num_samples)
@@ -56,7 +56,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy da
   num_samples <- 6
   num_genotypes <- 15
   set.seed(1)
-  temp_tree <- rtree(num_samples)
+  temp_tree <- ape::rtree(num_samples)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   num_edge <- ape::Nedge(temp_tree)
   temp_geno_trans <- temp_hi_conf_edges <- rep(list(0), num_genotypes)
@@ -84,7 +84,7 @@ test_that("discrete_permutation returns expected results given this dummy data",
   num_samples <- 6
   num_genotypes <- 15
   set.seed(1)
-  temp_tree <- rtree(num_samples)
+  temp_tree <- ape::rtree(num_samples)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   num_edge <- ape::Nedge(temp_tree)
   temp_geno_trans <- temp_hi_conf_edges <- rep(list(0), num_genotypes)

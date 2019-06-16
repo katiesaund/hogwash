@@ -430,8 +430,8 @@ test_that("prepare_ancestral_reconstructions gives expected ancestral results gi
   genotype2 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
   genotype5 <- matrix(c(0, 1, 1, 1, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
   genotype6 <- matrix(c(0, 1, 1, 1, 1, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
-  genotype7 <- matrix(c(0, 1, 0, 0, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
-  genotype8 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
+  genotype7 <- matrix(c(0, 1, 0, 0, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
+  genotype8 <- matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
   temp_geno <- cbind(genotype1, genotype2, genotype5, genotype6, genotype7, genotype8)
   row.names(temp_geno) <- temp_tree$tip.label
   colnames(temp_geno) <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")

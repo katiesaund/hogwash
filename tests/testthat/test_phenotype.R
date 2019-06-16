@@ -109,8 +109,8 @@ test_that("check_if_phenotype_normal does nothing when phenotype is 'discrete'",
 test_that("check_if_convergence_occurs prints 'white noise model better' for this specific test set", {
   temp_pheno <- matrix(c(10, 1, 10, 1, 10, 1, 10, 1, 10, 1), ncol = 1)
   set.seed(1)
-  temp_tree <- rtree(10)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(10)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   temp_type <- "continuous"
   row.names(temp_pheno) <- temp_tree$tip.label
   expect_output(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type), "white noise model better")
@@ -119,9 +119,9 @@ test_that("check_if_convergence_occurs prints 'white noise model better' for thi
 
 test_that("check_if_convergence_occurs is silent for this specific test set", {
   set.seed(1)
-  temp_tree <- rtree(5)
+  temp_tree <- ape::rtree(5)
   temp_pheno <- matrix(rnorm(1:5), ncol = 1)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   temp_type <- "continuous"
   row.names(temp_pheno) <- temp_tree$tip.label
   expect_silent(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type))
@@ -129,9 +129,9 @@ test_that("check_if_convergence_occurs is silent for this specific test set", {
 
 test_that("check_if_convergence_occurs gives error when phenotype is incorrectly formatted", {
   set.seed(1)
-  temp_tree <- rtree(5)
+  temp_tree <- ape::rtree(5)
   temp_pheno <- rnorm(1:5)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   temp_type <- "continuous"
   expect_error(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type))
 })

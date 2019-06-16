@@ -151,8 +151,8 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr, annot){
   # discrete_or_continuous. Character. Either "discrete" or "continuous". Describes the input phenotype.
   #
   # Check input ----------------------------------------------------------------
-  check_dimensions(geno, Ntip(tr), 2, NULL, 2) # Genotype matrix should have same rows as tr$tip.label, at least 2 genotypes in the columns
-  check_dimensions(pheno, Ntip(tr), 2, 1, 1) # Phnoetype matrix should have same rows as tr$tip.label and exactly 1 column
+  check_dimensions(geno, ape::Ntip(tr), 2, NULL, 2) # Genotype matrix should have same rows as tr$tip.label, at least 2 genotypes in the columns
+  check_dimensions(pheno, ape::Ntip(tr), 2, 1, 1) # Phnoetype matrix should have same rows as tr$tip.label and exactly 1 column
   check_rownames(geno, tr) # Genotype rownames should be in the same order as the tr$tip.label
   check_rownames(pheno, tr) # Phenotype rownames should be in the same order as the tr$tip.label
   check_for_NA_and_inf(geno)
@@ -163,7 +163,7 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr, annot){
   check_if_permutation_num_valid(perm)
   check_num_between_0_and_1(fdr)
   if (!is.null(annot)) {
-    check_dimensions(annot, Ntip(tr), 2, 2, 2)
+    check_dimensions(annot, ape::Ntip(tr), 2, 2, 2)
   }
 
   # Function -------------------------------------------------------------------

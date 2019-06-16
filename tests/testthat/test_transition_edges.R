@@ -58,11 +58,11 @@ test_that("keep_at_least_two_high_conf_trans_edges returns a vector c(TRUE, FALS
   for (i in 1:2) {
     temp_recon[[i]] <- ancestral_reconstruction_by_ML(temp_tree, temp_geno, i, "discrete")
     temp_results[[i]] <- identify_transition_edges(temp_tree, temp_geno, i, temp_recon[[i]]$node_anc_rec, "discrete")
-    fake_confidence[[i]] <- rep(1, Nedge(temp_tree))
+    fake_confidence[[i]] <- rep(1, ape::Nedge(temp_tree))
   }
   expect_equivalent(keep_at_least_two_high_conf_trans_edges(temp_results, fake_confidence), c(TRUE, FALSE))
   for (i in 1:2) {
-    fake_confidence[[i]] <- rep(0, Nedge(temp_tree))
+    fake_confidence[[i]] <- rep(0, ape::Nedge(temp_tree))
   }
   expect_equivalent(keep_at_least_two_high_conf_trans_edges(temp_results, fake_confidence), c(FALSE, FALSE))
 })
@@ -90,7 +90,7 @@ test_that("prepare_genotype_transitions_for_original_discrete_test returns a $tr
   colnames(temp_geno) <- c("SNP1", "SNP2")
   row.names(temp_geno) <- temp_tree$tip.label
   temp_recon <- temp_trans <- rep(list(0), ncol(temp_geno))
-  temp_pheno <- matrix(c(0, 1, 2, 3, 4), nrow = Ntip(temp_tree), ncol = 1)
+  temp_pheno <- matrix(c(0, 1, 2, 3, 4), nrow = ape::Ntip(temp_tree), ncol = 1)
   temp_AR  <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, temp_geno, "continuous")
   temp_results <- prepare_genotype_transitions_for_original_discrete_test(temp_geno, temp_AR$geno_trans)
 

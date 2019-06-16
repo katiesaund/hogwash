@@ -19,7 +19,7 @@ test_that("select_test_type doesn't throw error when given valid continuous inpu
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- read_in_tsv_matrix(test_pheno)
-  args$tree                   <- read.tree(test_tree)
+  args$tree                   <- ape::read.tree(test_tree)
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- read_in_tsv_matrix(test_geno)
@@ -57,7 +57,7 @@ test_that("select_test_type doesn't throw error given valid discrete input", {
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- read_in_tsv_matrix(test_pheno)
-  args$tree                   <- read.tree(test_tree)
+  args$tree                   <- ape::read.tree(test_tree)
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- read_in_tsv_matrix(test_geno)

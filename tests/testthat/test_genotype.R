@@ -4,8 +4,8 @@ context("Genotype") #----------------------------------------------#
 
 test_that("reduce_redundancy removes columns that have all ones or all zeroes, or all but one 1s.", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   test_mat <- matrix(c(1, 1, 1, 0, 0,
                        1, 1, 1, 1, 0,
                        1, 1, 1, 1, 1,
@@ -22,8 +22,8 @@ test_that("reduce_redundancy removes columns that have all ones or all zeroes, o
 
 test_that("reduce_redundancy gives error is all columns contain only 0s.", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   test_mat <- matrix(0, ncol = 5, nrow = 5)
   row.names(test_mat) <- temp_tree$tip.label
   colnames(test_mat) <- letters[1:5]
@@ -32,8 +32,8 @@ test_that("reduce_redundancy gives error is all columns contain only 0s.", {
 
 test_that("reduce_redundancy gives error is all columns contain letters.", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   test_mat <- matrix(letters[1:25], ncol = 5, nrow = 5)
   row.names(test_mat) <- temp_tree$tip.label
   colnames(test_mat) <- letters[1:5]
@@ -42,8 +42,8 @@ test_that("reduce_redundancy gives error is all columns contain letters.", {
 
 test_that("reduce_redundancy removes no columns when all rows are two 1s and three 0s.", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   test_mat <- matrix(c(0, 1, 1, 0, 0,
                        1, 1, 0, 0, 0,
                        1, 0, 0, 0, 1,

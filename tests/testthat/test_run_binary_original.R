@@ -15,7 +15,7 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- read_in_tsv_matrix(test_pheno)
-  args$tree                   <- read.tree(test_tree)
+  args$tree                   <- ape::read.tree(test_tree)
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- read_in_tsv_matrix(test_geno)
@@ -50,7 +50,7 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- read_in_tsv_matrix(test_pheno)
-  args$tree                   <- read.tree(test_tree)
+  args$tree                   <- ape::read.tree(test_tree)
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- read_in_tsv_matrix(test_geno)

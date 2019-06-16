@@ -325,8 +325,8 @@ test_that("check_for_NA_and_inf doesn't give an error when x is a matrix of zero
 # test check_for_root_and_bootstrap
 test_that("check_for_root_and_bootstrap doesn't give an error when x is rooted tree with node values of 100", {
   # Set up
-  temp_tree <- rtree(20, rooted = TRUE)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::ape::rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
 
   # Tree
   expect_error(check_for_root_and_bootstrap(temp_tree), NA)
@@ -334,8 +334,8 @@ test_that("check_for_root_and_bootstrap doesn't give an error when x is rooted t
 
 test_that("check_for_root_and_bootstrap gives an error when x is unrooted tree with node values of 100", {
   # Set up
-  temp_tree <- rtree(20, rooted = FALSE)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(20, rooted = FALSE)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
 
   # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
@@ -343,8 +343,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is unrooted tree w
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node values of -100", {
   # Set up
-  temp_tree <- rtree(20, rooted = TRUE)
-  temp_tree$node.labels <- rep(-100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(-100, ape::Nnode(temp_tree))
 
   # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
@@ -352,8 +352,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with too few node values", {
   # Set up
-  temp_tree <- rtree(20, rooted = TRUE)
-  temp_tree$node.labels <- rep(-100, Nnode(temp_tree) - 1)
+  temp_tree <- ape::rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(-100, ape::Nnode(temp_tree) - 1)
 
   # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
@@ -361,8 +361,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with too many node values", {
   # Set up
-  temp_tree <- rtree(20, rooted = TRUE)
-  temp_tree$node.labels <- rep(-100, Nnode(temp_tree) + 1)
+  temp_tree <- ape::rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(-100, ape::Nnode(temp_tree) + 1)
 
   # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
@@ -370,8 +370,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node values of NA", {
   # Set up
-  temp_tree <- rtree(20, rooted = TRUE)
-  temp_tree$node.labels <- rep(NA, Nnode(temp_tree))
+  temp_tree <- ape::rtree(20, rooted = TRUE)
+  temp_tree$node.labels <- rep(NA, ape::Nnode(temp_tree))
 
   # Test
   expect_error(check_for_root_and_bootstrap(temp_tree))
@@ -379,7 +379,7 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
 
 test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node.labels = NULL", {
   # Set up
-  temp_tree <- rtree(20, rooted = TRUE)
+  temp_tree <- ape::rtree(20, rooted = TRUE)
   temp_tree$node.labels <- NULL
 
   # Test
@@ -599,7 +599,7 @@ test_that("check_file_exists doesn't give an error when x is 'test_validation.R'
 # test check_rownames ----------------------------------------------------------
 test_that("check_rownames doesn't give an error when tree$tip.label <- row.names(mat) <- letters[1:10]", {
   # Set up
-  temp_tree <- rtree(10)
+  temp_tree <- ape::rtree(10)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
   temp_tree$tip.label <- row.names(temp_mat) <- letters[1:10]
 
@@ -609,7 +609,7 @@ test_that("check_rownames doesn't give an error when tree$tip.label <- row.names
 
 test_that("check_rownames gives an error when tree$tip.label <- letters[11:20],  row.names(mat) <- letters[1:10]", {
   # Set up
-  temp_tree <- rtree(10)
+  temp_tree <- ape::rtree(10)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
   temp_tree$tip.label <- letters[11:20]
   row.names(temp_mat) <- letters[1:10]
@@ -620,14 +620,14 @@ test_that("check_rownames gives an error when tree$tip.label <- letters[11:20], 
 
 test_that("check_rownames gives an error when Ntip(tree) != nrow(mat)", {
   # Set up
-  temp_tree <- rtree(10)
+  temp_tree <- ape::rtree(10)
   temp_mat  <- matrix(1:8, nrow = 1, ncol = 8)
 
   # Test
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
 
   # Set up
-  temp_tree <- rtree(2)
+  temp_tree <- ape::rtree(2)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
 
   # Test
@@ -637,7 +637,7 @@ test_that("check_rownames gives an error when Ntip(tree) != nrow(mat)", {
 
 test_that("check_rownames gives an error when not given a tree object or not given matrix", {
   # Set up
-  temp_tree <- rtree(10)
+  temp_tree <- ape::rtree(10)
   fake_tree <- "tree"
   temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
   row.names(temp_mat) <- temp_tree$tip.label
@@ -651,7 +651,7 @@ test_that("check_rownames gives an error when not given a tree object or not giv
 
 test_that("check_rownames gives an error when given a matrix without rownames", {
   # Set up
-  temp_tree <- rtree(10)
+  temp_tree <- ape::rtree(10)
   temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
   # Test
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
@@ -665,7 +665,7 @@ test_that("check_rownames gives an error when given a matrix without rownames", 
 
 test_that("check_rownames gives an error when given a tree without tip.labels", {
   # Set up
-  temp_tree <- rtree(10)
+  temp_tree <- ape::rtree(10)
   temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
   temp_tree$tip.label <- NULL
   # Test
@@ -676,7 +676,7 @@ test_that("check_rownames gives an error when given a tree without tip.labels", 
 test_that("check_rownames gives an error when tree$tip.label doesn't perfectly match matrix rownames", {
   # Set up
   set.seed(1)
-  temp_tree <- rtree(10)
+  temp_tree <- ape::rtree(10)
   temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
   row.names(temp_mat) <- temp_tree$tip.label
   row.names(temp_mat)[1] <- "t6"
@@ -786,26 +786,26 @@ test_that("check_is_number gives an error when x = Inf", {
 # test check_node_is_in_tree ---------------------------------------------------
 test_that("check_node_is_in_tree doesn't give an error when node = 1", {
   # Set up
-  temp <- rtree(10)
-  temp$node.label <- c(1:Nnode(temp))
+  temp <- ape::rtree(10)
+  temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
   expect_error(check_node_is_in_tree(node_val = 1, tr = temp), NA)
 })
 
-test_that("check_node_is_in_tree doesn't give an error when node = Nnode(tree)", {
+test_that("check_node_is_in_tree doesn't give an error when node = ape::Nnode(tree)", {
   # Set up
-  temp <- rtree(10)
-  temp$node.label <- c(1:Nnode(temp))
+  temp <- ape::rtree(10)
+  temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
-  expect_error(check_node_is_in_tree(node_val = Nnode(temp), tr = temp), NA)
+  expect_error(check_node_is_in_tree(node_val = ape::Nnode(temp), tr = temp), NA)
 })
 
 test_that("check_node_is_in_tree gives an error when node = 0", {
   # Set up
-  temp <- rtree(10)
-  temp$node.label <- c(1:Nnode(temp))
+  temp <- ape::rtree(10)
+  temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
   expect_error(check_node_is_in_tree(node_val = 0, tr = temp))
@@ -813,26 +813,26 @@ test_that("check_node_is_in_tree gives an error when node = 0", {
 
 test_that("check_node_is_in_tree gives an error when node = -1", {
   # Set up
-  temp <- rtree(10)
-  temp$node.label <- c(1:Nnode(temp))
+  temp <- ape::rtree(10)
+  temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
   expect_error(check_node_is_in_tree(node_val = -1, tr = temp))
 })
 
-test_that("check_node_is_in_tree gives an error when node = Nnode + Ntip + 1", {
+test_that("check_node_is_in_tree gives an error when node = ape::Nnode + Ntip + 1", {
   # Set up
-  temp <- rtree(10)
-  temp$node.label <- c(1:Nnode(temp))
+  temp <- ape::rtree(10)
+  temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
-  expect_error(check_node_is_in_tree(node_val = Nnode(temp) + Ntip(temp) + 1, tr = temp))
+  expect_error(check_node_is_in_tree(node_val = ape::Nnode(temp) + ape::Ntip(temp) + 1, tr = temp))
 })
 
 test_that("check_node_is_in_tree gives an error when node = 1.5", {
   # Set up
-  temp <- rtree(10)
-  temp$node.label <- c(1:Nnode(temp))
+  temp <- ape::rtree(10)
+  temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
   expect_error(check_node_is_in_tree(node_val = 1.5, tr = temp))
@@ -842,16 +842,16 @@ test_that("check_node_is_in_tree gives an error when node = 1.5", {
 test_that("check_tree_is_valid returns true for randomly generated trees where Ntip is between 2 and 10", {
   # Test
   for (i in 2:10) {
-    expect_error(check_tree_is_valid(rtree(i)), NA)
+    expect_error(check_tree_is_valid(ape::rtree(i)), NA)
   }
 })
 
 test_that("check_tree_is_invalid throws an error when tree edge index is greater than Nedge(tree)", {
   # Set up
-  invalid_tree <- rtree(10)
-  for (j in 1:Nedge(invalid_tree)) {
+  invalid_tree <- ape::rtree(10)
+  for (j in 1:ape::Nedge(invalid_tree)) {
     if (invalid_tree$edge[j, 2] == 1) {
-      invalid_tree$edge[j, 2] <- Nedge(invalid_tree) + 1
+      invalid_tree$edge[j, 2] <- ape::Nedge(invalid_tree) + 1
       break
     }
   }
@@ -919,8 +919,8 @@ test_that("check_convergence_possible gives an error 'discrete' and all values =
 # test is_tip ------------------------------------------------------------------
 test_that("is_tip returns TRUE when given a tree and the node = 1 (a tip)", {
   # Set up
-  temp_tree <- rtree(10)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(10)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   temp_node <- 1
 
   # Test
@@ -929,9 +929,9 @@ test_that("is_tip returns TRUE when given a tree and the node = 1 (a tip)", {
 
 test_that("is_tip returns FALSE when given a tree and the node = Ntip(temp_tree) + 1 (not a tip)", {
   # Set up
-  temp_tree <- rtree(10)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
-  temp_node <- Ntip(temp_tree) + 1
+  temp_tree <- ape::rtree(10)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
+  temp_node <- ape::Ntip(temp_tree) + 1
 
   # Test
   expect_false(is_tip(temp_node, temp_tree))
@@ -939,8 +939,8 @@ test_that("is_tip returns FALSE when given a tree and the node = Ntip(temp_tree)
 
 test_that("is_tip gives an error when given a tree and the node = 12.5", {
   # Set up
-  temp_tree <- rtree(10)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(10)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   temp_node <- 12.5
 
   # Test
@@ -949,8 +949,8 @@ test_that("is_tip gives an error when given a tree and the node = 12.5", {
 
 test_that("is_tip gives an error when given a tree and the node = NA", {
   # Set up
-  temp_tree <- rtree(10)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(10)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   temp_node <- NA
 
   # Test
@@ -1098,7 +1098,7 @@ test_that("check_class doesn't throw error when given an object and expected cla
   expect_error(check_class("test", "character"), NA)
   expect_error(check_class(matrix(0), "matrix"), NA)
   expect_error(check_class(as.data.frame(matrix(0)), "data.frame"), NA)
-  expect_error(check_class(rtree(2), "phylo"), NA)
+  expect_error(check_class(ape::rtree(2), "phylo"), NA)
 })
 
 test_that("check_class throws error when given an object and an incorrect class", {
@@ -1108,5 +1108,5 @@ test_that("check_class throws error when given an object and an incorrect class"
   expect_error(check_class("test", "matrix"))
   expect_error(check_class(matrix(0), "data.frame"))
   expect_error(check_class(as.data.frame(matrix(0)), "phylo"))
-  expect_error(check_class(rtree(2), "numeric"))
+  expect_error(check_class(ape::rtree(2), "numeric"))
 })
