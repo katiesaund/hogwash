@@ -704,7 +704,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
       show_colnames = TRUE,
       cellwidth = cell_width_value)
   }
-
+  pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
   # loop through transition sig hits:
   for (j in 1:nrow(trans_hit_vals)) {
     if (trans_hit_vals[j, 1] < fdr) {
