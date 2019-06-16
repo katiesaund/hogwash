@@ -4,7 +4,6 @@
 
 #' Read in a tsv matrix
 #'
-#' @export
 read_in_tsv_matrix <- function(mat){
   # Function description -------------------------------------------------------
   # Read in the standardized GWAS matrix format: rows correspond to samples, columns correspond to genotypes/phenotypes.

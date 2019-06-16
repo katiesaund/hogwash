@@ -343,7 +343,6 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
 #' @param trans_or_recon
 #'
 #' @return
-#' @export
 #'
 #' @examples
 make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans_or_recon){
@@ -448,7 +447,6 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
 #' @param geno_matrix
 #'
 #' @return
-#' @export
 #'
 #' @examples
 make_ann_colors <- function(geno_matrix){
@@ -508,7 +506,6 @@ make_ann_colors <- function(geno_matrix){
 #' @param snp_in_gene
 #'
 #' @return
-#' @export
 #'
 #' @examples
 discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
