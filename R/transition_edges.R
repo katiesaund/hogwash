@@ -44,7 +44,7 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
 
   # FUNCTION ------------------------------------------------------------------#
   transition <- transition_direction <-
-    parent_node <- child_node <- integer(Nedge(tr)) # initialize all as zeroes
+    parent_node <- child_node <- integer(ape::Nedge(tr)) # initialize all as zeroes
   older <- 1 # older node is 1st column in tr$edge
   younger <- 2 # younger node is 2nd column in tr$edge
   parent_0_child_1 <- 1
@@ -53,15 +53,15 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
   both_parent_and_child_are_one <- 2
 
 
-  for (i in 1:Nedge(tr)) {
+  for (i in 1:ape::Nedge(tr)) {
     if (is_tip(tr$edge[i, older], tr)) {
       stop("tree invalid")
     }
-    parent_node[i] <- node_recon[tr$edge[i, older] - Ntip(tr)]
+    parent_node[i] <- node_recon[tr$edge[i, older] - ape::Ntip(tr)]
     if (is_tip(tr$edge[i, younger], tr)) {# child is a tip
       child_node[i]  <- mat[ , num][tr$edge[i, younger]]
     } else {# child is internal nodes
-      child_node[i]  <- node_recon[tr$edge[i, younger] - Ntip(tr)]
+      child_node[i]  <- node_recon[tr$edge[i, younger] - ape::Ntip(tr)]
     }
 
     transition[i] <- sum(parent_node[i] + child_node[i])

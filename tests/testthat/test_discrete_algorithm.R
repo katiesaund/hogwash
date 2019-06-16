@@ -21,8 +21,8 @@ test_that("calculate_permutation_based_p_value returns a non-significant p-value
 test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with genotype given this test data", {
   num_samples <- 6
   temp_tree <- rtree(num_samples)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
-  num_edge <- Nedge(temp_tree)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
+  num_edge <- ape::Nedge(temp_tree)
   temp_geno_recon <- temp_hi_conf_edges <- rep(list(0), num_samples)
   for (k in 1:num_samples) {
     temp_geno_recon[[k]] <- temp_hi_conf_edges[[k]] <- rep(1, num_edge)
@@ -39,8 +39,8 @@ test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with geno
 test_that("count_hits_on_edges returns 0 edges shared and 0 edges only with genotype given this all absent genotype", {
   num_samples <- 6
   temp_tree <- rtree(num_samples)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
-  num_edge <- Nedge(temp_tree)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
+  num_edge <- ape::Nedge(temp_tree)
   temp_geno_recon <- temp_hi_conf_edges <- rep(list(0), num_samples)
   for (k in 1:num_samples) {
     temp_geno_recon[[k]] <- temp_hi_conf_edges[[k]] <- rep(0, num_edge)
@@ -57,8 +57,8 @@ test_that("discrete_calculate_pvals returns expected results given this dummy da
   num_genotypes <- 15
   set.seed(1)
   temp_tree <- rtree(num_samples)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
-  num_edge <- Nedge(temp_tree)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
+  num_edge <- ape::Nedge(temp_tree)
   temp_geno_trans <- temp_hi_conf_edges <- rep(list(0), num_genotypes)
   for (k in 1:num_genotypes) {
     temp_geno_trans[[k]] <- c(0, 0, 0, 1, 0, 0, 0, 1, 0, 0)
@@ -66,7 +66,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy da
   }
   temp_geno_trans[[15]] <- c(0, 0, 1, 1, 0, 0, 0, 1, 0, 0)
   temp_pheno_trans <- c(1, 1, 1, 1, 0, 0, 0, 0, 0, 0)
-  temp_geno <- matrix(1, ncol = num_genotypes, nrow = Ntip(temp_tree)) # doesn't match recon or transition, just made up for now.
+  temp_geno <- matrix(1, ncol = num_genotypes, nrow = ape::Ntip(temp_tree)) # doesn't match recon or transition, just made up for now.
   temp_perm <- 8
   temp_fdr <- 0.25
 
@@ -85,8 +85,8 @@ test_that("discrete_permutation returns expected results given this dummy data",
   num_genotypes <- 15
   set.seed(1)
   temp_tree <- rtree(num_samples)
-  temp_tree$node.labels <- rep(100, Nnode(temp_tree))
-  num_edge <- Nedge(temp_tree)
+  temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
+  num_edge <- ape::Nedge(temp_tree)
   temp_geno_trans <- temp_hi_conf_edges <- rep(list(0), num_genotypes)
   for (k in 1:num_genotypes) {
     temp_geno_trans[[k]] <- c(0, 0, 0, 1, 0, 0, 0, 1, 0, 0)
@@ -94,7 +94,7 @@ test_that("discrete_permutation returns expected results given this dummy data",
   }
   temp_geno_trans[[15]] <- c(0, 0, 1, 1, 0, 0, 0, 1, 0, 0)
   temp_pheno_trans <- c(1, 1, 1, 1, 0, 0, 0, 0, 0, 0)
-  temp_geno <- matrix(1, ncol = num_genotypes, nrow = Ntip(temp_tree)) # doesn't match recon or transition, just made up for now.
+  temp_geno <- matrix(1, ncol = num_genotypes, nrow = ape::Ntip(temp_tree)) # doesn't match recon or transition, just made up for now.
   temp_perm <- 8
 
   temp_num_edges_with_geno_trans <- sapply(temp_geno_trans, function(x) sum(x))

@@ -3,8 +3,8 @@ context("Group genotypes") #---------------------------------------------------#
 # test build_gene_trans_from_snp_trans -----------------------------------------
 test_that("build_gene_trans_from_snp_trans does X given Y", {
   set.seed(1)
-  temp_tree <- rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree <- ape::rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
@@ -39,16 +39,16 @@ test_that("build_gene_trans_from_snp_trans does X given Y", {
   expect_equal(temp_results[[4]]$transition, AR$geno_trans[[4]]$transition)
   expect_equal(temp_results[[5]]$transition, AR$geno_trans[[5]]$transition + AR$geno_trans[[6]]$transition)
 
-  expect_equal(length(temp_results[[1]]$transition), Nedge(temp_tree))
-  expect_equal(length(temp_results[[1]]$trans_dir), Nedge(temp_tree))
+  expect_equal(length(temp_results[[1]]$transition), ape::Nedge(temp_tree))
+  expect_equal(length(temp_results[[1]]$trans_dir), ape::Nedge(temp_tree))
 
 })
 
 # test prepare_genotype --------------------------------------------------------
 test_that("prepare_genotype gives expected genotype for a grouped input", {
   set.seed(1)
-  temp_tree <- rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree <- ape::rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
@@ -79,8 +79,8 @@ test_that("prepare_genotype gives expected genotype for a grouped input", {
 })
 test_that("prepare_genotype gives expected genotype for an not grouped input", {
   set.seed(1)
-  temp_tree <- rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree <- ape::rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
@@ -111,8 +111,8 @@ test_that("prepare_genotype gives expected genotype for an not grouped input", {
 # test prepare_ungrouped_genotype ----------------------------------------------
 test_that("prepare_ungrouped_genotype", {
   set.seed(1)
-  temp_tree <- rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree <- ape::rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
@@ -136,8 +136,8 @@ test_that("prepare_ungrouped_genotype", {
 # test prepare_grouped_genotype ------------------------------------------------
 test_that("prepare_grouped_genotype", {
   set.seed(1)
-  temp_tree <- rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree <- ape::rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <- matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = Ntip(temp_tree), ncol = 1)
@@ -168,8 +168,8 @@ test_that("prepare_grouped_genotype", {
 # test group_genotypes ---------------------------------------------------------
 test_that("group_genotypes does X given Y", {
   set.seed(1)
-  temp_tree <- rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/Nedge(temp_tree), Nedge(temp_tree))
+  temp_tree <- ape::rtree(7)
+  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   set.seed(1)
@@ -206,8 +206,8 @@ test_that("group_genotypes does X given Y", {
   temp_results <- group_genotypes(temp_tree, genotype, AR$geno_recon_and_conf, geno_trans_concomitant, geno_trans_original, geno$gene_snp_lookup, geno$unique_genes)
   expect_equal(length(temp_results$geno_recon_ordered_by_edges), ncol(temp_results$genotype))
   expect_identical(row.names(temp_results$genotype), temp_tree$tip.label)
-  expect_equal(length(temp_results$geno_trans_concomitant[[1]]$transition), Nedge(temp_tree))
-  expect_equal(length(temp_results$geno_trans_orig[[1]]$transition), Nedge(temp_tree))
-  expect_equal(length(temp_results$geno_trans_concomitant[[1]]$trans_dir), Nedge(temp_tree))
-  expect_equal(length(temp_results$geno_trans_orig[[1]]$trans_dir), Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_concomitant[[1]]$transition), ape::Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_orig[[1]]$transition), ape::Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_concomitant[[1]]$trans_dir), ape::Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_orig[[1]]$trans_dir), ape::Nedge(temp_tree))
 })

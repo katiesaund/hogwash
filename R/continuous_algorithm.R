@@ -101,8 +101,8 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
 
   # Function -------------------------------------------------------------------
   # GRAB THE IDS OF THE TRANSITION EDGES
-  trans_index     <- c(1:Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
-  non_trans_index <- c(1:Nedge(tr))[!geno_tran[[index]]$transition]
+  trans_index     <- c(1:ape::Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
+  non_trans_index <- c(1:ape::Nedge(tr))[!geno_tran[[index]]$transition]
   # [1] EX:  8 12 13 16 19 26 27 31 37 44 52 56 64 67 68 76 77 80 89 92 97 98
   # THESE EDGES ARE DEFINED BY THE NODES IN THE CORRESPONDING ROWS OF tr$EDGE
 
@@ -145,7 +145,7 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   check_if_permutation_num_valid(perm)
   check_if_binary_vector(geno_conf[[1]])
   check_is_number(num_i)
-  check_equal(length(geno_conf[[1]]), Nedge(tr))
+  check_equal(length(geno_conf[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
   # Note on implementation of this permutation. I've tested this as a for()
@@ -155,7 +155,7 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
 
   # do the permutation part
   num_trans_edges          <- length(index_obj$trans_index)
-  list_of_all_edges        <- c(1:Nedge(tr))
+  list_of_all_edges        <- c(1:ape::Nedge(tr))
   hi_conf_edges            <- list_of_all_edges[as.logical(geno_conf[[num_i]])]
   num_hi_conf_edges        <- sum(geno_conf[[num_i]])
   if (num_hi_conf_edges != length(hi_conf_edges)) {
@@ -258,10 +258,10 @@ calculate_genotype_significance <- function(mat,
   check_if_binary_matrix(mat)
   check_if_binary_vector(genotype_confidence[[1]])
   check_dimensions(mat = mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
-  check_dimensions(mat = pheno_recon_ordered_by_edges, exact_rows = Nedge(tr), min_rows = Nedge(tr), exact_cols = 2, min_cols = 2)
-  check_equal(length(genotype_transition_list[[1]]$transition), Nedge(tr))
+  check_dimensions(mat = pheno_recon_ordered_by_edges, exact_rows = ape::Nedge(tr), min_rows = ape::Nedge(tr), exact_cols = 2, min_cols = 2)
+  check_equal(length(genotype_transition_list[[1]]$transition), ape::Nedge(tr))
   check_equal(length(genotype_transition_list), ncol(mat))
-  check_equal(length(genotype_confidence[[1]]), Nedge(tr))
+  check_equal(length(genotype_confidence[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
   num_genotypes <- ncol(mat)

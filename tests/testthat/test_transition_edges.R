@@ -3,8 +3,8 @@ context("Transition edges") #----------------------------------------------#
 
 test_that("identify_transition_edges returns correct transition vector and trans_dir vector for discrete phenotype", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_pheno <- matrix(c(1, 0, 1, 0, 1), ncol = 1)
   row.names(temp_pheno) <- temp_tree$tip.label
   set.seed(1)
@@ -16,8 +16,8 @@ test_that("identify_transition_edges returns correct transition vector and trans
 
 test_that("identify_transition_edges returns correct transition vector and trans_dir vector for discrete genotype", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_geno <- cbind(c(1, 0, 1, 0, 1), c(1, 0, 0, 0, 0))
   row.names(temp_geno) <- temp_tree$tip.label
   temp_recon <- temp_results <- rep(list(0), ncol(temp_geno))
@@ -35,8 +35,8 @@ test_that("identify_transition_edges returns correct transition vector and trans
 
 test_that("identify_transition_edges returns correct transition vector and trans_dir vector for continuous phenotype", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_pheno <- matrix(rnorm(5), ncol = 1)
   row.names(temp_pheno) <- temp_tree$tip.label
   set.seed(1)
@@ -49,8 +49,8 @@ test_that("identify_transition_edges returns correct transition vector and trans
 # test keep_at_least_two_high_conf_trans_edges
 test_that("keep_at_least_two_high_conf_trans_edges returns a vector c(TRUE, FALSE) for this test genotype", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_geno <- cbind(c(1, 0, 1, 0, 1), c(1, 0, 0, 0, 0))
   row.names(temp_geno) <- temp_tree$tip.label
   fake_confidence <- temp_recon <- temp_results <- rep(list(0), ncol(temp_geno))
@@ -84,8 +84,8 @@ test_that("keep_hits_with_more_change_on_trans_edges does X given Y", {
 # test prepare_genotype_transitions_for_original_discrete_test
 test_that("prepare_genotype_transitions_for_original_discrete_test returns a $transition vector that corresponds only to positive values in $trans_dir", {
   set.seed(1)
-  temp_tree <- rtree(5)
-  temp_tree$node.label <- rep(100, Nnode(temp_tree))
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_geno <- cbind(c(1, 0, 1, 0, 1), c(1, 0, 0, 0, 0))
   colnames(temp_geno) <- c("SNP1", "SNP2")
   row.names(temp_geno) <- temp_tree$tip.label

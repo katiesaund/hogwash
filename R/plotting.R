@@ -27,7 +27,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   plot_p_recon <- contMap(tr, pheno_vector, method = "user", anc.states = pheno_anc_rec, plot = FALSE)
   plot(plot_p_recon,
        add = TRUE,
-       ylim = c(-1 / 25 * Ntip(tr), Ntip(tr)),
+       ylim = c(-1 / 25 * ape::Ntip(tr), ape::Ntip(tr)),
        colors = plot_p_recon$cols,
        lwd = 4,
        ftype = "off",
@@ -96,7 +96,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
 
   # TODO Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
   for (c in 1:ncol(trans_edge_mat)) {
-    trans_edge_mat[(1:Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
+    trans_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
   # end update trans_edge_mat
   ph_trans <- abs(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2])
@@ -112,7 +112,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
   log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
   column_annot <- cbind(significant_loci, log_p_value)
 
-  row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:Nedge(tr))
+  row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:ape::Nedge(tr))
   # end heatmap prep
   ann_colors = list(
     locus = c(not_sig = "white", sig = "blue")
@@ -209,7 +209,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
 
   # TODO Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
   for (c in 1:ncol(trans_dir_edge_mat)) {
-    trans_dir_edge_mat[(1:Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
+    trans_dir_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
 
   all_tables <- all_lists <- rep(list(NULL), ncol(trans_dir_edge_mat))
@@ -323,7 +323,7 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
   # Function -------------------------------------------------------------------
 
   # Return output --------------------------------------------------------------
-  edge_color <- rep("black", Nedge(tr))
+  edge_color <- rep("black", ape::Nedge(tr))
   if (trans_or_recon == "recon") {
     edge_color[edges_to_highlight[[index]] == 1] <- edge_color_bright
   } else if (trans_or_recon == "trans") {
@@ -462,19 +462,19 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   if (ncol(recon_hit_vals) != 1 | nrow(recon_hit_vals) != length(geno_confidence)) {
     stop("Dimensions of hit p-values dataframe are incorrect.")
   }
-  check_equal(length(p_recon_edges), Nedge(tr))
+  check_equal(length(p_recon_edges), ape::Nedge(tr))
   if (!is.null(snp_in_gene)) {
     if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
       stop("snp_in_gene should be a table of integers")
     }
   }
-  check_equal(length(p_trans_edges), Nedge(tr))
-  check_equal(length(geno_confidence[[1]]), Nedge(tr))
-  check_equal(length(g_trans_edges[[1]]), Nedge(tr))
+  check_equal(length(p_trans_edges), ape::Nedge(tr))
+  check_equal(length(geno_confidence[[1]]), ape::Nedge(tr))
+  check_equal(length(g_trans_edges[[1]]), ape::Nedge(tr))
   check_if_binary_vector(geno_confidence[[1]])
   check_if_binary_vector(p_trans_edges)
   check_if_binary_vector(g_trans_edges[[1]])
-  check_equal(length(tr_and_pheno_hi_conf), Nedge(tr))
+  check_equal(length(tr_and_pheno_hi_conf), ape::Nedge(tr))
   check_equal(length(recon_perm_obs_results$permuted_count[[1]]), num_perm)
   check_class(recon_perm_obs_results$hit_pvals, "character")
   check_class(recon_perm_obs_results$observed_overlap, "integer")
@@ -486,7 +486,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, recon_hit_vals, fdr, "phyc")
 
-  g_trans_mat <- matrix(0, nrow = Nedge(tr), ncol = length(g_trans_edges))
+  g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
 
   for (i in 1:length(g_trans_edges)) {
     g_trans_mat[ , i] <- g_trans_edges[[i]]
@@ -705,13 +705,13 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
       stop("snp_in_gene should be a table of integers")
     }
   }
-  check_equal(length(p_trans_edges), Nedge(tr))
-  check_equal(length(geno_confidence[[1]]), Nedge(tr))
-  check_equal(length(g_trans_edges[[1]]), Nedge(tr))
+  check_equal(length(p_trans_edges), ape::Nedge(tr))
+  check_equal(length(geno_confidence[[1]]), ape::Nedge(tr))
+  check_equal(length(g_trans_edges[[1]]), ape::Nedge(tr))
   check_if_binary_vector(geno_confidence[[1]])
   check_if_binary_vector(p_trans_edges)
   check_if_binary_vector(g_trans_edges[[1]])
-  check_equal(length(tr_and_pheno_hi_conf), Nedge(tr))
+  check_equal(length(tr_and_pheno_hi_conf), ape::Nedge(tr))
   check_equal(length(trans_perm_obs_results$permuted_count[[1]]), num_perm)
   check_class(trans_perm_obs_results$hit_pvals, "character")
   check_class(trans_perm_obs_results$observed_overlap,"integer")
@@ -724,7 +724,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   make_manhattan_plot(dir, name, trans_hit_vals, fdr, "synchronous")
 
   # heatmaps
-  g_trans_mat <- matrix(0, nrow = Nedge(tr), ncol = length(g_trans_edges))
+  g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
 
   for (i in 1:length(g_trans_edges)) {
     g_trans_mat[ , i] <- g_trans_edges[[i]]

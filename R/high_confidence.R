@@ -104,15 +104,15 @@ assign_high_confidence_to_transition_edges_including_parent_info  <- function(tr
   check_tree_is_valid(tr)
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
-  check_equal(length(genotype_transition_by_edges[[1]]$transition), Nedge(tr))
+  check_equal(length(genotype_transition_by_edges[[1]]$transition), ape::Nedge(tr))
   check_for_root_and_bootstrap(tr)
-  check_equal(length(all_confidence_by_edge[[1]]), Nedge(tr))
+  check_equal(length(all_confidence_by_edge[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
   # Identify all edges for which the edge and the parent edge are both high confidence
-  edge_and_parent_both_confident <- rep(list(rep(0, Nedge(tr))), ncol(geno))
+  edge_and_parent_both_confident <- rep(list(rep(0, ape::Nedge(tr))), ncol(geno))
   for (ge in 1:ncol(geno)) {
-    for (ed in 1:Nedge(tr)) {
+    for (ed in 1:ape::Nedge(tr)) {
       parent_edge <- find_parent_edge(tr, ed)
       if (!is.na(parent_edge)) {
         if (all_confidence_by_edge[[ge]][ed] == 1) {
@@ -157,9 +157,9 @@ assign_high_confidence_to_transition_edges <- function(tr,
   check_tree_is_valid(tr)
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
-  check_equal(length(genotype_transition_by_edges[[1]]$transition), Nedge(tr))
+  check_equal(length(genotype_transition_by_edges[[1]]$transition), ape::Nedge(tr))
   check_for_root_and_bootstrap(tr)
-  check_equal(length(all_confidence_by_edge[[1]]), Nedge(tr))
+  check_equal(length(all_confidence_by_edge[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
   edge_confident_and_trans_edge <- rep(list(NULL), ncol(geno))
@@ -216,15 +216,15 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
   #
   # Check input ----------------------------------------------------------------
   check_equal(length(genotype_transition), ncol(geno))
-  check_equal(length(genotype_transition[[1]]$transition), Nedge(tr))
+  check_equal(length(genotype_transition[[1]]$transition), ape::Nedge(tr))
   check_for_root_and_bootstrap(tr)
-  check_equal(length(pheno_tip_node_recon_conf), c(Ntip(tr) + Nnode(tr)))
+  check_equal(length(pheno_tip_node_recon_conf), c(ape::Ntip(tr) + ape::Nnode(tr)))
   check_num_between_0_and_1(boot_threshold)
-  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
+  check_dimensions(geno, exact_rows = ape::Ntip(tr), min_rows = ape::Ntip(tr), exact_cols = NULL, min_cols = 1)
   check_equal(length(geno_conf_edge), ncol(geno))
-  check_equal(length(geno_conf_edge[[1]]), Nedge(tr))
+  check_equal(length(geno_conf_edge[[1]]), ape::Nedge(tr))
   check_equal(length(geno_recon_edge), ncol(geno))
-  check_equal(length(geno_recon_edge[[1]]), Nedge(tr))
+  check_equal(length(geno_recon_edge[[1]]), ape::Nedge(tr))
   check_if_binary_vector(geno_conf_edge[[1]])
   check_if_binary_vector(geno_recon_edge[[1]])
 
@@ -235,7 +235,7 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
   short_edges                 <- identify_short_edges(tr)
 
   high_confidence_edges <- pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3
-  if (length(high_confidence_edges) != Nedge(tr)) {
+  if (length(high_confidence_edges) != ape::Nedge(tr)) {
     stop("Confidence should correspond to each tree edge")
   }
   all_high_confidence_edges <- rep(list(0), ncol(geno))

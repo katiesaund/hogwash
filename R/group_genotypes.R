@@ -36,14 +36,14 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr, geno, g_reconstruction_an
   # VALIDATE INPUTS -----------------------------------------------------------#
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
-  check_dimensions(geno, Ntip(tr), 2, NULL, 2)
+  check_dimensions(geno, ape::Ntip(tr), 2, NULL, 2)
   check_equal(length(g_reconstruction_and_confidence), ncol(geno))
   check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
   check_if_binary_vector_numeric(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)
   check_if_binary_vector_numeric(g_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf)
 
   # FUNCTION ------------------------------------------------------------------#
-  tip_nodes_by_snp_mat_recon <- tip_nodes_by_snp_mat_confi <- matrix(0, nrow = (Nnode(tr) + Ntip(tr)), ncol = ncol(geno))
+  tip_nodes_by_snp_mat_recon <- tip_nodes_by_snp_mat_confi <- matrix(0, nrow = (ape::Nnode(tr) + ape::Ntip(tr)), ncol = ncol(geno))
   if (nrow(tip_nodes_by_snp_mat_recon) != length(g_reconstruction_and_confidence[[1]]$tip_and_node_recon)) {
     stop("mismatch in size")
   }
@@ -124,7 +124,7 @@ build_node_anc_recon_from_gene_list <- function(gene_list, tr){
   # TODO test this function works.
   gene_list_built_from_snps_just_node_anc_rec <- rep(list(0), length(gene_list$tip_and_node_recon))
   for (m in 1:length(gene_list$tip_and_node_recon)) {
-    gene_list_built_from_snps_just_node_anc_rec[[m]] <- gene_list[[m]]$tip_and_node_recon[(Ntip(tr) + 1):(Ntip(tr) + Nedge(tr))]
+    gene_list_built_from_snps_just_node_anc_rec[[m]] <- gene_list[[m]]$tip_and_node_recon[(ape::Ntip(tr) + 1):(ape::Ntip(tr) + ape::Nedge(tr))]
   }
   return(gene_list_built_from_snps_just_node_anc_rec)
 } # end build_node_anc_recon_from_gene_list()
@@ -148,16 +148,16 @@ build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_s
   #
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
-  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, exact_cols =  nrow(gene_to_snp_lookup_table), min_cols = 1)
+  check_dimensions(geno, exact_rows = ape::Ntip(tr), min_rows = 1, exact_cols =  nrow(gene_to_snp_lookup_table), min_cols = 1)
   check_if_binary_matrix(geno)
   check_equal(length(geno_transition), ncol(geno))
-  check_equal(length(geno_transition[[1]]$transition), Nedge(tr))
-  check_equal(length(geno_transition[[1]]$trans_dir), Nedge(tr))
+  check_equal(length(geno_transition[[1]]$transition), ape::Nedge(tr))
+  check_equal(length(geno_transition[[1]]$trans_dir), ape::Nedge(tr))
   check_if_binary_vector_numeric(geno_transition[[1]]$transition)
   check_dimensions(gene_to_snp_lookup_table, exact_rows = ncol(geno), min_rows = 1, exact_cols = 2, min_cols = 1)
 
   # Function -------------------------------------------------------------------
-  transition_edges_by_snp_mat <- trans_dir_edges_by_snp_mat <- matrix(0, nrow = Nedge(tr), ncol = ncol(geno))
+  transition_edges_by_snp_mat <- trans_dir_edges_by_snp_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = ncol(geno))
 
   for (k in 1:ncol(geno)) {
     transition_edges_by_snp_mat[ , k] <- geno_transition[[k]]$transition
@@ -315,7 +315,7 @@ prepare_ungrouped_genotype <- function(geno, tr){
   #   $convergene_not_possible_genotypes. Character vector. Vector of genotype names.
   #
   # Check input ----------------------------------------------------------------
-  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, min_cols = 1)
+  check_dimensions(geno, exact_rows = ape::Ntip(tr), min_rows = 1, min_cols = 1)
   check_if_binary_matrix(geno)
   check_for_root_and_bootstrap(tr)
 
@@ -362,7 +362,7 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
   if (!is.null(lookup)) {
     check_dimensions(lookup, exact_cols = 2, min_cols = 2, min_rows = 1)
   }
-  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = 1, min_cols = 1)
+  check_dimensions(geno, exact_rows = ape::Ntip(tr), min_rows = 1, min_cols = 1)
   #
   # Function -------------------------------------------------------------------
   if (group_logical) {
@@ -421,16 +421,16 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
   #
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
-  check_dimensions(geno, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
+  check_dimensions(geno, exact_rows = ape::Ntip(tr), min_rows = ape::Ntip(tr), exact_cols = NULL, min_cols = 1)
   check_equal(length(genotype_reconstruction_and_confidence), ncol(geno))
-  check_equal(length(genotype_reconstruction_and_confidence[[1]]$node_anc_rec), Nnode(tr))
-  check_equal(length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_recon), c(Nnode(tr) + Ntip(tr)))
-  check_equal(length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf), c(Nnode(tr) + Ntip(tr)))
-  check_equal(nrow(genotype_reconstruction_and_confidence[[1]]$recon_edge_mat), Nedge(tr))
+  check_equal(length(genotype_reconstruction_and_confidence[[1]]$node_anc_rec), ape::Nnode(tr))
+  check_equal(length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_recon), c(ape::Nnode(tr) + ape::Ntip(tr)))
+  check_equal(length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf), c(ape::Nnode(tr) + ape::Ntip(tr)))
+  check_equal(nrow(genotype_reconstruction_and_confidence[[1]]$recon_edge_mat), ape::Nedge(tr))
   check_equal(length(genotype_transition_con), ncol(geno))
-  check_equal(length(genotype_transition_con[[1]]$transition), Nedge(tr))
+  check_equal(length(genotype_transition_con[[1]]$transition), ape::Nedge(tr))
   check_equal(length(genotype_transition_orig), ncol(geno))
-  check_equal(length(genotype_transition_orig[[1]]$transition), Nedge(tr))
+  check_equal(length(genotype_transition_orig[[1]]$transition), ape::Nedge(tr))
   check_dimensions(lookup, exact_rows = ncol(geno), min_rows = ncol(geno), exact_cols = 2, min_cols = 2)
 
   # Function -------------------------------------------------------------------

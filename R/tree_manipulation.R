@@ -16,11 +16,11 @@ find_parent_edge <- function(tr, edge_num){
   if (edge_num %% 1 != 0 | edge_num < 1) {
     stop("Node number must be a positive integer")
   }
-  if (edge_num > Nedge(tr)) {
+  if (edge_num > ape::Nedge(tr)) {
     stop("Number must be an edge in the tree.")
   }
   # Function -------------------------------------------------------------------
-  edge_with_basal_node <- Ntip(tr) + 1
+  edge_with_basal_node <- ape::Ntip(tr) + 1
   if (tr$edge[edge_num, 1] == edge_with_basal_node) {
     parent_edge <- NA
   } else {
@@ -50,7 +50,7 @@ identify_short_edges <- function(tr){
   check_tree_is_valid(tr)
 
   # Function -------------------------------------------------------------------
-  short_edges <- rep(1, Nedge(tr))
+  short_edges <- rep(1, ape::Nedge(tr))
   while (max(tr$edge.length[as.logical(short_edges)]) >=
          (0.1 * sum(tr$edge.length[as.logical(short_edges)]))) {
     short_edges[tr$edge.length ==
@@ -63,7 +63,7 @@ identify_short_edges <- function(tr){
 
   # Return output --------------------------------------------------------------
   check_if_binary_vector(short_edges)
-  if (length(short_edges) != Nedge(tr)) {
+  if (length(short_edges) != ape::Nedge(tr)) {
     stop("Short_edges should have length == Nedge(tr)")
   }
   return(short_edges)
@@ -113,11 +113,11 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
   }
   node_confidence <-
     discretize_confidence_using_threshold(node_confidence, confidence_threshold)
-  tree_tip_and_node_confidence <- c(rep(1, Ntip(tr)), node_confidence)
+  tree_tip_and_node_confidence <- c(rep(1, ape::Ntip(tr)), node_confidence)
 
   # Check and return output ----------------------------------------------------
   check_if_binary_vector(tree_tip_and_node_confidence)
-  if (length(tree_tip_and_node_confidence) != sum(Ntip(tr) + Nnode(tr))) {
+  if (length(tree_tip_and_node_confidence) != sum(ape::Ntip(tr) + ape::Nnode(tr))) {
     stop("tree confidence made incorrectly")
   }
 
@@ -140,8 +140,8 @@ reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
   # TODO add check of length of edges vs tips_and_node_vector
 
   # Function -------------------------------------------------------------------
-  ordered_by_edges <- rep(NA, Nedge(tr))
-  for (i in 1:Nedge(tr)) {
+  ordered_by_edges <- rep(NA, ape::Nedge(tr))
+  for (i in 1:ape::Nedge(tr)) {
     ordered_by_edges[i] <- tips_and_node_vector[tr$edge[i, 2]]
   }
 

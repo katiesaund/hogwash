@@ -51,9 +51,9 @@ count_hits_on_edges <- function(genotype_transition_edges, phenotype_reconstruct
   check_is_number(genotype_transition_edges[[1]][1])
   check_is_number(high_confidence_edges[[1]][1])
   check_is_number(phenotype_reconstruction[1])
-  check_equal(length(genotype_transition_edges[[1]]), Nedge(tr))
-  check_equal(length(phenotype_reconstruction), Nedge(tr))
-  check_equal(length(high_confidence_edges[[1]]), Nedge(tr))
+  check_equal(length(genotype_transition_edges[[1]]), ape::Nedge(tr))
+  check_equal(length(phenotype_reconstruction), ape::Nedge(tr))
+  check_equal(length(high_confidence_edges[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
   both_present <- sapply(1:length(high_confidence_edges), function(x) {
@@ -103,13 +103,13 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   #
   # Check input ----------------------------------------------------------------
   check_equal(ncol(mat), length(genotype_transition_edges))
-  check_equal(length(genotype_transition_edges[[1]]), Nedge(tr))
-  check_equal(length(phenotype_reconstruction), Nedge(tr))
+  check_equal(length(genotype_transition_edges[[1]]), ape::Nedge(tr))
+  check_equal(length(phenotype_reconstruction), ape::Nedge(tr))
   check_if_permutation_num_valid(permutations)
   check_for_root_and_bootstrap(tr)
   check_num_between_0_and_1(fdr)
   check_equal(ncol(mat), length(high_confidence_edges))
-  check_equal(length(high_confidence_edges[[1]]), Nedge(tr))
+  check_equal(length(high_confidence_edges[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
   # Calculate observed values
@@ -126,7 +126,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
   num_edges_with_geno_trans             <- both_present + only_geno_present
   hit_pvals                             <- rep(NA, num_genotypes)
   num_hi_conf_edges                     <- sapply(high_confidence_edges, function(x) sum(x))
-  list_of_all_edges                     <- c(1:Nedge(tr))
+  list_of_all_edges                     <- c(1:ape::Nedge(tr))
   hi_conf_edges                        <- list(rep(0, num_genotypes))
 
   # 1. Subset tr edges to those with high confidence (as determined by phenotype & genotype reconstructions as well as tr bootstrap values).
@@ -149,7 +149,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       # This should never get triggered because we should be filtering the genotype before this step, but it's being kept in as a fail safe.
     } else {
 
-      permuted_geno_trans_edges <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, Nedge(tr), hi_conf_edges, i)
+      permuted_geno_trans_edges <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, ape::Nedge(tr), hi_conf_edges, i)
       # Now calculate both_present and only_geno_present with the permuted data in the same fashion as with the observed data
       empirical_both_present <- count_empirical_both_present(permuted_geno_trans_edges, phenotype_reconstruction, high_confidence_edges, i)
       empirical_only_geno_present <- count_empirical_only_geno_present(permuted_geno_trans_edges, empirical_both_present)
@@ -205,11 +205,11 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
   check_is_number(number_edges)
   check_is_number(index)
   check_is_number(high_conf_edges[[index]][1])
-  check_equal(number_edges, Nedge(tr))
+  check_equal(number_edges, ape::Nedge(tr))
   if (index < 1) {
     stop("loop index must be positive")
   }
-  if (max(high_conf_edges[[index]]) > Nedge(tr) | number_hi_conf_edges[index] > Nedge(tr) | number_edges_with_geno_trans[index] > Nedge(tr)) {
+  if (max(high_conf_edges[[index]]) > ape::Nedge(tr) | number_hi_conf_edges[index] > ape::Nedge(tr) | number_edges_with_geno_trans[index] > ape::Nedge(tr)) {
     stop("max value should be Nedge(tr")
   }
 
@@ -234,7 +234,7 @@ discrete_permutation <- function(tr, num_perm, number_edges_with_geno_trans, num
     redistributed_hits[m, ][permuted_geno_trans_mat[m, ]] <- 1
   }
   # Check and return output ----------------------------------------------------
-  check_dimensions(redistributed_hits, exact_rows = num_perm, min_rows = num_perm, exact_cols = Nedge(tr), min_cols = Nedge(tr))
+  check_dimensions(redistributed_hits, exact_rows = num_perm, min_rows = num_perm, exact_cols = ape::Nedge(tr), min_cols = ape::Nedge(tr))
   return(redistributed_hits)
 } # end discrete_permutation()
 
