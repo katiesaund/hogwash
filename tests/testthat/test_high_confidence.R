@@ -90,7 +90,7 @@ test_that("prepare_high_confidence_objects returns objects of expected sizes for
   temp_AR <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, temp_geno, temp_discrete)
 
   for (i in 1:num_samples) {
-    temp_AR$geno_recon_and_conf[[i]]$tip_and_node_rec_conf <- rep(1, ape::Ntip(temp_treape::e) + ape::Nnode(temp_tree))
+    temp_AR$geno_recon_and_conf[[i]]$tip_and_node_rec_conf <- rep(1, ape::Ntip(temp_tree) + ape::Nnode(temp_tree))
   }
 
   temp_trans_original <- prepare_genotype_transitions_for_original_discrete_test(temp_geno, temp_trans) # Keep only WT -> mutant transitions.
