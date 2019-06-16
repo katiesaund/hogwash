@@ -152,7 +152,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges, phenotype_recons
       permuted_geno_trans_edges <- discrete_permutation(tr, permutations, num_edges_with_geno_trans, num_hi_conf_edges, ape::Nedge(tr), hi_conf_edges, i)
       # Now calculate both_present and only_geno_present with the permuted data in the same fashion as with the observed data
       empirical_both_present <- count_empirical_both_present(permuted_geno_trans_edges, phenotype_reconstruction, high_confidence_edges, i)
-      empirical_only_geno_present <- count_empirical_only_geno_present(permuted_geno_trans_edges, empirical_both_present)
+      # empirical_only_geno_present <- count_empirical_only_geno_present(permuted_geno_trans_edges, empirical_both_present)
 
       # Note on nomeclature from the original PhyC paper supplement page 7: https://media.nature.com/original/nature-assets/ng/journal/v45/n10/extref/ng.2747-S1.pdf
       # X -> G on R is the same as sum(empirical_both_present >= both_present[i])

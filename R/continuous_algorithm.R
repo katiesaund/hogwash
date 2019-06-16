@@ -257,7 +257,7 @@ calculate_genotype_significance <- function(mat,
   check_if_permutation_num_valid(permutations)
   check_if_binary_matrix(mat)
   check_if_binary_vector(genotype_confidence[[1]])
-  check_dimensions(mat = mat, exact_rows = Ntip(tr), min_rows = Ntip(tr), exact_cols = NULL, min_cols = 1)
+  check_dimensions(mat = mat, exact_rows = ape::Ntip(tr), min_rows = ape::Ntip(tr), exact_cols = NULL, min_cols = 1)
   check_dimensions(mat = pheno_recon_ordered_by_edges, exact_rows = ape::Nedge(tr), min_rows = ape::Nedge(tr), exact_cols = 2, min_cols = 2)
   check_equal(length(genotype_transition_list[[1]]$transition), ape::Nedge(tr))
   check_equal(length(genotype_transition_list), ncol(mat))

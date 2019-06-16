@@ -15,7 +15,7 @@ test_that("ancestral_reconstruction_by_ML with discrete input produce ancestral 
 
 
   # Test
-  expected_length <-ape::Ntip(temp_tree) + ape::Nnode(temp_tree)
+  expected_length <- ape::Ntip(temp_tree) + ape::Nnode(temp_tree)
   expect_identical(length(dummy_pheno$tip_and_node_recon), expected_length)
   expect_identical(length(dummy_geno$tip_and_node_recon), expected_length)
   expect_identical(length(dummy_pheno$tip_and_node_rec_conf), expected_length)

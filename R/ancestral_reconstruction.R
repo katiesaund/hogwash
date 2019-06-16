@@ -115,14 +115,14 @@ continuous_ancestral_reconstruction <- function(tr,
   check_tree_is_valid(tr)
   check_is_number(num)
   check_dimensions(mat,
-                   exact_rows = Ntip(tr),
-                   min_rows = Ntip(tr),
+                   exact_rows = ape::Ntip(tr),
+                   min_rows = ape::Ntip(tr),
                    exact_cols = 1,
                    min_cols = 1)
 
   # Function -------------------------------------------------------------------
   set.seed(1)
-  reconstruction <- ace(mat[ , num, drop = TRUE],
+  reconstruction <- ape::ace(mat[ , num, drop = TRUE],
                         tr,
                         model = "BM",
                         type = disc_cont,
@@ -133,7 +133,7 @@ continuous_ancestral_reconstruction <- function(tr,
   # are 1-N.
   ML_anc_rec <- reconstruction$ace
   tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
-  names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
+  names(tip_and_node_recon) <- c(1:sum(ape::Ntip(tr), ape::Nnode(tr)))
 
   # Return output --------------------------------------------------------------
   return(list("ML_anc_rec" = ML_anc_rec,
@@ -191,7 +191,7 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
   # Check inputs ---------------------------------------------------------------
   check_tree_is_valid(tr)
   check_for_root_and_bootstrap(tr)
-  check_equal(length(tip_and_node_reconstruction), Nnode(tr) + Ntip(tr))
+  check_equal(length(tip_and_node_reconstruction), ape::Nnode(tr) + ape::Ntip(tr))
 
   # Function -------------------------------------------------------------------
   reconstruction_as_edge_mat <- tr$edge
@@ -254,7 +254,7 @@ discrete_ancestral_reconstruction <- function(tr,
   set.seed(1)
   recon_model <- pick_recon_model(mat, tr, disc_cont, num, recon_method)
   set.seed(1)
-  reconstruction <- ace(mat[ , num, drop = TRUE],
+  reconstruction <- ape::ace(mat[ , num, drop = TRUE],
                         tr,
                         model = recon_model,
                         type = disc_cont,
@@ -266,9 +266,9 @@ discrete_ancestral_reconstruction <- function(tr,
     as.numeric(colnames(reconstruction$lik.anc)[apply(reconstruction$lik.anc,
                                                       1,
                                                       which.max)])
-  names(ML_anc_rec) <- c((Ntip(tr) + 1):(Ntip(tr) + Nnode(tr)))
+  names(ML_anc_rec) <- c((ape::Ntip(tr) + 1):(ape::Ntip(tr) + ape::Nnode(tr)))
   tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
-  names(tip_and_node_recon) <- c(1:sum(Ntip(tr), Nnode(tr)))
+  names(tip_and_node_recon) <- c(1:sum(ape::Ntip(tr), ape::Nnode(tr)))
 
   # Return outputs -------------------------------------------------------------
   return(list("tip_and_node_recon" = tip_and_node_recon,
@@ -313,7 +313,7 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
   anc_rec_confidence <- apply(recon$lik.anc, 1, max)
 
   # Count all tips as high confidence
-  tip_and_node_anc_rec_confidence <- c(rep(1, Ntip(tr)), anc_rec_confidence)
+  tip_and_node_anc_rec_confidence <- c(rep(1, ape::Ntip(tr)), anc_rec_confidence)
 
   # Count anything lower than threshold as low confidence
   tip_and_node_anc_rec_confidence <-
@@ -358,8 +358,8 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
     stop("Index must be 1 <= index <= ncol(matrix)")
   }
   check_dimensions(mat = mat,
-                   exact_rows = Ntip(tr),
-                   min_rows = Ntip(tr),
+                   exact_rows = ape::Ntip(tr),
+                   min_rows = ape::Ntip(tr),
                    exact_cols = NULL,
                    min_cols = 1)
 
@@ -376,7 +376,7 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
   # Test ER vs ARD
   set.seed(1)
-  ERreconstruction  <- ace(mat[ , num, drop = TRUE],
+  ERreconstruction  <- ape::ace(mat[ , num, drop = TRUE],
                            tr,
                            type = disc_cont,
                            method = recon_method,
@@ -388,7 +388,7 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # preferred in this case use the following warning catching:
   error_msg <- "ARD_bad_fit"
   set.seed(1)
-  ARDreconstruction <- tryCatch(ace(mat[ , num, drop = TRUE],
+  ARDreconstruction <- tryCatch(ape::ace(mat[ , num, drop = TRUE],
                                     tr,
                                     type = disc_cont,
                                     method = recon_method,
@@ -472,13 +472,13 @@ prepare_ancestral_reconstructions <- function(tr, pheno, geno, disc_cont){
   check_for_root_and_bootstrap(tr)
   check_str_is_discrete_or_continuous(disc_cont)
   check_dimensions(pheno,
-                   exact_rows = Ntip(tr),
-                   min_rows = Ntip(tr),
+                   exact_rows = ape::Ntip(tr),
+                   min_rows = ape::Ntip(tr),
                    min_cols = 1,
                    exact_cols = 1)
   check_dimensions(geno,
-                   exact_rows = Ntip(tr),
-                   min_rows = Ntip(tr),
+                   exact_rows = ape::Ntip(tr),
+                   min_rows = ape::Ntip(tr),
                    min_cols = 1)
   check_if_binary_matrix(geno)
 

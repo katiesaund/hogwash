@@ -187,13 +187,13 @@ check_for_root_and_bootstrap <- function(tr){
   if (class(tr) != "phylo") {
     stop("Tree must be phylo object")
   }
-  if (!is.rooted(tr)) {
+  if (!ape::is.rooted(tr)) {
     stop("Tree must be rooted")
   }
   if (is.null(tr$node.label)) {
     stop("Tree must have bootstrap values in the nodes")
   }
-  if (length(tr$node.label) != Nnode(tr)) {
+  if (length(tr$node.label) != ape::Nnode(tr)) {
     stop("Tree must have bootstrap values for each node")
 
   }
@@ -299,8 +299,8 @@ check_rownames <- function(mat, tr) {
     stop("Inputs are incorrectly formatted.")
   }
   check_dimensions(mat,
-                   exact_rows = Ntip(tr),
-                   min_rows = Ntip(tr),
+                   exact_rows = ape::Ntip(tr),
+                   min_rows = ape::Ntip(tr),
                    exact_cols = NULL,
                    min_cols = 1)
 
@@ -315,7 +315,7 @@ check_rownames <- function(mat, tr) {
     stop("Matrix must be formatted with samples in matrix in the same order as
          tree$tip.label.")
   }
-  if (sum(row.names(mat) == tr$tip.label) != Ntip(tr)) {
+  if (sum(row.names(mat) == tr$tip.label) != ape::Ntip(tr)) {
     stop("Matrix must be formatted with samples in matrix in the same order as
          tree$tip.label.")
   }
@@ -369,7 +369,7 @@ check_node_is_in_tree <- function(node_val, tr){
   check_for_root_and_bootstrap(tr)
   check_is_number(node_val)
 
-  if (node_val > Nnode(tr) + Ntip(tr)) {
+  if (node_val > ape::Nnode(tr) + ape::Ntip(tr)) {
     stop("Node number is too high; not found in tree.")
   }
   if (node_val < 1 | node_val %% 1 != 0) {
@@ -397,13 +397,13 @@ check_tree_is_valid <- function(tr){
 
   num_edges_for_node <- table(tr$edge)
 
-  for (i in 1:Ntip(tr)) {
+  for (i in 1:ape::Ntip(tr)) {
     if (num_edges_for_node[i] != 1) {
       stop(paste("Tip node", i, "has", num_edges_for_node[i],
                  "edges. Should have 1 edge"))
     }
   }
-  for (i in (Ntip(tr) + 1):(Nnode(tr) + Ntip(tr))) {
+  for (i in (ape::Ntip(tr) + 1):(ape::Nnode(tr) + ape::Ntip(tr))) {
     if (num_edges_for_node[i] != 2 && num_edges_for_node[i] != 3) {
       stop(paste("Internal node", i, "has", num_edges_for_node[i],
                  "edges. Should have 2(root) or 3 edge"))
@@ -465,7 +465,7 @@ is_tip <- function(node_num, tr){
   check_node_is_in_tree(node_num, tr)
   #
   # Function & return output --------------------------------------------------#
-  return(node_num <= Ntip(tr))
+  return(node_num <= ape::Ntip(tr))
 } # end is_tip()
 
 

@@ -24,7 +24,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   check_tree_is_valid(tr)
 
   # Function -------------------------------------------------------------------
-  plot_p_recon <- contMap(tr, pheno_vector, method = "user", anc.states = pheno_anc_rec, plot = FALSE)
+  plot_p_recon <- phytools::contMap(tr, pheno_vector, method = "user", anc.states = pheno_anc_rec, plot = FALSE)
   plot(plot_p_recon,
        add = TRUE,
        ylim = c(-1 / 25 * ape::Ntip(tr), ape::Ntip(tr)),
@@ -338,7 +338,7 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
        use.edge.length = FALSE,
        label.offset = 3,
        adj = 0)
-  tiplabels(pch = 21,
+  ape::tiplabels(pch = 21,
             col = annot[ , 2],
             adj = 2,
             bg = annot[ , 2],

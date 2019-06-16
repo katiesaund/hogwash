@@ -41,8 +41,8 @@ reduce_redundancy <- function(mat, tr){
   # Function -------------------------------------------------------------------
   geno_to_drop <- rep(FALSE, ncol(mat))
   geno_to_drop[colSums(mat) <= 1] <- TRUE
-  geno_to_drop[colSums(mat) == (Ntip(tr) - 1)] <- TRUE
-  geno_to_drop[colSums(mat) == Ntip(tr)] <- TRUE
+  geno_to_drop[colSums(mat) == (ape::Ntip(tr) - 1)] <- TRUE
+  geno_to_drop[colSums(mat) == ape::Ntip(tr)] <- TRUE
   dropped_genotype_names <- colnames(mat)[geno_to_drop]
   mat <- mat[ , !geno_to_drop, drop = FALSE]
 
