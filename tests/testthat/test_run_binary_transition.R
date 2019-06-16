@@ -1,3 +1,5 @@
+library(ape)
+
 context("Run binary transition") #-----------------------------------------------#
 
 test_that("run_binary_transition() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{

@@ -1,3 +1,4 @@
+library(ape)
 context("Run binary original") #-----------------------------------------------#
 
 test_that("run_binary_original() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{

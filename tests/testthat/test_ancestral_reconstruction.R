@@ -1,3 +1,4 @@
+library(ape)
 context("Ancestral reconstruction") #------------------------------------------#
 
 # test ancestral_reconstruction_by_ML ------------------------------------------

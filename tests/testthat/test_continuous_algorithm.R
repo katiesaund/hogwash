@@ -1,3 +1,5 @@
+library(ape)
+
 context("Continuous algorithm") #----------------------------------------------#
 
 # test run_ks_test
