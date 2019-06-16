@@ -202,7 +202,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
   colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
 
-  fname <- create_file_name(dir, name, paste("summary_and_sig_hit_results.pdf", sep = "")) # 2019-02-25 removed counter from pdf file name because combining.
+  fname <- create_file_name(dir, name, ".pdf")
   pdf(fname, width = 16, height = 20)
 
   make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, fdr, "continuous")

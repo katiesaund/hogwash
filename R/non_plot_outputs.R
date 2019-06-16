@@ -1,4 +1,4 @@
-save_results_as_r_object <- function(dir, name, object){
+save_results_as_r_object <- function(dir, name, object, prefix){
   # Function description -------------------------------------------------------
   # Save all of the non-plot outputs in a .rda file.
   #
@@ -17,7 +17,7 @@ save_results_as_r_object <- function(dir, name, object){
   # TODO check on object?
 
   # Function & output ----------------------------------------------------------
-  save(object, file = paste0(dir, "/phyc_", name, ".rda"))
+  save(object, file = paste0(dir, "/", prefix, "_", name, ".rda"))
 } # end save_results_as_r_object()
 
 # End of script ----------------------------------------------------------------
