@@ -9,7 +9,7 @@ test_that("select_test_type doesn't throw error when given valid continuous inpu
   args$tree                   <- hogwash::tree
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
-  args$genotype               <- hogwash::genotype
+  args$genotype               <- hogwash::snp_genotype
   args$output_name            <- "dummy_grouped"
   args$output_dir             <- "."
   args$perm                   <- 10
@@ -33,7 +33,7 @@ test_that("select_test_type doesn't throw error given valid discrete input", {
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::antibiotic_resistance
-  args$tree                   <- hogwash::tree
+  args$tree                   <- hogwash::snp_tree
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- hogwash::genotype

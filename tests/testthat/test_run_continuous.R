@@ -7,7 +7,7 @@ test_that("run_continuous() doesn't give any errors when given a continuous phen
   args$tree                   <- hogwash::tree
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
-  args$genotype               <- hogwash::genotype
+  args$genotype               <- hogwash::snp_genotype
   args$output_name            <- "dummy_grouped"
   args$output_dir             <- "."
   args$perm                   <- 1000
@@ -16,7 +16,7 @@ test_that("run_continuous() doesn't give any errors when given a continuous phen
   args$discrete_or_continuous <- "continuous"
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- FALSE
-  args$gene_snp_lookup <- NULL
+  args$gene_snp_lookup        <- NULL
   expect_error(run_continuous(args), NA)
 })
 
@@ -27,7 +27,7 @@ test_that("run_continuous() doesn't give any errors when given a continuous phen
   args$tree                   <- hogwash::tree
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
-  args$genotype               <- hogwash::genotype
+  args$genotype               <- hogwash::snp_genotype
   args$output_name            <- "dummy_grouped"
   args$output_dir             <- "."
   args$perm                   <- 1000

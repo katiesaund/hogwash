@@ -7,7 +7,7 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args$tree                   <- hogwash::tree
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
-  args$genotype               <- hogwash::genotype
+  args$genotype               <- hogwash::snp_genotype
   args$output_name            <- "dummy_grouped"
   args$output_dir             <- "."
   args$perm                   <- 1000
@@ -31,7 +31,7 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args$tree                   <- hogwash::tree
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
-  args$genotype               <- hogwash::genotype
+  args$genotype               <- hogwash::snp_genotype
   args$output_name            <- "dummy_grouped"
   args$output_dir             <- "."
   args$perm                   <- 1000
