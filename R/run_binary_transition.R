@@ -49,7 +49,7 @@ run_binary_transition <- function(args){
                                         args$tree)
     }
   }
-  hi_conf_concomitant <-
+  hi_conf <-
     prepare_high_confidence_objects(geno_trans_concomitant,
                                     args$tree,
                                     AR$pheno_recon_and_conf$tip_and_node_rec_conf,
@@ -58,10 +58,10 @@ run_binary_transition <- function(args){
                                     geno_conf_ordered_by_edges,
                                     geno_recon_ordered_by_edges,
                                     geno$snps_per_gene)
-  genotype_transition_edges <- rep(list(0), ncol(hi_conf_concomitant$genotype))
-  for (k in 1:ncol(hi_conf_concomitant$genotype)) {
+  genotype_transition_edges <- rep(list(0), ncol(hi_conf$genotype))
+  for (k in 1:ncol(hi_conf$genotype)) {
     genotype_transition_edges[[k]] <-
-      hi_conf_concomitant$genotype_transition[[k]]$transition
+      hi_conf$genotype_transition[[k]]$transition
   }
 
   pheno_trans <- identify_transition_edges(args$tree,
@@ -75,10 +75,10 @@ run_binary_transition <- function(args){
     discrete_calculate_pvals(genotype_transition_edges,
                              pheno_trans$transition,
                              args$tree,
-                             hi_conf_concomitant$genotype,
+                             hi_conf$genotype,
                              args$perm,
                              args$fdr,
-                             hi_conf_concomitant$high_conf_ordered_by_edges)
+                             hi_conf$high_conf_ordered_by_edges)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_trans <-
@@ -91,8 +91,8 @@ run_binary_transition <- function(args){
                      annot = args$annot, num_perm = args$perm,
                      trans_hit_vals = corrected_pvals_trans$hit_pvals,
                      trans_perm_obs_results = disc_trans_results,
-                     tr_and_pheno_hi_conf = hi_conf_concomitant$tr_and_pheno_hi_conf,
-                     geno_confidence = hi_conf_concomitant$high_conf_ordered_by_edges,
+                     tr_and_pheno_hi_conf = hi_conf$tr_and_pheno_hi_conf,
+                     geno_confidence = hi_conf$high_conf_ordered_by_edges,
                      g_trans_edges = genotype_transition_edges,
                      p_trans_edges = pheno_trans$transition,
                      snp_in_gene = geno$snps_per_gene,
@@ -102,15 +102,14 @@ run_binary_transition <- function(args){
   results_object$contingency_table <-
     create_contingency_table(genotype_transition_edges,
                              pheno_trans$transition,
-                             hi_conf_concomitant$genotype,
+                             hi_conf$genotype,
                              "synchronous")
   results_object$hit_pvals <- corrected_pvals_trans$hit_pvals
   results_object$sig_pvals <- corrected_pvals_trans$sig_pvals
   results_object$high_confidence_transition_edges <-
-    hi_conf_concomitant$high_confidence_transition_edges
+    hi_conf$high_confidence_transition_edges
   results_object$num_high_confidence_transition_edges <-
-    hi_conf_concomitant$num_high_confidence_transition_edges
-  results_object$dropped_genotypes <-
-    hi_conf_concomitant$dropped_genotypes
+    hi_conf$num_high_confidence_transition_edges
+  results_object$dropped_genotypes <- hi_conf$dropped_genotypes
   save_results_as_r_object(args$output_dir, args$output_name, results_object, "synchronous", args$group_genotype)
 } # end run_binary_transition()

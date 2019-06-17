@@ -46,7 +46,7 @@ run_continuous <- function(args){
                                         args$tree)
     }
   }
-  hi_conf_concomitant <-
+  hi_conf <-
     prepare_high_confidence_objects(geno_trans_concomitant,
                                     args$tree,
                                     AR$pheno_recon_and_conf$tip_and_node_rec_conf,
@@ -58,13 +58,13 @@ run_continuous <- function(args){
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   results_all_transitions <-
-    calculate_genotype_significance(hi_conf_concomitant$genotype,
+    calculate_genotype_significance(hi_conf$genotype,
                                     args$perm,
-                                    hi_conf_concomitant$genotype_transition,
+                                    hi_conf$genotype_transition,
                                     args$tree,
                                     AR$pheno_recon_and_conf$recon_edge_mat,
-                                    hi_conf_concomitant$high_conf_ordered_by_edges,
-                                    hi_conf_concomitant$geno_recon_edge)
+                                    hi_conf$high_conf_ordered_by_edges,
+                                    hi_conf$geno_recon_edge)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_all_transitions <-
@@ -92,20 +92,20 @@ run_continuous <- function(args){
                           args$perm,
                           results_all_transitions,
                           AR$pheno_recon_and_conf$node_anc_rec,
-                          hi_conf_concomitant$geno_recon_edge,
-                          hi_conf_concomitant$high_conf_ordered_by_edges,
-                          hi_conf_concomitant$genotype_transition,
-                          hi_conf_concomitant$genotype,
+                          hi_conf$geno_recon_edge,
+                          hi_conf$high_conf_ordered_by_edges,
+                          hi_conf$genotype_transition,
+                          hi_conf$genotype,
                           AR$pheno_recon_and_conf$recon_edge_mat,
-                          hi_conf_concomitant$high_conf_ordered_by_edges,
+                          hi_conf$high_conf_ordered_by_edges,
                           all_transitions_sig_hits,
                           args$group_genotype)
   results_object$high_confidence_trasition_edges <-
-    hi_conf_concomitant$high_confidence_trasition_edges
+    hi_conf$high_confidence_trasition_edges
   results_object$num_high_confidence_trasition_edges <-
-    hi_conf_concomitant$num_high_confidence_trasition_edges
+    hi_conf$num_high_confidence_trasition_edges
   results_object$dropped_genotypes <-
-    hi_conf_concomitant$dropped_genotypes
+    hi_conf$dropped_genotypes
   results_object$genotype_transition_edge_matrix <-
     trans_mat_results$trans_dir_edge_mat
   results_object$phenotype_transition_edge_matrix <-
