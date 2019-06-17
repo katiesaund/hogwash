@@ -8,7 +8,7 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- hogwash::genotype
-  args$output_name            <- "dummy_group_snps_into_genes"
+  args$output_name            <- "dummy_grouped"
   args$output_dir             <- "../../data/outputs/"
   args$perm                   <- 1000
   args$fdr                    <- 0.15
@@ -31,7 +31,7 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   test_geno  <- "../../data/grouped_genotype.tsv"
   test_gene_snp_lookup <- NULL
   test_annot <- NULL
-  test_name  <- "dummy_group_snps_into_genes"
+  test_name  <- "dummy"
   test_perm  <- "1000"
   test_fdr <- "0.15"
   test_bootstrap <- "0.7"

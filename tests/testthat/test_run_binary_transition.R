@@ -9,7 +9,7 @@ test_that("run_binary_transition() doesn't give any errors when given a discrete
   test_geno  <- "../../data/grouped_genotype.tsv"
   test_gene_snp_lookup <- "../../data/snp_gene_key.tsv"
   test_annot <- NULL
-  test_name  <- "dummy_group_snps_into_genes"
+  test_name  <- "dummy_group"
   test_perm  <- "1000"
   test_fdr <- "0.15"
   test_bootstrap <- "0.7"
@@ -44,7 +44,7 @@ test_that("run_binary_transition() doesn't give any errors when given a discrete
   test_geno  <- "../../data/grouped_genotype.tsv"
   test_gene_snp_lookup <- NULL
   test_annot <- NULL
-  test_name  <- "dummy_group_snps_into_genes"
+  test_name  <- "dummy"
   test_perm  <- "1000"
   test_fdr <- "0.15"
   test_bootstrap <- "0.7"

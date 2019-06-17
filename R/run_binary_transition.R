@@ -97,7 +97,7 @@ run_binary_transition <- function(args){
                      p_trans_edges = pheno_trans$transition,
                      snp_in_gene = geno$snps_per_gene,
                      prefix = "synchronous",
-                     grouped_logical = args$genotype)
+                     grouped_logical = args$group_genotype)
 
   results_object$contingency_table <-
     create_contingency_table(genotype_transition_edges,
