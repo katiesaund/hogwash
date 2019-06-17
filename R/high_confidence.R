@@ -206,13 +206,13 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
   # TODO Add descripts for each output.
   # Outputs:
   # list(c("dropped_genotypes" = dropped_genotypes,
-  # "high_confidence_trasition_edges" = only_high_conf_geno_trans,
+  # "high_confidence_transition_edges" = only_high_conf_geno_trans,
   # "genotype" = geno,
   # "snps_per_gene" = snps_in_each_gene,
   # "genotype_transition" = genotype_transition,
   # "geno_recon_edge" = geno_recon_edge,
   # "high_conf_ordered_by_edges" = high_conf_ordered_by_edges,
-  # "num_high_confidence_trasition_edges" = num_high_confidence_trasition_edges))
+  # "num_high_confidence_transition_edges" = num_high_confidence_transition_edges))
   #
   # Check input ----------------------------------------------------------------
   check_equal(length(genotype_transition), ncol(geno))
@@ -249,7 +249,8 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
     genotype_transition[[i]]$transition <- only_high_conf_geno_trans[[i]]
     genotype_transition[[i]]$trans_dir <- only_high_conf_geno_trans[[i]] * genotype_transition[[i]]$trans_dir
   }
-  num_high_confidence_trasition_edges <- report_num_high_confidence_trans_edge(genotype_transition, all_high_confidence_edges, colnames(geno))
+  names(only_high_conf_geno_trans) <- colnames(geno)
+  num_high_confidence_transition_edges <- report_num_high_confidence_trans_edge(genotype_transition, all_high_confidence_edges, colnames(geno))
 
   # KEEP ONLY genoS WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES ----#
   geno_to_keep                <- keep_at_least_two_high_conf_trans_edges(genotype_transition, all_high_confidence_edges)
@@ -262,13 +263,13 @@ prepare_high_confidence_objects <- function(genotype_transition, tr,
 
   # Return output --------------------------------------------------------------
   results = list("dropped_genotypes" = dropped_genotypes,
-                  "high_confidence_trasition_edges" = only_high_conf_geno_trans,
+                  "high_confidence_transition_edges" = only_high_conf_geno_trans,
                   "genotype" = geno,
                   "snps_per_gene" = snps_in_each_gene,
                   "genotype_transition" = genotype_transition,
                   "geno_recon_edge" = geno_recon_edge,
                   "high_conf_ordered_by_edges" = high_conf_ordered_by_edges,
-                  "num_high_confidence_trasition_edges" = num_high_confidence_trasition_edges,
+                  "num_high_confidence_transition_edges" = num_high_confidence_transition_edges,
                  "tr_and_pheno_hi_conf" = high_confidence_edges)
   return(results)
 
