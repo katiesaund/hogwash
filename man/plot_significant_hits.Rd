@@ -7,7 +7,8 @@
 plot_significant_hits(disc_cont, tr, fdr, dir, name, pval_all_transition,
   pheno_vector, annot, perm, results_all_trans, pheno_anc_rec,
   geno_reconstruction, geno_confidence, geno_transition, geno,
-  pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf, all_trans_sig_hits)
+  pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf, all_trans_sig_hits,
+  group_logical)
 }
 \arguments{
 \item{all_trans_sig_hits}{}

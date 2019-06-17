@@ -9,6 +9,9 @@ make_ann_colors(geno_matrix)
 \arguments{
 \item{geno_matrix}{}
 }
+\value{
+
+}
 \description{
 Create object to annotate columns in the significant hit results.
 }

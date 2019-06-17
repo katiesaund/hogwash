@@ -6,10 +6,14 @@
 \usage{
 discrete_plot_orig(tr, dir, name, fdr, annot, num_perm, recon_hit_vals,
   p_recon_edges, recon_perm_obs_results, tr_and_pheno_hi_conf,
-  geno_confidence, g_trans_edges, p_trans_edges, snp_in_gene)
+  geno_confidence, g_trans_edges, p_trans_edges, snp_in_gene, prefix,
+  grouped_logical)
 }
 \arguments{
 \item{snp_in_gene}{}
+}
+\value{
+
 }
 \description{
 Plot convergence test results.

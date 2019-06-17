@@ -10,6 +10,9 @@ make_manhattan_plot(outdir, geno_pheno_name, pval_hits, alpha,
 \arguments{
 \item{trans_or_recon}{}
 }
+\value{
+
+}
 \description{
 Create a manhattan plot of GWAS hit p-values.
 }
