@@ -164,6 +164,7 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
 
   # Keep only those that are also significant after FDR correction.
   hits <- temp[temp[ , 1] < fdr, , drop = FALSE]
+  colnames(hits) <- "fdr_corrected_pvals"
 
   # Check and return output ----------------------------------------------------
   return(hits)

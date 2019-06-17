@@ -100,11 +100,11 @@ run_continuous <- function(args){
                           hi_conf_concomitant$high_conf_ordered_by_edges,
                           all_transitions_sig_hits,
                           args$group_genotype)
-  results_object$concomitant_high_confidence_trasition_edges <-
+  results_object$high_confidence_trasition_edges <-
     hi_conf_concomitant$high_confidence_trasition_edges
-  results_object$concomitant_num_high_confidence_trasition_edges <-
+  results_object$num_high_confidence_trasition_edges <-
     hi_conf_concomitant$num_high_confidence_trasition_edges
-  results_object$concomitant_dropped_genotypes <-
+  results_object$dropped_genotypes <-
     hi_conf_concomitant$dropped_genotypes
   results_object$genotype_transition_edge_matrix <-
     trans_mat_results$trans_dir_edge_mat

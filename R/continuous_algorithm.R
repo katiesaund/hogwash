@@ -352,6 +352,9 @@ get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
   fdr_corrected_pvals <- as.data.frame(fdr_corrected_pvals)
   row.names(fdr_corrected_pvals) <- names(hit_values)
 
+  colnames(fdr_corrected_pvals) <- "fdr_corrected_pvals"
+  colnames(sig_pvals) <- "fdr_corrected_pvals"
+
   # Check and return output ----------------------------------------------------
   results <- list("hit_pvals" = fdr_corrected_pvals,
                   "sig_pvals" = sig_pvals)
