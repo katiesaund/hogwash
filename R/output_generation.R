@@ -1,5 +1,4 @@
-# FUNCTIONS FOR PHYC ----------------------------------------------------------#
-create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno){
+create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno, test_type){
   # TODO
   # add names to contingency table results
   # add validations
@@ -15,21 +14,32 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
   # Compute ancestral reconstruction from a continuous or discrete input.
   #
   # Inputs:
-  # Varname. Var class. Description.
+  # test_type. Character string. Either "convergence" or "synchronous"
   #
   # Outputs:
   # "anc_rec" = ML_anc_rec. Vector. Description.
   #
   # Check input ----------------------------------------------------------------
+  check_is_string(test_type)
 
   # Function -------------------------------------------------------------------
 
-  # Return output --------------------------------------------------------------
+
 
   all_tables <- rep(list(NULL), length(genotype_by_edges))
   contingency_table <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)
-  row.names(contingency_table) <- c("geno_present", "geno_absent")
-  colnames(contingency_table) <- c("pheno_present", "pheno_absent")
+
+  if (test_type == "synchronous") {
+    row.names(contingency_table) <- c("geno_transition", "geno_not_trans")
+    colnames(contingency_table) <- c("pheno_transition", "pheno_not_trans")
+  } else if (test_type == "continous") {
+    row.names(contingency_table) <- c("geno_transition", "geno_not_trans")
+    colnames(contingency_table) <- c("pheno_present", "pheno_absent")
+  } else {
+    stop("Test must be either synchronous or continuous")
+  }
+
+
   for (i in 1:length(genotype_by_edges)) {
     temp_table <- contingency_table
     temp_table[1, 1] <- sum(genotype_by_edges[[i]]  + phenotype_by_edges == 2,  na.rm = TRUE)
@@ -40,6 +50,8 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
   }
 
   names(all_tables) <- colnames(geno)
+
+  # Return output --------------------------------------------------------------
   return(all_tables)
 } # end create_contigency_table()
 

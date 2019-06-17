@@ -103,13 +103,13 @@ run_binary_transition <- function(args){
     create_contingency_table(genotype_transition_edges,
                              pheno_trans$transition,
                              hi_conf_concomitant$genotype)
-  results_object$hit_pvals_transition <- corrected_pvals_trans$hit_pvals
-  results_object$sig_pvals_transition <- corrected_pvals_trans$sig_pvals
-  results_object$concomitant_high_confidence_trasition_edges <-
+  results_object$hit_pvals <- corrected_pvals_trans$hit_pvals
+  results_object$sig_pvals <- corrected_pvals_trans$sig_pvals
+  results_object$high_confidence_trasition_edges <-
     hi_conf_concomitant$high_confidence_trasition_edges
-  results_object$concomitant_num_high_confidence_trasition_edges <-
+  results_object$num_high_confidence_trasition_edges <-
     hi_conf_concomitant$num_high_confidence_trasition_edges
-  results_object$concomitant_dropped_genotypes <-
+  results_object$dropped_genotypes <-
     hi_conf_concomitant$dropped_genotypes
   save_results_as_r_object(args$output_dir, args$output_name, results_object, "synchronous", args$group_genotype)
 } # end run_binary_transition()
