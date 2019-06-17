@@ -589,7 +589,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   pdf(fname)
 
   par(mfrow = c(1,1))
-  make_manhattan_plot(dir, name, recon_hit_vals, fdr, "phyc")
+  make_manhattan_plot(dir, name, recon_hit_vals, fdr, prefix)
 
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
 
@@ -659,9 +659,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (plotting_logical) {
-    # phyc loci summary heat maps
     colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
-
 
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
