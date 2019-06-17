@@ -98,7 +98,8 @@ run_continuous <- function(args){
                           hi_conf_concomitant$genotype,
                           AR$pheno_recon_and_conf$recon_edge_mat,
                           hi_conf_concomitant$high_conf_ordered_by_edges,
-                          all_transitions_sig_hits)
+                          all_transitions_sig_hits,
+                          args$group_genotype)
   results_object$concomitant_high_confidence_trasition_edges <-
     hi_conf_concomitant$high_confidence_trasition_edges
   results_object$concomitant_num_high_confidence_trasition_edges <-

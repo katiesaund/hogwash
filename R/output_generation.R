@@ -44,27 +44,27 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
 } # end create_contigency_table()
 
 
-create_file_name <- function(output_dir, output_name, other_info){
-  # Function description -------------------------------------------------------
-  # Create a file name string that includes the path to the output directory.
-  #
-  # Input:
-  # output_dir.  Character.
-  # output_name. Character.
-  # other_info.  Character.
-  #
-  # Output:
-  # file_name. Character.
-  #
-  # Check input ----------------------------------------------------------------
-  check_if_dir_exists(output_dir)
-  check_is_string(output_name)
-  check_is_string(other_info)
-
-  # Function -------------------------------------------------------------------
-  file_name <- paste(output_dir, "/", "phyc_", output_name, "_", other_info, sep = "")
-
-  # Check and return output ----------------------------------------------------
-  check_is_string(file_name)
-  return(file_name)
-} # end create_file_name()
+# create_file_name <- function(output_dir, output_name, other_info){
+#   # Function description -------------------------------------------------------
+#   # Create a file name string that includes the path to the output directory.
+#   #
+#   # Input:
+#   # output_dir.  Character.
+#   # output_name. Character.
+#   # other_info.  Character.
+#   #
+#   # Output:
+#   # file_name. Character.
+#   #
+#   # Check input ----------------------------------------------------------------
+#   check_if_dir_exists(output_dir)
+#   check_is_string(output_name)
+#   check_is_string(other_info)
+#
+#   # Function -------------------------------------------------------------------
+#   file_name <- paste(output_dir, "/", "hogwash_", output_name, "_", other_info, sep = "")
+#
+#   # Check and return output ----------------------------------------------------
+#   check_is_string(file_name)
+#   return(file_name)
+# } # end create_file_name()

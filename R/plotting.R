@@ -139,7 +139,14 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
 #' @return
 #'
 #' @examples
-plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transition, pheno_vector, annot, perm, results_all_trans, pheno_anc_rec, geno_reconstruction, geno_confidence, geno_transition, geno, pheno_recon_ordered_by_edges, tr_and_pheno_hi_conf, all_trans_sig_hits){
+plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
+                                  pval_all_transition, pheno_vector,
+                                  annot, perm, results_all_trans,
+                                  pheno_anc_rec, geno_reconstruction,
+                                  geno_confidence, geno_transition, geno,
+                                  pheno_recon_ordered_by_edges,
+                                  tr_and_pheno_hi_conf, all_trans_sig_hits,
+                                  group_logical){
   # Function description -------------------------------------------------------
   # Plot continuous phenotype results.
   # Plot all genotype's -log(p-value) as a manhattan plot.
@@ -202,7 +209,13 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name, pval_all_transi
   column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
   colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
 
-  fname <- create_file_name(dir, name, ".pdf")
+  if (group_logical) {
+    fname <- paste0(output_dir, "/hogwash_continuous_grouped_", output_name, ".pdf")
+  } else {
+    fname <- paste0(output_dir, "/hogwash_continuous_", output_name, ".pdf")
+  }
+
+
   pdf(fname, width = 16, height = 20)
 
   make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, fdr, "continuous")
@@ -512,7 +525,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                                 recon_hit_vals, p_recon_edges,
                                 recon_perm_obs_results, tr_and_pheno_hi_conf,
                                 geno_confidence, g_trans_edges, p_trans_edges,
-                                snp_in_gene){
+                                snp_in_gene, prefix, grouped_logical){
   # Function description -------------------------------------------------------
   # Plot the discrete test results.
   #
@@ -567,7 +580,13 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
   # Function -------------------------------------------------------------------
   image_width <- 250
-  pdf(paste0(dir, "/phyc_",  name, ".pdf"))
+  if (grouped_logical) {
+    fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
+  } else {
+    fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
+  }
+
+  pdf(fname)
 
   par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, recon_hit_vals, fdr, "phyc")
@@ -812,7 +831,13 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
 
   # Function -------------------------------------------------------------------
   image_width <- 250
-  pdf(paste0(dir, "/synchronous_",  name, ".pdf"))
+  if (grouped_logical) {
+    fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
+  } else {
+    fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
+  }
+
+  pdf(fname)
 
   par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, trans_hit_vals, fdr, "synchronous")

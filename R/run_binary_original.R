@@ -67,7 +67,9 @@ run_binary_original <- function(args){
                      geno_confidence = hi_conf_original$high_conf_ordered_by_edges,
                      g_trans_edges = genotype_transition_edges,
                      p_trans_edges = pheno_trans$transition,
-                     snp_in_gene = geno$snps_per_gene)
+                     snp_in_gene = geno$snps_per_gene,
+                     prefix = "convergence",
+                     grouped_logical = args$grouped_genotype)
 
   results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, hi_conf_original$genotype)
   results_object$hit_pvals_reconstruction <- corrected_pvals_recon$hit_pvals

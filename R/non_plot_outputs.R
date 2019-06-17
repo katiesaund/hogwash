@@ -20,10 +20,10 @@ save_results_as_r_object <- function(dir, name, object, prefix, group_logical){
   # TODO check on object?
 
   # Function & output ----------------------------------------------------------
-  if (args$group_genotype) {
-    save(object, file = paste0(dir, "/", prefix, "_grouped_", name, ".rda"))
+  if (group_logical) {
+    save(object, file = paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".rda"))
   } else {
-    save(object, file = paste0(dir, "/", prefix, "_", name, ".rda"))
+    save(object, file = paste0(dir, "/hogwash_", prefix, "_", name, ".rda"))
   }
 
 } # end save_results_as_r_object()
