@@ -210,9 +210,9 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
   colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
 
   if (group_logical) {
-    fname <- paste0(output_dir, "/hogwash_continuous_grouped_", output_name, ".pdf")
+    fname <- paste0(dir, "/hogwash_continuous_grouped_", name, ".pdf")
   } else {
-    fname <- paste0(output_dir, "/hogwash_continuous_", output_name, ".pdf")
+    fname <- paste0(dir, "/hogwash_continuous_", name, ".pdf")
   }
 
 
@@ -778,7 +778,8 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
                                  trans_hit_vals, trans_perm_obs_results,
                                  tr_and_pheno_hi_conf, geno_confidence,
-                                 g_trans_edges, p_trans_edges, snp_in_gene){
+                                 g_trans_edges, p_trans_edges, snp_in_gene,
+                                 prefix, grouped_logical){
   # Function description -------------------------------------------------------
   # Plot the discrete test results.
   #

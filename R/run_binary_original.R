@@ -71,11 +71,18 @@ run_binary_original <- function(args){
                      prefix = "convergence",
                      grouped_logical = args$grouped_genotype)
 
-  results_object$contingency_table_recon <- create_contingency_table(genotype_transition_edges, pheno_recon_ordered_by_edges, hi_conf_original$genotype)
-  results_object$hit_pvals_reconstruction <- corrected_pvals_recon$hit_pvals
-  results_object$sig_pvals_reconstruction <- corrected_pvals_recon$sig_pvals
-  results_object$original_high_confidence_trasition_edges     <- hi_conf_original$high_confidence_trasition_edges
-  results_object$original_num_high_confidence_trasition_edges <- hi_conf_original$num_high_confidence_trasition_edges
-  results_object$original_dropped_genotypes                   <- hi_conf_original$dropped_genotypes
+  results_object$contingency_table <-
+    create_contingency_table(genotype_transition_edges,
+                             pheno_recon_ordered_by_edges,
+                             hi_conf_original$genotype,
+                             "convergence")
+  results_object$hit_pvals <- corrected_pvals_recon$hit_pvals
+  results_object$sig_pvals <- corrected_pvals_recon$sig_pvals
+  results_object$high_confidence_transition_edges <-
+    hi_conf_original$high_confidence_transition_edges
+  results_object$num_high_confidence_transition_edges <-
+    hi_conf_original$num_high_confidence_transition_edges
+  results_object$dropped_genotypes <-
+    hi_conf_original$dropped_genotypes
   save_results_as_r_object(args$output_dir, args$output_name, results_object, "convergence", args$group_genotype)
 } # end run_binary_original()
