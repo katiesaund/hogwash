@@ -4,5 +4,5 @@
 .Ruserdata
 *.pdf
 *.gz
-*.rda
+*dummy*.rda
 *.Rcheck
