@@ -1,25 +1,12 @@
 #' Plot the continuous phenotype on tree with the phenotype coloring the branches.
 #'
-#' @param tr
-#' @param pheno_vector
-#' @param pheno_anc_rec
+#' @noRd
+#' @param tr Phylo
+#' @param pheno_vector Vector
+#' @param pheno_anc_rec Vector
 #'
-#' @return
-#'
-#' @examples
+#' @return A tree plot.
 plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
-  # Function description -------------------------------------------------------
-  # TODO
-  # Plot the continuous phenotype as a tree with phenotype as colors in branches.
-  #
-  # Inputs:
-  # tr. Phylo.
-  # pheno_vector. Vector.
-  # pheno_anc_rec. Vector?
-  #
-  # Output:
-  # None
-  #
   # Check inputs ---------------------------------------------------------------
   check_tree_is_valid(tr)
 
@@ -33,9 +20,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
        ftype = "off",
        offset = 1.7)
 
-  # No output ------------------------------------------------------------------
 } # end plot_continuous_phenotype()
-
 
 histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, index, non_trans_color, trans_color){
   trans_index     <- c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
@@ -117,6 +102,7 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
 
 #' Plot continuous phenotype results.
 #'
+#' @noRd
 #' @param disc_cont
 #' @param tr
 #' @param fdr
@@ -349,6 +335,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
 #' Create a manhattan plot of GWAS hit p-values.
 #'
+#' @noRd
 #' @param outdir
 #' @param geno_pheno_name
 #' @param pval_hits
@@ -396,6 +383,7 @@ make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
 
 #' Plot a phylogenetic tree with certain edges highlighted.
 #'
+#' @noRd
 #' @param tr
 #' @param edges_to_highlight
 #' @param geno_confidence
@@ -457,6 +445,7 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
 
 #' Create object to annotate columns in the significant hit results.
 #'
+#' @noRd
 #' @param geno_matrix
 #'
 #' @return
@@ -503,6 +492,7 @@ make_ann_colors <- function(geno_matrix){
 
 #' Plot convergence test results.
 #'
+#' @noRd
 #' @param tr
 #' @param dir
 #' @param name
