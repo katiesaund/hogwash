@@ -16,7 +16,7 @@ read_in_tsv_matrix <- function(mat){
   check_file_exists(mat)
 
   # Function -------------------------------------------------------------------
-  temp <- read.table(mat,
+  temp <- utils::read.table(mat,
                      sep = "\t",
                      row.names = 1,
                      header = TRUE,

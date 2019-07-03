@@ -13,14 +13,18 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     ape,
-    phytools,
-    phangorn,
-    pheatmap,
+    geiger,
+    graphics,
+    grDevices,
     grid,
     gridExtra,
     ggplot2,
+    phangorn,
+    pheatmap,
+    phytools,
+    stats,
     truncnorm,
-    geiger,
+    utils,
     optparse
 Suggests: 
     testthat

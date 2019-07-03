@@ -25,7 +25,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
 
   # Function -------------------------------------------------------------------
   plot_p_recon <- phytools::contMap(tr, pheno_vector, method = "user", anc.states = pheno_anc_rec, plot = FALSE)
-  plot(plot_p_recon,
+  graphics::plot(plot_p_recon,
        add = TRUE,
        ylim = c(-1 / 25 * ape::Ntip(tr), ape::Ntip(tr)),
        colors = plot_p_recon$cols,
@@ -47,7 +47,7 @@ histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function
   raw_trans_delta     <- calc_raw_diff(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
   raw_non_trans_delta <- calc_raw_diff(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
 
-  hist(raw_non_trans_delta,
+  graphics::hist(raw_non_trans_delta,
        main = paste("Raw delta phenotype on only high confidence edges\n # trans edge= ",
                     length(raw_trans_delta), "\n# non trans edge =",
                     length(raw_non_trans_delta), sep = ""),
@@ -59,7 +59,7 @@ histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function
        cex = .8,
        xlab = "Raw delta phenotype")
 
-  hist(raw_trans_delta,
+  graphics::hist(raw_trans_delta,
        breaks = ape::Nedge(tr)/4,
        col = trans_color,
        border = trans_color,
@@ -68,8 +68,8 @@ histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function
 }
 
 histogram_abs_high_confidence_delta_pheno_highlight_transition_edges <- function(results_all_trans, tr, index, non_trans_color, trans_color){
-  par(mar = c(4, 4, 4, 4))
-  hist(results_all_trans$observed_pheno_non_trans_delta[[index]],
+  graphics::par(mar = c(4, 4, 4, 4))
+  graphics::hist(results_all_trans$observed_pheno_non_trans_delta[[index]],
        breaks = ape::Nedge(tr)/4,
        col = non_trans_color,
        border = FALSE,
@@ -82,7 +82,7 @@ histogram_abs_high_confidence_delta_pheno_highlight_transition_edges <- function
                     "\n # trans edges = ", length(results_all_trans$observed_pheno_trans_delta[[index]]), sep = ""))
 
 
-  hist(results_all_trans$observed_pheno_trans_delta[[index]],
+  graphics::hist(results_all_trans$observed_pheno_trans_delta[[index]],
        breaks = ape::Nedge(tr)/4,
        col = trans_color,
        border = trans_color,
@@ -95,18 +95,18 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
   hi_edge_num <- length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
   title <- paste("|delta phenotype| on all edges \n Light Green: all edges = ", edge_num, "\n Grey: high confidence edges = ", hi_edge_num, sep = "")
   delta_phenotype_on_all_edges <- as.numeric(unlist(p_trans_mat))
-  hist(delta_phenotype_on_all_edges,
+  graphics::hist(delta_phenotype_on_all_edges,
        breaks = ape::Nedge(tr)/4,
-       col = rgb(0, 0.5, 0, 0.25),
+       col = grDevices::rgb(0, 0.5, 0, 0.25),
        border = FALSE,
        ylab = "Count",
        xlab = "Delta phenotype",
        main = title)
 
   delta_phenotype_on_high_confidence_edges <- as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
-  hist(delta_phenotype_on_high_confidence_edges, # plot phenotype transition only high confidence edges for this genotype
+  graphics::hist(delta_phenotype_on_high_confidence_edges, # plot phenotype transition only high confidence edges for this genotype
        breaks = ape::Nedge(tr)/4,
-       col = rgb(0, 0, 0, 0.25),
+       col = grDevices::rgb(0, 0, 0, 0.25),
        border = FALSE,
        ylab = "Count",
        add = TRUE)
@@ -216,7 +216,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
   }
 
 
-  pdf(fname, width = 16, height = 20)
+  grDevices::pdf(fname, width = 16, height = 20)
 
   make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, fdr, "continuous")
   cell_width_value <- 1.5
@@ -263,10 +263,10 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] < fdr) {
       counter <- counter + 1
-      par(mfrow = c(3, 3))
-      par(mgp   = c(3, 1, 0))
-      par(oma   = c(0, 0, 4, 0))
-      par(mar = c(4, 4, 4, 4))
+      graphics::par(mfrow = c(3, 3))
+      graphics::par(mgp   = c(3, 1, 0))
+      graphics::par(oma   = c(0, 0, 4, 0))
+      graphics::par(mar = c(4, 4, 4, 4))
 
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
       plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
@@ -275,13 +275,13 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
       histogram_abs_high_confidence_delta_pheno_highlight_transition_edges(results_all_trans, tr, j, "grey", "red") # 6. Delta phenotype histogram. Note that results_all_trans$observed_pheno_non_trans_delta[[j]] is already subset down to only high confidence edges
       histogram_raw_high_confidence_delta_pheno_highlight_transition_edges(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, j, "grey", "red")
 
-      hist(log(results_all_trans$ks_statistics[[j]]),
+      graphics::hist(log(results_all_trans$ks_statistics[[j]]),
            breaks = perm/10, col = "grey", border = FALSE,
            main = paste("Null distribution of KS statistic for all transitions.\n Red = Observed KS statistic.\n p-value = ", round(pval_all_transition$hit_pvals[j, 1], 10), "\np-value rank = ", rank(pval_all_transition$hit_pvals)[j], sep = ""),
            ylab = "Count",
            xlab = "ln(KS statistic)",
            xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])), log(results_all_trans$ks_statistics[[j]])), 0))
-      abline(v = log(as.numeric(results_all_trans$observed_ks_stat[j])), col = "red")
+      graphics::abline(v = log(as.numeric(results_all_trans$observed_ks_stat[j])), col = "red")
 
       colnames(sorted_trans_edge_mat) <- substr(colnames(sorted_trans_edge_mat), 1, 20)
 
@@ -300,7 +300,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
     }
   }
 
-  dev.off()
+  grDevices::dev.off()
 
   trans_dir_edge_mat <- NULL
   for (i in 1:length(geno_transition)) {
@@ -377,21 +377,21 @@ make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
   sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[ , 2] > -log(alpha))
   ymax <- max(-log(0.01), neg_log_p_with_num[ , 2, drop = TRUE])
   with(neg_log_p_with_num,
-       plot(x = neg_log_p_with_num[ , 1],
+       graphics::plot(x = neg_log_p_with_num[ , 1],
             y = neg_log_p_with_num[ , 2, drop = TRUE],
             type = "p",
             main = paste(trans_or_recon, geno_pheno_name, sep = " "),
-            col = rgb(0, 0, 0, 0.3),
+            col = grDevices::rgb(0, 0, 0, 0.3),
             pch = 19,
             xlab = "Genetic locus",
             ylim = c(0, ymax),
             ylab = "-ln(p-val)" ))
 
-  abline(h = -log(alpha), col = "red")
+  graphics::abline(h = -log(alpha), col = "red")
   if (nrow(sig_temp) > 0) {
-    text(x = sig_temp[ , 1], y = sig_temp[ , 2], labels = row.names(sig_temp), pos = 1, cex = 0.7)
+    graphics::text(x = sig_temp[ , 1], y = sig_temp[ , 2], labels = row.names(sig_temp), pos = 1, cex = 0.7)
   }
-  #dev.off()
+  #grDevices::dev.off()
 } #end make_manhattan_plot()
 
 #' Plot a phylogenetic tree with certain edges highlighted.
@@ -431,8 +431,8 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
     edge_color[edges_to_highlight[[index]]$transition == 1] <- edge_color_bright
   }
   edge_color[geno_confidence[[index]] == 0] <- edge_color_na # grey out long edges and low ML bootstrap support
-  par(mar = c(4, 4, 4, 4))
-  plot(tr,
+  graphics::par(mar = c(4, 4, 4, 4))
+  graphics::plot(tr,
        font = 1,
        edge.color = edge_color,
        main = title,
@@ -445,7 +445,7 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
             bg = annot[ , 2],
             cex = 0.75)
   if (!is.null(annot)) {
-    legend("bottomleft",
+    graphics::legend("bottomleft",
            legend = unique(annot[ , 1]),
            col = unique(annot[ , 2]),
            lty = 1,
@@ -586,9 +586,9 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
 
-  pdf(fname)
+  grDevices::pdf(fname)
 
-  par(mfrow = c(1,1))
+  graphics::par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, recon_hit_vals, fdr, prefix)
 
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
@@ -683,14 +683,14 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   # TODO break these plots into more functions b/c lots of redundant code between recon and transition plots
   for (j in 1:nrow(recon_hit_vals)) {
     if (recon_hit_vals[j, 1] < fdr) {
-      par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
+      graphics::par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
       # pheno
       plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
       # geno
       plot_tree_with_colored_edges(tr, g_trans_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype transition:\n Red = transition; Black = no transition"), annot, "recon", j)
       # Permutation test
       max_x <- max(recon_perm_obs_results$permuted_count[[j]], recon_perm_obs_results$observed_overlap[j]) # change to loop through sig hits
-      hist(recon_perm_obs_results$permuted_count[[j]],
+      graphics::hist(recon_perm_obs_results$permuted_count[[j]],
            breaks = num_perm/10,
            xlim = c(0, max_x),
            col = "grey",
@@ -698,7 +698,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
            ylab = "Count",
            xlab = "# edges with genotype transition & phenotype presence",
            main = paste0("Phyc: Overlap of genotype transition edge\n& phenotype presence \npval=", round(recon_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = ""))
-      abline(v = recon_perm_obs_results$observed_overlap[j], col = "red")
+      graphics::abline(v = recon_perm_obs_results$observed_overlap[j], col = "red")
 
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1 # should be NA but it won't work correctedly TODO
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
@@ -751,7 +751,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
     }
   }
 
-  dev.off()
+  grDevices::dev.off()
 } # end discrete_plot_orig()
 
 #' Plot the synchronous test results.
@@ -836,9 +836,9 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
 
-  pdf(fname)
+  grDevices::pdf(fname)
 
-  par(mfrow = c(1,1))
+  graphics::par(mfrow = c(1,1))
   make_manhattan_plot(dir, name, trans_hit_vals, fdr, "synchronous")
 
   # heatmaps
@@ -930,7 +930,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   # loop through transition sig hits:
   for (j in 1:nrow(trans_hit_vals)) {
     if (trans_hit_vals[j, 1] < fdr) {
-      par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
+      graphics::par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
       # Plot pheno
       p_trans_edges_as_list <- list(p_trans_edges)
       #plot_tree_with_colored_edges(tr, pheno_as_list,         pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
@@ -940,7 +940,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
       plot_tree_with_colored_edges(tr, g_trans_edges, geno_confidence, "grey", "red", paste0(row.names(trans_hit_vals)[j], "\n Genotype transitions:\n Red = transition; Black = no change"), annot, "recon", j)
       # Permutation test
       max_x <- max(trans_perm_obs_results$permuted_count[[j]], trans_perm_obs_results$observed_overlap[j]) # change to loop through sig hits
-      hist(trans_perm_obs_results$permuted_count[[j]],
+      graphics::hist(trans_perm_obs_results$permuted_count[[j]],
            breaks = num_perm/10,
            xlim = c(0, max_x),
            col = "grey",
@@ -948,10 +948,10 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
            ylab = "Count",
            xlab = "# edges where genotype-phenotype transitions co-occur",
            main = paste0("Geno & pheno transition overlap\npval=", round(trans_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = "")) # TODO add rank pvalue
-      abline(v = trans_perm_obs_results$observed_overlap[j], col = "red")
+      graphics::abline(v = trans_perm_obs_results$observed_overlap[j], col = "red")
 
       # edge heatmap - heatmap is tree edges, annotation is phenotype edges
-      par(mfrow = c(1,1))
+      graphics::par(mfrow = c(1,1))
       p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1 # should be NA but it won't work correctedly TODO
       p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
       colnames(p_mat) <- "pheno_transition"
@@ -1000,6 +1000,6 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
       }
     }
   }
-  dev.off()
+  grDevices::dev.off()
 } # end discrete_plot_trans()
 # End of script ----------------------------------------------------------------

@@ -1,7 +1,7 @@
 run_binary_transition <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
-  results_object$log <- capture.output(sessionInfo()) # log session info
+  results_object$log <- utils::capture.output(utils::sessionInfo()) # log session info
   args$tree <- format_tree(args$tree)
   geno <- prepare_genotype(args$group_genotype,
                            args$genotype,

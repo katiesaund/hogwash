@@ -121,7 +121,7 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
     if (length(unique(pheno)) == 1) {
       stop("phenotype must have some variability")
     }
-    result <- shapiro.test(unlist(pheno))
+    result <- stats::shapiro.test(unlist(pheno))
     alpha <- 0.05
     if (result$p < alpha) {
       print("Please consider normalizing your phenotype so as to not violate assumptions used in the ancestral reconstruction.")
@@ -162,8 +162,8 @@ check_if_convergence_occurs <- function(pheno, tr, continuous_or_discrete){
     }
 
     # TODO Add this as a plot to output?
-    #pdf(paste(test_dir, "/evolutionary_model_barplot.pdf", sep =""))
-    #par(mfrow = c(1,1))
+    #grDevices::pdf(paste(test_dir, "/evolutionary_model_barplot.pdf", sep =""))
+    #graphics::par(mfrow = c(1,1))
     #barplot(c(geiger_BM$opt$aicc, geiger_OU$opt$aicc, geiger_white$opt$aicc),
     #        names.arg = c("Brownian Motion", "Ornstein-Uhlenbeck", "White Noise"),
     #        col = c("black", "black", "black"),ylim = c(0, 600),

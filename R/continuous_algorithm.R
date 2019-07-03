@@ -52,7 +52,7 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   # withCalligHandlers suppresses the warning message:
   # 'cannot compute exact p-value with ties'
   set.seed(1)
-  ks_results <-  withCallingHandlers(ks.test(p_trans_delta, p_non_trans_delta),
+  ks_results <-  withCallingHandlers(stats::ks.test(p_trans_delta, p_non_trans_delta),
                       warning = function(w) {
                         if (grepl("cannot compute exact p-value with ties",
                                   w$message))
@@ -288,8 +288,8 @@ calculate_genotype_significance <- function(mat,
       observed_results$pheno_non_trans_delta
     observed_pheno_trans_delta[[i]] <- observed_results$pheno_trans_delta
     observed_ks_stat[i] <- observed_results$statistic
-    trans_median[i] <- median(observed_results$pheno_trans_delta)
-    all_edges_median[i] <- median(c(observed_results$pheno_trans_delta,
+    trans_median[i] <- stats::median(observed_results$pheno_trans_delta)
+    all_edges_median[i] <- stats::median(c(observed_results$pheno_trans_delta,
                                     observed_results$pheno_non_trans_delta))
 
     # Create permuted transition index matrix and get edge numbersof the high confidence edges
@@ -345,7 +345,7 @@ get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
   check_num_between_0_and_1(fdr)
 
   # Function -------------------------------------------------------------------
-  fdr_corrected_pvals <- p.adjust(hit_values, method = "fdr")
+  fdr_corrected_pvals <- stats::p.adjust(hit_values, method = "fdr")
   sig_pvals <- as.data.frame(fdr_corrected_pvals[fdr_corrected_pvals < fdr])
   sig_pvals <- as.data.frame(sig_pvals)
   row.names(sig_pvals) <- names(hit_values)[fdr_corrected_pvals < fdr]

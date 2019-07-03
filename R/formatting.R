@@ -68,7 +68,7 @@ create_test_data <- function(){
   # Create genotypes
   genotype_matrix <- matrix(NA, nrow = tips, ncol = 100)
   for (i in 1:ncol(genotype_matrix)) {
-    genotype_matrix[ , i] <- rbinom(tips, 1, 0.5)
+    genotype_matrix[ , i] <- stats::rbinom(tips, 1, 0.5)
   }
   row.names(genotype_matrix)  <- tree$tip.label
   colnames(genotype_matrix) <- paste("snp", c(1:100), sep = "_")

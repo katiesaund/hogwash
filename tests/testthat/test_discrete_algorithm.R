@@ -115,7 +115,7 @@ test_that("discrete_permutation returns expected results given this dummy data",
 
   edge_probability <- temp_tree$edge.length / sum(temp_tree$edge.length) # high confidence is one for all genotypes, so can do just one calculation for all genotypes in this case.
   edges_selected_other_way <- sample(1:num_edge, size = length(edges_selected), replace = TRUE, prob = edge_probability)
-  ks_results <-  withCallingHandlers(ks.test(edges_selected_other_way, edges_selected),
+  ks_results <-  withCallingHandlers(stats::ks.test(edges_selected_other_way, edges_selected),
                                      warning = function(w) {
                                        if (grepl("cannot compute exact p-value with ties", w$message))
                                          invokeRestart("muffleWarning")
@@ -129,7 +129,7 @@ test_that("count_empirical_both_present gives X given Y", {
   temp_hi_conf_edge <- NULL
   temp_hi_conf_edge[[1]] <- c(0, 1 ,1, 0, 0, 1, 1, 0, 0, 1, 1, 1)
   temp_hi_conf_edge[[2]] <- c(0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1)
-  temp_permuted_mat <- matrix(rbinom(120, 1, .5), ncol = 12, nrow = 10)
+  temp_permuted_mat <- matrix(stats::rbinom(120, 1, .5), ncol = 12, nrow = 10)
   temp_index <- 1
   expect_error(count_empirical_both_present(temp_permuted_mat, temp_pheno_vec, temp_hi_conf_edge, temp_index), NA)
   expect_warning(count_empirical_both_present(temp_permuted_mat, temp_pheno_vec, temp_hi_conf_edge, temp_index), NA)

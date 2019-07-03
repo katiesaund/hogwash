@@ -405,10 +405,10 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   } else {
     # Pick best of ER and ARD
     p_ER_ARD <-
-      1 - pchisq(2 * abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
+      1 - stats::pchisq(2 * abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
     if (p_ER_ARD < alpha &
-        AIC(ERreconstruction) >
-        (significant_difference_in_AIC + AIC(ARDreconstruction))) {
+        stats::AIC(ERreconstruction) >
+        (significant_difference_in_AIC + stats::AIC(ARDreconstruction))) {
       best_model <- "ARD"
     }
   }
