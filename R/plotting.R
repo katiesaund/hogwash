@@ -1,4 +1,5 @@
-#' Plot the continuous phenotype on tree with the phenotype coloring the branches.
+#' Plot the continuous phenotype on tree with the phenotype coloring the
+#'   branches.
 #'
 #' @noRd
 #' @param tr Phylo
@@ -11,7 +12,11 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   check_tree_is_valid(tr)
 
   # Function -------------------------------------------------------------------
-  plot_p_recon <- phytools::contMap(tr, pheno_vector, method = "user", anc.states = pheno_anc_rec, plot = FALSE)
+  plot_p_recon <- phytools::contMap(tr,
+                                    pheno_vector,
+                                    method = "user",
+                                    anc.states = pheno_anc_rec,
+                                    plot = FALSE)
   graphics::plot(plot_p_recon,
        add = TRUE,
        ylim = c(-1 / 25 * ape::Ntip(tr), ape::Ntip(tr)),
@@ -45,22 +50,35 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
 #'   tree edge. Transition edges are different color than non-transition edges.
 #'   Low confidence edges are excluded. Change in phenotype is raw (not absolute
 #'   value).
-histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, index, non_trans_color, trans_color){
-  trans_index     <- c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
+hist_raw_hi_conf_delta_pheno <- function(geno_transition,
+                                         geno_confidence,
+                                         pheno_recon_ordered_by_edges,
+                                         tr,
+                                         index,
+                                         non_trans_color,
+                                         trans_color){
+  trans_index <-
+    c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
   non_trans_index <- c(1:ape::Nedge(tr))[!geno_transition[[index]]$transition]
-  hi_conf_trans_index     <- trans_index[    as.logical(geno_confidence[[index]][trans_index    ])]
-  hi_conf_non_trans_index <- non_trans_index[as.logical(geno_confidence[[index]][non_trans_index])]
-  raw_trans_delta     <- calc_raw_diff(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
-  raw_non_trans_delta <- calc_raw_diff(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
+  hi_conf_trans_index <-
+    trans_index[as.logical(geno_confidence[[index]][trans_index])]
+  hi_conf_non_trans_index <-
+    non_trans_index[as.logical(geno_confidence[[index]][non_trans_index])]
+  raw_trans_delta <- calc_raw_diff(hi_conf_trans_index,
+                                   pheno_recon_ordered_by_edges)
+  raw_non_trans_delta <- calc_raw_diff(hi_conf_non_trans_index,
+                                       pheno_recon_ordered_by_edges)
 
   graphics::hist(raw_non_trans_delta,
-       main = paste("Raw delta phenotype on only high confidence edges\n # trans edge= ",
+       main = paste("Raw delta phenotype on only high confidence edges\n # trans
+                    edge= ",
                     length(raw_trans_delta), "\n# non trans edge =",
                     length(raw_non_trans_delta), sep = ""),
        breaks = ape::Nedge(tr)/4,
        col = non_trans_color,
        border = FALSE,
-       xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)),
+       xlim = c(min(raw_trans_delta, raw_non_trans_delta),
+                max(raw_trans_delta, raw_non_trans_delta)),
        ylab = "Count",
        cex = .8,
        xlab = "Raw delta phenotype")
@@ -70,15 +88,16 @@ histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function
        col = trans_color,
        border = trans_color,
        add = TRUE,
-       xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)))
-}
+       xlim = c(min(raw_trans_delta, raw_non_trans_delta),
+                max(raw_trans_delta, raw_non_trans_delta)))
+} # end hist_raw_hi_conf_delta_pheno()
 
 #' Plot a histogram to show the change in phenotype on each tree edge. Plot
 #'   phenotype change as absolute value change. Exclude low confidence tree
 #'   edges.
 #'
 #' @noRd
-#' @param results_all_trans TODO
+#' @param all_trans TODO
 #' @param tr Phylo.
 #' @param index Integer. Indexes which genotype is being plotted.
 #' @param non_trans_color Character. Color of non-transition histogram bars.
@@ -87,28 +106,39 @@ histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function
 #' @return Histogram showing the change in phenotype on each high confidence
 #'   tree edge. Transition edges are different color than non-transition edges.
 #'   Low confidence edges are excluded. Change in phenotype is absolute value.
-histogram_abs_high_confidence_delta_pheno_highlight_transition_edges <- function(results_all_trans, tr, index, non_trans_color, trans_color){
+hist_abs_hi_conf_delta_pheno <- function(all_trans,
+                                         tr,
+                                         index,
+                                         non_trans_color,
+                                         trans_color){
   graphics::par(mar = c(4, 4, 4, 4))
-  graphics::hist(results_all_trans$observed_pheno_non_trans_delta[[index]],
+  graphics::hist(all_trans$observed_pheno_non_trans_delta[[index]],
        breaks = ape::Nedge(tr)/4,
        col = non_trans_color,
        border = FALSE,
        ylab = "Count",
        xlab = "|Delta phenotype|",
-       xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[index]], results_all_trans$observed_pheno_non_trans_delta[[index]])),
+       xlim = c(0,
+                max(all_trans$observed_pheno_trans_delta[[index]],
+                    all_trans$observed_pheno_non_trans_delta[[index]])),
        cex = .8,
-       main = paste("|delta phenotype| on only high confidence edges \n # non-trans edges = ",
-                    length(results_all_trans$observed_pheno_non_trans_delta[[index]]),
-                    "\n # trans edges = ", length(results_all_trans$observed_pheno_trans_delta[[index]]), sep = ""))
+       main = paste("|delta phenotype| on only high confidence edges \n #
+                    non-trans edges = ",
+                    length(all_trans$observed_pheno_non_trans_delta[[index]]),
+                    "\n # trans edges = ",
+                    length(all_trans$observed_pheno_trans_delta[[index]]),
+                    sep = ""))
 
 
-  graphics::hist(results_all_trans$observed_pheno_trans_delta[[index]],
+  graphics::hist(all_trans$observed_pheno_trans_delta[[index]],
        breaks = ape::Nedge(tr)/4,
        col = trans_color,
        border = trans_color,
        add = TRUE,
-       xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[index]], results_all_trans$observed_pheno_non_trans_delta[[index]])))
-} # end histogram_abs_high_confidence_delta_pheno_highlight_transition_edges()
+       xlim = c(0,
+                max(all_trans$observed_pheno_trans_delta[[index]],
+                    all_trans$observed_pheno_non_trans_delta[[index]])))
+} # end hist_abs_hi_conf_delta_pheno()
 
 #' Plot a histogram to show the change in phenotype on each tree edge. Plot
 #'   phenotype change as absolute value change. First, plot all tree edge values
@@ -124,10 +154,17 @@ histogram_abs_high_confidence_delta_pheno_highlight_transition_edges <- function
 #'
 #' @return Histogram showing the change in phenotype on each edge. Emphasizes
 #'   edges lost due to low confidence. Change in phenotype is absolute value.
-histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_trans_mat, geno_confidence, tr, index){
+hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
+                                           geno_confidence,
+                                           tr,
+                                           index){
   edge_num <- length(unlist(p_trans_mat))
-  hi_edge_num <- length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
-  title <- paste("|delta phenotype| on all edges \n Light Green: all edges = ", edge_num, "\n Grey: high confidence edges = ", hi_edge_num, sep = "")
+  hi_edge_num <-
+    length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
+  title <- paste("|delta phenotype| on all edges \n Light Green: all edges = ",
+                 edge_num, "\n Grey: high confidence edges = ",
+                 hi_edge_num,
+                 sep = "")
   delta_phenotype_on_all_edges <- as.numeric(unlist(p_trans_mat))
   graphics::hist(delta_phenotype_on_all_edges,
        breaks = ape::Nedge(tr)/4,
@@ -137,14 +174,16 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
        xlab = "Delta phenotype",
        main = title)
 
-  delta_phenotype_on_high_confidence_edges <- as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
-  graphics::hist(delta_phenotype_on_high_confidence_edges, # plot phenotype transition only high confidence edges for this genotype
+  delta_phenotype_on_high_confidence_edges <-
+    as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
+  graphics::hist(delta_phenotype_on_high_confidence_edges,
+  # plot phenotype transition only high confidence edges for this genotype
        breaks = ape::Nedge(tr)/4,
        col = grDevices::rgb(0, 0, 0, 0.25),
        border = FALSE,
        ylab = "Count",
        add = TRUE)
-} # end histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno()
+} # end hist_abs_delta_pheno_all_edges()
 
 #' Plot continuous phenotype results.
 #'
@@ -199,20 +238,24 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
   }
   colnames(trans_edge_mat) <- colnames(geno)
 
-  # TODO Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
+  # TODO Update trans_edge_mat to exclude low confidence  edges, currently it
+  # includes transition edges (all high and some low confidence transitions)
   for (c in 1:ncol(trans_edge_mat)) {
     trans_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
   # end update trans_edge_mat
-  ph_trans <- abs(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2])
+  ph_trans <-
+    abs(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2])
 
   p_trans_mat <- matrix(ph_trans, nrow = length(ph_trans), ncol = 1)
   colnames(p_trans_mat) <- "delta_pheno"
   p_trans_mat <- as.data.frame(round(p_trans_mat, 2))
 
-  significant_loci <- data.frame("locus" = rep("not_sig", ncol(trans_edge_mat)), stringsAsFactors = FALSE)
+  significant_loci <- data.frame("locus" = rep("not_sig", ncol(trans_edge_mat)),
+                                 stringsAsFactors = FALSE)
   row.names(significant_loci) <- colnames(trans_edge_mat)
-  significant_loci[row.names(significant_loci) %in% row.names(all_trans_sig_hits), ] <- "sig"
+  significant_loci[row.names(significant_loci) %in%
+                     row.names(all_trans_sig_hits), ] <- "sig"
 
   log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
   column_annot <- cbind(significant_loci, log_p_value)
@@ -223,10 +266,18 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
     locus = c(not_sig = "white", sig = "blue")
   )
 
-  sorted_trans_edge_mat <-           trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[ , 1])], row.names(trans_edge_mat)), ]
-  ordered_by_p_val      <- sorted_trans_edge_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(sorted_trans_edge_mat))]
-  column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
-  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <- c("locus", "-ln(p-val)")
+  sorted_trans_edge_mat <-
+    trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[ , 1])],
+                         row.names(trans_edge_mat)), ]
+  ordered_by_p_val <-
+    sorted_trans_edge_mat[ ,
+                           match(row.names(log_p_value)[order(log_p_value[ , 1])],
+                                 colnames(sorted_trans_edge_mat))]
+  column_annot_ordered_by_p_val <-
+    column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])],
+                       row.names(column_annot)), ]
+  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
+    c("locus", "-ln(p-val)")
 
   if (group_logical) {
     fname <- paste0(dir, "/hogwash_continuous_grouped_", name, ".pdf")
@@ -236,7 +287,11 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
   grDevices::pdf(fname, width = 16, height = 20)
 
-  make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, fdr, "continuous")
+  make_manhattan_plot(dir,
+                      name,
+                      pval_all_transition$hit_pvals,
+                      fdr,
+                      "continuous")
   cell_width_value <- 1.5
   if (ncol(ordered_by_p_val) < 50) {
     cell_width_value <- 10
@@ -259,7 +314,8 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
     fontsize = 8,
     cellwidth = cell_width_value)
 
-  colnames(sorted_trans_edge_mat) <- substr(colnames(sorted_trans_edge_mat), 1, 20)
+  colnames(sorted_trans_edge_mat) <-
+    substr(colnames(sorted_trans_edge_mat), 1, 20)
 
   pheatmap::pheatmap(
     sorted_trans_edge_mat,
@@ -290,7 +346,8 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                    "grey",
                                    "red",
                                    paste0(row.names(pval_all_transition$hit_pvals)[j],
-                                          "\n Genotype reconstruction:\n Red = Variant; Black = WT"),
+                                          "\n Genotype reconstruction:\n Red =
+                                          Variant; Black = WT"),
                                    annot,
                                    "recon",
                                    j)
@@ -299,26 +356,27 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                    geno_confidence,
                                    "grey",
                                    "red",
-                                   "Genotype transition edge:\n Red = transition; Black = No transition",
+                                   "Genotype transition edge:\n Red =
+                                   transition; Black = No transition",
                                    annot,
                                    "trans",
                                    j)
-      histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno(p_trans_mat,
-                                                                    geno_confidence,
-                                                                    tr,
-                                                                    j)
-      histogram_abs_high_confidence_delta_pheno_highlight_transition_edges(results_all_trans,
-                                                                           tr,
-                                                                           j,
-                                                                           "grey",
-                                                                           "red")
-      histogram_raw_high_confidence_delta_pheno_highlight_transition_edges(geno_transition,
-                                                                           geno_confidence,
-                                                                           pheno_recon_ordered_by_edges,
-                                                                           tr,
-                                                                           j,
-                                                                           "grey",
-                                                                           "red")
+      hist_abs_delta_pheno_all_edges(p_trans_mat,
+                                     geno_confidence,
+                                     tr,
+                                     j)
+      hist_abs_hi_conf_delta_pheno(results_all_trans,
+                                   tr,
+                                   j,
+                                   "grey",
+                                   "red")
+      hist_raw_hi_conf_delta_pheno(geno_transition,
+                                   geno_confidence,
+                                   pheno_recon_ordered_by_edges,
+                                   tr,
+                                   j,
+                                   "grey",
+                                   "red")
 
       graphics::hist(log(results_all_trans$ks_statistics[[j]]),
            breaks = perm/10, col = "grey", border = FALSE,
@@ -366,7 +424,8 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
   colnames(trans_dir_edge_mat) <- colnames(geno)
 
-  # TODO Update trans_edge_mat to exclude low confidence  edges, currently it includes transition edges (all high and some low confidence transitions)
+  # TODO Update trans_edge_mat to exclude low confidence  edges, currently it
+  # includes transition edges (all high and some low confidence transitions)
   for (c in 1:ncol(trans_dir_edge_mat)) {
     trans_dir_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
@@ -477,7 +536,15 @@ make_manhattan_plot <- function(outdir,
 #'
 #' @return Plot of a tree with certain edges colored.
 #'
-plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence, edge_color_na, edge_color_bright, title, annot, trans_or_recon, index){
+plot_tree_with_colored_edges <- function(tr,
+                                         edges_to_highlight,
+                                         geno_confidence,
+                                         edge_color_na,
+                                         edge_color_bright,
+                                         title,
+                                         annot,
+                                         trans_or_recon,
+                                         index){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_string(edge_color_na)
@@ -490,7 +557,8 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
   } else if (trans_or_recon == "trans") {
     edge_color[edges_to_highlight[[index]]$transition == 1] <- edge_color_bright
   }
-  edge_color[geno_confidence[[index]] == 0] <- edge_color_na # grey out long edges and low ML bootstrap support
+  edge_color[geno_confidence[[index]] == 0] <- edge_color_na # grey out long
+  # edges and low ML bootstrap support
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::plot(tr,
        font = 1,
@@ -531,7 +599,9 @@ make_ann_colors <- function(geno_matrix){
   nas <- sum(is.na(geno_matrix)) > 1
 
   if (ones + zeros + nas == 3) {
-    ann_colors = list(pheno_presence = c(na = "grey", absent = "white", present = "red"))
+    ann_colors = list(pheno_presence = c(na = "grey",
+                                         absent = "white",
+                                         present = "red"))
   } else if (ones == 1 && zeros == 1 && nas == 0) {
     ann_colors = list(pheno_presence = c(absent = "white", present = "red"))
   } else if (ones == 1 && zeros == 0 && nas == 1) {
@@ -596,7 +666,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   check_if_permutation_num_valid(num_perm)
   if (ncol(recon_hit_vals) != 1 | nrow(recon_hit_vals) != length(geno_confidence)) {
     stop("Dimensions of hit p-values dataframe are incorrect.")
-  }
+  } # Don't change to check_dimensions because input is dataframe, not matrix.
   check_equal(length(p_recon_edges), ape::Nedge(tr))
   if (!is.null(snp_in_gene)) {
     if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
@@ -634,7 +704,8 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
     g_trans_mat[geno_confidence[[i]] == 0, i] <- NA
   }
 
-  p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1 # should be NA but it won't work correctedly TODO
+  p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1
+  # TODO -1 should be NA but it won't work correctly
   p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
   colnames(p_mat) <- "pheno_presence"
   phenotype_annotation <- as.data.frame(p_mat)
@@ -672,8 +743,8 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                  match(row.names(log_p_value)[order(log_p_value[ , 1])],
                        colnames(g_trans_mat)),
                  drop = FALSE]
-  column_annot_ordered_by_p_val
-  <- column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])],
+  column_annot_ordered_by_p_val <-
+    column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])],
                         row.names(column_annot)), ]
 
   # TODO: make sure this kind of annotation steps gets generalized to more locations -- I think I wrote a function like this somewhere else. Double check!
