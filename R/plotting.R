@@ -22,13 +22,34 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
 
 } # end plot_continuous_phenotype()
 
+#' Plot a histogram to show the change in phenotype on each tree edge. Plot
+#'   phenotype change as raw value change (not absolute value). Exclude low
+#'   confidence tree edges.
+#'
+#' @noRd
+#' @param geno_transition List of list of 2 vectors: $transition and $trans_dir.
+#'   Each list corresponds to 1 genotype. In $transition vector each entry
+#'   corresponds to 1 tree edge.
+#' @param geno_confidence List of vectors. Each list corresponds to 1 genotype.
+#'   Each vector entry corresponds to 1 tree edge. 1 == high confidence edge.
+#'   0 == low confidence edge.
+#' @param pheno_recon_ordered_by_edges Matrix. Dimensions: Nedge x 2 matrix.
+#'   Entries are the phenotype value at the node, where row is the edge, 1st
+#'   column is the parent node and 2nd column is the child node.
+#' @param tr Phylo.
+#' @param index Integer. Indexes which genotype is being plotted.
+#' @param non_trans_color Character. Color of non-transition histogram bars.
+#' @param trans_color Character. Color of transition histogram bars.
+#'
+#' @return Histogram showing the change in phenotype on each high confidence
+#'   tree edge. Transition edges are different color than non-transition edges.
+#'   Low confidence edges are excluded. Change in phenotype is raw (not absolute
+#'   value).
 histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, index, non_trans_color, trans_color){
   trans_index     <- c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
   non_trans_index <- c(1:ape::Nedge(tr))[!geno_transition[[index]]$transition]
   hi_conf_trans_index     <- trans_index[    as.logical(geno_confidence[[index]][trans_index    ])]
   hi_conf_non_trans_index <- non_trans_index[as.logical(geno_confidence[[index]][non_trans_index])]
-  #hi_conf_pheno_trans_delta     <- calculate_phenotype_change_on_edge(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
-  #hi_conf_pheno_non_trans_delta <- calculate_phenotype_change_on_edge(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
   raw_trans_delta     <- calc_raw_diff(hi_conf_trans_index,     pheno_recon_ordered_by_edges)
   raw_non_trans_delta <- calc_raw_diff(hi_conf_non_trans_index, pheno_recon_ordered_by_edges)
 
@@ -52,6 +73,20 @@ histogram_raw_high_confidence_delta_pheno_highlight_transition_edges <- function
        xlim = c(min(raw_trans_delta, raw_non_trans_delta), max(raw_trans_delta, raw_non_trans_delta)))
 }
 
+#' Plot a histogram to show the change in phenotype on each tree edge. Plot
+#'   phenotype change as absolute value change. Exclude low confidence tree
+#'   edges.
+#'
+#' @noRd
+#' @param results_all_trans TODO
+#' @param tr Phylo.
+#' @param index Integer. Indexes which genotype is being plotted.
+#' @param non_trans_color Character. Color of non-transition histogram bars.
+#' @param trans_color Character. Color of transition histogram bars.
+#'
+#' @return Histogram showing the change in phenotype on each high confidence
+#'   tree edge. Transition edges are different color than non-transition edges.
+#'   Low confidence edges are excluded. Change in phenotype is absolute value.
 histogram_abs_high_confidence_delta_pheno_highlight_transition_edges <- function(results_all_trans, tr, index, non_trans_color, trans_color){
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::hist(results_all_trans$observed_pheno_non_trans_delta[[index]],
@@ -75,6 +110,20 @@ histogram_abs_high_confidence_delta_pheno_highlight_transition_edges <- function
        xlim = c(0, max(results_all_trans$observed_pheno_trans_delta[[index]], results_all_trans$observed_pheno_non_trans_delta[[index]])))
 } # end histogram_abs_high_confidence_delta_pheno_highlight_transition_edges()
 
+#' Plot a histogram to show the change in phenotype on each tree edge. Plot
+#'   phenotype change as absolute value change. First, plot all tree edge values
+#'   then overlay only the high confidence edges.
+#'
+#' @noRd
+#' @param p_trans_mat TODO
+#' @param geno_confidence List of vectors. Each list corresponds to 1 genotype.
+#'   Each vector entry corresponds to 1 tree edge. 1 == high confidence edge.
+#'   0 == low confidence edge.
+#' @param tr Phylo.
+#' @param index Integer. Indexes which genotype is being plotted.
+#'
+#' @return Histogram showing the change in phenotype on each edge. Emphasizes
+#'   edges lost due to low confidence. Change in phenotype is absolute value.
 histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_trans_mat, geno_confidence, tr, index){
   edge_num <- length(unlist(p_trans_mat))
   hi_edge_num <- length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
@@ -96,9 +145,6 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
        ylab = "Count",
        add = TRUE)
 } # end histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno()
-
-
-
 
 #' Plot continuous phenotype results.
 #'
