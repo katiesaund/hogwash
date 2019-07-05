@@ -27,5 +27,6 @@ Imports:
     utils,
     optparse
 Suggests: 
-    testthat
+    testthat, knitr, rmarkdown
+VignetteBuilder: knitr
 RoxygenNote: 6.1.0

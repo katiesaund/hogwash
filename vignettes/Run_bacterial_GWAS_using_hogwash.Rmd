@@ -1,0 +1,8 @@
+---
+title: "Run bacterial GWAS using hogwash"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Run bacterial GWAS using hogwash}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
