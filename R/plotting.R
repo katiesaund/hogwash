@@ -102,16 +102,19 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
 
 #' Plot continuous phenotype results.
 #'
+#' @details Plot all genotype's -log(p-value) as a manhattan plot. If any hits
+#' are significant after FDR, then plot heatmaps & trees for each of these.
+#'
 #' @noRd
-#' @param disc_cont
-#' @param tr
-#' @param fdr
-#' @param dir
-#' @param name
+#' @param disc_cont String, should be continuous.
+#' @param tr Phylo.
+#' @param fdr Number. False discovery rate.
+#' @param dir Character. Output path.
+#' @param name Character. Output name.
 #' @param pval_all_transition
-#' @param pheno_vector
-#' @param annot
-#' @param perm
+#' @param pheno_vector Vector.
+#' @param annot Matrix.
+#' @param perm Number.
 #' @param results_all_trans
 #' @param pheno_anc_rec
 #' @param geno_reconstruction
@@ -122,7 +125,7 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
 #' @param tr_and_pheno_hi_conf
 #' @param all_trans_sig_hits
 #'
-#' @return
+#' @return Plots continuous test resutlts.
 #'
 #' @examples
 plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
@@ -133,24 +136,8 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                   pheno_recon_ordered_by_edges,
                                   tr_and_pheno_hi_conf, all_trans_sig_hits,
                                   group_logical){
-  # Function description -------------------------------------------------------
-  # Plot continuous phenotype results.
-  # Plot all genotype's -log(p-value) as a manhattan plot.
-  # If any hits are significant after FDR, then plot heatmaps & trees for each of these.
-  #
-  # Inputs:
-  # tr.                  Phylo.
-  # fdr.                 Number. False discovery rate.
-  # dir.                 Character. Output path.
-  # name.                Character. Output name.
-  # pheno_vector.        Vector.
-  # annot.               Matrix.
-  # perm.                Number.
-
-  # Output:
-  # None.
-  #
   # Check inputs ---------------------------------------------------------------
+  check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
   check_num_between_0_and_1(fdr)
@@ -201,7 +188,6 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
     fname <- paste0(dir, "/hogwash_continuous_", name, ".pdf")
   }
 
-
   grDevices::pdf(fname, width = 16, height = 20)
 
   make_manhattan_plot(dir, name, pval_all_transition$hit_pvals, fdr, "continuous")
@@ -212,7 +198,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
   colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
 
-  pheatmap::pheatmap( # Plot the heatmap
+  pheatmap::pheatmap(
     ordered_by_p_val,
     main          = paste0("Edges:\n hi conf trans vs delta pheno"),
     cluster_cols  = FALSE,
@@ -229,7 +215,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
   colnames(sorted_trans_edge_mat) <- substr(colnames(sorted_trans_edge_mat), 1, 20)
 
-  pheatmap::pheatmap( # Plot the heatmap
+  pheatmap::pheatmap(
     sorted_trans_edge_mat,
     main          = paste0("Edges:\n hi conf trans vs delta pheno"),
     cluster_cols  = TRUE,
@@ -245,35 +231,73 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
     na_col = "grey")
 
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
-  counter <- 0 # TODO can I get rid of counter now? 2019-02-25
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] < fdr) {
-      counter <- counter + 1
       graphics::par(mfrow = c(3, 3))
       graphics::par(mgp   = c(3, 1, 0))
       graphics::par(oma   = c(0, 0, 4, 0))
       graphics::par(mar = c(4, 4, 4, 4))
 
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
-      plot_tree_with_colored_edges(tr, geno_reconstruction, geno_confidence, "grey", "red", paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
-      plot_tree_with_colored_edges(tr, geno_transition,     geno_confidence, "grey", "red", "Genotype transition edge:\n Red = transition; Black = No transition", annot, "trans", j)
-      histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno(p_trans_mat, geno_confidence, tr, j)
-      histogram_abs_high_confidence_delta_pheno_highlight_transition_edges(results_all_trans, tr, j, "grey", "red") # 6. Delta phenotype histogram. Note that results_all_trans$observed_pheno_non_trans_delta[[j]] is already subset down to only high confidence edges
-      histogram_raw_high_confidence_delta_pheno_highlight_transition_edges(geno_transition, geno_confidence, pheno_recon_ordered_by_edges, tr, j, "grey", "red")
+      plot_tree_with_colored_edges(tr, geno_reconstruction,
+                                   geno_confidence,
+                                   "grey",
+                                   "red",
+                                   paste0(row.names(pval_all_transition$hit_pvals)[j],
+                                          "\n Genotype reconstruction:\n Red = Variant; Black = WT"),
+                                   annot,
+                                   "recon",
+                                   j)
+      plot_tree_with_colored_edges(tr,
+                                   geno_transition,
+                                   geno_confidence,
+                                   "grey",
+                                   "red",
+                                   "Genotype transition edge:\n Red = transition; Black = No transition",
+                                   annot,
+                                   "trans",
+                                   j)
+      histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno(p_trans_mat,
+                                                                    geno_confidence,
+                                                                    tr,
+                                                                    j)
+      histogram_abs_high_confidence_delta_pheno_highlight_transition_edges(results_all_trans,
+                                                                           tr,
+                                                                           j,
+                                                                           "grey",
+                                                                           "red")
+      histogram_raw_high_confidence_delta_pheno_highlight_transition_edges(geno_transition,
+                                                                           geno_confidence,
+                                                                           pheno_recon_ordered_by_edges,
+                                                                           tr,
+                                                                           j,
+                                                                           "grey",
+                                                                           "red")
 
       graphics::hist(log(results_all_trans$ks_statistics[[j]]),
            breaks = perm/10, col = "grey", border = FALSE,
-           main = paste("Null distribution of KS statistic for all transitions.\n Red = Observed KS statistic.\n p-value = ", round(pval_all_transition$hit_pvals[j, 1], 10), "\np-value rank = ", rank(pval_all_transition$hit_pvals)[j], sep = ""),
+           main = paste("Null distribution of KS statistic for all transitions.
+                        \n Red = Observed KS statistic.\n p-value = ",
+                        round(pval_all_transition$hit_pvals[j, 1], 10),
+                        "\np-value rank = ",
+                        rank(pval_all_transition$hit_pvals)[j],
+                        sep = ""),
            ylab = "Count",
            xlab = "ln(KS statistic)",
-           xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])), log(results_all_trans$ks_statistics[[j]])), 0))
-      graphics::abline(v = log(as.numeric(results_all_trans$observed_ks_stat[j])), col = "red")
+           xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])),
+                        log(results_all_trans$ks_statistics[[j]])), 0))
+      graphics::abline(v =
+                         log(as.numeric(results_all_trans$observed_ks_stat[j])),
+                       col = "red")
 
-      colnames(sorted_trans_edge_mat) <- substr(colnames(sorted_trans_edge_mat), 1, 20)
+      colnames(sorted_trans_edge_mat) <- substr(colnames(sorted_trans_edge_mat),
+                                                1,
+                                                20)
 
       pheatmap::pheatmap(
         sorted_trans_edge_mat[ , j, drop = FALSE],
-        main          = paste0(row.names(pval_all_transition$hit_pvals)[j], "\n Tree edges: hi conf trans vs delta pheno"),
+        main          = paste0(row.names(pval_all_transition$hit_pvals)[j],
+                               "\n Tree edges: hi conf trans vs delta pheno"),
         cluster_cols  = FALSE,
         cluster_rows  = FALSE,
         na_col = "grey",
@@ -290,7 +314,8 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
   trans_dir_edge_mat <- NULL
   for (i in 1:length(geno_transition)) {
-    trans_dir_edge_mat <- cbind(trans_dir_edge_mat, geno_transition[[i]]$trans_dir)
+    trans_dir_edge_mat <- cbind(trans_dir_edge_mat,
+                                geno_transition[[i]]$trans_dir)
   }
 
   colnames(trans_dir_edge_mat) <- colnames(geno)
@@ -302,19 +327,26 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
   all_tables <- all_lists <- rep(list(NULL), ncol(trans_dir_edge_mat))
   delta_pheno_table <- matrix(0, nrow = 3, ncol = 1)
-  row.names(delta_pheno_table) <- c("geno_parent_0_child_1", "geno_parent_1_child_0", "geno_no_change")
+  row.names(delta_pheno_table) <- c("geno_parent_0_child_1",
+                                    "geno_parent_1_child_0",
+                                    "geno_no_change")
   colnames(delta_pheno_table) <- c("sum(|delta_phenotype|)")
   for (i in 1:ncol(trans_dir_edge_mat)) {
     temp_table <- delta_pheno_table
-    temp_table[1, 1] <- sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == 1),  1], na.rm = TRUE)
-    temp_table[2, 1] <- sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == -1), 1], na.rm = TRUE)
-    temp_table[3, 1] <- sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == 0),  1], na.rm = TRUE)
+    temp_table[1, 1] <-
+      sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == 1),  1], na.rm = TRUE)
+    temp_table[2, 1] <-
+      sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == -1), 1], na.rm = TRUE)
+    temp_table[3, 1] <-
+      sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == 0),  1], na.rm = TRUE)
     all_tables[[i]] <- temp_table
   }
   names(all_tables) <- colnames(geno)
   delta_pheno_table <- all_tables
   delta_pheno_list <- rep(list(0), 3)
-  names(delta_pheno_list) <- c("geno_parent_0_child_1", "geno_parent_1_child_0", "geno_no_change")
+  names(delta_pheno_list) <- c("geno_parent_0_child_1",
+                               "geno_parent_1_child_0",
+                               "geno_no_change")
   for (i in 1:ncol(trans_dir_edge_mat)) {
     temp_list <- delta_pheno_list
     temp_list[[1]] <- p_trans_mat[which(trans_dir_edge_mat[ , i] == 1),  1]
@@ -336,32 +368,31 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 #' Create a manhattan plot of GWAS hit p-values.
 #'
 #' @noRd
-#' @param outdir
-#' @param geno_pheno_name
-#' @param pval_hits
-#' @param alpha
-#' @param trans_or_recon
+#' @param outdir. Character. Output dictory.
+#' @param geno_pheno_name Character.
+#' @param pval_hits Vector. P-values for all loci.
+#' @param fdr Number. False discorvery rate.
+#' @param trans_or_recon Character.
 #'
-#' @return
+#' @return A manhattan plot of all of the hit values.
 #'
 #' @examples
-make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans_or_recon){
-  # Function description -------------------------------------------------------
-  # Create a manhattan plot of GWAS hit p-values.
-  # TODO
-  # Inputs:
-  #
-  # Output:
-  # None
-  #
+make_manhattan_plot <- function(outdir,
+                                geno_pheno_name,
+                                pval_hits,
+                                fdr,
+                                trans_or_recon){
   # Check inputs ---------------------------------------------------------------
+  check_if_dir_exists(outdir)
+  check_num_between_0_and_1(fdr)
+  # TODO add checks
 
   # Function -------------------------------------------------------------------
   # Create negative log p-values with arbitrary locus numbers
   neg_log_p_value <- data.frame(-log(pval_hits))
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
   colnames(neg_log_p_with_num)[1] <- "locus"
-  sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[ , 2] > -log(alpha))
+  sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[ , 2] > -log(fdr))
   ymax <- max(-log(0.01), neg_log_p_with_num[ , 2, drop = TRUE])
   with(neg_log_p_with_num,
        graphics::plot(x = neg_log_p_with_num[ , 1],
@@ -374,44 +405,39 @@ make_manhattan_plot <- function(outdir, geno_pheno_name, pval_hits, alpha, trans
             ylim = c(0, ymax),
             ylab = "-ln(p-val)" ))
 
-  graphics::abline(h = -log(alpha), col = "red")
+  graphics::abline(h = -log(fdr),
+                   col = "red")
   if (nrow(sig_temp) > 0) {
-    graphics::text(x = sig_temp[ , 1], y = sig_temp[ , 2], labels = row.names(sig_temp), pos = 1, cex = 0.7)
+    graphics::text(x = sig_temp[ , 1],
+                   y = sig_temp[ , 2],
+                   labels = row.names(sig_temp),
+                   pos = 1,
+                   cex = 0.7)
   }
-  #grDevices::dev.off()
 } #end make_manhattan_plot()
 
 #' Plot a phylogenetic tree with certain edges highlighted.
 #'
 #' @noRd
-#' @param tr
-#' @param edges_to_highlight
-#' @param geno_confidence
-#' @param edge_color_na
-#' @param edge_color_bright
-#' @param title
-#' @param annot
-#' @param trans_or_recon
-#' @param index
+#' @param tr Phylo.
+#' @param edges_to_highlight List of vectors.
+#' @param geno_confidence List of vectors.
+#' @param edge_color_na. Character. Color.
+#' @param edge_color_bright Character. Color.
+#' @param title String.
+#' @param annot Deprecated.
+#' @param trans_or_recon String. Either "recon" or "trans."
+#' @param index Number.
 #'
-#' @return
+#' @return Plot of a tree with certain edges colored.
 #'
-#' @examples
 plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence, edge_color_na, edge_color_bright, title, annot, trans_or_recon, index){
-  # Function description -------------------------------------------------------
-  # Plot a phylogenetic tree with certain edges highlighted.
-  #
-  # Inputs:
-  # Varname. Var class. Description.
-  #
-  # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
-  #
   # Check input ----------------------------------------------------------------
+  check_for_root_and_bootstrap(tr)
+  check_is_string(edge_color_na)
+  check_is_string(edge_color_bright)
 
   # Function -------------------------------------------------------------------
-
-  # Return output --------------------------------------------------------------
   edge_color <- rep("black", ape::Nedge(tr))
   if (trans_or_recon == "recon") {
     edge_color[edges_to_highlight[[index]] == 1] <- edge_color_bright
@@ -446,26 +472,14 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
 #' Create object to annotate columns in the significant hit results.
 #'
 #' @noRd
-#' @param geno_matrix
+#' @param geno_matrix Genotype matrix to be plotting in heatmap.
 #'
-#' @return
-#'
-#' @examples
+#' @return Annotation color object for heatmap.
 make_ann_colors <- function(geno_matrix){
-  # Function description -------------------------------------------------------
-  # Create object to annotate columns in the significant hit results.
-  #
-  # Inputs:
-  # Varname. Var class. Description.
-  #
-  # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
-  #
   # Check input ----------------------------------------------------------------
 
   # Function -------------------------------------------------------------------
 
-  # Return output --------------------------------------------------------------
   ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
   zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 1
   nas <- sum(is.na(geno_matrix)) > 1
@@ -485,30 +499,44 @@ make_ann_colors <- function(geno_matrix){
   } else if (ones == 1 && zeros == 0 && nas == 0) {
     ann_colors = list(pheno_presence = c(present = "red"))
   } else {
-    stop("no ones, zeroes, or NAs present in g_mat")
+    stop("No ones, zeroes, or NAs present in g_mat")
   }
+  # Return output --------------------------------------------------------------
   return(ann_colors)
 }
 
 #' Plot convergence test results.
 #'
 #' @noRd
-#' @param tr
-#' @param dir
-#' @param name
-#' @param fdr
-#' @param annot
-#' @param num_perm
-#' @param recon_hit_vals
-#' @param p_recon_edges
-#' @param recon_perm_obs_results
-#' @param tr_and_pheno_hi_conf
-#' @param geno_confidence
-#' @param g_trans_edges
-#' @param p_trans_edges
-#' @param snp_in_gene
+#' @param tr Phylo.
+#' @param dir Directory where to save plots.
+#' @param name Prefix in plot file name.
+#' @param fdr Numeric. False discovery rate. Between 0 and 1.
+#' @param annot Deprecated.
+#' @param num_perm Numeric. Number of permutations.
+#' @param recon_hit_vals Dataframe. Nrows = number of genotypes. Ncol = 1.
+#'   Corrected p-values for each genotype tested.
+#' @param p_recon_edges Vector. Length = Nedge(tree). Reconstruction of
+#'   phenotype.
+#' @param recon_perm_obs_results List of many results.
+#'   $hit_pvals. Character. P-val for each genotype. Length = number of tested
+#'   genotypes. $permuted_count. List of vectors. 1 vector for each tested
+#'   genotype. Length of each vector = number of permuations. $observed_overlap.
+#'   Integer vector. Length = number of tested genotypes.
+#' @param tr_and_pheno_hi_conf Vector of logicals. TRUE = high confidence.
+#'   FALSE = low confidence. Length = Nedge(tree).
+#' @param geno_confidence List of vectors. Length of individual vector =
+#'   Nedge(tree). Genotype high confidence edges. Either 1 (high confidence) or
+#'   0 (low confidence).
+#' @param g_trans_edges List of vectors. Length of individual vector =
+#'   Nedge(tree). Genotype transition edges. Either 1 (transition) or 0 (no
+#'   transition).
+#' @param p_trans_edges Vector. Length = Nedge(tree). Transitions marked as 1,
+#'   not transition marked as 0.
+#' @param snp_in_gene Either NULL or table of integers where each entry
+#'   corresponds to one genotype.
 #'
-#' @return
+#' @return  Plots printed into one pdf.
 #'
 #' @examples
 discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
@@ -516,32 +544,6 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                                 recon_perm_obs_results, tr_and_pheno_hi_conf,
                                 geno_confidence, g_trans_edges, p_trans_edges,
                                 snp_in_gene, prefix, grouped_logical){
-  # Function description -------------------------------------------------------
-  # Plot the discrete test results.
-  #
-  # Inputs:
-  # tr. Phylo.
-  # dir. Directory where to save plots.
-  # name. Prefix in plot file name.
-  # fdr. Numeric. False discovery rate. Between 0 and 1.
-  # TODO add description of annotation and make sure that including an annotation doesn't break anything OR remove annotation.
-  # annot. ??
-  # num_perm. Numeric. Number of permutations.
-  # recon_hit_vals. Dataframe. Nrows = number of genotypes. Ncol = 1. Corrected p-values for each genotype tested.
-  # p_recon_edges. Vector. Length = Nedge(tree). Reconstruction of phenotype.
-  # recon_perm_obs_results. List of many results.
-  #     $hit_pvals. Character. P-val for each genotype. Length = number of tested genotypes.
-  #     $permuted_count. List of vectors. 1 vector for each tested genotype. Length of each vector = number of permuations.
-  #     $observed_overlap. Integer vector. Length = number of tested genotypes.
-  # tr_and_pheno_hi_conf. Vector of logicals. TRUE = high confidence. FALSE = low confidence. Length = Nedge(tree).
-  # geno_confidence. List of vectors. Length of individual vector = Nedge(tree). Genotype high confidence edges. Either 1 (high confidence) or 0 (low confidence).
-  # g_trans_edges. List of vectors. Length of individual vector = Nedge(tree). Genotype transition edges. Either 1 (transition) or 0 (no transition).
-  # p_trans_edges. Vector. Length = Nedge(tree). Transitions marked as 1, not transition marked as 0.
-  # snp_in_gene. Either NULL or Table of integers where each entry corresponds to one genotype.
-  #
-  # Outputs:
-  # Plots printed into one pdf.
-  #
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -717,9 +719,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
         }
 
         cell_width_value <- image_width / ncol(g_mat)
-
         colnames(g_mat) <- substr(colnames(g_mat), 1, 20)
-
 
         pheatmap::pheatmap(
           mat               = g_mat,
@@ -746,53 +746,38 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
 #' Plot the synchronous test results.
 #'
-#' @param tr
-#' @param dir
-#' @param name
-#' @param fdr
-#' @param annot
-#' @param num_perm
-#' @param trans_hit_vals
-#' @param trans_perm_obs_results
-#' @param tr_and_pheno_hi_conf
-#' @param geno_confidence
-#' @param g_trans_edges
-#' @param p_trans_edges
-#' @param snp_in_gene
+#' @param tr Phylo.
+#' @param dir Directory where to save plots.
+#' @param name Prefix in plot file name.
+#' @param fdr Numeric. False discovery rate. Between 0 and 1.
+#' @param annot Deprecated.
+#' @param num_perm Numeric. Number of permutations.
+#' @param trans_hit_vals Dataframe. Nrows = number of genotypes. Ncol = 1.
+#'   Corrected p-values for each genotype tested.
+#' @param trans_perm_obs_results List of many results.  $hit_pvals. Character.
+#'   P-val for each genotype. Length = number of tested genotypes.
+#'   $permuted_count. List of vectors. 1 vector for each tested genotype. Length
+#'   of each vector = number of permuations. $observed_overlap. Integer vector.
+#'   Length = number of tested genotypes.
+#' @param tr_and_pheno_hi_conf Vector of logicals. TRUE = high confidence. FALSE
+#'   = low confidence. Length = Nedge(tree).
+#' @param geno_confidence List of vectors. Length of individual vector =
+#'   Nedge(tree). Genotype high confidence edges. Either 1 (high confidence) or
+#'   0 (low confidence).
+#' @param g_trans_edges List of vectors. Length of individual vector =
+#'   Nedge(tree). Genotype transition edges. Either 1 (transition) or 0 (no
+#'   transition).
+#' @param p_trans_edges Vector. Length = Nedge(tree). Transitions marked as 1,
+#'   not transition marked as 0.
+#' @param snp_in_gene Either NULL or Table of integers where each entry
+#'   corresponds to one genotype.
 #'
-#' @return
-#'
-#' @examples
+#' @return  Plots printed into one pdf.
 discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
                                  trans_hit_vals, trans_perm_obs_results,
                                  tr_and_pheno_hi_conf, geno_confidence,
                                  g_trans_edges, p_trans_edges, snp_in_gene,
                                  prefix, grouped_logical){
-  # Function description -------------------------------------------------------
-  # Plot the discrete test results.
-  #
-  # Inputs:
-  # tr. Phylo.
-  # dir. Directory where to save plots.
-  # name. Prefix in plot file name.
-  # fdr. Numeric. False discovery rate. Between 0 and 1.
-  # TODO add description of annotation and make sure that including an annotation doesn't break anything OR remove annotation.
-  # annot. ??
-  # num_perm. Numeric. Number of permutations.
-  # trans_hit_vals. Dataframe. Nrows = number of genotypes. Ncol = 1. Corrected p-values for each genotype tested.
-  # trans_perm_obs_results. List of many results.
-  #     $hit_pvals. Character. P-val for each genotype. Length = number of tested genotypes.
-  #     $permuted_count. List of vectors. 1 vector for each tested genotype. Length of each vector = number of permuations.
-  #     $observed_overlap. Integer vector. Length = number of tested genotypes.
-  # tr_and_pheno_hi_conf. Vector of logicals. TRUE = high confidence. FALSE = low confidence. Length = Nedge(tree).
-  # geno_confidence. List of vectors. Length of individual vector = Nedge(tree). Genotype high confidence edges. Either 1 (high confidence) or 0 (low confidence).
-  # g_trans_edges. List of vectors. Length of individual vector = Nedge(tree). Genotype transition edges. Either 1 (transition) or 0 (no transition).
-  # p_trans_edges. Vector. Length = Nedge(tree). Transitions marked as 1, not transition marked as 0.
-  # snp_in_gene. Either NULL or Table of integers where each entry corresponds to one genotype.
-  #
-  # Outputs:
-  # Plots printed into one pdf.
-  #
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
