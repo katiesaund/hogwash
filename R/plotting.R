@@ -152,7 +152,7 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
 #' are significant after FDR, then plot heatmaps & trees for each of these.
 #'
 #' @noRd
-#' @param disc_cont String, should be continuous.
+#' @param disc_cont String, should be "continuous."
 #' @param tr Phylo.
 #' @param fdr Number. False discovery rate.
 #' @param dir Character. Output path.
@@ -161,15 +161,15 @@ histogram_all_delta_pheno_overlaid_with_high_conf_delta_pheno <- function(p_tran
 #' @param pheno_vector Vector.
 #' @param annot Matrix.
 #' @param perm Number.
-#' @param results_all_trans
-#' @param pheno_anc_rec
-#' @param geno_reconstruction
-#' @param geno_confidence
-#' @param geno_transition
-#' @param geno
-#' @param pheno_recon_ordered_by_edges
-#' @param tr_and_pheno_hi_conf
-#' @param all_trans_sig_hits
+#' @param results_all_trans TODO
+#' @param pheno_anc_rec TODO
+#' @param geno_reconstruction TODO
+#' @param geno_confidence TODO
+#' @param geno_transition TODO
+#' @param geno TODO
+#' @param pheno_recon_ordered_by_edges TODO
+#' @param tr_and_pheno_hi_conf TODO
+#' @param all_trans_sig_hits TODO
 #'
 #' @return Plots continuous test resutlts.
 #'
@@ -279,10 +279,10 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] < fdr) {
-      graphics::par(mfrow = c(3, 3))
-      graphics::par(mgp   = c(3, 1, 0))
-      graphics::par(oma   = c(0, 0, 4, 0))
-      graphics::par(mar = c(4, 4, 4, 4))
+      graphics::par(mfrow = c(3, 3),
+                    mgp   = c(3, 1, 0),
+                    oma   = c(0, 0, 4, 0),
+                    mar = c(4, 4, 4, 4))
 
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
       plot_tree_with_colored_edges(tr, geno_reconstruction,
@@ -518,12 +518,12 @@ plot_tree_with_colored_edges <- function(tr, edges_to_highlight, geno_confidence
 #' Create object to annotate columns in the significant hit results.
 #'
 #' @noRd
-#' @param geno_matrix Genotype matrix to be plotting in heatmap.
+#' @param geno_matrix Genotype matrix to plot in heatmap. Dimensions: TODO?
 #'
 #' @return Annotation color object for heatmap.
 make_ann_colors <- function(geno_matrix){
   # Check input ----------------------------------------------------------------
-
+  # TODO add checks
   # Function -------------------------------------------------------------------
 
   ones <- sum(geno_matrix == 1, na.rm = TRUE) > 1
@@ -583,8 +583,6 @@ make_ann_colors <- function(geno_matrix){
 #'   corresponds to one genotype.
 #'
 #' @return  Plots printed into one pdf.
-#'
-#' @examples
 discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                                 recon_hit_vals, p_recon_edges,
                                 recon_perm_obs_results, tr_and_pheno_hi_conf,
@@ -643,12 +641,17 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
 
   temp_g_trans_mat <- cbind(phenotype_annotation, g_trans_mat)
-  g_trans_mat <- temp_g_trans_mat[order(temp_g_trans_mat[,1], na.last = FALSE, decreasing = FALSE ), 2:ncol(temp_g_trans_mat), drop = FALSE]
+  g_trans_mat <- temp_g_trans_mat[order(temp_g_trans_mat[,1],
+                                        na.last = FALSE,
+                                        decreasing = FALSE ),
+                                  2:ncol(temp_g_trans_mat),
+                                  drop = FALSE]
   colnames(g_trans_mat) <- row.names(recon_hit_vals)
 
   cell_width_value <- image_width / ncol(g_trans_mat)
 
-  significant_loci <- data.frame("locus" = rep("not_sig", ncol(g_trans_mat)), stringsAsFactors = FALSE)
+  significant_loci <- data.frame("locus" = rep("not_sig", ncol(g_trans_mat)),
+                                 stringsAsFactors = FALSE)
   row.names(significant_loci) <- row.names(recon_hit_vals)
   log_p_value <- data.frame(-log(recon_hit_vals))
   significant_loci[log_p_value > -log(fdr)] <- "sig"
@@ -656,16 +659,24 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
     colnames(snp_in_gene) <- "SNPs in gene"
-    snp_in_gene <- snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), , drop = FALSE]
+    snp_in_gene <-
+      snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
+                  drop = FALSE]
     column_annot <- cbind(significant_loci, log_p_value, snp_in_gene) # TODO add a test to make sure order doesn't matter here
   } else {
     column_annot <- cbind(significant_loci, log_p_value)
   }
 
-  ordered_by_p_val      <-           g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_trans_mat)), drop = FALSE]
-  column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
+  ordered_by_p_val <-
+    g_trans_mat[ ,
+                 match(row.names(log_p_value)[order(log_p_value[ , 1])],
+                       colnames(g_trans_mat)),
+                 drop = FALSE]
+  column_annot_ordered_by_p_val
+  <- column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])],
+                        row.names(column_annot)), ]
 
-  # TODO: make sure this kind of annotation steps gets generalized to more locatoins -- I think I wrote a function like this somewhere else. Double check!
+  # TODO: make sure this kind of annotation steps gets generalized to more locations -- I think I wrote a function like this somewhere else. Double check!
   if (length(unique(phenotype_annotation[ ,1])) == 3) {
     pheno_presence_col = c( na = "grey", absence = "white", presence = "red")
   } else if (length(unique(phenotype_annotation[ ,1])) == 2) {
@@ -701,7 +712,8 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
-      main          = paste0("Edges:\n Genotype transition with phenotype presence/absence"),
+      main          = paste0("Edges:\n Genotype transition with phenotype
+                             presence/absence"),
       cluster_cols  = FALSE,
       na_col = "grey",
       cluster_rows  = FALSE,
@@ -715,19 +727,43 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
       cellwidth = cell_width_value)
   }
 
-  # loop through reconstruction sig hits:
+  # Loop through significant hits:
   pheno_as_list <- list(p_recon_edges)
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
-  # TODO break these plots into more functions b/c lots of redundant code between recon and transition plots
+  # TODO break these plots into more functions b/c lots of redundant code
+  # between recon and transition plots
   for (j in 1:nrow(recon_hit_vals)) {
     if (recon_hit_vals[j, 1] < fdr) {
-      graphics::par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
-      # pheno
-      plot_tree_with_colored_edges(tr, pheno_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
-      # geno
-      plot_tree_with_colored_edges(tr, g_trans_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype transition:\n Red = transition; Black = no transition"), annot, "recon", j)
+      graphics::par(mfrow = c(3, 2),
+                    mgp = c(3, 1, 0),
+                    oma = c(0, 0, 4, 0),
+                    mar = c(4, 4, 4, 4))
+      # Phenotype
+      plot_tree_with_colored_edges(tr,
+                                   pheno_as_list,
+                                   pheno_conf_as_list,
+                                   "grey",
+                                   "red",
+                                   paste0("\n Phenotype reconstruction:\n
+                                          Red = Variant; Black = WT"),
+                                   annot,
+                                   "recon",
+                                   1)
+      # Genotype
+      plot_tree_with_colored_edges(tr,
+                                   g_trans_edges,
+                                   geno_confidence,
+                                   "grey",
+                                   "red",
+                                   paste0(row.names(recon_hit_vals)[j], "\n
+                                          Genotype transition:\n Red =
+                                          transition; Black = no transition"),
+                                   annot,
+                                   "recon",
+                                   j)
       # Permutation test
-      max_x <- max(recon_perm_obs_results$permuted_count[[j]], recon_perm_obs_results$observed_overlap[j]) # change to loop through sig hits
+      max_x <- max(recon_perm_obs_results$permuted_count[[j]],
+                   recon_perm_obs_results$observed_overlap[j]) # TODO change to loop through sig hits
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
            breaks = num_perm/10,
            xlim = c(0, max_x),
@@ -735,8 +771,13 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
            border = FALSE,
            ylab = "Count",
            xlab = "# edges with genotype transition & phenotype presence",
-           main = paste0("Phyc: Overlap of genotype transition edge\n& phenotype presence \npval=", round(recon_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = ""))
-      graphics::abline(v = recon_perm_obs_results$observed_overlap[j], col = "red")
+           main = paste0("Phyc: Overlap of genotype transition edge\n
+                         & phenotype presence \npval=",
+                         round(recon_hit_vals[j, 1], 4),
+                         "\nRed=observed,Grey=permutations",
+                         sep = ""))
+      graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
+                       col = "red")
 
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1 # should be NA but it won't work correctedly TODO
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
@@ -749,7 +790,12 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_transition"
       temp_g_mat <- cbind(g_mat, phenotype_annotation)
-      g_mat <- temp_g_mat[order(temp_g_mat[,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
+      g_mat <- temp_g_mat[order(temp_g_mat[,2],
+                                temp_g_mat[,1],
+                                na.last = FALSE,
+                                decreasing = FALSE ),
+                          1,
+                          drop = FALSE]
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
 
       if (plotting_logical) {
@@ -759,7 +805,8 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
           num_snps <- snp_in_gene[row.names(recon_hit_vals)[j], , drop = FALSE]
           row.names(num_snps) <- "genotype_transition"
           colnames(num_snps) <- "# grouped genotypes"
-          ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
+          ann_colors <-
+            c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
         } else {
           num_snps <- NULL
         }
@@ -769,7 +816,10 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
         pheatmap::pheatmap(
           mat               = g_mat,
-          main              = paste0(row.names(recon_hit_vals)[j], "\n Tree edges clustered by edge type\n Genotype transition edge\n & phenotype present edge"),
+          main              = paste0(row.names(recon_hit_vals)[j], "\n Tree
+                                     edges clustered by edge type\n Genotype
+                                     transition edge\n & phenotype present
+                                     edge"),
           cluster_cols      = FALSE,
           cluster_rows      = FALSE,
           na_col            = "grey",
@@ -830,7 +880,8 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   check_is_string(name)
   check_num_between_0_and_1(fdr)
   check_if_permutation_num_valid(num_perm)
-  if (ncol(trans_hit_vals) != 1 | nrow(trans_hit_vals) != length(geno_confidence)) {
+  if (ncol(trans_hit_vals) != 1 |
+      nrow(trans_hit_vals) != length(geno_confidence)) {
     stop("Dimensions of hit p-values dataframe are incorrect.")
   }
   if (!is.null(snp_in_gene)) {
@@ -877,10 +928,16 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
 
   temp_g_trans_mat <- cbind(phenotype_annotation, g_trans_mat)
-  g_trans_mat <- temp_g_trans_mat[order(temp_g_trans_mat[,1], na.last = FALSE, decreasing = FALSE ), 2:ncol(temp_g_trans_mat), drop = FALSE]
+  g_trans_mat <-
+    temp_g_trans_mat[order(temp_g_trans_mat[,1],
+                           na.last = FALSE, decreasing = FALSE ),
+                     2:ncol(temp_g_trans_mat),
+                     drop = FALSE]
   colnames(g_trans_mat) <- row.names(trans_hit_vals)
 
-  significant_loci <- data.frame("locus" = rep("not_sig", ncol(g_trans_mat)), stringsAsFactors = FALSE)
+  significant_loci <-
+    data.frame("locus" = rep("not_sig", ncol(g_trans_mat)),
+               stringsAsFactors = FALSE)
   row.names(significant_loci) <- row.names(trans_hit_vals)
   log_p_value <- data.frame(-log(trans_hit_vals))
   significant_loci[log_p_value > -log(fdr)] <- "sig"
@@ -888,15 +945,23 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
     colnames(snp_in_gene) <- "# grouped genotypes"
-    snp_in_gene <- snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), , drop = FALSE]
+    snp_in_gene <-
+      snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
+                  drop = FALSE]
     column_annot <- cbind(significant_loci, log_p_value, snp_in_gene) # TODO add a test to make sure order doesn't matter here
   } else {
     column_annot <- cbind(significant_loci, log_p_value)
   }
 
-  ordered_by_p_val      <-           g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])], colnames(g_trans_mat)), drop = FALSE]
-  column_annot_ordered_by_p_val <-     column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])], row.names(column_annot)), ]
+  ordered_by_p_val <-
+    g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])],
+                         colnames(g_trans_mat)),
+                 drop = FALSE]
+  column_annot_ordered_by_p_val <-
+    column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])],
+                       row.names(column_annot)), ]
 
+  # TODO use the annotation function here instead of this redundant code
   if (length(unique(phenotype_annotation[ ,1])) == 3) {
     pheno_presence_col = c("-1" = "grey", "0" = "white", "1" = "red")
   } else if (length(unique(phenotype_annotation[ ,1])) == 2) {
@@ -934,7 +999,8 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
     # Transition loci summary heat maps
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
-      main          = paste0("Edges:\n Genotype transitions with phenotype transitions"),
+      main          = paste0("Edges:\n
+                             Genotype transitions with phenotype transitions"),
       cluster_cols  = FALSE,
       na_col = "grey",
       cluster_rows  = FALSE,
@@ -948,19 +1014,40 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
       cellwidth = cell_width_value)
   }
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
-  # loop through transition sig hits:
+  # Loop through significant hits:
   for (j in 1:nrow(trans_hit_vals)) {
     if (trans_hit_vals[j, 1] < fdr) {
-      graphics::par(mfrow = c(3, 2), mgp = c(3, 1, 0), oma = c(0, 0, 4, 0), mar = c(4, 4, 4, 4))
-      # Plot pheno
+      graphics::par(mfrow = c(3, 2),
+                    mgp = c(3, 1, 0),
+                    oma = c(0, 0, 4, 0),
+                    mar = c(4, 4, 4, 4))
+      # Plot phenotype
       p_trans_edges_as_list <- list(p_trans_edges)
-      #plot_tree_with_colored_edges(tr, pheno_as_list,         pheno_conf_as_list, "grey", "red", paste0("\n Phenotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", 1)
-      plot_tree_with_colored_edges(tr, p_trans_edges_as_list, pheno_conf_as_list, "grey", "red", paste0("\n Phenotype transitions:\n Red = transition; Black = no change"), annot, "recon", 1)
-      # Plot geno
-      #plot_tree_with_colored_edges(tr, g_trans_edges, geno_confidence, "grey", "red", paste0(row.names(recon_hit_vals)[j], "\n Genotype reconstruction:\n Red = Variant; Black = WT"), annot, "recon", j)
-      plot_tree_with_colored_edges(tr, g_trans_edges, geno_confidence, "grey", "red", paste0(row.names(trans_hit_vals)[j], "\n Genotype transitions:\n Red = transition; Black = no change"), annot, "recon", j)
-      # Permutation test
-      max_x <- max(trans_perm_obs_results$permuted_count[[j]], trans_perm_obs_results$observed_overlap[j]) # change to loop through sig hits
+      plot_tree_with_colored_edges(tr,
+                                   p_trans_edges_as_list,
+                                   pheno_conf_as_list,
+                                   "grey",
+                                   "red",
+                                   paste0("\n Phenotype transitions:\n Red =
+                                          transition; Black = no change"),
+                                   annot,
+                                   "recon",
+                                   1)
+      # Plot genotype
+      plot_tree_with_colored_edges(tr,
+                                   g_trans_edges,
+                                   geno_confidence,
+                                   "grey",
+                                   "red",
+                                   paste0(row.names(trans_hit_vals)[j],
+                                          "\n Genotype transitions:\n Red =
+                                          transition; Black = no change"),
+                                   annot,
+                                   "recon",
+                                   j)
+      # Plot permutation test
+      max_x <- max(trans_perm_obs_results$permuted_count[[j]],
+                   trans_perm_obs_results$observed_overlap[j]) # TODO change to loop through sig hits
       graphics::hist(trans_perm_obs_results$permuted_count[[j]],
            breaks = num_perm/10,
            xlim = c(0, max_x),
@@ -968,8 +1055,12 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
            border = FALSE,
            ylab = "Count",
            xlab = "# edges where genotype-phenotype transitions co-occur",
-           main = paste0("Geno & pheno transition overlap\npval=", round(trans_hit_vals[j, 1], 4), "\nRed=observed,Grey=permutations", sep = "")) # TODO add rank pvalue
-      graphics::abline(v = trans_perm_obs_results$observed_overlap[j], col = "red")
+           main = paste0("Geno & pheno transition overlap\npval=",
+                         round(trans_hit_vals[j, 1], 4),
+                         "\nRed=observed,Grey=permutations",
+                         sep = "")) # TODO add rank pvalue
+      graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
+                       col = "red")
 
       # edge heatmap - heatmap is tree edges, annotation is phenotype edges
       graphics::par(mfrow = c(1,1))
@@ -985,9 +1076,16 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_transition"
       temp_g_mat <- cbind(g_mat, phenotype_annotation)
-      g_mat <- temp_g_mat[order(temp_g_mat[ ,2], temp_g_mat[,1], na.last = FALSE, decreasing = FALSE ), 1, drop = FALSE]
+      g_mat <- temp_g_mat[order(temp_g_mat[ ,2],
+                                temp_g_mat[,1],
+                                na.last = FALSE,
+                                decreasing = FALSE ),
+                          1,
+                          drop = FALSE]
 
-      ann_colors = list(pheno_transition = c( na = "grey", no_transition = "white", transition = "red"))
+      ann_colors = list(pheno_transition = c(na = "grey",
+                                             no_transition = "white",
+                                             transition = "red"))
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
 
       if (plotting_logical) {
@@ -996,15 +1094,17 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
           num_snps <- snp_in_gene[row.names(trans_hit_vals)[j], , drop = FALSE]
           row.names(num_snps) <- "genotype_transition"
           colnames(num_snps) <- "# grouped genotypes"
-          ann_colors <- c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
+          ann_colors <- c(ann_colors,
+                          list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
         }
         cell_width_value <- image_width / ncol(g_mat)
 
-        colnames(g_mat) <- substr(colnames(g_mat), 1, 20)
+        colnames(g_mat) <- substr(colnames(g_mat), 1, 20) # Limit size of name printed
 
         pheatmap::pheatmap(
           g_mat,
-          main              = paste0(row.names(trans_hit_vals)[j], "\n Tree edges: genotype & phenotype transitions"),
+          main              = paste0(row.names(trans_hit_vals)[j], "\n Tree
+                                     edges: genotype & phenotype transitions"),
           cluster_cols      = FALSE,
           cluster_rows      = FALSE,
           na_col            = "grey",
