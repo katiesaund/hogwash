@@ -346,8 +346,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                    "grey",
                                    "red",
                                    paste0(row.names(pval_all_transition$hit_pvals)[j],
-                                          "\n Genotype reconstruction:\n Red =
-                                          Variant; Black = WT"),
+                                          "\n Genotype reconstruction:\n Red = Variant; Black = WT"),
                                    annot,
                                    "recon",
                                    j)
@@ -356,8 +355,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                    geno_confidence,
                                    "grey",
                                    "red",
-                                   "Genotype transition edge:\n Red =
-                                   transition; Black = No transition",
+                                   "Genotype transition edge:\n Red = transition; Black = No transition",
                                    annot,
                                    "trans",
                                    j)
@@ -365,6 +363,16 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                      geno_confidence,
                                      tr,
                                      j)
+      print("results all trans")
+      print(class(results_all_trans))
+      print(dim(results_all_trans))
+      print(length(results_all_trans))
+      print(results_all_trans)
+      print("j")
+      print(length(j))
+      print(class(j))
+      print(j)
+
       hist_abs_hi_conf_delta_pheno(results_all_trans,
                                    tr,
                                    j,
@@ -380,8 +388,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
       graphics::hist(log(results_all_trans$ks_statistics[[j]]),
            breaks = perm/10, col = "grey", border = FALSE,
-           main = paste("Null distribution of KS statistic for all transitions.
-                        \n Red = Observed KS statistic.\n p-value = ",
+           main = paste("Null distribution of KS statistic for all transitions.\n Red = Observed KS statistic.\n p-value = ",
                         round(pval_all_transition$hit_pvals[j, 1], 10),
                         "\np-value rank = ",
                         rank(pval_all_transition$hit_pvals)[j],
@@ -783,8 +790,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
-      main          = paste0("Edges:\n Genotype transition with phenotype
-                             presence/absence"),
+      main = paste0("Edges:\nGenotype transition with phenotype presence/absence"),
       cluster_cols  = FALSE,
       na_col = "grey",
       cluster_rows  = FALSE,
@@ -815,8 +821,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                                    pheno_conf_as_list,
                                    "grey",
                                    "red",
-                                   paste0("\n Phenotype reconstruction:\n
-                                          Red = Variant; Black = WT"),
+                                   paste0("\n Phenotype reconstruction:\nRed=Variant; Black=WT"),
                                    annot,
                                    "recon",
                                    1)
@@ -826,9 +831,8 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                                    geno_confidence,
                                    "grey",
                                    "red",
-                                   paste0(row.names(recon_hit_vals)[j], "\n
-                                          Genotype transition:\n Red =
-                                          transition; Black = no transition"),
+                                   paste0(row.names(recon_hit_vals)[j],
+                                          "\nGenotype transition:\nRed=transition; Black=no transition"),
                                    annot,
                                    "recon",
                                    j)
@@ -842,8 +846,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
            border = FALSE,
            ylab = "Count",
            xlab = "# edges with genotype transition & phenotype presence",
-           main = paste0("Phyc: Overlap of genotype transition edge\n
-                         & phenotype presence \npval=",
+           main = paste0("PhyC: Overlap of genotype transition\n& phenotype presence\npval=",
                          round(recon_hit_vals[j, 1], 4),
                          "\nRed=observed,Grey=permutations",
                          sep = ""))
@@ -887,10 +890,8 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 
         pheatmap::pheatmap(
           mat               = g_mat,
-          main              = paste0(row.names(recon_hit_vals)[j], "\n Tree
-                                     edges clustered by edge type\n Genotype
-                                     transition edge\n & phenotype present
-                                     edge"),
+          main = paste0(row.names(recon_hit_vals)[j],
+                        "\n Tree edges clustered by edge type\n Genotype transition edge\n& phenotype present edge"),
           cluster_cols      = FALSE,
           cluster_rows      = FALSE,
           na_col            = "grey",
@@ -902,7 +903,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
           annotation_colors = ann_colors,
           show_colnames     = TRUE,
           legend            = TRUE,
-          fontsize = 8,
+          fontsize          = 8,
           cellwidth         = cell_width_value)
       }
     }
@@ -1070,8 +1071,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
     # Transition loci summary heat maps
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
-      main          = paste0("Edges:\n
-                             Genotype transitions with phenotype transitions"),
+      main = paste0("Edges:\nGenotype transitions with phenotype transitions"),
       cluster_cols  = FALSE,
       na_col = "grey",
       cluster_rows  = FALSE,
@@ -1099,8 +1099,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
                                    pheno_conf_as_list,
                                    "grey",
                                    "red",
-                                   paste0("\n Phenotype transitions:\n Red =
-                                          transition; Black = no change"),
+                                   paste0("\n Phenotype transitions:\nRed=transition; Black=no change"),
                                    annot,
                                    "recon",
                                    1)
@@ -1111,8 +1110,7 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
                                    "grey",
                                    "red",
                                    paste0(row.names(trans_hit_vals)[j],
-                                          "\n Genotype transitions:\n Red =
-                                          transition; Black = no change"),
+                                          "\n Genotype transitions:\nRed=transition; Black=no change"),
                                    annot,
                                    "recon",
                                    j)
@@ -1174,8 +1172,8 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
 
         pheatmap::pheatmap(
           g_mat,
-          main              = paste0(row.names(trans_hit_vals)[j], "\n Tree
-                                     edges: genotype & phenotype transitions"),
+          main = paste0(row.names(trans_hit_vals)[j],
+                        "\nTree edges: genotype & phenotype transitions"),
           cluster_cols      = FALSE,
           cluster_rows      = FALSE,
           na_col            = "grey",
