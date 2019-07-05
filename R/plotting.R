@@ -198,7 +198,6 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #' @param name Character. Output name.
 #' @param pval_all_transition
 #' @param pheno_vector Vector.
-#' @param annot Matrix.
 #' @param perm Number.
 #' @param results_all_trans TODO
 #' @param pheno_anc_rec TODO
@@ -215,7 +214,7 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #' @examples
 plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                   pval_all_transition, pheno_vector,
-                                  annot, perm, results_all_trans,
+                                  perm, results_all_trans,
                                   pheno_anc_rec, geno_reconstruction,
                                   geno_confidence, geno_transition, geno,
                                   pheno_recon_ordered_by_edges,
@@ -639,7 +638,6 @@ make_ann_colors <- function(geno_matrix){
 #' @param dir Directory where to save plots.
 #' @param name Prefix in plot file name.
 #' @param fdr Numeric. False discovery rate. Between 0 and 1.
-#' @param annot Deprecated.
 #' @param num_perm Numeric. Number of permutations.
 #' @param recon_hit_vals Dataframe. Nrows = number of genotypes. Ncol = 1.
 #'   Corrected p-values for each genotype tested.
@@ -664,7 +662,7 @@ make_ann_colors <- function(geno_matrix){
 #'   corresponds to one genotype.
 #'
 #' @return  Plots printed into one pdf.
-discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
+discrete_plot_orig <- function(tr, dir, name, fdr, num_perm,
                                 recon_hit_vals, p_recon_edges,
                                 recon_perm_obs_results, tr_and_pheno_hi_conf,
                                 geno_confidence, g_trans_edges, p_trans_edges,
@@ -931,7 +929,6 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 #' @param dir Directory where to save plots.
 #' @param name Prefix in plot file name.
 #' @param fdr Numeric. False discovery rate. Between 0 and 1.
-#' @param annot Deprecated.
 #' @param num_perm Numeric. Number of permutations.
 #' @param trans_hit_vals Dataframe. Nrows = number of genotypes. Ncol = 1.
 #'   Corrected p-values for each genotype tested.
@@ -954,7 +951,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
 #'   corresponds to one genotype.
 #'
 #' @return  Plots printed into one pdf.
-discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
+discrete_plot_trans  <- function(tr, dir, name, fdr, num_perm,
                                  trans_hit_vals, trans_perm_obs_results,
                                  tr_and_pheno_hi_conf, geno_confidence,
                                  g_trans_edges, p_trans_edges, snp_in_gene,

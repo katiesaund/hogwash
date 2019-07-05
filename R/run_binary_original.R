@@ -79,7 +79,7 @@ run_binary_original <- function(args){
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
   discrete_plot_orig(tr = args$tree, dir = args$output_dir,
                      name = args$output_name, fdr = args$fdr,
-                     annot = args$annot, num_perm = args$perm,
+                     num_perm = args$perm,
                      recon_hit_vals = corrected_pvals_recon$hit_pvals,
                      p_recon_edges = pheno_recon_ordered_by_edges,
                      recon_perm_obs_results = disc_recon_results,

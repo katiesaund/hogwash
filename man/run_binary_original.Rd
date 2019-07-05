@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_binary_original.R
 \name{run_binary_original}
 \alias{run_binary_original}
-\title{Run discrete convergence test based on PhyC algorithm.}
+\title{Run PhyC algorithm.}
 \usage{
 run_binary_original(args)
 }
@@ -13,5 +13,5 @@ run_binary_original(args)
 
 }
 \description{
-Run discrete convergence test based on PhyC algorithm.
+Run PhyC algorithm.
 }

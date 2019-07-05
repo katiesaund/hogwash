@@ -12,7 +12,6 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args$output_dir             <- "."
   args$perm                   <- 1000
   args$fdr                    <- 0.15
-  args$annotation             <- NULL
   args$discrete_or_continuous <- "discrete"
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- TRUE
@@ -36,7 +35,6 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args$output_dir             <- "."
   args$perm                   <- 1000
   args$fdr                    <- 0.15
-  args$annotation             <- NULL
   args$discrete_or_continuous <- "discrete"
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- FALSE

@@ -14,7 +14,6 @@ test_that("select_test_type doesn't throw error when given valid continuous inpu
   args$output_dir             <- "."
   args$perm                   <- 10
   args$fdr                    <- 0.15
-  args$annotation             <- NULL
   args$discrete_or_continuous <- "continuous"
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- TRUE
@@ -41,7 +40,6 @@ test_that("select_test_type doesn't throw error given valid discrete input", {
   args$output_dir             <- "."
   args$perm                   <- 10
   args$fdr                    <- 0.15
-  args$annotation             <- NULL
   args$discrete_or_continuous <- "discrete"
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- FALSE

@@ -4,7 +4,7 @@
 \alias{discrete_plot_trans}
 \title{Plot the synchronous test results.}
 \usage{
-discrete_plot_trans(tr, dir, name, fdr, annot, num_perm, trans_hit_vals,
+discrete_plot_trans(tr, dir, name, fdr, num_perm, trans_hit_vals,
   trans_perm_obs_results, tr_and_pheno_hi_conf, geno_confidence,
   g_trans_edges, p_trans_edges, snp_in_gene, prefix, grouped_logical)
 }
@@ -16,8 +16,6 @@ discrete_plot_trans(tr, dir, name, fdr, annot, num_perm, trans_hit_vals,
 \item{name}{Prefix in plot file name.}
 
 \item{fdr}{Numeric. False discovery rate. Between 0 and 1.}
-
-\item{annot}{Deprecated.}
 
 \item{num_perm}{Numeric. Number of permutations.}
 

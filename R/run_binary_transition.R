@@ -88,7 +88,7 @@ run_binary_transition <- function(args){
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
   discrete_plot_trans(tr = args$tree, dir = args$output_dir,
                      name = args$output_name, fdr = args$fdr,
-                     annot = args$annot, num_perm = args$perm,
+                     num_perm = args$perm,
                      trans_hit_vals = corrected_pvals_trans$hit_pvals,
                      trans_perm_obs_results = disc_trans_results,
                      tr_and_pheno_hi_conf = hi_conf$tr_and_pheno_hi_conf,

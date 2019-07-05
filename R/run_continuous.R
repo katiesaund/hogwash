@@ -88,7 +88,6 @@ run_continuous <- function(args){
                           args$output_name,
                           corrected_pvals_all_transitions,
                           phenotype_vector,
-                          args$annotation,
                           args$perm,
                           results_all_transitions,
                           AR$pheno_recon_and_conf$node_anc_rec,
