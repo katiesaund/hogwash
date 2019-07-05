@@ -196,7 +196,7 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #' @param fdr Number. False discovery rate.
 #' @param dir Character. Output path.
 #' @param name Character. Output name.
-#' @param pval_all_transition
+#' @param pval_all_transition TODO
 #' @param pheno_vector Vector.
 #' @param perm Number.
 #' @param results_all_trans TODO
@@ -210,8 +210,6 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #' @param all_trans_sig_hits TODO
 #'
 #' @return Plots continuous test resutlts.
-#'
-#' @examples
 plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                   pval_all_transition, pheno_vector,
                                   perm, results_all_trans,
@@ -489,8 +487,6 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 #' @param trans_or_recon Character.
 #'
 #' @return A manhattan plot of all of the hit values.
-#'
-#' @examples
 make_manhattan_plot <- function(outdir,
                                 geno_pheno_name,
                                 pval_hits,
@@ -925,6 +921,7 @@ discrete_plot_orig <- function(tr, dir, name, fdr, num_perm,
 
 #' Plot the synchronous test results.
 #'
+#' @noRd
 #' @param tr Phylo.
 #' @param dir Directory where to save plots.
 #' @param name Prefix in plot file name.

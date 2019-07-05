@@ -1,36 +1,3 @@
-#' Read in a tsv matrix
-#'
-read_in_tsv_matrix <- function(mat){
-  # Function description -------------------------------------------------------
-  # Read in the standardized GWAS matrix format: rows correspond to samples, columns correspond to genotypes/phenotypes.
-  # Data are tab-separated.
-  #
-  # Inputs:
-  # mat. Character. Path to matrix file.
-  #
-  # Output:
-  # temp. Matrix.
-  #
-  # Check inputs ---------------------------------------------------------------
-  check_is_string(mat)
-  check_file_exists(mat)
-
-  # Function -------------------------------------------------------------------
-  temp <- utils::read.table(mat,
-                     sep = "\t",
-                     row.names = 1,
-                     header = TRUE,
-                     stringsAsFactors = FALSE,
-                     check.names = FALSE)
-  temp <- as.matrix(temp)
-
-  # Check and return output ----------------------------------------------------
-  if (class(temp) != "matrix") {
-    stop("matrix is incorrectly formatted")
-  }
-  return(temp)
-} # end read_in_tsv_matrix()
-
 check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr){
   # Function description -------------------------------------------------------
   # Check that all of the inputs into phyC are in the valid format.

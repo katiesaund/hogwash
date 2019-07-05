@@ -2,15 +2,42 @@
 % Please edit documentation in R/hogwash.R
 \name{hogwash}
 \alias{hogwash}
-\title{Main hogwash function}
+\title{Bacterial genome-wide association study.}
 \usage{
 hogwash(pheno, geno, tree, file_name = paste(Sys.Date(), "_hogwash", sep
   = ""), dir = ".", perm = 10000, fdr = 0.15, bootstrap = 0.7,
   group_genotype_key = NULL)
 }
 \arguments{
-\item{group_genotype_key}{}
+\item{pheno}{Matrix. Dimensions: nrow = number of samples, ncol = 1. Either
+continuous or binary (0/1). Row.names() must match tree$tip.label.}
+
+\item{geno}{Matrix. Dimensions: nrow = number of samples, ncol = number of
+genotypes. Binary (0/1). Row.names() must match tree$tip.label.}
+
+\item{tree}{Phylo object. If unrooted, will be rooted using
+phytools::midpoint.root() method.}
+
+\item{file_name}{Character. Name of output files.}
+
+\item{dir}{Character. Path to output directory.}
+
+\item{perm}{Integer. Number of permutations to run.}
+
+\item{fdr}{Numeric. False discovery rate. Between 0 and 1.}
+
+\item{bootstrap}{Numeric. Confidence threshold for tree bootstrap values.}
+
+\item{group_genotype_key}{Matrix. Dimenions: nrow = number of unique genotypes, ncol = 2.}
 }
 \description{
-Main hogwash function
+This function runs a bacterial genome-wide association test. It
+  runs either the Continuous Test (when given continuous phenotype data) or
+  both the Synchronous Test and PhyC (when given binary phenotype data).
+}
+\references{
+Farhat MR, Shapiro BJ, Kieser KJ, et al. Genomic analysis identifies targets of convergent positive selection in drug-resistant Mycobacterium tuberculosis. Nat Genet. 2013;45(10):1183–1189. doi:10.1038/ng.2747
+}
+\author{
+Katie Saund
 }
