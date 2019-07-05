@@ -5,8 +5,8 @@ save_continuous <- function(hogwash_continuous, file_name){
 save_synchronous <- function(hogwash_synchronous, file_name){
   save(hogwash_synchronous, file = file_name)
 }
-save_convergence <- function(hogwash_convergence, file_name){
-  save(hogwash_convergence, file = file_name)
+save_convergence <- function(hogwash_phyc, file_name){
+  save(hogwash_phyc, file = file_name)
 }
 
 save_results_as_r_object <- function(dir, name, object, prefix, group_logical){

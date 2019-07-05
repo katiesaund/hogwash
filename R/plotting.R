@@ -632,7 +632,7 @@ make_ann_colors <- function(geno_matrix){
   return(ann_colors)
 }
 
-#' Plot convergence test results.
+#' Plot PhyC results.
 #'
 #' @noRd
 #' @param tr Phylo.

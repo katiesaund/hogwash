@@ -1,6 +1,6 @@
 # TODO: go through script line by and line and write unit tests for any untested functions.
 # TODO clean up script flow to make process more clear. Replace if / else with functions? How else to improve it?
-#' Run discrete convergence test based on PhyC algorithm.
+#' Run PhyC algorithm.
 #'
 #' @param args
 #'
