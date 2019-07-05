@@ -341,24 +341,27 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                     mar = c(4, 4, 4, 4))
 
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
-      plot_tree_with_colored_edges(tr, geno_reconstruction,
+      plot_tree_with_colored_edges(tr,
+                                   geno_reconstruction,
                                    geno_confidence,
                                    "grey",
                                    "red",
                                    paste0(row.names(pval_all_transition$hit_pvals)[j],
-                                          "\n Genotype reconstruction:\n Red = Variant; Black = WT"),
-                                   annot,
+                                          "\n Genotype reconstruction"),
                                    "recon",
-                                   j)
+                                   j,
+                                   "Wild type",
+                                   "Variant")
       plot_tree_with_colored_edges(tr,
                                    geno_transition,
                                    geno_confidence,
                                    "grey",
                                    "red",
-                                   "Genotype transition edge:\n Red = transition; Black = No transition",
-                                   annot,
+                                   "Genotype transition",
                                    "trans",
-                                   j)
+                                   j,
+                                   "No transition",
+                                   "Transition")
       hist_abs_delta_pheno_all_edges(p_trans_mat,
                                      geno_confidence,
                                      tr,
@@ -536,10 +539,11 @@ make_manhattan_plot <- function(outdir,
 #' @param geno_confidence List of vectors.
 #' @param edge_color_na. Character. Color.
 #' @param edge_color_bright Character. Color.
-#' @param title String.
-#' @param annot Deprecated.
-#' @param trans_or_recon String. Either "recon" or "trans."
+#' @param title Character. Plot title.
+#' @param trans_or_recon Character. Either "recon" or "trans."
 #' @param index Number.
+#' @param legend_baseline Character. Legend name for black lines.
+#' @param legend_other Character. Legend name for highlighted lines.
 #'
 #' @return Plot of a tree with certain edges colored.
 #'
@@ -549,13 +553,19 @@ plot_tree_with_colored_edges <- function(tr,
                                          edge_color_na,
                                          edge_color_bright,
                                          title,
-                                         annot,
                                          trans_or_recon,
-                                         index){
+                                         index,
+                                         legend_baseline,
+                                         legend_other){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_string(edge_color_na)
   check_is_string(edge_color_bright)
+  check_is_string(legend_baseline)
+  check_is_string(legend_other)
+  check_is_number(index)
+  check_is_string(trans_or_recon)
+  check_is_string(title)
 
   # Function -------------------------------------------------------------------
   edge_color <- rep("black", ape::Nedge(tr))
@@ -568,26 +578,20 @@ plot_tree_with_colored_edges <- function(tr,
   # edges and low ML bootstrap support
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::plot(tr,
-       font = 1,
-       edge.color = edge_color,
-       main = title,
-       use.edge.length = FALSE,
-       label.offset = 3,
-       adj = 0)
-  ape::tiplabels(pch = 21,
-            col = annot[ , 2],
-            adj = 2,
-            bg = annot[ , 2],
-            cex = 0.75)
-  if (!is.null(annot)) {
-    graphics::legend("bottomleft",
-           legend = unique(annot[ , 1]),
-           col = unique(annot[ , 2]),
-           lty = 1,
-           ncol = length(unique(annot[ , 1])),
-           lwd = 5,
-           cex = 0.6)
-  }
+                 font = 1,
+                 edge.color = edge_color,
+                 main = title,
+                 use.edge.length = FALSE,
+                 label.offset = 0.25,
+                 adj = 0)
+  graphics::legend("topleft",
+                   bty = "n",
+                   legend = c(legend_baseline, legend_other, "Low confidence"),
+                   col = c("black", edge_color_bright, edge_color_na),
+                   lty = 1,
+                   ncol = 1,
+                   lwd = 1,
+                   cex = 0.5)
 } # end plot_tree_with_colored_edges()
 
 #' Create object to annotate columns in the significant hit results.
@@ -821,10 +825,11 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                                    pheno_conf_as_list,
                                    "grey",
                                    "red",
-                                   paste0("\n Phenotype reconstruction:\nRed=Variant; Black=WT"),
-                                   annot,
+                                   paste0("\n Phenotype reconstruction"),
                                    "recon",
-                                   1)
+                                   1,
+                                   "Wild type",
+                                   "Variant")
       # Genotype
       plot_tree_with_colored_edges(tr,
                                    g_trans_edges,
@@ -832,26 +837,34 @@ discrete_plot_orig <- function(tr, dir, name, fdr, annot, num_perm,
                                    "grey",
                                    "red",
                                    paste0(row.names(recon_hit_vals)[j],
-                                          "\nGenotype transition:\nRed=transition; Black=no transition"),
-                                   annot,
+                                          "\nGenotype transition"),
                                    "recon",
-                                   j)
+                                   j,
+                                   "No trasition",
+                                   "Transition")
       # Permutation test
       max_x <- max(recon_perm_obs_results$permuted_count[[j]],
                    recon_perm_obs_results$observed_overlap[j]) # TODO change to loop through sig hits
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
-           breaks = num_perm/10,
-           xlim = c(0, max_x),
-           col = "grey",
-           border = FALSE,
-           ylab = "Count",
-           xlab = "# edges with genotype transition & phenotype presence",
-           main = paste0("PhyC: Overlap of genotype transition\n& phenotype presence\npval=",
-                         round(recon_hit_vals[j, 1], 4),
-                         "\nRed=observed,Grey=permutations",
-                         sep = ""))
+                     breaks = num_perm/10,
+                     xlim = c(0, max_x),
+                     col = "grey",
+                     border = FALSE,
+                     ylab = "Count",
+                     xlab = "Edges with genotype transition & phenotype presence",
+                     main = paste0("Genotype transition & phenotype presence\npval=",
+                                   round(recon_hit_vals[j, 1], 4),
+                                   sep = ""))
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
                        col = "red")
+      graphics::legend("topright",
+                       bty = "n",
+                       legend = c("Observed", "Null distribution"),
+                       col = c("red", "grey"),
+                       lty = 1,
+                       ncol = 1,
+                       lwd = 1,
+                       cex = 0.75)
 
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1 # should be NA but it won't work correctedly TODO
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
@@ -1099,10 +1112,11 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
                                    pheno_conf_as_list,
                                    "grey",
                                    "red",
-                                   paste0("\n Phenotype transitions:\nRed=transition; Black=no change"),
-                                   annot,
+                                   paste0("\n Phenotype transitions"),
                                    "recon",
-                                   1)
+                                   1,
+                                   "No transition",
+                                   "Transition")
       # Plot genotype
       plot_tree_with_colored_edges(tr,
                                    g_trans_edges,
@@ -1110,10 +1124,11 @@ discrete_plot_trans  <- function(tr, dir, name, fdr, annot, num_perm,
                                    "grey",
                                    "red",
                                    paste0(row.names(trans_hit_vals)[j],
-                                          "\n Genotype transitions:\nRed=transition; Black=no change"),
-                                   annot,
+                                          "\n Genotype transitions"),
                                    "recon",
-                                   j)
+                                   j,
+                                   "No transition",
+                                   "Transition")
       # Plot permutation test
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
                    trans_perm_obs_results$observed_overlap[j]) # TODO change to loop through sig hits
