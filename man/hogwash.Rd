@@ -35,6 +35,75 @@ This function runs a bacterial genome-wide association test. It
   runs either the Continuous Test (when given continuous phenotype data) or
   both the Synchronous Test and PhyC (when given binary phenotype data).
 }
+\details{
+hogwash reads in one phenotype (either continuous or binary), a
+  matrix of binary genotypes, and a phylogenetic tree. Given these inputs it
+  performs an ancestral reconstruction of that phenotype and each genotype.
+  The ancestral reconstructions are used to perform one of several tests to
+  associate the the genotypes with the phenotype:
+    1. Continuous Test
+    2. Synchronous Test
+    3. PhyC (Farhat et al.)
+  Once a test finishes running it returns (i) p-values for all genotypes
+  tested, (ii) a manhattan plot of those p-values; if any of the genotypes
+  tested were significant associated with the phenotype after FDR correction
+  it also returns (iii) a list of significant hits and (iv) figures of the
+  genotype & phenotype reconstructions on the tree.
+
+  Grouping
+  A unique feature of hogwash is the ability to organize genotypes into
+  biologically meaningful groups. Testing for an association between an
+  individual SNP and a phenotype is quite stringent, but patterns may emerge
+  when grouping together biologically related genotypes. For example,
+  grouping together all variants (insertions, deletions and SNPs) within a
+  gene or promoter region could allow the user to identify a particular gene
+   as being associated with a phenotype while any individual variant within
+   that gene may not have deep penetrance in the isolates being tested.
+   Grouped genotypes could have increased power to identify convergent
+   evolution because they captures larger trends in functional impact at the
+   group level and reduce the multiple testing correction burden. Use cases
+   for this method could be to group SNPs into genes, kmers or genes into
+   pathways, etc... Each of the three tests can be run on disaggregated data
+    or aggregated data with the inclusion of a grouping key which is
+    described later on the inputs page.
+}
+\examples{
+# Continuous Test for continuous phenotype
+phenotype <- hogwash::growth
+genotype <- hogwash::snp_genotype
+tree <- hogwash::tree
+hogwash(pheno = phenotype,
+        geno = genotype,
+        tree = tree)
+
+# Continuous Test while grouping SNPs into genes
+phenotype <- hogwash::growth
+genotype <- hogwash::snp_genotype
+tree <- hogwash::tree
+key <- hogwash::snp_gene_key
+hogwash(pheno = phenotype,
+        geno = genotype,
+        tree = tree,
+        group_genotype_key = key)
+
+# Both Synchronous Test & PhyC for discrete phenotype
+phenotype <- hogwash::antibiotic_resistance
+genotype <- hogwash::snp_genotype
+tree <- hogwash::tree
+hogwash(pheno = phenotype,
+        geno = genotype,
+        tree = tree)
+
+# Both Synchronous Test & PhyC while grouping SNPs into genes
+phenotype <- hogwash::antibiotic_resistance
+genotype <- hogwash::snp_genotype
+tree <- hogwash::tree
+key <- hogwash::snp_gene_key
+hogwash(pheno = phenotype,
+        geno = genotype,
+        tree = tree,
+        group_genotype_key = key)
+}
 \references{
 Farhat MR, Shapiro BJ, Kieser KJ, et al. Genomic analysis identifies targets of convergent positive selection in drug-resistant Mycobacterium tuberculosis. Nat Genet. 2013;45(10):1183–1189. doi:10.1038/ng.2747
 }
