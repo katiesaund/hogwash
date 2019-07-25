@@ -19,8 +19,6 @@ create_contingency_table <- function(genotype_by_edges,
                                      phenotype_by_edges,
                                      geno,
                                      test_type){
-  # TODO add names to contingency table results
-  # TODO add unit tests
   # Check input ----------------------------------------------------------------
   check_str_is_test_name(test_type)
   check_equal(length(genotype_by_edges), ncol(geno))
