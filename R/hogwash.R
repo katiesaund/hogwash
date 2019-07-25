@@ -1,4 +1,4 @@
-#' Bacterial genome-wide association study.
+#' hogwash
 #'
 #' @description This function runs a bacterial genome-wide association test. It
 #'   runs either the Continuous Test (when given continuous phenotype data) or
