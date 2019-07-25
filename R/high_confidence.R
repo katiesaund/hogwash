@@ -1,15 +1,15 @@
+#' discretize_confidence_using_threshold
+#'
+#' @description Given a vector with values that describe confidence, binarize
+#'  the vector a accoriding to a cutoff value.
+#' @param confidence_vector Numeric vector.
+#' @param threshold Number.
+#'
+#' @return Confidence vector. Binary vector.
+#'
+#' @noRd
+#'
 discretize_confidence_using_threshold <- function(confidence_vector, threshold){
-  # Function description -------------------------------------------------------
-  # Given a vector with values that describe confidence, binarize the vector a
-  # accoriding to a cutoff value.
-  #
-  # Input:
-  # Confidence vector. Numeric vector.
-  # Threshold. Number.
-  #
-  # Output:
-  # Confidence vector. Binary vector.
-  #
   # Check inputs ---------------------------------------------------------------
   check_is_number(threshold)
   if (!is.vector(confidence_vector)) {
@@ -27,29 +27,29 @@ discretize_confidence_using_threshold <- function(confidence_vector, threshold){
 } # end discretize_confidence_using_threshold()
 
 
+#' report_num_high_confidence_trans_edge
+#'
+#' @description Given a genotype for which you have: a list of vectors that
+#'  stores if there is a genotype transition or not for each edge
+#'  (genotype_transition), a list of vectors that stores if that edge is high
+#'  confidence or not (high_conf_edges), and a character vector of the genotype
+#'  names -- create an object that stores the number of high confidence
+#'  transition edges per genotype.
+#'
+#' @param genotype_transition List of numeric vectors. Number of lists == number
+#'  of genotypes. Length of vector == Nedge(tr).
+#' @param high_conf_edges Binary vector. List of numeric vectors. Number of
+#'   lists == number of genotypes. Length of vector == Nedge(tr).
+#' @param geno_names Character vector. Length == ncol(genotype_matrix).
+#'
+#' @return num_high_confidence_transition_edges. Numeric vector. Count of number
+#'   of high confidence transitions per genotype. Vector is named with genotype
+#'   names.
+#' @noRd
+#'
 report_num_high_confidence_trans_edge <- function(genotype_transition,
-                                                  high_conf_edges, geno_names){
-  # Function description -------------------------------------------------------
-  # Given a genotype for which you have: a list of vectors that stores if there
-  # is a genotype transition or not for each edge (genotype_transition), a list
-  # of vectors that stores if that edge is high confidence or not
-  # (high_conf_edges), and a character vector of the genotype names -- create an
-  # object that stores the number of high confidence transition edges per
-  # genotype.
-  #
-  # Inputs:
-  # genotype_transition. List of numeric vectors. Number of lists == number of
-  #                      genotypes. Length of vector == Nedge(tr)
-  # high_conf_edges. Binary vector. List of numeric vectors. Number of lists ==
-  #                  number of genotypes. Length of vector == Nedge(tr)
-  # geno_names. Character vector. Length == ncol(genotype_matrix)
-  #
-  # Outputs:
-  # num_high_confidence_transition_edges. Numeric vector. Count of number of
-  #                                       high confidence transitions per
-  #                                       genotype. Vector is named with
-  #                                       genotype names.
-  #
+                                                  high_conf_edges,
+                                                  geno_names){
   # Check input ----------------------------------------------------------------
   check_equal(length(genotype_transition), length(geno_names))
   check_equal(length(high_conf_edges), length(geno_names))
@@ -67,14 +67,14 @@ report_num_high_confidence_trans_edge <- function(genotype_transition,
   }
 
   # Function -------------------------------------------------------------------
-
-  # Return output --------------------------------------------------------------
   num_high_confidence_transition_edges <- rep(0, length(high_conf_edges))
   for (p in 1:length(high_conf_edges)) {
-    num_high_confidence_transition_edges[p] <- sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])
+    num_high_confidence_transition_edges[p] <-
+      sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])
   }
-
   names(num_high_confidence_transition_edges) <- geno_names
+
+  # Return output --------------------------------------------------------------
   return(num_high_confidence_transition_edges)
 } # end report_num_high_confidence_trans_edge
 
