@@ -20,6 +20,7 @@ test_that("calculate_permutation_based_p_value returns a non-significant p-value
 # test count_hits_on_edges
 test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with genotype given this test data", {
   num_samples <- 6
+  set.seed(1)
   temp_tree <- ape::rtree(num_samples)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
   num_edge <- ape::Nedge(temp_tree)
