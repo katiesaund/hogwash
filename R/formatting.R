@@ -1,4 +1,18 @@
+#' format_tree
+#'
+#' @description For a phylogenetic tree convert all bootstrap support values
+#'   to numeric (from character). Typically, a tree's root doesn't have a value
+#'   but this adds a zero to that location (if necessary) because functions
+#'   later in hogwash require that all nodes have numeric values.
+#'
+#' @param tr Phylo.
+#'
+#' @return tr. Phylo.
+#'
+#' @noRd
+#'
 format_tree <- function(tr){
+  # Check input ----------------------------------------------------------------
   check_class(tr, "phylo")
   if (is.null(tr$node.label)) {
     stop("trees must have support values at the nodes")
@@ -7,6 +21,8 @@ format_tree <- function(tr){
   if (!ape::is.rooted(tr)) {
     tr <- phytools::midpoint.root(tr)
   }
+
+  # Function -------------------------------------------------------------------
   for (i in 1:ape::Nnode(tr)) {
     if (tr$node.label[i] == "") {
       tr$node.label[i] <- 0
@@ -14,22 +30,24 @@ format_tree <- function(tr){
   }
   tr$node.label <- as.numeric(tr$node.label)
 
+  # Check and return output ----------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
-
   return(tr)
-}
+} # end format_tree()
 
+#' convert_matrix_to_vector
+#'
+#' @description Convert a single column matrix into a vector, retain row names
+#'  as names of vector.
+#'
+#' @param mat Matrix. Matrix should have only 1 column.
+#'
+#' @return vec. Named vector.
+#'
+#' @noRd
+#'
 convert_matrix_to_vector <- function(mat){
-  # Function description -------------------------------------------------------
-  # Convert a single column matrix into a vector, retain row names as names of vector.
-  #
-  # Input:
-  # mat. Matrix. Matrix should have only 1 column.
-  #
-  # Output:
-  # vec. Vector.
-  #
   # Check input ----------------------------------------------------------------
   check_dimensions(mat, NULL, 1, 1, 1)
 
@@ -41,7 +59,6 @@ convert_matrix_to_vector <- function(mat){
   check_if_vector(vec)
   return(vec)
 } # end convert_matrix_to_vector()
-
 
 create_test_data <- function(){
   # Function description -------------------------------------------------------
