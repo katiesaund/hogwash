@@ -67,7 +67,7 @@ remove_rare_or_common_geno <- function(mat, tr){
   # Check and return output ----------------------------------------------------
   check_if_binary_matrix(mat)
   check_rownames(mat, tr)
-  results <- list("mat" = mat, "
-                  dropped_genotype_names" = dropped_genotype_names)
+  results <- list("mat" = mat,
+                  "dropped_genotype_names" = dropped_genotype_names)
   return(results)
 } # end remove_rare_or_common_geno()
