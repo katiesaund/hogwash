@@ -611,4 +611,25 @@ check_class <- function(obj, cls){
   }
 } # end check_class()
 
-# End of script ----------------------------------------------------------------
+#' check_str_is_test_name
+#'
+#' @description Verify that the string is one of the three valid gwas test
+#'  names:
+#'  * "continuous"
+#'  * "synchronous"
+#'  * "phyc"
+#'  If not valid, give error message.
+#'
+#' @param test_name Character.
+#'
+#' @noRd
+check_str_is_test_name <- function(test_name){
+  # Check input ----------------------------------------------------------------
+  check_class(test_name, "character")
+
+  # Function -------------------------------------------------------------------
+  valid_names <- c("continuous", "synchronous", "phyc")
+  if (!(test_name %in% valid_names)) {
+    stop("Test name must be either continuous, synchronous, or phyc")
+  }
+} # end check_str_is_test_name()
