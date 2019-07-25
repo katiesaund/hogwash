@@ -167,10 +167,6 @@ prepare_high_confidence_objects <- function(genotype_transition,
                                             geno_conf_edge,
                                             geno_recon_edge,
                                             snps_in_each_gene){
-  # TODO Fill in descript and checks for snps_in_each_gene!
-  # snps_in_each_gene. Either NULL or ?????.
-  #
-  # TODO Add descripts for each output.
   # Check input ----------------------------------------------------------------
   check_equal(length(genotype_transition), ncol(geno))
   check_equal(length(genotype_transition[[1]]$transition), ape::Nedge(tr))
@@ -189,6 +185,7 @@ prepare_high_confidence_objects <- function(genotype_transition,
   check_equal(length(geno_recon_edge[[1]]), ape::Nedge(tr))
   check_if_binary_vector(geno_conf_edge[[1]])
   check_if_binary_vector(geno_recon_edge[[1]])
+  # TODO add checks for snps_in_each_gene
 
   # Function -------------------------------------------------------------------
   pheno_conf_ordered_by_edges <-
