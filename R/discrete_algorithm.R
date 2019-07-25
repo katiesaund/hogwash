@@ -79,8 +79,7 @@ count_hits_on_edges <- function(genotype_transition_edges,
   })
 
   only_geno_present <- sapply(1:length(high_confidence_edges), function(x) {
-    sum(genotype_transition_edges[[x]][as.logical(high_confidence_edges[[x]])])
-    - both_present[x]
+    sum(genotype_transition_edges[[x]][as.logical(high_confidence_edges[[x]])]) - both_present[x]
   })
 
   # Check and return output ----------------------------------------------------
