@@ -27,6 +27,6 @@ Imports:
     utils,
     optparse
 Suggests: 
-    testthat, knitr, rmarkdown
+    testthat, knitr, rmarkdown, qpdf
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0
