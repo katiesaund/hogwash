@@ -135,21 +135,6 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
               "tip_node_conf" = gene_conf_list_built_from_snps ))
 } # end build_gene_anc_recon_from_snp()
 
-
-build_node_anc_recon_from_gene_list <- function(gene_list, tr){
-  # Check input ----------------------------------------------------------------
-  # TODO add checks to input.
-  # Function -------------------------------------------------------------------
-  # TODO test this function works.
-  gene_list_built_from_snps_just_node_anc_rec <- rep(list(0), length(gene_list$tip_and_node_recon))
-  for (m in 1:length(gene_list$tip_and_node_recon)) {
-    gene_list_built_from_snps_just_node_anc_rec[[m]] <- gene_list[[m]]$tip_and_node_recon[(ape::Ntip(tr) + 1):(ape::Ntip(tr) + ape::Nedge(tr))]
-  }
-  # Return output --------------------------------------------------------------
-  return(gene_list_built_from_snps_just_node_anc_rec)
-} # end build_node_anc_recon_from_gene_list()
-
-
 build_gene_trans_from_snp_trans <- function(tr, geno, geno_transition, gene_to_snp_lookup_table){
   # Function description -------------------------------------------------------
   # TODO
