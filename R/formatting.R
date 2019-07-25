@@ -60,77 +60,38 @@ convert_matrix_to_vector <- function(mat){
   return(vec)
 } # end convert_matrix_to_vector()
 
-create_test_data <- function(){
-  # Function description -------------------------------------------------------
-  # Create a set of reproducible test data.
-  #
-  # Input:
-  # None.
-  #
-  # Output:
-  # tree.             Phylo.
-  # phenotype_matrix. Matrix.
-  # genotype_matrix.  Matrix.
-  #
-  # Function -------------------------------------------------------------------
-  # Create tree
-  set.seed(1)
-  tips            <- 50
-  tree            <- ape::rtree(n = tips, rooted = TRUE)
-  tree$node.label <- truncnorm::rtruncnorm(n = ape::Nnode(tree), sd = 10, mean = 85, a = 0, b = 100) # dummy tree bootstrap values
-
-  # Create continous phenotype
-  phenotype_matrix <- as.matrix(phytools::fastBM(tree))
-
-  # Create genotypes
-  genotype_matrix <- matrix(NA, nrow = tips, ncol = 100)
-  for (i in 1:ncol(genotype_matrix)) {
-    genotype_matrix[ , i] <- stats::rbinom(tips, 1, 0.5)
-  }
-  row.names(genotype_matrix)  <- tree$tip.label
-  colnames(genotype_matrix) <- paste("snp", c(1:100), sep = "_")
-
-  # Check and return output ----------------------------------------------------
-  check_for_root_and_bootstrap(tree)
-  check_dimensions(phenotype_matrix, ape::Ntip(tree), 2, 1, 1)
-  check_dimensions(genotype_matrix, ape::Ntip(tree), 2, NULL, 1)
-  check_if_binary_matrix(genotype_matrix)
-  check_rownames(phenotype_matrix, tree)
-  check_rownames(genotype_matrix, tree)
-
-  results <- list("tree" = tree, "phenotype" = phenotype_matrix, "genotype" = genotype_matrix)
-  return(results)
-} # end create_test_data()
-
+#' prepare_phenotype
+#'
+#' @description Prepare phenotype for downstream analyses. Convert phenotype
+#'  matrix to phenotype vector. Check if the continuous phenotype is normally
+#'  distributed.
+#'
+#' @param pheno Matrix with 1 column.
+#' @param disc_cont String. Either "discrete" or "continuous."
+#' @param tr Phylo. Ntip = nrow(pheno).
+#'
+#' @return pheno_vector. Vector. Length = Ntip(tr).
+#'
+#' @noRd
+#'
 prepare_phenotype <- function(pheno, disc_cont, tr){
-  # Function description -------------------------------------------------------
-  # Prepare phenotype for downstream analysese.
-  # Convert phenotype matrix to phenotype vector.
-  # Check if the continuous phenotype is normally distributed.
-  # Check if convergence is possible in the phenotype given the tree.
-  #
-  # Inputs:
-  # pheno. Matrix with 1 column.
-  # disc_cont. String. Either "discrete" or "continuous"
-  # tr. Phylo. Ntip = nrow(pheno).
-  #
-  # Outputs:
-  # pheno_vector. Vector. Length = Ntip(tr).
-  #
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
-  check_dimensions(pheno, exact_rows = ape::Ntip(tr), exact_cols = 1, min_rows = 1, min_cols = 1)
+  check_dimensions(pheno,
+                   exact_rows = ape::Ntip(tr),
+                   exact_cols = 1,
+                   min_rows = 1,
+                   min_cols = 1)
   check_str_is_discrete_or_continuous(disc_cont)
 
   # Function -------------------------------------------------------------------
   check_if_phenotype_normal(pheno, disc_cont)
   # check_if_convergence_occurs(pheno, tr, disc_cont)
+  # TODO figure out why I've commented out check_if_convergence occurs.
   pheno_vector <- convert_matrix_to_vector(pheno)
   check_convergence_possible(pheno_vector, disc_cont)
 
   # Check and return output --------------------------------------------------------------
   check_equal(length(pheno_vector), ape::Ntip(tr))
   return(pheno_vector)
-} # end prepare_phenotype
-
-# END OF SCRIPT ---------------------------------------------------------------#
+} # end prepare_phenotype()
