@@ -1,31 +1,34 @@
-create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno, test_type){
-  # TODO
-  # add names to contingency table results
-  # add validations
-  # add unit tests
-  # add function description
-  # genotype_by_edges should be a list
-  # phenotype_by_edges should be a numeric vector
-  # length of genotype_by_edges should be ncol of geno
-  # length of _phenotype_by_edges should be same length as every entry in genotype_by_edges
-  # all genotype_by_edges and phenotype_by_edges should be 0s or 1
-  # Function description -------------------------------------------------------
-  # TODO
-  # Compute ancestral reconstruction from a continuous or discrete input.
-  #
-  # Inputs:
-  # test_type. Character string. Either "convergence" or "synchronous"
-  #
-  # Outputs:
-  # "anc_rec" = ML_anc_rec. Vector. Description.
-  #
+#' create_contingency_table
+#'
+#' @description This function generates a contingency table for the genotype
+#'  and phenotype. Each entry in the table correpsonds to a tree edge. For
+#'  synchronous it counts the number of tree edges that are +/- genotype
+#'  transitions and +/- phenotype transitions. For phyc it counts the number of
+#'  tree edges that are +/- genotype transitions and +/- phenotype presence.
+#'
+#' @param genotype_by_edges List.
+#' @param phenotype_by_edges Numeric vector.
+#' @param geno Matrix.
+#' @param test_type Character. Either "synchronous" or "phyc."
+#'
+#' @return all_tables. List of matrices.
+#'
+#' @noRd
+#'
+create_contingency_table <- function(genotype_by_edges,
+                                     phenotype_by_edges,
+                                     geno,
+                                     test_type){
+  # TODO add names to contingency table results
+  # TODO add unit tests
   # Check input ----------------------------------------------------------------
-  check_is_string(test_type)
+  check_str_is_test_name(test_type)
+  check_equal(length(genotype_by_edges), ncol(geno))
+  check_equal(length(phenotype_by_edges), length(genotype_by_edges[[1]]))
+  check_if_binary_vector(phenotype_by_edges)
+  check_if_binary_vector(genotype_by_edges[[1]])
 
   # Function -------------------------------------------------------------------
-
-
-
   all_tables <- rep(list(NULL), length(genotype_by_edges))
   contingency_table <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)
 
@@ -39,16 +42,18 @@ create_contingency_table <- function(genotype_by_edges, phenotype_by_edges, geno
     stop("Test must be either synchronous or convergence")
   }
 
-
   for (i in 1:length(genotype_by_edges)) {
     temp_table <- contingency_table
-    temp_table[1, 1] <- sum(genotype_by_edges[[i]]  + phenotype_by_edges == 2,  na.rm = TRUE)
-    temp_table[2, 2] <- sum(genotype_by_edges[[i]]  + phenotype_by_edges == 0,  na.rm = TRUE)
-    temp_table[1, 2] <- sum(-genotype_by_edges[[i]] + phenotype_by_edges == -1, na.rm = TRUE)
-    temp_table[2, 1] <- sum(-genotype_by_edges[[i]] + phenotype_by_edges == 1,  na.rm = TRUE)
+    temp_table[1, 1] <-
+      sum(genotype_by_edges[[i]]  + phenotype_by_edges == 2,  na.rm = TRUE)
+    temp_table[2, 2] <-
+      sum(genotype_by_edges[[i]]  + phenotype_by_edges == 0,  na.rm = TRUE)
+    temp_table[1, 2] <-
+      sum(-genotype_by_edges[[i]] + phenotype_by_edges == -1, na.rm = TRUE)
+    temp_table[2, 1] <-
+      sum(-genotype_by_edges[[i]] + phenotype_by_edges == 1,  na.rm = TRUE)
     all_tables[[i]] <- temp_table
   }
-
   names(all_tables) <- colnames(geno)
 
   # Return output --------------------------------------------------------------
