@@ -437,19 +437,6 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
   return(prepped_geno)
 } # end prepare_genotype()
 
-
-format_and_name_grouped_transitions <- function(genotype_transition){
-  # I think this isn't needed for anything based on updates 2019-06-09
-  dummy <- genotype_transition
-  genotype_transition <- rep(list(NULL), length(dummy))
-  for (i in 1:length(dummy)) {
-    genotype_transition[[i]]$transition <- as.numeric(as.character(unlist((dummy[i]))))
-  }
-  return(genotype_transition)
-} # end format_and_name_grouped_transitions()
-
-
-
 group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, genotype_transition_con, genotype_transition_orig, lookup, uni_genes){
   # Function description -------------------------------------------------------
   # Group genotypes into larger groups.
