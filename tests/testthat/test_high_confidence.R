@@ -30,28 +30,6 @@ test_that("report_num_high_confidence_trans_edge returns expected outcome for th
   expect_equal(report_num_high_confidence_trans_edge(fake_trans, fake_hi_conf_edges,fake_geno_names), expected_result)
 })
 
-# test assign_high_confidence_to_transition_edges_including_parent_info
-test_that("assign_high_confidence_to_transition_edges_including_parent_info returns the edges that are high confidence transition edges for this tree", {
-  set.seed(1)
-  num_samples <- 5
-  temp_tree <- ape::rtree(num_samples)
-  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  plot(temp_tree)
-  ape::edgelabels()
-  temp_trans <- temp_confidence <- expected_result <- rep(list(NULL), num_samples)
-  for (i in 1:num_samples) {
-    temp_trans[[i]]$transition <- c(0, 0, 0, 1, 0, 1, 1, 0)
-    temp_confidence[[i]] <- c(0, 0, 0, 0, 0, 1, 1, 0)
-    expected_result[[i]] <- c(0, 0, 0, 0, 0, 0, 1, 0)
-  }
-  temp_geno <- matrix(1, ncol = num_samples, nrow = num_samples) # FYI this geno does not match up with the fake transitions I made up
-  temp_tree$tip.label <- row.names(temp_geno) <- letters[1:num_samples]
-  foo <- assign_high_confidence_to_transition_edges_including_parent_info(temp_tree, temp_confidence, temp_trans, temp_geno)
-  expect_equal(foo[[1]], expected_result[[1]])
-})
-
-
-
 # test assign_high_confidence_to_transition_edges
 test_that("assign_high_confidence_to_transition_edges returns the edges that are high confidence transition edges for this tree", {
   set.seed(1)
