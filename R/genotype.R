@@ -36,7 +36,7 @@ get_dropped_genotypes <- function(geno, keepers){
   return(dropped_genotype_names)
 } # end get_dropped_genotypes()
 
-#' reduce_redundancy
+#' remove_rare_or_common_geno
 #'
 #' @description This function removes genotypes are either too rare (only occur
 #'  once) or too common (occur everywhere or everywhere but once). This step is
@@ -51,7 +51,7 @@ get_dropped_genotypes <- function(geno, keepers){
 #'
 #' @noRd
 #'
-reduce_redundancy <- function(mat, tr){
+remove_rare_or_common_geno <- function(mat, tr){
   # Check inputs ---------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(mat)
@@ -70,4 +70,4 @@ reduce_redundancy <- function(mat, tr){
   results <- list("mat" = mat, "
                   dropped_genotype_names" = dropped_genotype_names)
   return(results)
-} # end reduce_redundancy()
+} # end remove_rare_or_common_geno()

@@ -320,7 +320,7 @@ prepare_ungrouped_genotype <- function(geno, tr){
   check_for_root_and_bootstrap(tr)
 
   # Function -------------------------------------------------------------------
-  simplified_genotype <- reduce_redundancy(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
+  simplified_genotype <- remove_rare_or_common_geno(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
   snps_per_gene <- NULL
 
   # Check and return output --------------------------------------------------
@@ -440,7 +440,7 @@ group_genotypes <- function(tr, geno, genotype_reconstruction_and_confidence, ge
 
   # make new geno (just at the tips, from the snps)
   geno                           <- build_gene_genotype_from_snps(geno, lookup)
-  simplified_genotype            <- reduce_redundancy(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
+  simplified_genotype            <- remove_rare_or_common_geno(geno, tr) # Remove genotypes that are too rare or too commmon for (1) convergence to be possible and (2) for ancestral reconstruction to work
   geno                           <- simplified_genotype$mat
   genes_to_keep_in_consideration <- !(uni_genes %in% simplified_genotype$dropped_genotype_names)
 
