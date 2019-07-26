@@ -108,7 +108,7 @@ continuous_ancestral_reconstruction <- function(tr,
                                                 disc_cont,
                                                 recon_method){
   # Check inputs ---------------------------------------------------------------
-  check_if_ancestral_reconstruction_method_compatible_with_ape(recon_method)
+  check_anc_rec_compatible(recon_method)
   check_is_string(disc_cont)
   check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
@@ -240,7 +240,7 @@ discrete_ancestral_reconstruction <- function(tr,
                                               disc_cont,
                                               recon_method){
   # Check inputs ---------------------------------------------------------------
-  check_if_ancestral_reconstruction_method_compatible_with_ape(recon_method)
+  check_anc_rec_compatible(recon_method)
   check_is_string(disc_cont)
   check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
@@ -350,7 +350,7 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   check_is_string(disc_cont)
   check_is_number(num)
   check_is_string(recon_method)
-  check_if_ancestral_reconstruction_method_compatible_with_ape(recon_method)
+  check_anc_rec_compatible(recon_method)
   if (disc_cont != "discrete") {
     stop("Only pick recon model for discrete. Continuous must use BM.")
   }

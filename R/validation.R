@@ -529,7 +529,7 @@ check_equal <- function(first_number, second_number){
   }
 } # end check_equal()
 
-#' check_if_ancestral_reconstruction_method_compatible_with_ape
+#' check_anc_rec_compatible
 #'
 #' @description Check that the reconstruction method that is being fed to
 #'  ape::ace() is one of the four acceptable methods. The four methods are:
@@ -538,7 +538,7 @@ check_equal <- function(first_number, second_number){
 #' @param input String. Either "ML", "REML", "pic", or "GLS."
 #'
 #' @noRd
-check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
+check_anc_rec_compatible <- function(input){
   # Check inputs -------------------------------------------------------------
   check_is_string(input)
   check_equal(length(input), 1)
@@ -549,7 +549,7 @@ check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
     stop("Reconstruction methods for ape::ace must be either:
          ML, REML, pic, or GLS.")
   }
-} # end check_if_ancestral_reconstruction_method_compatible_with_ape()
+} # end check_anc_rec_compatible()
 
 #' check_class
 #'

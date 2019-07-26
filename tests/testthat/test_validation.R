@@ -1,7 +1,8 @@
 context("Validation") #--------------------------------------------------------#
 
 # test check_dimensions --------------------------------------------------------
-test_that("check_dimensions gives an error for when given a dataframe instead of a matrix", {
+test_that("check_dimensions gives an error for when given a dataframe instead of
+          a matrix", {
   # Set up
   temp_mat <- as.data.frame(matrix(1:100, nrow = 10, ncol = 10))
 
@@ -9,7 +10,8 @@ test_that("check_dimensions gives an error for when given a dataframe instead of
   expect_error(check_dimensions(temp_mat, 10, 1, 10, 1))
 })
 
-test_that("check_dimensions gives an error for when given a vector instead of a matrix", {
+test_that("check_dimensions gives an error for when given a vector instead of a
+          matrix", {
   # Set up
   temp_vector <- c(1:100)
 
@@ -17,7 +19,8 @@ test_that("check_dimensions gives an error for when given a vector instead of a 
   expect_error(check_dimensions(temp_vector, 10, 1, 10, 1))
 })
 
-test_that("check_dimensions gives an error for when given min_rows is too large", {
+test_that("check_dimensions gives an error for when given min_rows is too
+          large", {
   # Set up
   num_row <- 10
   temp_mat <- matrix(rep("A", 100), nrow = num_row, ncol = 10)
@@ -30,7 +33,8 @@ test_that("check_dimensions gives an error for when given min_rows is too large"
                                 min_cols = 1))
 })
 
-test_that("check_dimensions gives an error for when given a min_cols it too large", {
+test_that("check_dimensions gives an error for when given a min_cols it too
+          large", {
   # Set up
   num_col <- 10
   temp_mat <- matrix(rep("A", 100), nrow = 10, ncol = num_col)
@@ -43,7 +47,8 @@ test_that("check_dimensions gives an error for when given a min_cols it too larg
                                 min_cols = num_col + 2))
 })
 
-test_that("check_dimensions gives an error for when given exact_cols that is smaller or larger than ncol()", {
+test_that("check_dimensions gives an error for when given exact_cols that is
+          smaller or larger than ncol()", {
   # Set up
   num_col <- 10
   temp_mat <- matrix(rep("A", 100), nrow = 2, ncol = num_col)
@@ -61,7 +66,8 @@ test_that("check_dimensions gives an error for when given exact_cols that is sma
                                 min_cols = 1))
 })
 
-test_that("check_dimensions gives an error for when given exact_rows that is smaller or larger than nrow()", {
+test_that("check_dimensions gives an error for when given exact_rows that is
+          smaller or larger than nrow()", {
   # Set up
   num_row <- 10
   temp_mat <- matrix(rep("A", 100), nrow = num_row, ncol = 1)
@@ -77,7 +83,8 @@ test_that("check_dimensions gives an error for when given exact_rows that is sma
                                 min_cols = 1))
 })
 
-test_that("check_dimensions gives an error for when given NULL instead of a matrix", {
+test_that("check_dimensions gives an error for when given NULL instead of a
+          matrix", {
   # Set up
   temp_vector <- NULL
 
@@ -85,7 +92,8 @@ test_that("check_dimensions gives an error for when given NULL instead of a matr
   expect_error(check_dimensions(temp_vector, 10, 1, 10, 1))
 })
 
-test_that("check_dimensions gives an error for when given NA instead of a matrix", {
+test_that("check_dimensions gives an error for when given NA instead of a
+          matrix", {
   # Set up
   temp_vector <- NA
 
@@ -93,7 +101,8 @@ test_that("check_dimensions gives an error for when given NA instead of a matrix
   expect_error(check_dimensions(temp_vector, 10, 1, 10, 1))
 })
 
-test_that("check_dimensions doesn't give an error for when given a valid matrix", {
+test_that("check_dimensions doesn't give an error for when given a valid
+          matrix", {
   # Set up
   temp_matrix <- matrix(0, nrow = 10, ncol = 5)
 
@@ -151,7 +160,8 @@ test_that("check_if_dir_exists doesn't give an error when dir does exist", {
 })
 
 # test check_if_permutation_num_valid ------------------------------------------
-test_that("check_if_permutation_num_valid gives an error for a positive, non-integer perm = 1.5", {
+test_that("check_if_permutation_num_valid gives an error for a positive,
+          non-integer perm = 1.5", {
   # Set up
   temp_perm <- 1.5
 
@@ -159,7 +169,8 @@ test_that("check_if_permutation_num_valid gives an error for a positive, non-int
   expect_error(check_if_permutation_num_valid(temp_perm))
 })
 
-test_that("check_if_permutation_num_valid gives an error for a negative integer perm = -15", {
+test_that("check_if_permutation_num_valid gives an error for a negative integer
+          perm = -15", {
   # Set up
   temp_perm <- -15
 
@@ -175,7 +186,8 @@ test_that("check_if_permutation_num_valid gives an error whem perm = 0", {
   expect_error(check_if_permutation_num_valid(temp_perm))
 })
 
-test_that("check_if_permutation_num_valid gives an error whem perm = '20' (a character)", {
+test_that("check_if_permutation_num_valid gives an error whem perm = '20' (a
+          character)", {
   # Set up
   temp_perm <- '20'
 
@@ -282,7 +294,8 @@ test_that("check_for_NA_and_inf gives an error when x is a dataframe", {
   expect_error(check_for_NA_and_inf(temp))
 })
 
-test_that("check_for_NA_and_inf gives an error when x is a matrix containing NA", {
+test_that("check_for_NA_and_inf gives an error when x is a matrix containing
+          NA", {
   # Set up
   temp <- matrix(NA, 10, 10)
 
@@ -298,7 +311,8 @@ test_that("check_for_NA_and_inf gives an error when x is NULL", {
   expect_error(check_for_NA_and_inf(temp))
 })
 
-test_that("check_for_NA_and_inf gives an error when x is a matrix containing -Inf", {
+test_that("check_for_NA_and_inf gives an error when x is a matrix containing
+          -Inf", {
   # Set up
   temp <- matrix(-Inf, 10, 10)
 
@@ -306,7 +320,8 @@ test_that("check_for_NA_and_inf gives an error when x is a matrix containing -In
   expect_error(check_for_NA_and_inf(temp))
 })
 
-test_that("check_for_NA_and_inf gives an error when x is a matrix containing +Inf", {
+test_that("check_for_NA_and_inf gives an error when x is a matrix containing
+          +Inf", {
   # Set up
   temp <- matrix(Inf, 10, 10)
 
@@ -314,7 +329,8 @@ test_that("check_for_NA_and_inf gives an error when x is a matrix containing +In
   expect_error(check_for_NA_and_inf(temp))
 })
 
-test_that("check_for_NA_and_inf doesn't give an error when x is a matrix of zeroes", {
+test_that("check_for_NA_and_inf doesn't give an error when x is a matrix of
+          zeroes", {
   # Set up
   temp <- matrix(0, 10, 10)
 
@@ -323,7 +339,8 @@ test_that("check_for_NA_and_inf doesn't give an error when x is a matrix of zero
 })
 
 # test check_for_root_and_bootstrap
-test_that("check_for_root_and_bootstrap doesn't give an error when x is rooted tree with node values of 100", {
+test_that("check_for_root_and_bootstrap doesn't give an error when x is rooted
+          tree with node values of 100", {
   # Set up
   temp_tree <- ape::rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
@@ -332,7 +349,8 @@ test_that("check_for_root_and_bootstrap doesn't give an error when x is rooted t
   expect_error(check_for_root_and_bootstrap(temp_tree), NA)
 })
 
-test_that("check_for_root_and_bootstrap gives an error when x is unrooted tree with node values of 100", {
+test_that("check_for_root_and_bootstrap gives an error when x is unrooted tree
+          with node values of 100", {
   # Set up
   temp_tree <- ape::rtree(20, rooted = FALSE)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
@@ -341,7 +359,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is unrooted tree w
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
-test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node values of -100", {
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree
+          with node values of -100", {
   # Set up
   temp_tree <- ape::rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(-100, ape::Nnode(temp_tree))
@@ -350,7 +369,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
-test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with too few node values", {
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree
+          with too few node values", {
   # Set up
   temp_tree <- ape::rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(-100, ape::Nnode(temp_tree) - 1)
@@ -359,7 +379,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
-test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with too many node values", {
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree
+          with too many node values", {
   # Set up
   temp_tree <- ape::rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(-100, ape::Nnode(temp_tree) + 1)
@@ -368,7 +389,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
-test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node values of NA", {
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree
+          with node values of NA", {
   # Set up
   temp_tree <- ape::rtree(20, rooted = TRUE)
   temp_tree$node.labels <- rep(NA, ape::Nnode(temp_tree))
@@ -377,7 +399,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
-test_that("check_for_root_and_bootstrap gives an error when x is rooted tree with node.labels = NULL", {
+test_that("check_for_root_and_bootstrap gives an error when x is rooted tree
+          with node.labels = NULL", {
   # Set up
   temp_tree <- ape::rtree(20, rooted = TRUE)
   temp_tree$node.labels <- NULL
@@ -386,7 +409,8 @@ test_that("check_for_root_and_bootstrap gives an error when x is rooted tree wit
   expect_error(check_for_root_and_bootstrap(temp_tree))
 })
 
-test_that("check_for_root_and_bootstrap gives an error when not given a tree object", {
+test_that("check_for_root_and_bootstrap gives an error when not given a tree
+          object", {
   # Test
   expect_error(check_for_root_and_bootstrap("tree"))
   expect_error(check_for_root_and_bootstrap(10))
@@ -417,7 +441,8 @@ test_that("check_if_binary_vector gives an error when x is letters[1:10]", {
   expect_error(check_if_binary_vector(temp))
 })
 
-test_that("check_if_binary_vector gives an error when x is dataframe(matrix(0, 10, 10))", {
+test_that("check_if_binary_vector gives an error when x is
+          dataframe(matrix(0, 10, 10))", {
   # Set up
   temp <- as.data.frame(matrix(0, 10, 10))
 
@@ -433,7 +458,8 @@ test_that("check_if_binary_vector gives an error when x is matrix(0, 10, 10)", {
   expect_error(check_if_binary_vector(temp))
 })
 
-test_that("check_if_binary_vector doesn't give an error when x is c(1, 0, 1, 0)", {
+test_that("check_if_binary_vector doesn't give an error when x is
+          c(1, 0, 1, 0)", {
   # Set up
   temp <- c(1, 0, 1, 0)
 
@@ -441,7 +467,8 @@ test_that("check_if_binary_vector doesn't give an error when x is c(1, 0, 1, 0)"
   expect_error(check_if_binary_vector(temp), NA)
 })
 
-test_that("check_if_binary_vector doesn't give an error when x is c(0, 0, 0, 0)", {
+test_that("check_if_binary_vector doesn't give an error when x is
+          c(0, 0, 0, 0)", {
   # Set up
   temp <- c(0, 0, 0, 0)
 
@@ -458,7 +485,8 @@ test_that("check_if_binary_vector doesn't give an error when x is c(1)", {
 })
 
 # test check_if_binary_vector_numeric ------------------------------------------
-test_that("check_if_binary_vector_numeric gives an error when x is rep(NA, 10)", {
+test_that("check_if_binary_vector_numeric gives an error when x is
+          rep(NA, 10)", {
   # Set up
   temp <- rep(NA, 10)
 
@@ -474,7 +502,8 @@ test_that("check_if_binary_vector_numeric gives an error when x is NULL", {
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
-test_that("check_if_binary_vector_numeric gives an error when x is letters[1:10]", {
+test_that("check_if_binary_vector_numeric gives an error when x is
+          letters[1:10]", {
   # Set up
   temp <- letters[1:10]
 
@@ -482,7 +511,8 @@ test_that("check_if_binary_vector_numeric gives an error when x is letters[1:10]
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
-test_that("check_if_binary_vector_numeric gives an error when x is dataframe(matrix(0, 10, 10))", {
+test_that("check_if_binary_vector_numeric gives an error when x is
+          dataframe(matrix(0, 10, 10))", {
   # Set up
   temp <- as.data.frame(matrix(0, 10, 10))
 
@@ -490,7 +520,8 @@ test_that("check_if_binary_vector_numeric gives an error when x is dataframe(mat
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
-test_that("check_if_binary_vector_numeric gives an error when x is matrix(0, 10, 10)", {
+test_that("check_if_binary_vector_numeric gives an error when x is
+          matrix(0, 10, 10)", {
   # Set up
   temp <- as.data.frame(matrix(0, 10, 10))
 
@@ -498,7 +529,8 @@ test_that("check_if_binary_vector_numeric gives an error when x is matrix(0, 10,
   expect_error(check_if_binary_vector_numeric(temp))
 })
 
-test_that("check_if_binary_vector_numeric doesn't give an error when x is c(1, 0, 1, 0)", {
+test_that("check_if_binary_vector_numeric doesn't give an error when x is
+          c(1, 0, 1, 0)", {
   # Set up
   temp <- c(1, 0, 1, 0)
 
@@ -506,7 +538,8 @@ test_that("check_if_binary_vector_numeric doesn't give an error when x is c(1, 0
   expect_error(check_if_binary_vector_numeric(temp), NA)
 })
 
-test_that("check_if_binary_vector_numeric doesn't give an error when x is c(0, 0, 0, 0)", {
+test_that("check_if_binary_vector_numeric doesn't give an error when x is
+          c(0, 0, 0, 0)", {
   # Set up
   temp <- c(0, 0, 0, 0)
 
@@ -514,7 +547,8 @@ test_that("check_if_binary_vector_numeric doesn't give an error when x is c(0, 0
   expect_error(check_if_binary_vector_numeric(temp), NA)
 })
 
-test_that("check_if_binary_vector_numeric doesn't give an error when x is c(1)", {
+test_that("check_if_binary_vector_numeric doesn't give an error when x is
+          c(1)", {
   # Set up
   temp <- c(1)
 
@@ -523,7 +557,8 @@ test_that("check_if_binary_vector_numeric doesn't give an error when x is c(1)",
 })
 
 # test check_if_binary_matrix --------------------------------------------------
-test_that("check_if_binary_matrix doesn't give an error when x is matrix(c(0, 1), 2, 1)", {
+test_that("check_if_binary_matrix doesn't give an error when x is
+          matrix(c(0, 1), 2, 1)", {
   # Set up
   temp <- matrix(c(0, 1), 2, 1)
 
@@ -555,7 +590,8 @@ test_that("check_if_binary_matrix gives an error when x is NULL", {
   expect_error(check_if_binary_matrix(temp))
 })
 
-test_that("check_if_binary_matrix gives an error when x is matrix(c(1.5, 2.5), 2, 1)", {
+test_that("check_if_binary_matrix gives an error when x is
+          matrix(c(1.5, 2.5), 2, 1)", {
   # Set up
   temp <- matrix(c(1.5, 2.5), 2, 1)
 
@@ -571,7 +607,8 @@ test_that("check_if_binary_matrix gives an error when x is matrix(3, 2, 1)", {
   expect_error(check_if_binary_matrix(temp))
 })
 
-test_that("check_if_binary_matrix gives an error when x is as.data.frame(matrix(0, 2, 1))", {
+test_that("check_if_binary_matrix gives an error when x is
+          as.data.frame(matrix(0, 2, 1))", {
   # Set up
   temp <- as.data.frame(matrix(0, 2, 1))
 
@@ -588,7 +625,8 @@ test_that("check_file_exists gives an error when x is 'fake_file_name.txt'", {
   expect_error(check_file_exists(temp))
 })
 
-test_that("check_file_exists doesn't give an error when x is 'test_validation.R'", {
+test_that("check_file_exists doesn't give an error when x is
+          'test_validation.R'", {
   # Set up
   temp <- 'test_validation.R'
 
@@ -597,7 +635,8 @@ test_that("check_file_exists doesn't give an error when x is 'test_validation.R'
 })
 
 # test check_rownames ----------------------------------------------------------
-test_that("check_rownames doesn't give an error when tree$tip.label <- row.names(mat) <- letters[1:10]", {
+test_that("check_rownames doesn't give an error when tree$tip.label <-
+          row.names(mat) <- letters[1:10]", {
   # Set up
   temp_tree <- ape::rtree(10)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
@@ -607,7 +646,8 @@ test_that("check_rownames doesn't give an error when tree$tip.label <- row.names
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree), NA)
 })
 
-test_that("check_rownames gives an error when tree$tip.label <- letters[11:20],  row.names(mat) <- letters[1:10]", {
+test_that("check_rownames gives an error when tree$tip.label <-
+          letters[11:20],  row.names(mat) <- letters[1:10]", {
   # Set up
   temp_tree <- ape::rtree(10)
   temp_mat  <- matrix(1:80, nrow = 10, ncol = 8)
@@ -635,7 +675,8 @@ test_that("check_rownames gives an error when Ntip(tree) != nrow(mat)", {
 })
 
 
-test_that("check_rownames gives an error when not given a tree object or not given matrix", {
+test_that("check_rownames gives an error when not given a tree object or not
+          given matrix", {
   # Set up
   temp_tree <- ape::rtree(10)
   fake_tree <- "tree"
@@ -649,7 +690,8 @@ test_that("check_rownames gives an error when not given a tree object or not giv
   expect_error(check_rownames(mat = fake_mat, tr = temp_tree))
 })
 
-test_that("check_rownames gives an error when given a matrix without rownames", {
+test_that("check_rownames gives an error when given a matrix without
+          rownames", {
   # Set up
   temp_tree <- ape::rtree(10)
   temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
@@ -663,7 +705,8 @@ test_that("check_rownames gives an error when given a matrix without rownames", 
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
 })
 
-test_that("check_rownames gives an error when given a tree without tip.labels", {
+test_that("check_rownames gives an error when given a tree without
+          tip.labels", {
   # Set up
   temp_tree <- ape::rtree(10)
   temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
@@ -673,7 +716,8 @@ test_that("check_rownames gives an error when given a tree without tip.labels", 
 })
 
 
-test_that("check_rownames gives an error when tree$tip.label doesn't perfectly match matrix rownames", {
+test_that("check_rownames gives an error when tree$tip.label doesn't perfectly
+          match matrix rownames", {
   # Set up
   set.seed(1)
   temp_tree <- ape::rtree(10)
@@ -793,13 +837,15 @@ test_that("check_node_is_in_tree doesn't give an error when node = 1", {
   expect_error(check_node_is_in_tree(node_val = 1, tr = temp), NA)
 })
 
-test_that("check_node_is_in_tree doesn't give an error when node = ape::Nnode(tree)", {
+test_that("check_node_is_in_tree doesn't give an error when
+          node = ape::Nnode(tree)", {
   # Set up
   temp <- ape::rtree(10)
   temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
-  expect_error(check_node_is_in_tree(node_val = ape::Nnode(temp), tr = temp), NA)
+  expect_error(check_node_is_in_tree(node_val = ape::Nnode(temp), tr = temp),
+               NA)
 })
 
 test_that("check_node_is_in_tree gives an error when node = 0", {
@@ -820,13 +866,15 @@ test_that("check_node_is_in_tree gives an error when node = -1", {
   expect_error(check_node_is_in_tree(node_val = -1, tr = temp))
 })
 
-test_that("check_node_is_in_tree gives an error when node = ape::Nnode + Ntip + 1", {
+test_that("check_node_is_in_tree gives an error when
+          node = ape::Nnode + Ntip + 1", {
   # Set up
   temp <- ape::rtree(10)
   temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
-  expect_error(check_node_is_in_tree(node_val = ape::Nnode(temp) + ape::Ntip(temp) + 1, tr = temp))
+  expect_error(check_node_is_in_tree(node_val = ape::Nnode(temp) + ape::Ntip(temp) + 1,
+                                     tr = temp))
 })
 
 test_that("check_node_is_in_tree gives an error when node = 1.5", {
@@ -839,14 +887,16 @@ test_that("check_node_is_in_tree gives an error when node = 1.5", {
 })
 
 # test check_tree_is_valid -----------------------------------------------------
-test_that("check_tree_is_valid returns true for randomly generated trees where Ntip is between 2 and 10", {
+test_that("check_tree_is_valid returns true for randomly generated trees where
+          Ntip is between 2 and 10", {
   # Test
   for (i in 2:10) {
     expect_error(check_tree_is_valid(ape::rtree(i)), NA)
   }
 })
 
-test_that("check_tree_is_invalid throws an error when tree edge index is greater than Nedge(tree)", {
+test_that("check_tree_is_invalid throws an error when tree edge index is greater
+          than Nedge(tree)", {
   # Set up
   invalid_tree <- ape::rtree(10)
   for (j in 1:ape::Nedge(invalid_tree)) {
@@ -861,59 +911,71 @@ test_that("check_tree_is_invalid throws an error when tree edge index is greater
 })
 
 # test check_convergence_possible ----------------------------------------------
-test_that("check_convergence_possible gives an error 'discrete' and all values = 0", {
+test_that("check_convergence_possible gives an error 'discrete' and all
+          values = 0", {
   # Set up
   disc_cont <- "discrete"
   temp_vec <- c(0,0,0,0,0,0,0,0)
 
   # Test
-  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
+                                          vec = temp_vec))
 })
 
-test_that("check_convergence_possible doesn't give an error 'discrete' and values= c(1,0,1,0,1,0,1,0)", {
+test_that("check_convergence_possible doesn't give an error 'discrete' and
+          values = c(1,0,1,0,1,0,1,0)", {
   # Set up
   disc_cont <- "discrete"
   temp_vec <- c(1,0,1,0,1,0,1,0)
 
   # Test
-  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec), NA)
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
+                                          vec = temp_vec), NA)
 })
 
 
-test_that("check_convergence_possible throws error given 'foobar' but valid values= c(1,0,1,0,1,0,1,0)", {
+test_that("check_convergence_possible throws error given 'foobar' but valid
+          values = c(1,0,1,0,1,0,1,0)", {
   # Set up
   disc_cont <- "foobar"
   temp_vec <- c(1,0,1,0,1,0,1,0)
 
   # Test
-  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
+                                          vec = temp_vec))
 })
 
-test_that("check_convergence_possible gives an error 'continuous' and all values = 0", {
+test_that("check_convergence_possible gives an error 'continuous' and all
+          values = 0", {
   # Set up
   disc_cont <- "continuous"
   temp_vec <- c(0,0,0,0,0,0,0,0)
 
   # Test
-  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
+                                          vec = temp_vec))
 })
 
-test_that("check_convergence_possible gives an error 'discrete' and values= c(0, 0.1, 0.2)", {
+test_that("check_convergence_possible gives an error 'discrete' and
+          values = c(0, 0.1, 0.2)", {
   # Set up
   disc_cont <- "discrete"
   temp_vec <- c(0, 0.1, 0.2)
 
   # Test
-  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
+                                          vec = temp_vec))
 })
 
-test_that("check_convergence_possible gives an error 'discrete' and all values = 'a'", {
+test_that("check_convergence_possible gives an error 'discrete' and all
+          values = 'a'", {
   # Set up
   disc_cont <- "discrete"
   temp_vec <- rep('a', 10)
 
   # Test
-  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont, vec = temp_vec))
+  expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
+                                          vec = temp_vec))
 })
 
 # test is_tip ------------------------------------------------------------------
@@ -927,7 +989,8 @@ test_that("is_tip returns TRUE when given a tree and the node = 1 (a tip)", {
   expect_true(is_tip(temp_node, temp_tree))
 })
 
-test_that("is_tip returns FALSE when given a tree and the node = Ntip(temp_tree) + 1 (not a tip)", {
+test_that("is_tip returns FALSE when given a tree and the
+          node = Ntip(temp_tree) + 1 (not a tip)", {
   # Set up
   temp_tree <- ape::rtree(10)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
@@ -967,7 +1030,8 @@ test_that("is_tip gives an error when given a matrix and a node", {
 })
 
 # test check_if_g_mat_can_be_plotted -------------------------------------------
-test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of 2x2", {
+test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of
+          2x2", {
   # Set up
   temp_mat <- matrix(c(0, 1, 0, 1), nrow = 2, ncol = 2)
 
@@ -976,7 +1040,8 @@ test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of 2x2
   expect_true(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
-test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of 3x2 including NAs", {
+test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of
+          3x2 including NAs", {
   # Set up
   temp_mat <- matrix(c(0, 1, NA, 0, 1, NA), nrow = 3, ncol = 2)
 
@@ -985,7 +1050,8 @@ test_that("check_if_g_mat_can_be_plotted returns true for a binary matrix of 3x2
   expect_true(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
-test_that("check_if_g_mat_can_be_plotted returns an error for a non-binary matrix of 2x2", {
+test_that("check_if_g_mat_can_be_plotted returns an error for a non-binary
+          matrix of 2x2", {
   # Set up
   temp_mat <- matrix(c(0.5, 1.5, 0, 1), nrow = 2, ncol = 2)
 
@@ -993,7 +1059,8 @@ test_that("check_if_g_mat_can_be_plotted returns an error for a non-binary matri
   expect_error(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
-test_that("check_if_g_mat_can_be_plotted returns FALSE for a binary matrix of all zeroes", {
+test_that("check_if_g_mat_can_be_plotted returns FALSE for a binary matrix of
+          all zeroes", {
   # Set up
   temp_mat <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)
 
@@ -1001,7 +1068,8 @@ test_that("check_if_g_mat_can_be_plotted returns FALSE for a binary matrix of al
   expect_false(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
-test_that("check_if_g_mat_can_be_plotted returns an FALSE for a binary matrix of 2x1", {
+test_that("check_if_g_mat_can_be_plotted returns an FALSE for a binary matrix of
+          2x1", {
   # Set up
   temp_mat <- matrix(c(0, 1), nrow = 2, ncol = 1)
 
@@ -1009,7 +1077,8 @@ test_that("check_if_g_mat_can_be_plotted returns an FALSE for a binary matrix of
   expect_false(check_if_g_mat_can_be_plotted(temp_mat))
 })
 
-test_that("check_if_g_mat_can_be_plotted returns FALSE for non-matrix, non-dataframe inputs", {
+test_that("check_if_g_mat_can_be_plotted returns FALSE for non-matrix,
+          non-dataframe inputs", {
   # Test
   expect_false(check_if_g_mat_can_be_plotted(c(0, 1, 0, 1)))
   expect_false(check_if_g_mat_can_be_plotted(NA))
@@ -1018,7 +1087,8 @@ test_that("check_if_g_mat_can_be_plotted returns FALSE for non-matrix, non-dataf
 })
 
 # test check_str_is_discrete_or_continuous -------------------------------------
-test_that("check_str_is_discrete_or_continuous gives no error when given 'discrete'", {
+test_that("check_str_is_discrete_or_continuous gives no error when given
+          'discrete'", {
   # Set up
   input <- 'discrete'
 
@@ -1026,7 +1096,8 @@ test_that("check_str_is_discrete_or_continuous gives no error when given 'discre
   expect_error(check_str_is_discrete_or_continuous(input), NA)
 })
 
-test_that("check_str_is_discrete_or_continuous gives no error when given 'continuous'", {
+test_that("check_str_is_discrete_or_continuous gives no error when given
+          'continuous'", {
   # Set up
   input <- 'continuous'
 
@@ -1034,7 +1105,8 @@ test_that("check_str_is_discrete_or_continuous gives no error when given 'contin
   expect_error(check_str_is_discrete_or_continuous(input), NA)
 })
 
-test_that("check_str_is_discrete_or_continuous gives an error when given 'foobar'", {
+test_that("check_str_is_discrete_or_continuous gives an error when given
+          'foobar'", {
   # Set up
   input <- 'foobar'
 
@@ -1050,7 +1122,8 @@ test_that("check_str_is_discrete_or_continuous gives an error when given NA", {
   expect_error(check_str_is_discrete_or_continuous(input))
 })
 
-test_that("check_str_is_discrete_or_continuous gives an error when given NULL", {
+test_that("check_str_is_discrete_or_continuous gives an error when given
+          NULL", {
   # Set up
   input <- NULL
 
@@ -1058,21 +1131,23 @@ test_that("check_str_is_discrete_or_continuous gives an error when given NULL", 
   expect_error(check_str_is_discrete_or_continuous(input))
 })
 
-# test check_if_ancestral_reconstruction_method_compatible_with_ape ------------
-test_that("check_if_ancestral_reconstruction_method_compatible_with_ape doesn't throw an error when given the acceptable inputs", {
+# test check_anc_rec_compatible ------------
+test_that("check_anc_rec_compatible doesn't
+          throw an error when given the acceptable inputs", {
   # Test
-  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("ML"), NA)
-  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("REML"), NA)
-  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("pic"), NA)
-  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("GLS"), NA)
+  expect_error(check_anc_rec_compatible("ML"), NA)
+  expect_error(check_anc_rec_compatible("REML"), NA)
+  expect_error(check_anc_rec_compatible("pic"), NA)
+  expect_error(check_anc_rec_compatible("GLS"), NA)
 })
 
-test_that("check_if_ancestral_reconstruction_method_compatible_with_ape throws error when given the unacceptable inputs", {
+test_that("check_anc_rec_compatible throws error when given the unacceptable
+          inputs", {
   # Test
-  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape("other"))
-  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape(10))
-  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape(matrix(0, 10, 10)))
-  expect_error(check_if_ancestral_reconstruction_method_compatible_with_ape(letters[1:10]))
+  expect_error(check_anc_rec_compatible("other"))
+  expect_error(check_anc_rec_compatible(10))
+  expect_error(check_anc_rec_compatible(matrix(0, 10, 10)))
+  expect_error(check_anc_rec_compatible(letters[1:10]))
 })
 
 # test check_equal -------------------------------------------------------------
