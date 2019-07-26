@@ -200,14 +200,14 @@ test_that("group_genotypes does X given Y", {
   geno <- prepare_genotype(temp_group_logical, temp_geno, temp_tree, temp_lookup)
   genotype <- geno$genotype
   AR <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, genotype, temp_continuous)
-  geno_trans_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For discrete concomitant and continuous tests.
-  geno_trans_original    <- prepare_genotype_transitions_for_original_discrete_test(genotype, geno_trans_concomitant) # Keep only WT -> mutant transitions.
+  geno_trans_synchronous <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For synchronous and continuous tests.
+  geno_trans_phyc <- prepare_genotype_transitions_for_original_discrete_test(genotype, geno_trans_synchronous) # Keep only WT -> mutant transitions.
 
-  temp_results <- group_genotypes(temp_tree, genotype, AR$geno_recon_and_conf, geno_trans_concomitant, geno_trans_original, geno$gene_snp_lookup, geno$unique_genes)
+  temp_results <- group_genotypes(temp_tree, genotype, AR$geno_recon_and_conf, geno_trans_synchronous, geno_trans_phyc, geno$gene_snp_lookup, geno$unique_genes)
   expect_equal(length(temp_results$geno_recon_ordered_by_edges), ncol(temp_results$genotype))
   expect_identical(row.names(temp_results$genotype), temp_tree$tip.label)
-  expect_equal(length(temp_results$geno_trans_concomitant[[1]]$transition), ape::Nedge(temp_tree))
-  expect_equal(length(temp_results$geno_trans_orig[[1]]$transition), ape::Nedge(temp_tree))
-  expect_equal(length(temp_results$geno_trans_concomitant[[1]]$trans_dir), ape::Nedge(temp_tree))
-  expect_equal(length(temp_results$geno_trans_orig[[1]]$trans_dir), ape::Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_synchronous[[1]]$transition), ape::Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_phyc[[1]]$transition), ape::Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_synchronous[[1]]$trans_dir), ape::Nedge(temp_tree))
+  expect_equal(length(temp_results$geno_trans_phyc[[1]]$trans_dir), ape::Nedge(temp_tree))
 })

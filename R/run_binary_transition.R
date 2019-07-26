@@ -26,10 +26,10 @@ run_binary_transition <- function(args){
                                           args$discrete_or_continuous)
   # Include all transition edges (WT -> mutant and mutant -> WT). For discrete
   #  concomitant and continuous tests.
-  geno_trans_concomitant <- AR$geno_trans
+  geno_trans_synchronous <- AR$geno_trans
 
   # Keep only WT -> mutant transitions.
-  geno_trans_original <-
+  geno_trans_phyc <-
     prepare_genotype_transitions_for_original_discrete_test(genotype,
                                                             AR$geno_trans)
 
@@ -37,15 +37,15 @@ run_binary_transition <- function(args){
     grouped_geno <- group_genotypes(args$tree,
                                     genotype,
                                     AR$geno_recon_and_conf,
-                                    geno_trans_concomitant,
-                                    geno_trans_original,
+                                    geno_trans_synchronous,
+                                    geno_trans_phyc,
                                     geno$gene_snp_lookup,
                                     geno$unique_genes)
     genotype <- grouped_geno$genotype
     geno_recon_ordered_by_edges <- grouped_geno$geno_recon_ordered_by_edges
     geno_conf_ordered_by_edges  <- grouped_geno$geno_conf_ordered_by_edges
-    geno_trans_concomitant <- grouped_geno$geno_trans_concomitant
-    geno_trans_original <- grouped_geno$geno_trans_original
+    geno_trans_synchronous <- grouped_geno$geno_trans_synchronous
+    geno_trans_phyc <- grouped_geno$geno_trans_phyc
     results_object$convergence_not_possible_genotypes <-
       grouped_geno$convergence_not_possible_genotypes
   } else {
@@ -62,7 +62,7 @@ run_binary_transition <- function(args){
     }
   }
   hi_conf <-
-    prepare_high_confidence_objects(geno_trans_concomitant,
+    prepare_high_confidence_objects(geno_trans_synchronous,
                                     args$tree,
                                     AR$pheno_recon_and_conf$tip_and_node_rec_conf,
                                     args$bootstrap_cutoff,
