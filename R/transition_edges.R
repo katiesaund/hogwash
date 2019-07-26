@@ -115,7 +115,7 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition,
   # Check inputs ---------------------------------------------------------------
   check_equal(length(genotype_transition), length(genotype_confidence))
   if (!is.vector(genotype_transition[[1]]$transition)) {
-    stop("Genotype transition should have a vector called 'transition'.")
+    stop("Input must be a numeric vector")
   }
   check_if_binary_vector(genotype_confidence[[1]])
 

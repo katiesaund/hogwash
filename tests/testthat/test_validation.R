@@ -730,6 +730,19 @@ test_that("check_rownames gives an error when tree$tip.label doesn't perfectly
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
 })
 
+test_that("check_rownames gives an error when tree$tip.label doesn't perfectly
+          match matrix rownames", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(10)
+  temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
+  row.names(temp_mat) <- temp_tree$tip.label
+  temp_tree$tip.label <- NULL
+
+  # Test
+  expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
+})
+
 # test check_is_number ---------------------------------------------------------
 test_that("check_is_number doesn't give an error when x = 5", {
   # Set up

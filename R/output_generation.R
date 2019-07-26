@@ -36,8 +36,6 @@ create_contingency_table <- function(genotype_by_edges,
   } else if (test_type == "phyc") {
     row.names(contingency_table) <- c("geno_transition", "geno_not_trans")
     colnames(contingency_table) <- c("pheno_present", "pheno_absent")
-  } else {
-    stop("Test must be either synchronous or phyc")
   }
 
   for (i in 1:length(genotype_by_edges)) {

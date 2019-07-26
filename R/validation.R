@@ -290,10 +290,6 @@ check_rownames <- function(mat, tr){
     stop("Matrix must be formatted with samples in matrix in the same order as
          tree$tip.label.")
   }
-  if (sum(row.names(mat) == tr$tip.label) != ape::Ntip(tr)) {
-    stop("Matrix must be formatted with samples in matrix in the same order as
-         tree$tip.label.")
-  }
 } # end check_rownames()
 
 #' check_is_number

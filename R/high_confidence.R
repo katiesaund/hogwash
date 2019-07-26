@@ -13,7 +13,7 @@ discretize_conf_with_cutoff <- function(confidence_vector, threshold){
   # Check inputs ---------------------------------------------------------------
   check_is_number(threshold)
   if (!is.vector(confidence_vector)) {
-    stop("input must be a numeric vector")
+    stop("Input must be a numeric vector")
   }
   check_is_number(confidence_vector[1])
 
@@ -194,8 +194,6 @@ prepare_high_confidence_objects <- function(genotype_transition,
   tree_conf <- get_bootstrap_confidence(tr, boot_threshold)
   tree_conf_ordered_by_edges <- reorder_tip_and_node_to_edge(tree_conf, tr)
   short_edges <- identify_short_edges(tr)
-
-
 
   high_confidence_edges <-
     pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3

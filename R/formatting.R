@@ -17,7 +17,6 @@ format_tree <- function(tr){
   if (is.null(tr$node.label)) {
     stop("trees must have support values at the nodes")
   }
-
   if (!ape::is.rooted(tr)) {
     tr <- phytools::midpoint.root(tr)
   }
@@ -25,6 +24,8 @@ format_tree <- function(tr){
   # Function -------------------------------------------------------------------
   for (i in 1:ape::Nnode(tr)) {
     if (tr$node.label[i] == "") {
+      tr$node.label[i] <- 0
+    } else if (tr$node.label[i] == "Root") {
       tr$node.label[i] <- 0
     }
   }
