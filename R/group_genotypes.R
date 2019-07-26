@@ -381,7 +381,7 @@ prepare_grouped_genotype <- function(geno, lookup){
 #' @description Remove genotypes that are too common or rare for ancestral
 #'  reconstruction to work. Given that this genotype is not grouped return NULL
 #'  for the variable snps_per_gene. Keep track of which genotypes got removed in
-#'  convergence_not_possible_genotypes.
+#'  no_convergence_genotypes.
 #'
 #' @param geno Matrix. Binary. Ncol = number of genotypes. Nrow = Ntip(tr).
 #' @param tr Phylo.
@@ -406,7 +406,7 @@ prepare_ungrouped_genotype <- function(geno, tr){
   results <-
     list("snps_per_gene" = snps_per_gene,
          "genotype" = simple_geno$mat,
-         "convergence_not_possible_genotypes" = simple_geno$dropped_genotype_names)
+         "no_convergence_genotypes" = simple_geno$dropped_genotype_names)
   return(results)
 } # end prepare_ungrouped_genotype()
 
@@ -488,7 +488,7 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
 #'  * geno_conf_ordered_by_edges. List.
 #'  * geno_trans_synchronous. List of two objects. $transition and $trans_dir.
 #'  * geno_trans_phyc. List of two objects. $transition and $trans_dir.
-#'  * convergence_not_possible_genotypes. Character vector.
+#'  * no_convergence_genotypes. Character vector.
 #'  * genotype. Matrix.
 #'
 #' @noRd
@@ -569,11 +569,12 @@ group_genotypes <- function(tr,
 
   # Return output --------------------------------------------------------------
   results <-
-    list("geno_recon_ordered_by_edges" = geno_recon_ordered_by_edges,
-         "geno_conf_ordered_by_edges" = geno_conf_ordered_by_edges,
-         "geno_trans_synchronous" = genotype_transition_sync,
-         "geno_trans_phyc" = genotype_transition_phyc,
-         "convergence_not_possible_genotypes" = simplified_genotype$dropped_genotype_names,
-         "genotype" = geno)
+    list(
+      "geno_recon_ordered_by_edges" = geno_recon_ordered_by_edges,
+      "geno_conf_ordered_by_edges" = geno_conf_ordered_by_edges,
+      "geno_trans_synchronous" = genotype_transition_sync,
+      "geno_trans_phyc" = genotype_transition_phyc,
+      "no_convergence_genotypes" = simplified_genotype$dropped_genotype_names,
+      "genotype" = geno)
   return(results)
 } # end group_genotypes()

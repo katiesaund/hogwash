@@ -19,8 +19,7 @@ run_continuous <- function(args){
                            args$tree,
                            args$gene_snp_lookup)
   genotype <- geno$genotype
-  results_object$convergence_not_possible_genotypes <-
-    geno$convergence_not_possible_genotypes
+  results_object$no_convergence_genotypes <- geno$no_convergence_genotypes
   AR <- prepare_ancestral_reconstructions(args$tree,
                                           args$phenotype,
                                           genotype,
@@ -43,8 +42,8 @@ run_continuous <- function(args){
     geno_recon_ordered_by_edges <- grouped_geno$geno_recon_ordered_by_edges
     geno_conf_ordered_by_edges <- grouped_geno$geno_conf_ordered_by_edges
     geno_trans_synchronous <- grouped_geno$geno_trans_synchronous
-    results_object$convergence_not_possible_genotypes <-
-      grouped_geno$convergence_not_possible_genotypes
+    results_object$no_convergence_genotypes <-
+      grouped_geno$no_convergence_genotypes
   } else {
     geno_conf_ordered_by_edges <-
       geno_recon_ordered_by_edges <-

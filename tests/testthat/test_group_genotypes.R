@@ -165,7 +165,7 @@ test_that("prepare_genotype gives expected genotype for an not grouped input", {
 
   expect_null(temp_result$snps_per_gene)
   expect_equal(temp_result$genotype, temp_geno[, c(1, 5, 6)])
-  expect_equal(temp_result$convergence_not_possible_genotypes,
+  expect_equal(temp_result$no_convergence_genotypes,
                c("SNP2", "SNP3", "SNP4", "SNP7", "SNP8"))
 
 })
@@ -210,7 +210,7 @@ test_that("prepare_ungrouped_genotype", {
   temp_result <- prepare_ungrouped_genotype(temp_geno, temp_tree)
   expect_null(temp_result$snps_per_gene)
   expect_equal(temp_result$genotype, temp_geno[, c(1, 5, 6)])
-  expect_equal(temp_result$convergence_not_possible_genotypes,
+  expect_equal(temp_result$no_convergence_genotypes,
                c("SNP2", "SNP3", "SNP4", "SNP7", "SNP8"))
 })
 
