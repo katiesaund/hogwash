@@ -1,6 +1,7 @@
-context("Run phyc") #-----------------------------------------------#
+context("Run phyc") #----------------------------------------------------------#
 
-test_that("run_phyc() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
+test_that("run_phyc() doesn't give any errors when given a discrete phenotype
+          and snps that group into genes" ,{
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::antibiotic_resistance
@@ -23,7 +24,8 @@ test_that("run_phyc() doesn't give any errors when given a discrete phenotype an
   expect_error(run_phyc(args), NA)
 })
 
-test_that("run_phyc() doesn't give any errors when given a discrete phenotype and snps (do not group into genes)" ,{
+test_that("run_phyc() doesn't give any errors when given a discrete phenotype
+          and snps (do not group into genes)" ,{
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::antibiotic_resistance

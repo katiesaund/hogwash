@@ -1,8 +1,7 @@
-library(ape)
+context("Run synchronous") #---------------------------------------------------#
 
-context("Run synchronous") #-----------------------------------------------#
-
-test_that("run_synchronous() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
+test_that("run_synchronous() doesn't give any errors when given a discrete
+          phenotype and snps that group into genes" ,{
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::antibiotic_resistance
@@ -25,7 +24,8 @@ test_that("run_synchronous() doesn't give any errors when given a discrete pheno
   expect_error(run_synchronous(args), NA)
 })
 
-test_that("run_synchronous() doesn't give any errors when given a discrete phenotype and snps (do not group into genes)" ,{
+test_that("run_synchronous() doesn't give any errors when given a discrete
+          phenotype and snps (do not group into genes)" ,{
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::antibiotic_resistance

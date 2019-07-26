@@ -1,7 +1,8 @@
 context("Select test type") #--------------------------------------------------#
 
 # test select_test_type() ------------------------------------------------------
-test_that("select_test_type doesn't throw error when given valid continuous input", {
+test_that("select_test_type doesn't throw error when given valid continuous
+          input", {
   # Set up
   args                        <- NULL
   args$test                   <- FALSE

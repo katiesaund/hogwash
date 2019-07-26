@@ -1,6 +1,7 @@
 context("Run continuous") #----------------------------------------------------#
 
-test_that("run_continuous() doesn't give any errors when given a continuous phenotype and snps (do not group into genes)" ,{
+test_that("run_continuous() doesn't give any errors when given a continuous
+          phenotype and snps (do not group into genes)" ,{
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::growth
@@ -19,7 +20,8 @@ test_that("run_continuous() doesn't give any errors when given a continuous phen
   expect_error(run_continuous(args), NA)
 })
 
-test_that("run_continuous() doesn't give any errors when given a continuous phenotype and snps are grouped into genes" ,{
+test_that("run_continuous() doesn't give any errors when given a continuous
+          phenotype and snps are grouped into genes" ,{
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::growth
