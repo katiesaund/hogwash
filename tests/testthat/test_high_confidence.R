@@ -1,21 +1,20 @@
 context("High confidence") #----------------------------------------------#
 # TODO write unit tests for assign_high_confidence_to_transition_edges
 
-# test discretize_confidence_using_threshold
-test_that("discretize_confidence_using_threshold should give this expected
-          result", {
+# test discretize_conf_with_cutoff
+test_that("discretize_conf_with_cutoff should give this expected result", {
   temp_vector <- c(1:100)
   temp_threshold <- 50
-  expect_equal(discretize_confidence_using_threshold(temp_vector,
+  expect_equal(discretize_conf_with_cutoff(temp_vector,
                                                      temp_threshold),
                c(rep(0, 49), rep(1, 51)))
 })
 
-test_that("discretize_confidence_using_threshold should give this expected
-          result - now with fractions", {
+test_that("discretize_conf_with_cutoff should give this expected result -
+          now with fractions", {
   temp_vector <- seq(from = 0, to = 1, by = 0.1)
   temp_threshold <- 0.5
-  expect_equal(discretize_confidence_using_threshold(temp_vector,
+  expect_equal(discretize_conf_with_cutoff(temp_vector,
                                                      temp_threshold),
                c(rep(0, 5), rep(1, 6)))
 })

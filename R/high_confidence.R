@@ -1,4 +1,4 @@
-#' discretize_confidence_using_threshold
+#' discretize_conf_with_cutoff
 #'
 #' @description Given a vector with values that describe confidence, binarize
 #'  the vector a accoriding to a cutoff value.
@@ -9,7 +9,7 @@
 #'
 #' @noRd
 #'
-discretize_confidence_using_threshold <- function(confidence_vector, threshold){
+discretize_conf_with_cutoff <- function(confidence_vector, threshold){
   # Check inputs ---------------------------------------------------------------
   check_is_number(threshold)
   if (!is.vector(confidence_vector)) {
@@ -24,7 +24,7 @@ discretize_confidence_using_threshold <- function(confidence_vector, threshold){
   # Check and return output ----------------------------------------------------
   check_if_binary_vector(confidence_vector)
   return(confidence_vector)
-} # end discretize_confidence_using_threshold()
+} # end discretize_conf_with_cutoff()
 
 
 #' report_num_high_confidence_trans_edge

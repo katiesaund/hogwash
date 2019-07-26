@@ -69,7 +69,7 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
     node_confidence <- as.numeric(node_confidence) / 100
   }
   node_confidence <-
-    discretize_confidence_using_threshold(node_confidence, confidence_threshold)
+    discretize_conf_with_cutoff(node_confidence, confidence_threshold)
   tree_tip_and_node_confidence <- c(rep(1, ape::Ntip(tr)), node_confidence)
 
   # Check and return output ----------------------------------------------------

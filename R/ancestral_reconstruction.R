@@ -57,7 +57,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
     tip_and_node_recon <- cont_results$tip_and_node_recon
 
     # CONFIDENCE IN RECONSTRUCTION
-    tip_and_node_anc_rec_confidence <-
+    tip_and_node_anc_rec_conf <-
       continuous_get_recon_confidence(tip_and_node_recon)
 
   } else if (disc_cont == "discrete") {
@@ -69,7 +69,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
     tip_and_node_recon <- discrete_results$tip_and_node_recon
 
     # CONFIDENCE IN RECONSTRUCTION
-    tip_and_node_anc_rec_confidence <-
+    tip_and_node_anc_rec_conf <-
       discrete_get_recon_confidence(discrete_results$reconstruction,
                                     tr,
                                     ML_significance_threshold)
@@ -78,7 +78,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
 
   # Return outputs -------------------------------------------------------------
   results <- list("node_anc_rec" = ML_anc_rec,
-                  "tip_and_node_rec_conf" = tip_and_node_anc_rec_confidence,
+                  "tip_and_node_rec_conf" = tip_and_node_anc_rec_conf,
                   "recon_edge_mat" = reconstruction_as_edge_mat,
                   "tip_and_node_recon" = tip_and_node_recon)
   return(results)
@@ -122,7 +122,7 @@ continuous_ancestral_reconstruction <- function(tr,
 
   # Function -------------------------------------------------------------------
   set.seed(1)
-  reconstruction <- ape::ace(mat[ , num, drop = TRUE],
+  reconstruction <- ape::ace(mat[, num, drop = TRUE],
                         tr,
                         model = "BM",
                         type = disc_cont,
@@ -132,7 +132,7 @@ continuous_ancestral_reconstruction <- function(tr,
   # Vector containing reconstruction data for all internal nodes N+ where tips
   # are 1-N.
   ML_anc_rec <- reconstruction$ace
-  tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
+  tip_and_node_recon <- c(mat[, num, drop = TRUE], ML_anc_rec)
   names(tip_and_node_recon) <- c(1:sum(ape::Ntip(tr), ape::Nnode(tr)))
 
   # Return output --------------------------------------------------------------
@@ -151,7 +151,7 @@ continuous_ancestral_reconstruction <- function(tr,
 #' @param recon_vector Numeric vector. Values of the reconstruction. Length ==
 #'   Ntip(tr) + Nnode(tr).
 #'
-#' @return tip_and_node_anc_rec_confidence: Vector of all 1s, indicating 'high'
+#' @return tip_and_node_anc_rec_conf: Vector of all 1s, indicating 'high'
 #'   confidence. Length == Ntip(tr) + Nnode(tr). Tips folowed by nodes.
 #'
 #' @noRd
@@ -164,10 +164,10 @@ continuous_get_recon_confidence <- function(recon_vector){
   check_is_number(recon_vector[1])
 
   # Function -------------------------------------------------------------------
-  tip_and_node_anc_rec_confidence <- rep(1, length(recon_vector))
+  tip_and_node_anc_rec_conf <- rep(1, length(recon_vector))
 
   # Return output --------------------------------------------------------------
-  return(tip_and_node_anc_rec_confidence)
+  return(tip_and_node_anc_rec_conf)
 } # end continuous_get_recon_confidence()
 
 #' convert_to_edge_mat
@@ -190,7 +190,8 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
   # Check inputs ---------------------------------------------------------------
   check_tree_is_valid(tr)
   check_for_root_and_bootstrap(tr)
-  check_equal(length(tip_and_node_reconstruction), ape::Nnode(tr) + ape::Ntip(tr))
+  check_equal(length(tip_and_node_reconstruction),
+              ape::Nnode(tr) + ape::Ntip(tr))
 
   # Function -------------------------------------------------------------------
   reconstruction_as_edge_mat <- tr$edge
@@ -255,7 +256,7 @@ discrete_ancestral_reconstruction <- function(tr,
   set.seed(1)
   recon_model <- pick_recon_model(mat, tr, disc_cont, num, recon_method)
   set.seed(1)
-  reconstruction <- ape::ace(mat[ , num, drop = TRUE],
+  reconstruction <- ape::ace(mat[, num, drop = TRUE],
                         tr,
                         model = recon_model,
                         type = disc_cont,
@@ -268,7 +269,7 @@ discrete_ancestral_reconstruction <- function(tr,
                                                       1,
                                                       which.max)])
   names(ML_anc_rec) <- c((ape::Ntip(tr) + 1):(ape::Ntip(tr) + ape::Nnode(tr)))
-  tip_and_node_recon <- c(mat[ , num, drop = TRUE], ML_anc_rec)
+  tip_and_node_recon <- c(mat[, num, drop = TRUE], ML_anc_rec)
   names(tip_and_node_recon) <- c(1:sum(ape::Ntip(tr), ape::Nnode(tr)))
 
   # Return outputs -------------------------------------------------------------
@@ -311,15 +312,14 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
   anc_rec_confidence <- apply(recon$lik.anc, 1, max)
 
   # Count all tips as high confidence
-  tip_and_node_anc_rec_confidence <- c(rep(1, ape::Ntip(tr)), anc_rec_confidence)
+  tip_and_node_anc_rec_conf <- c(rep(1, ape::Ntip(tr)), anc_rec_confidence)
 
   # Count anything lower than threshold as low confidence
-  tip_and_node_anc_rec_confidence <-
-    discretize_confidence_using_threshold(tip_and_node_anc_rec_confidence,
-                                          ML_cutoff)
+  tip_and_node_anc_rec_conf <-
+    discretize_conf_with_cutoff(tip_and_node_anc_rec_conf, ML_cutoff)
 
   # Return output --------------------------------------------------------------
-  return(tip_and_node_anc_rec_confidence)
+  return(tip_and_node_anc_rec_conf)
 } # end discrete_get_recon_confidence()
 
 #' pick_recon_model
