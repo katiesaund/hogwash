@@ -80,8 +80,7 @@ run_continuous <- function(args){
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_all_transitions <-
-    get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals,
-                                                       args$fdr)
+    get_sig_hit_and_mult_test_corr(results_all_transitions$pvals, args$fdr)
 
   # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON
   #  TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES #

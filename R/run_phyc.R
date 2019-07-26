@@ -100,9 +100,7 @@ run_phyc <- function(args){
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_recon <-
-    get_sig_hits_while_correcting_for_multiple_testing(disc_recon_results$hit_pvals,
-                                                       args$fdr)
-
+    get_sig_hit_and_mult_test_corr(disc_recon_results$hit_pvals, args$fdr)
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
   discrete_plot_phyc(tr = args$tree,

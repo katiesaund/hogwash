@@ -375,7 +375,7 @@ calculate_genotype_significance <- function(mat,
   return(results)
 } # end calculate_genotype_significance()
 
-#' get_sig_hits_while_correcting_for_multiple_testing
+#' get_sig_hit_and_mult_test_corr
 #'
 #' @description Given p-values that have not yet been corrected for multiple
 #' testing, apply a false discovery rate. Using FDR instead of FWER/bonferroni
@@ -402,9 +402,8 @@ calculate_genotype_significance <- function(mat,
 #'        p-value is less than the fdr value.
 #' @noRd
 #'
-get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
+get_sig_hit_and_mult_test_corr <- function(hit_values, fdr){
   # TODO fix column names?
-  # Shorten function name?
   # Check inputs ---------------------------------------------------------------
   check_num_between_0_and_1(fdr)
 
@@ -423,4 +422,4 @@ get_sig_hits_while_correcting_for_multiple_testing <- function(hit_values, fdr){
   results <- list("hit_pvals" = fdr_corrected_pvals,
                   "sig_pvals" = sig_pvals)
   return(results)
-} # end get_sig_hits_while_correcting_for_multiple_testing()
+} # end get_sig_hit_and_mult_test_corr()
