@@ -62,7 +62,7 @@ remove_rare_or_common_geno <- function(mat, tr){
   geno_to_drop[colSums(mat) == (ape::Ntip(tr) - 1)] <- TRUE
   geno_to_drop[colSums(mat) == ape::Ntip(tr)] <- TRUE
   dropped_genotype_names <- colnames(mat)[geno_to_drop]
-  mat <- mat[ , !geno_to_drop, drop = FALSE]
+  mat <- mat[, !geno_to_drop, drop = FALSE]
 
   # Check and return output ----------------------------------------------------
   check_if_binary_matrix(mat)

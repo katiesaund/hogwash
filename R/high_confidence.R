@@ -42,7 +42,7 @@ discretize_conf_with_cutoff <- function(confidence_vector, threshold){
 #'   lists == number of genotypes. Length of vector == Nedge(tr).
 #' @param geno_names Character vector. Length == ncol(genotype_matrix).
 #'
-#' @return num_high_confidence_transition_edges. Numeric vector. Count of number
+#' @return num_high_conf_trans_edges. Numeric vector. Count of number
 #'   of high confidence transitions per genotype. Vector is named with genotype
 #'   names.
 #' @noRd
@@ -67,15 +67,15 @@ report_num_high_confidence_trans_edge <- function(genotype_transition,
   }
 
   # Function -------------------------------------------------------------------
-  num_high_confidence_transition_edges <- rep(0, length(high_conf_edges))
+  num_high_conf_trans_edges <- rep(0, length(high_conf_edges))
   for (p in 1:length(high_conf_edges)) {
-    num_high_confidence_transition_edges[p] <-
+    num_high_conf_trans_edges[p] <-
       sum(genotype_transition[[p]]$transition * high_conf_edges[[p]])
   }
-  names(num_high_confidence_transition_edges) <- geno_names
+  names(num_high_conf_trans_edges) <- geno_names
 
   # Return output --------------------------------------------------------------
-  return(num_high_confidence_transition_edges)
+  return(num_high_conf_trans_edges)
 } # end report_num_high_confidence_trans_edge
 
 #' assign_high_confidence_to_transition_edges
@@ -152,7 +152,7 @@ assign_high_confidence_to_transition_edges <- function(tr,
 #'  * geno_recon_edge. List of lists. Binary. Number of lists = number of
 #'      genotypes. Length(each individual list) == Nedge(tree).
 #'  * high_conf_ordered_by_edges. List.
-#'  * num_high_confidence_transition_edges. Numeric vector. Count of number of
+#'  * num_high_conf_trans_edges. Numeric vector. Count of number of
 #'      high confidence transitions per genotype. Vector is named with genotype
 #'      names.
 #'  * tr_and_pheno_hi_conf. Vector. Binary. Length = Nedge(tree).
@@ -243,7 +243,7 @@ prepare_high_confidence_objects <- function(genotype_transition,
           "genotype_transition" = genotype_transition,
           "geno_recon_edge" = geno_recon_edge,
           "high_conf_ordered_by_edges" = high_conf_ordered_by_edges,
-          "num_high_confidence_transition_edges" = geno_trans_by_edge,
+          "num_high_conf_trans_edges" = geno_trans_by_edge,
           "tr_and_pheno_hi_conf" = high_confidence_edges)
   return(results)
 } # end prepare_high_confidence_objects()

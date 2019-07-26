@@ -184,7 +184,8 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
 
   # For each genotype from the genotype_matrix:
   record_redistrib_both_present <- rep(list(0), num_genotypes)
-  for (i in 1:num_genotypes) { # looping over each genotype in the genotype_mat
+  # looping over each genotype in the genotype_mat
+  for (i in 1:num_genotypes) {
     if (num_edges_with_geno_trans[i] > num_hi_conf_edges[i]) {
       stop("Too many hits on the branches")
     }
@@ -216,15 +217,15 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
                                      high_confidence_edges,
                                      i)
 
-      # Note on nomeclature from the phyC paper supplement page 7:
-      # https://media.nature.com/original/nature-assets/ng/journal/v45/n10/extref/ng.2747-S1.pdf
-      # X -> G on R is the same as
-      #   sum(empirical_both_present >= both_present[i])
-      # X -> G on S is the same as
-      #   sum(empirical_only_geno_present <= only_geno_present[i])
-      # Note: sum(empirical_both_present >= both_present[i]) always equals
-      #       sum(empirical_only_geno_present <= only_geno_present[i])
-      #       so we only need to include one in the p-value calculation.
+# Note on nomeclature from the phyC paper supplement page 7:
+# X -> G on R is the same as
+#   sum(empirical_both_present >= both_present[i])
+# X -> G on S is the same as
+#   sum(empirical_only_geno_present <= only_geno_present[i])
+# Note: sum(empirical_both_present >= both_present[i]) always equals
+#       sum(empirical_only_geno_present <= only_geno_present[i])
+#       so we only need to include one in the p-value calculation.
+
       pval <- calculate_permutation_based_p_value(empirical_both_present,
                                                   both_present[i],
                                                   permutations)
@@ -300,7 +301,7 @@ discrete_permutation <- function(tr,
       sample(1:number_hi_conf_edges[index],
              size = number_edges_with_geno_trans[index],
              replace = TRUE,
-             prob = tr$edge.length[high_conf_edges[[index]]]/
+             prob = tr$edge.length[high_conf_edges[[index]]] /
                sum(tr$edge.length[high_conf_edges[[index]]]))
   }
 

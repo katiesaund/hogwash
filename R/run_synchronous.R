@@ -119,7 +119,7 @@ run_synchronous <- function(args){
   results_object$high_confidence_transition_edges <-
     hi_conf$high_confidence_transition_edges
   results_object$num_high_confidence_transition_edges <-
-    hi_conf$num_high_confidence_transition_edges
+    hi_conf$num_high_conf_trans_edges
   results_object$dropped_genotypes <- hi_conf$dropped_genotypes
   save_results_as_r_object(args$output_dir,
                            args$output_name,

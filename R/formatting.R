@@ -52,7 +52,7 @@ convert_matrix_to_vector <- function(mat){
   check_dimensions(mat, NULL, 1, 1, 1)
 
   # Function -------------------------------------------------------------------
-  vec <- as.vector(unlist(mat[ , 1]))
+  vec <- as.vector(unlist(mat[, 1]))
   names(vec) <- row.names(mat)
 
   # Check and return output ----------------------------------------------------
@@ -91,7 +91,7 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   pheno_vector <- convert_matrix_to_vector(pheno)
   check_convergence_possible(pheno_vector, disc_cont)
 
-  # Check and return output --------------------------------------------------------------
+  # Check and return output ----------------------------------------------------
   check_equal(length(pheno_vector), ape::Ntip(tr))
   return(pheno_vector)
 } # end prepare_phenotype()
