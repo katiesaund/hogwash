@@ -251,26 +251,26 @@ build_gene_trans_from_snp_trans <- function(tr,
   row.names(gene_trans_dir_mat_blt_frm_snp) <-
     c(1:nrow(gene_trans_dir_mat_blt_frm_snp))
 
-  gene_transition_list_built_from_snps <- rep(list(0), length(unique_genes))
+  gene_trans_list_from_snp <- rep(list(0), length(unique_genes))
   for (m in 1:length(unique_genes)) {
-    gene_transition_list_built_from_snps[[m]] <-
+    gene_trans_list_from_snp[[m]] <-
       gene_trans_mat_built_from_snp[, m, drop = TRUE]
   }
-  names(gene_transition_list_built_from_snps) <- unique_genes
+  names(gene_trans_list_from_snp) <- unique_genes
 
-  gene_trans_dir_list_built_from_snps <- rep(list(0), length(unique_genes))
+  gene_trans_dir_list_from_snp <- rep(list(0), length(unique_genes))
   for (m in 1:length(unique_genes)) {
-    gene_trans_dir_list_built_from_snps[[m]] <-
+    gene_trans_dir_list_from_snp[[m]] <-
       gene_trans_dir_mat_blt_frm_snp[, m, drop = TRUE]
   }
-  names(gene_trans_dir_list_built_from_snps) <- unique_genes
+  names(gene_trans_dir_list_from_snp) <- unique_genes
 
   temp_results <- rep(list(list()), length(unique_genes))
   for (i in 1:length(unique_genes)) {
     temp_results[[i]]$transition <-
-      unname(unlist(gene_transition_list_built_from_snps[i]))
+      unname(unlist(gene_trans_list_from_snp[i]))
     temp_results[[i]]$trans_dir <-
-      unname(unlist(gene_trans_dir_list_built_from_snps[i]))
+      unname(unlist(gene_trans_dir_list_from_snp[i]))
   }
   # Return output --------------------------------------------------------------
   return(temp_results)
@@ -551,9 +551,9 @@ group_genotypes <- function(tr,
   genotype_transition_phyc <-
     genotype_transition_phyc[genes_to_keep_in_consideration]
 
-  geno_recon_and_confidence_tip_node_recon <-
+  geno_recon_conf_tip_node_recon <-
     geno_recon_and_conf_tip_node$tip_node_recon[genes_to_keep_in_consideration]
-  geno_recon_and_confidence_tip_node_confidence <-
+  geno_rec_conf_tip_node_conf <-
     geno_recon_and_conf_tip_node$tip_node_conf[ genes_to_keep_in_consideration]
 
   geno_conf_ordered_by_edges <-
@@ -562,10 +562,10 @@ group_genotypes <- function(tr,
   for (k in 1:ncol(geno)) {
     geno_recon_ordered_by_edges[[k]] <-
       reorder_tip_and_node_to_edge(
-        geno_recon_and_confidence_tip_node_recon[[k]], tr)
+        geno_recon_conf_tip_node_recon[[k]], tr)
     geno_conf_ordered_by_edges[[k]] <-
       reorder_tip_and_node_to_edge(
-        geno_recon_and_confidence_tip_node_confidence[[k]], tr)
+        geno_rec_conf_tip_node_conf[[k]], tr)
   }
 
   # Return output --------------------------------------------------------------

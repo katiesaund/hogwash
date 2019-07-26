@@ -858,7 +858,7 @@ discrete_plot_phyc <- function(tr,
                                    "\nGenotype transition"),
                             "recon",
                             j,
-                            "No trasition",
+                            "No transition",
                             "Transition")
       # Permutation test
       # TODO change to loop through sig hits
