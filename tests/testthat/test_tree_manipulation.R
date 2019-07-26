@@ -26,50 +26,6 @@ context("Tree manipulation functions") #---------------------------------------#
 #   return(ordered_by_edges)
 # } # end reorder_tips_and_nodes_to_edges()
 
-# test find_parent_edge
-test_that("find_parent_edge returns edge 2 when given edge 3", {
-  set.seed(1)
-  temp_tree <- ape::rtree(4)
-  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_num <- 3
-  expected_result <- 2
-  expect_equal(find_parent_edge(temp_tree, temp_num), expected_result)
-})
-
-test_that("find_parent_edge returns NA when given edge 1", {
-  set.seed(1)
-  temp_tree <- ape::rtree(4)
-  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_num <- 1
-  expected_result <- NA
-  expect_equivalent(find_parent_edge(temp_tree, temp_num), expected_result)
-})
-
-test_that("find_parent_edge returns NA when given edge 2", {
-  set.seed(1)
-  temp_tree <- ape::rtree(4)
-  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_num <- 2
-  expected_result <- NA
-  expect_equal(find_parent_edge(temp_tree, temp_num), expected_result)
-})
-
-test_that("find_parent_edge returns an error when given edge 0", {
-  set.seed(1)
-  temp_tree <- ape::rtree(4)
-  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_num <- 0
-  expect_error(find_parent_edge(temp_tree, temp_num))
-})
-
-test_that("find_parent_edge returns an error when an edge that doesn't exist", {
-  set.seed(1)
-  temp_tree <- ape::rtree(4)
-  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_num <- 100
-  expect_error(find_parent_edge(temp_tree, temp_num))
-})
-
 # test identify_short_edges
 test_that("identify_short_edges returns the only 1s in this test tree", {
   set.seed(1)

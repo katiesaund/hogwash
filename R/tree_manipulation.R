@@ -1,38 +1,3 @@
-find_parent_edge <- function(tr, edge_num){
-  # Function description -------------------------------------------------------
-  # Given the number of a tree edge, return the parent edge number.
-  #
-  # Inputs:
-  # tr. Phylo.
-  # edge_num. Number.
-  #
-  # Outputs:
-  # parent_edge. Number or NA. NA when given edge doesn't have a parent.
-  #
-  # Check input ----------------------------------------------------------------
-  check_tree_is_valid(tr)
-  check_for_root_and_bootstrap(tr)
-  check_is_number(edge_num)
-  if (edge_num %% 1 != 0 | edge_num < 1) {
-    stop("Node number must be a positive integer")
-  }
-  if (edge_num > ape::Nedge(tr)) {
-    stop("Number must be an edge in the tree.")
-  }
-  # Function -------------------------------------------------------------------
-  edge_with_basal_node <- ape::Ntip(tr) + 1
-  if (tr$edge[edge_num, 1] == edge_with_basal_node) {
-    parent_edge <- NA
-  } else {
-    parent_node <- tr$edge[edge_num, 1]
-    parent_edge <- which(tr$edge[ , 2] == parent_node)
-  }
-
-  # Return output --------------------------------------------------------------
-  return(parent_edge)
-} # end find_parent_edge
-
-
 identify_short_edges <- function(tr){
   # Function description -------------------------------------------------------
   # Removes any edges that make up a 10% or more of the total tr length.
