@@ -1,8 +1,7 @@
 context("Genotype") #----------------------------------------------#
-
 # test remove_rare_or_common_geno
-
-test_that("remove_rare_or_common_geno removes columns that have all ones or all zeroes, or all but one 1s.", {
+test_that("remove_rare_or_common_geno removes columns that have all ones or all
+          zeroes, or all but one 1s.", {
   set.seed(1)
   temp_tree <- ape::rtree(5)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
@@ -16,11 +15,16 @@ test_that("remove_rare_or_common_geno removes columns that have all ones or all 
   colnames(test_mat) <- c("three_1_two_0", "four_1_one_0", "five_1_zero_0",
                           "zero_1_five_0", "one_1_four_0")
   temp_results <- remove_rare_or_common_geno(test_mat, temp_tree)
-  expect_identical(temp_results$dropped_genotype_names, c("four_1_one_0", "five_1_zero_0", "zero_1_five_0", "one_1_four_0"))
+  expect_identical(temp_results$dropped_genotype_names,
+                   c("four_1_one_0",
+                     "five_1_zero_0",
+                     "zero_1_five_0",
+                     "one_1_four_0"))
   expect_identical(colnames(temp_results$mat), "three_1_two_0")
 })
 
-test_that("remove_rare_or_common_geno gives error is all columns contain only 0s.", {
+test_that("remove_rare_or_common_geno gives error is all columns contain only
+          0s.", {
   set.seed(1)
   temp_tree <- ape::rtree(5)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
@@ -30,7 +34,8 @@ test_that("remove_rare_or_common_geno gives error is all columns contain only 0s
   expect_error(remove_rare_or_common_geno(test_mat, temp_tree))
 })
 
-test_that("remove_rare_or_common_geno gives error is all columns contain letters.", {
+test_that("remove_rare_or_common_geno gives error is all columns contain
+          letters.", {
   set.seed(1)
   temp_tree <- ape::rtree(5)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
@@ -40,7 +45,8 @@ test_that("remove_rare_or_common_geno gives error is all columns contain letters
   expect_error(remove_rare_or_common_geno(test_mat, temp_tree))
 })
 
-test_that("remove_rare_or_common_geno removes no columns when all rows are two 1s and three 0s.", {
+test_that("remove_rare_or_common_geno removes no columns when all rows are two
+          1s and three 0s.", {
   set.seed(1)
   temp_tree <- ape::rtree(5)
   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
