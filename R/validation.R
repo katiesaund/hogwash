@@ -1,24 +1,23 @@
-# Library of all functions that "check" or "assert" that something is true.
-
+#' check_dimensions
+#'
+#' @description Check that the main input is a matrix and that said matrix is of
+#'  the specified dimensions.
+#' @param mat Matrix.
+#' @param exact_rows Numeric. Describes expected number of rows in matrix.
+#'  Default is NULL.
+#' @param min_rows Numeric. Describes minimum number of rows in matrix. Must be
+#'  specified.
+#' @param exact_cols Numeric. Describes expected number of columns in matrix.
+#'  Default NULL.
+#' @param min_cols Numeric. Describes minimum number of columns in matrix. Must
+#'  be specified.
+#'
+#' @noRd
 check_dimensions <- function(mat,
                              exact_rows = NULL,
                              min_rows,
                              exact_cols = NULL,
                              min_cols){
-  # Function description -------------------------------------------------------
-  # Check that the main input is a matrix and that said matrix is of the
-  # specified dimensions.
-  #
-  # Input:
-  # mat: Matrix.
-  # exact_rows: Numeric. Describes expected number of rows in matrix. Default is NULL.
-  # min_rows: Numeric. Describes minimum number of rows in matrix. Must be specified.
-  # exact_cols: Numeric. Describes expected number of columns in matrix. Default NULL.
-  # min_cols: Numeric. Describes minimum number of columns in matrix. Must be specified.
-  #
-  # Output:
-  # None.
-  #
   # Check input ----------------------------------------------------------------
   if (!is.null(exact_rows)) {
     check_is_number(exact_rows)
@@ -51,18 +50,16 @@ check_dimensions <- function(mat,
   }
 } # end check_dimensions()
 
+#' check_num_between_0_and_1
+#'
+#' @description Check that the input is within a the expected range
+#'  (0 < num < 1). To be used to check values such as fdr, p-value, and
+#'  bootstrap confidence.
+#'
+#' @param num Number.
+#'
+#' @noRd
 check_num_between_0_and_1 <- function(num){
-  # Function description -------------------------------------------------------
-  # Check that the input is within a the expected range (0 < num < 1).
-  # To be used to check values such as alpha (p-value) and  bootstrap confidence
-  # which is typically ~0.70.
-  #
-  # Input:
-  # num: Number.
-  #
-  # Output:
-  # None.
-  #
   # Check input ----------------------------------------------------------------
   check_is_number(num)
 
@@ -72,16 +69,14 @@ check_num_between_0_and_1 <- function(num){
   }
 } # end check_num_between_0_and_1()
 
+#' check_if_dir_exists
+#'
+#' @description Check that output directory exists so data can be saved in it.
+#'
+#' @param dir Character. Path to output directory.
+#'
+#' @noRd
 check_if_dir_exists <- function(dir){
-  # Function description -------------------------------------------------------
-  # Check that output directory exists so data can be saved in it.
-  #
-  # Input:
-  # dir: Character. Path to output directory.
-  #
-  # Output:
-  # None.
-  #
   # Check input ----------------------------------------------------------------
   check_is_string(dir)
 
@@ -91,18 +86,16 @@ check_if_dir_exists <- function(dir){
   }
 } # end check_if_dir_exists()
 
+#' check_if_permutation_num_valid
+#'
+#' @description Check that the permutation number indicated is valid
+#'  (1 <= perm). A typical choice is 10,000.
+#'
+#' @param perm Integer. Number of times to shuffle the data on the tree to
+#'  create a null distribution for the permutation test.
+#'
+#' @noRd
 check_if_permutation_num_valid <- function(perm){
-  # Function description -------------------------------------------------------
-  # Check that the permutation number indicated is valid (1 <= perm). A typical
-  # choice is 10,000.
-  #
-  # Input:
-  # perm: Integer. Number of times to shuffle the data on the tree to create a
-  #       null distribution for the permutation test.
-  #
-  # Output:
-  # None.
-  #
   # Check input ----------------------------------------------------------------
   check_is_number(perm)
 
@@ -113,48 +106,42 @@ check_if_permutation_num_valid <- function(perm){
   }
 } # end check_if_permutation_num_valid()
 
+#' check_is_string
+#'
+#' @description Check that the input is a character string.
+#'
+#' @param char Character.
+#'
+#' @noRd
 check_is_string <- function(char){
-  # Function description -------------------------------------------------------
-  # Check that the input is a character string.
-  #
-  # Input:
-  # char: Character.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (!is.character(char)) {
     stop("Object must be a character string.")
   }
 } # end check_is_string()
 
+#' check_if_vector
+#'
+#' @description Check that input is a vector.
+#'
+#' @param vector Vector.
+#'
+#' @noRd
 check_if_vector <- function(vector){
-  # Function description -------------------------------------------------------
-  # Check that input is a vector.
-  #
-  # Input:
-  # vector: Vector.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (!is.vector(vector)) {
     stop("Input must be a vector")
   }
 } # end check_if_vector()
 
+#' check_for_NA_and_inf
+#'
+#' @description Check that matrix contains no NAs and no +/- infinities.
+#'
+#' @param mat Matrix.
+#'
+#' @noRd
 check_for_NA_and_inf <- function(mat){
-  # Function description -------------------------------------------------------
-  # Check that matrix contains no NAs and no +/- infinities.
-  #
-  # Input:
-  # mat: Matrix.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (class(mat) != "matrix") {
     stop("Input should be a matrix.")
@@ -170,19 +157,17 @@ check_for_NA_and_inf <- function(mat){
   }
 } # end check_for_NA_and_inf()
 
+#' check_for_root_and_bootstrap
+#'
+#' @description Check that phylogenetic tree is rooted and contains bootstrap
+#'  values in the node labels. Trees need to have roots for the ancestral
+#'  reconstruction function ape::ace() to work properly. Trees need to have
+#'  bootstrap values so that confidence in the tree edges can be measured.
+#'
+#' @param tr Phylo.
+#'
+#' @noRd
 check_for_root_and_bootstrap <- function(tr){
-  # Function description -------------------------------------------------------
-  # Check that phylogenetic tree is rooted and contains bootstrap values in the
-  # node labels. Trees need to have roots for the ancestral reconstruction
-  # function ape::ace() to work properly. Trees need to have bootstrap values so
-  # that confidence in the tree edges can be measured.
-  #
-  # Input:
-  # tr: Phylo.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (class(tr) != "phylo") {
     stop("Tree must be phylo object")
@@ -205,17 +190,15 @@ check_for_root_and_bootstrap <- function(tr){
   }
 } # end check_for_root_and_bootstrap()
 
+#' check_if_binary_vector
+#'
+#' @description Check that the matrix only contains values 1 or 0. Useful for
+#'  checking things for binary phenotypes, confidence, $transition, etc...
+#'
+#' @param vec Vector
+#'
+#' @noRd
 check_if_binary_vector <- function(vec) {
-  # Function description -------------------------------------------------------
-  # Check that the matrix only contains values 1 or 0. Useful for checking
-  # things for binary phenotypes, confidence, $transition, etc...
-  #
-  # Input:
-  # vec: Vector.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (sum(!(vec %in% c(0, 1))) > 0) {
     stop("Vector should be only 1s and 0s")
@@ -227,34 +210,29 @@ check_if_binary_vector <- function(vec) {
   }
 } # end check_if_binary_vector()
 
+#' check_if_binary_vector_numeric
+#'
+#' @description Check that the matrix only contains values 1 or 0.
+#'
+#' @param vec Vector.
+#'
+#' @noRd
 check_if_binary_vector_numeric <- function(vec) {
-  # Function description -------------------------------------------------------
-  # Check that the matrix only contains values 1 or 0.
-  #
-  # Input:
-  # vec: Vector.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "numeric") {
     stop("Vector should be only 1s and 0s")
   }
 } # end check_if_binary_vector_numeric()
 
-
+#' check_if_binary_matrix
+#'
+#' @description Check that the matrix only contains values 1 or 0. Useful for
+#'  binary phenotype matrix or genotype matrix.
+#'
+#' @param mat Matrix.
+#'
+#' @noRd
 check_if_binary_matrix <- function(mat) {
-  # Function description -------------------------------------------------------
-  # Check that the matrix only contains values 1 or 0. Useful for binary
-  # phenotype matrix or genotype matrix.
-  #
-  # Input:
-  # mat: Matrix.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (is.null(dim(mat))) {
     stop("Must be a matrix")
@@ -267,33 +245,30 @@ check_if_binary_matrix <- function(mat) {
   }
 } # end check_if_binary_matrix()
 
+#' check_file_exists
+#'
+#' @description Check that the file exists.
+#'
+#' @param file_name Character.
+#'
+#' @noRd
 check_file_exists <- function(file_name) {
-  # Function description -------------------------------------------------------
-  # Check that the file exists.
-  #
-  # Input:
-  # file_name: Character.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (!file.exists(file_name)) {
     stop("File does not exist")
   }
 } # end check_file_exists()
 
-check_rownames <- function(mat, tr) {
-  # Function description -------------------------------------------------------
-  # Check that phylogenetic tree tip labels are identical to the matrix row.names.
-  #
-  # Input:
-  # mat: Matrix. Nrow(mat) == Ntip(tr).
-  # tr: Phylo.
-  #
-  # Output:
-  # None.
-  #
+#' check_rownames
+#'
+#' @description Check that phylogenetic tree tip labels are identical to the
+#'  matrix row.names.
+#'
+#' @param mat Matrix. Nrow(mat) == Ntip(tr).
+#' @param tr Phylo.
+#'
+#' @noRd
+check_rownames <- function(mat, tr){
   # Check input ----------------------------------------------------------------
   if (class(mat) != "matrix" | class(tr) != "phylo") {
     stop("Inputs are incorrectly formatted.")
@@ -321,17 +296,15 @@ check_rownames <- function(mat, tr) {
   }
 } # end check_rownames()
 
+#' check_is_number
+#'
+#' @description Check that input is some type of number. Check that the input is
+#'  a single number.
+#'
+#' @param num Number. Could be numeric, double, or integer.
+#'
+#' @noRd
 check_is_number <- function(num){
-  # Function description -------------------------------------------------------
-  # Check that input is some type of number.
-  # Check that the input is a single number.
-  #
-  # Input:
-  # num: Number. Could be numeric, double, or integer.
-  #
-  # Output:
-  # None.
-  #
   # Check input & function -----------------------------------------------------
   if (!is.numeric(num)) {
     if (!is.integer(num)) {
@@ -354,18 +327,16 @@ check_is_number <- function(num){
   }
 } # end check_is_number()
 
+#' check_node_is_in_tree
+#'
+#' @description Test if a node value is plausibly contained within the tree.
+#'
+#' @param node_val Integer. Index of node.
+#' @param tr Phylo.
+#'
+#' @noRd
 check_node_is_in_tree <- function(node_val, tr){
-  # Function description ------------------------------------------------------#
-  # Test if a node value is plausibly contained within the tree.
-  #
-  # Inputs:
-  # node_val: Integer. Index of node.
-  # tr: Phylo.
-  #
-  # Output:
-  # None.
-  #
-  # Check input & function ----------------------------------------------------#
+  # Check input & function -----------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_number(node_val)
 
@@ -377,20 +348,18 @@ check_node_is_in_tree <- function(node_val, tr){
   }
 } # end check_node_is_in_tree()
 
+#' check_tree_is_valid
+#'
+#' @description Test if a tree has valid structure. Each tree node should touch
+#'  either three edges (internal node) or two edges (root node). This function
+#'  checks if a phylogenetic tree is structured correctly so that later
+#'  functions will work as expected.
+#'
+#' @param tr Phylo.
+#'
+#' @noRd
 check_tree_is_valid <- function(tr){
-  # Function description ------------------------------------------------------#
-  # Test if a tree has valid structure. Each tree node should touch either three
-  # edges (internal node) or two edges (root node). This function checks if a
-  # phylogenetic tree is structured correctly so that later functions will work
-  # as expected.
-  #
-  # Inputs:
-  # tr: Phylo.
-  #
-  # Output:
-  # None.
-  #
-  # Check input & function ----------------------------------------------------#
+  # Check input & function -----------------------------------------------------
   if (class(tr) != "phylo") {
     stop("Input must be a phylogenetic tree (object with class phylo)")
   }
@@ -411,20 +380,19 @@ check_tree_is_valid <- function(tr){
   }
 }
 
+#' check_convergence_possible
+#'
+#' @description Test if vector, which represents values on the tips of tree,
+#'  could plausibly be consistent with convergence of those values, e.g. A value
+#'  needs to appear at leaset twice in the vector.
+#'
+#' @param vec Vector. A vector of numbers. If "discrete" then vector must be
+#'  binary.
+#' @param discrete_or_continuous Character. Either "discrete" or "continuous."
+#'
+#' @noRd
 check_convergence_possible <- function(vec, discrete_or_continuous){
-  # Function description ------------------------------------------------------#
-  # Test if vector, which represents values on the tips of tree, could plausibly
-  # be consistent with convergence of those values. Eg. A value needs to appear
-  # at leaset twice in the vector.
-  #
-  # Inputs:
-  # vec: Vector. A vector of numbers. If "discrete" then vector must be binary.
-  # discrete_or_continuous: Character. Either "discrete" or "continuous."
-  #
-  # Output:
-  # None.
-  #
-  # Check input & function ----------------------------------------------------#
+  # Check input & function -----------------------------------------------------
   if (discrete_or_continuous != "discrete") {
     if (discrete_or_continuous != "continuous") {
       stop("discrete_or_continuous must be a string 'discrete' or
@@ -445,42 +413,42 @@ check_convergence_possible <- function(vec, discrete_or_continuous){
   }
 } # end check_convergence_possible()
 
+#' is_tip
+#'
+#' @description Test if a node is a tree tip. An internal node should return
+#'  false.
+#'
+#' @param node_num Integer. Index of node.
+#' @param tr Phylo.
+#'
+#' @return Logical. TRUE OR FALSE.
+#' @noRd
 is_tip <- function(node_num, tr){
-  # Function description ------------------------------------------------------#
-  # Test if a node is a tree tip. An internal node should return false.
-  #
-  # Inputs:
-  # node_num: Integer. Index of node.
-  # tr: Phylo.
-  #
-  # Output:
-  # Logical. TRUE OR FALSE.
-  #
-  # Check input ---------------------------------------------------------------#
+  # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
   check_is_number(node_num)
   if (node_num < 1 || node_num %% 1 != 0) {
     stop("Node number must be a positive integer")
   }
   check_node_is_in_tree(node_num, tr)
-  #
-  # Function & return output --------------------------------------------------#
+
+  # Function & return output ---------------------------------------------------
   return(node_num <= ape::Ntip(tr))
 } # end is_tip()
 
 
+#' check_if_g_mat_can_be_plotted
+#'
+#' @description The program cannot plot all results. In order to plot the
+#'  heatmap results there needs to be 1) at least two columns in the matrix, 2)
+#'  two different values within the matrix (0 and 1). There can be NAs in the
+#'  matrix.
+#'
+#' @param geno_matrix Matrix. 1, 0, and/or NA.
+#'
+#' @return plot_logical. Logical. TRUE or FALSE.
+#' @noRd
 check_if_g_mat_can_be_plotted <- function(geno_matrix){
-  # Function description -------------------------------------------------------
-  # The program cannot plot all results. In order to plot the heatmap results
-  # there needs to be 1) at least two columns in the matrix, 2) two different
-  # values within the matrix (0 and 1). There can be NAs in the matrix.
-  #
-  # Inputs:
-  # geno_matrix. Matrix. 1, 0, and/or NA.
-  #
-  # Outputs:
-  # plot_logical. Logical. TRUE or FALSE.
-  #
   # Check input & function -----------------------------------------------------
   if (sum(class(geno_matrix) != "data.frame",
           class(geno_matrix) != "matrix") == 2) {
@@ -520,16 +488,14 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
   return(plot_logical)
 } # end check_if_g_mat_can_be_plotted()
 
+#' check_str_is_discrete_or_continuous
+#'
+#' @description Check if the string is either "discrete" or "continuous."
+#'
+#' @param input String. "discrete" or "continuous"
+#'
+#' @noRd
 check_str_is_discrete_or_continuous <- function(input){
-  # Function description -------------------------------------------------------
-  # Check if the string is either "discrete" or "continuous."
-  #
-  # Inputs:
-  # input: String. "discrete" or "continuous"
-  #
-  # Outputs:
-  # None.
-  #
   # Check input ----------------------------------------------------------------
   check_is_string(input)
 
@@ -541,20 +507,18 @@ check_str_is_discrete_or_continuous <- function(input){
   }
 } # end check_str_is_discrete_or_continuous()
 
+#' check_equal
+#'
+#' @description This function simply replaces the if(){stop()} statements for
+#'  asserting that two things are equal. Example:
+#'   check_equal(nrow(genotype_matrix), Ntip(tree)) should not give any
+#'   warnings.
+#'
+#' @param first_number Number.
+#' @param second_number Number.
+#'
+#' @noRd
 check_equal <- function(first_number, second_number){
-  # Function description
-  # This function simply replaces the if(){stop()} statements for asserting that
-  # two things are equal.
-  # Example: check_equal(nrow(genotype_matrix), Ntip(tree)) should not give any
-  # warnings.
-  #
-  # Inputs:
-  # first_number Number.
-  # second_number. Number.
-  #
-  # Output:
-  # None.
-  #
   # Check inputs ---------------------------------------------------------------
   check_is_number(first_number)
   check_is_number(second_number)
@@ -563,21 +527,18 @@ check_equal <- function(first_number, second_number){
   if (first_number != second_number) {
     stop("Inputs are not equal")
   }
-}
+} # end check_equal()
 
+#' check_if_ancestral_reconstruction_method_compatible_with_ape
+#'
+#' @description Check that the reconstruction method that is being fed to
+#'  ape::ace() is one of the four acceptable methods. The four methods are:
+#'  "ML", "REML", "pic", and "GLS." For the intial implementation of this
+#'  package the default (hard-coded) option is always maximum likelihood ("ML").
+#' @param input String. Either "ML", "REML", "pic", or "GLS."
+#'
+#' @noRd
 check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
-  # Function description -------------------------------------------------------
-  # Check that the reconstruction method that is being fed to ape::ace() is
-  # one of the four acceptable methods. The four methods are: "ML", "REML",
-  # "pic", and "GLS." For the intial implementation of this package the default
-  # (hard-coded) option is always maximum likelihood ("ML").
-  #
-  # Inputs:
-  # input: String. Either "ML", "REML", "pic", or "GLS."
-  #
-  # Output:
-  # none.
-  #
   # Check inputs -------------------------------------------------------------
   check_is_string(input)
   check_equal(length(input), 1)
@@ -590,18 +551,14 @@ check_if_ancestral_reconstruction_method_compatible_with_ape <- function(input){
   }
 } # end check_if_ancestral_reconstruction_method_compatible_with_ape()
 
+#' check_class
+#'
+#' @param obj  Any R object.
+#' @param cls Character string. Describes a class type, e.g. "matrix", "list",
+#'  "vector", etc...
+#'
+#' @noRd
 check_class <- function(obj, cls){
-  # Function description -------------------------------------------------------
-  # Check that object has expected class.
-  #
-  # Inputs:
-  # obj: Any R object.
-  # cls: Character string. Describes a class type, e.g. "matrix", "list",
-  #      "vector", etc...
-  #
-  # Output:
-  # none.
-  #
   # Check inputs -------------------------------------------------------------
   check_is_string(cls)
 
