@@ -111,7 +111,8 @@ assign_high_confidence_to_transition_edges <- function(tr,
   edge_confident_and_trans_edge <- rep(list(NULL), ncol(geno))
   for (k in 1:ncol(geno)) {
     edge_confident_and_trans_edge[[k]] <-
-      as.numeric((all_confidence_by_edge[[k]] + geno_trans_by_edge[[k]]$transition) == 2)
+      as.numeric( (all_confidence_by_edge[[k]] +
+                    geno_trans_by_edge[[k]]$transition) == 2)
   }
 
   # Return output --------------------------------------------------------------
@@ -230,7 +231,7 @@ prepare_high_confidence_objects <- function(genotype_transition,
   geno_recon_edge <- geno_recon_edge[geno_to_keep]
   high_conf_ordered_by_edges <- all_high_confidence_edges[geno_to_keep]
   dropped_genotypes <- get_dropped_genotypes(geno, geno_to_keep)
-  geno <- geno[ , geno_to_keep, drop = FALSE]
+  geno <- geno[, geno_to_keep, drop = FALSE]
   snps_in_each_gene <-
     snps_in_each_gene[names(snps_in_each_gene) %in% colnames(geno)]
 

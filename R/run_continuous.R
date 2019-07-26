@@ -79,14 +79,14 @@ run_continuous <- function(args){
              hi_conf$geno_recon_edge)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
-  corrected_pvals_all_transitions <-
+  corrected_pvals_all_trans <-
     get_sig_hit_and_mult_test_corr(results_all_transitions$pvals, args$fdr)
 
   # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON
   #  TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES #
   all_transitions_sig_hits <-
     keep_hits_with_more_change_on_trans_edges(results_all_transitions,
-                                              corrected_pvals_all_transitions,
+                                              corrected_pvals_all_trans,
                                               args$fdr)
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
@@ -98,7 +98,7 @@ run_continuous <- function(args){
                           args$fdr,
                           args$output_dir,
                           args$output_name,
-                          corrected_pvals_all_transitions,
+                          corrected_pvals_all_trans,
                           phenotype_vector,
                           args$perm,
                           results_all_transitions,
@@ -124,7 +124,7 @@ run_continuous <- function(args){
   results_object$delta_pheno_table <-
     trans_mat_results$delta_pheno_table
   results_object$delta_pheno_list <- trans_mat_results$delta_pheno_list
-  results_object$hit_pvals <- corrected_pvals_all_transitions$hit_pvals
+  results_object$hit_pvals <- corrected_pvals_all_trans$hit_pvals
   results_object$sig_hits <- all_transitions_sig_hits
   save_results_as_r_object(args$output_dir,
                            args$output_name,

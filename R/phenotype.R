@@ -51,14 +51,16 @@ calculate_phenotype_change_on_edge <- function(edge_list, phenotype_by_edges){
                    exact_cols = NULL,
                    min_cols = 2)
   if (!is.vector(edge_list)) {
-    stop("edge_list must be a vector of indices of edges")}
+    stop("edge_list must be a vector of indices of edges")
+  }
   check_is_number(edge_list[1])
 
   # Function -------------------------------------------------------------------
   delta <- rep(NA, length(unique(edge_list)))
   for (j in 1:length(edge_list)) {
     delta[j] <-
-      abs(phenotype_by_edges[edge_list[j], 1] - phenotype_by_edges[edge_list[j], 2])
+      abs(phenotype_by_edges[edge_list[j], 1] -
+            phenotype_by_edges[edge_list[j], 2])
   }
 
   # Check and return output ----------------------------------------------------
@@ -89,7 +91,11 @@ calc_raw_diff <- function(edge_list, phenotype_by_edges){
   if (max(edge_list) > nrow(phenotype_by_edges)) {
     stop("Cannot calculate phenotype change on edges.")
   }
-  check_dimensions(phenotype_by_edges, exact_rows = NULL, min_rows = max(edge_list), exact_cols = NULL, min_cols = 2)
+  check_dimensions(phenotype_by_edges,
+                   exact_rows = NULL,
+                   min_rows = max(edge_list),
+                   exact_cols = NULL,
+                   min_cols = 2)
   if (!is.vector(edge_list)) {
     stop("edge_list must be a vector of indices of edges")
   }
@@ -98,7 +104,8 @@ calc_raw_diff <- function(edge_list, phenotype_by_edges){
   # Function -------------------------------------------------------------------
   delta <- rep(NA, length(unique(edge_list)))
   for (j in 1:length(edge_list)) {
-    delta[j] <- phenotype_by_edges[edge_list[j], 1] - phenotype_by_edges[edge_list[j], 2]
+    delta[j] <-
+      phenotype_by_edges[edge_list[j], 1] - phenotype_by_edges[edge_list[j], 2]
   }
 
   # Return output --------------------------------------------------------------
@@ -126,7 +133,8 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
   check_str_is_discrete_or_continuous(continuous_or_discrete)
 
   # Function -------------------------------------------------------------------
-  msg <- "Consider making phenotype normal so ancestral reconstruction assumptions are not violated."
+  msg <- "Consider making phenotype normal so ancestral reconstruction
+  assumptions are not violated."
   if (continuous_or_discrete == "continuous") {
     if (length(unique(pheno)) == 1) {
       stop("phenotype must have some variability")
@@ -186,4 +194,3 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
 #   # TODO? Add the plot? If I do, then I need to add unit tests
 #   # TODO where is best place to put this function in the large script?
 # } # end check_if_convergence_occurs()
-

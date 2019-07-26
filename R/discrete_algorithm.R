@@ -189,7 +189,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
     if (num_edges_with_geno_trans[i] > num_hi_conf_edges[i]) {
       stop("Too many hits on the branches")
     }
-    if ((both_present[[i]] + only_geno_present[[i]]) < 2) {
+    if ( (both_present[[i]] + only_geno_present[[i]]) < 2) {
       # If there are 1 or 0 high confidence edges with the genotype present then
       # the p-value should be reported as 1.0; both_present and
       # only_geno_present are made up of only high confidence branches as
@@ -350,7 +350,7 @@ count_empirical_both_present <- function(permuted_mat,
 
   # Function -------------------------------------------------------------------
   result <- sapply(1:nrow(permuted_mat), function(x) {
-    sum((pheno_vec + permuted_mat[x, ]) == 2 & hi_conf_edge[[index]] == 1)
+    sum( (pheno_vec + permuted_mat[x, ]) == 2 & hi_conf_edge[[index]] == 1)
   })
 
   # Check and return output ----------------------------------------------------

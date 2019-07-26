@@ -60,7 +60,7 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
   tip_nod_by_mat_recon_w_gene_id <-
     rbind(tip_nodes_by_snp_mat_recon,
           unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
-  tip_nodes_by_snp_mat_confi_with_gene_id <-
+  tip_node_by_snp_mat_conf_w_id <-
     rbind(tip_nodes_by_snp_mat_confi,
           unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
   recon_times_confi_with_gene_id <-
@@ -86,10 +86,14 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
       tip_nod_by_mat_recon_w_gene_id[1:(nrow(tip_nod_by_mat_recon_w_gene_id) - 1),
                                               tip_nod_by_mat_recon_w_gene_id[nrow(tip_nod_by_mat_recon_w_gene_id), ] == unique_genes[j],
                                               drop = FALSE]
-    temp_recon_times_confi <- recon_times_confi_with_gene_id[1:(nrow(recon_times_confi_with_gene_id) - 1),
-                                                             recon_times_confi_with_gene_id[nrow(recon_times_confi_with_gene_id), ] == unique_genes[j], drop = FALSE]
-    temp_conf <- tip_nodes_by_snp_mat_confi_with_gene_id[1:(nrow(tip_nodes_by_snp_mat_confi_with_gene_id) - 1),
-                                                         tip_nodes_by_snp_mat_confi_with_gene_id[nrow(tip_nodes_by_snp_mat_confi_with_gene_id), ] == unique_genes[j], drop = FALSE]
+    temp_recon_times_confi <-
+      recon_times_confi_with_gene_id[1:(nrow(recon_times_confi_with_gene_id) - 1),
+                                     recon_times_confi_with_gene_id[nrow(recon_times_confi_with_gene_id), ] == unique_genes[j],
+                                     drop = FALSE]
+    temp_conf <-
+      tip_node_by_snp_mat_conf_w_id[1:(nrow(tip_node_by_snp_mat_conf_w_id) - 1),
+                                    tip_node_by_snp_mat_conf_w_id[nrow(tip_node_by_snp_mat_conf_w_id), ] == unique_genes[j],
+                                    drop = FALSE]
     class(temp_mat) <-
       class(temp_recon_times_confi) <-
       class(temp_conf) <-
@@ -99,8 +103,8 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
         gene_absence_confidence[r, j] <- 1
       }
     }
-    gene_mat_built_from_snps[,j] <- rowSums(temp_mat)
-    gene_presence_confidence[,j] <- rowSums(temp_recon_times_confi)
+    gene_mat_built_from_snps[, j] <- rowSums(temp_mat)
+    gene_presence_confidence[, j] <- rowSums(temp_recon_times_confi)
   }
 
   gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
@@ -124,9 +128,9 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
 
   for (m in 1:length(unique_genes)) {
     gene_list_built_from_snps[[m]] <-
-      gene_mat_built_from_snps[,m, drop = TRUE]
+      gene_mat_built_from_snps[, m, drop = TRUE]
     gene_conf_list_built_from_snps[[m]] <-
-      gene_all_confidence[      , m, drop = TRUE]
+      gene_all_confidence[, m, drop = TRUE]
   }
   names(gene_list_built_from_snps) <-
     names(gene_conf_list_built_from_snps) <-
@@ -184,7 +188,7 @@ build_gene_trans_from_snp_trans <- function(tr,
     matrix(0, nrow = ape::Nedge(tr), ncol = ncol(geno))
 
   for (k in 1:ncol(geno)) {
-    transition_edges_by_snp_mat[,k] <- geno_transition[[k]]$transition
+    transition_edges_by_snp_mat[, k] <- geno_transition[[k]]$transition
     trans_dir_edges_by_snp_mat[, k] <- geno_transition[[k]]$trans_dir
   }
   row.names(transition_edges_by_snp_mat) <-
@@ -197,12 +201,12 @@ build_gene_trans_from_snp_trans <- function(tr,
 
   transition_edges_by_snp_mat_with_gene_id <-
     rbind(transition_edges_by_snp_mat,
-          unlist(gene_to_snp_lookup_table[,2, drop = TRUE]))
+          unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
   trans_dir_edges_by_snp_mat_with_gene_id <-
     rbind(trans_dir_edges_by_snp_mat,
-          unlist(gene_to_snp_lookup_table[,2, drop = TRUE]))
+          unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
 
-  unique_genes <- unique(gene_to_snp_lookup_table[,2])
+  unique_genes <- unique(gene_to_snp_lookup_table[, 2])
   gene_transition_mat_built_from_snps <-
     gene_trans_dir_mat_built_from_snps <-
     matrix(0,
@@ -240,14 +244,14 @@ build_gene_trans_from_snp_trans <- function(tr,
   gene_transition_list_built_from_snps <- rep(list(0), length(unique_genes))
   for (m in 1:length(unique_genes)) {
     gene_transition_list_built_from_snps[[m]] <-
-      gene_transition_mat_built_from_snps[,m, drop = TRUE]
+      gene_transition_mat_built_from_snps[, m, drop = TRUE]
   }
   names(gene_transition_list_built_from_snps) <- unique_genes
 
   gene_trans_dir_list_built_from_snps <- rep(list(0), length(unique_genes))
   for (m in 1:length(unique_genes)) {
     gene_trans_dir_list_built_from_snps[[m]] <-
-      gene_trans_dir_mat_built_from_snps[,m, drop = TRUE]
+      gene_trans_dir_mat_built_from_snps[, m, drop = TRUE]
   }
   names(gene_trans_dir_list_built_from_snps) <- unique_genes
 
@@ -280,13 +284,13 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
   # Check input ----------------------------------------------------------------
   # TODO add input checks
   # Function -------------------------------------------------------------------
-  unique_genes <- unique(gene_to_snp_lookup_table[,2])
+  unique_genes <- unique(gene_to_snp_lookup_table[, 2])
   samples_by_genes <- matrix(0, nrow = nrow(geno), ncol = length(unique_genes))
   colnames(samples_by_genes) <- unique_genes
   row.names(samples_by_genes) <- row.names(geno)
 
   snp_geno_with_gene_id <-
-    rbind(geno, unlist(gene_to_snp_lookup_table[,2, drop = TRUE]))
+    rbind(geno, unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
   if (nrow(snp_geno_with_gene_id) != (nrow(geno) + 1)) {
     stop("rbind didn't work")
   }
@@ -344,13 +348,13 @@ prepare_grouped_genotype <- function(geno, lookup){
 
   # TODO replace the magic numbers in the next four lines. Group into a function?
   gene_snp_lookup <-
-    lookup[!(lookup[,1] %in% genotypes_to_drop_because_not_present),
+    lookup[!(lookup[, 1] %in% genotypes_to_drop_because_not_present),
            , drop = FALSE]
   gene_snp_lookup <-
-    gene_snp_lookup[gene_snp_lookup[,1] %in% colnames(genotype),
+    gene_snp_lookup[gene_snp_lookup[, 1] %in% colnames(genotype),
                     , drop = FALSE]
-  unique_genes <- unique(gene_snp_lookup[,2])
-  snps_per_gene <- table(gene_snp_lookup[,2])
+  unique_genes <- unique(gene_snp_lookup[, 2])
+  snps_per_gene <- table(gene_snp_lookup[, 2])
 
   # Check and return output ----------------------------------------------------
   results <- list("snps_per_gene" = snps_per_gene,

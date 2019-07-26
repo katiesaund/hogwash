@@ -80,7 +80,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
                     edge= ",
                     length(raw_trans_delta), "\n# non trans edge =",
                     length(raw_non_trans_delta), sep = ""),
-       breaks = ape::Nedge(tr)/4,
+       breaks = ape::Nedge(tr) / 4,
        col = non_trans_color,
        border = FALSE,
        xlim = c(min(raw_trans_delta, raw_non_trans_delta),
@@ -90,7 +90,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
        xlab = "Raw delta phenotype")
 
   graphics::hist(raw_trans_delta,
-       breaks = ape::Nedge(tr)/4,
+       breaks = ape::Nedge(tr) / 4,
        col = trans_color,
        border = trans_color,
        add = TRUE,
@@ -121,7 +121,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
                                          trans_color){
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::hist(all_trans$observed_pheno_non_trans_delta[[index]],
-       breaks = ape::Nedge(tr)/4,
+       breaks = ape::Nedge(tr) / 4,
        col = non_trans_color,
        border = FALSE,
        ylab = "Count",
@@ -139,7 +139,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
 
 
   graphics::hist(all_trans$observed_pheno_trans_delta[[index]],
-       breaks = ape::Nedge(tr)/4,
+       breaks = ape::Nedge(tr) / 4,
        col = trans_color,
        border = trans_color,
        add = TRUE,
@@ -175,18 +175,18 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
                  sep = "")
   delta_phenotype_on_all_edges <- as.numeric(unlist(p_trans_mat))
   graphics::hist(delta_phenotype_on_all_edges,
-       breaks = ape::Nedge(tr)/4,
+       breaks = ape::Nedge(tr) / 4,
        col = grDevices::rgb(0, 0.5, 0, 0.25),
        border = FALSE,
        ylab = "Count",
        xlab = "Delta phenotype",
        main = title)
 
-  delta_phenotype_on_high_confidence_edges <-
+  delta_pheno_on_hi_conf_edges <-
     as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
-  graphics::hist(delta_phenotype_on_high_confidence_edges,
+  graphics::hist(delta_pheno_on_hi_conf_edges,
   # plot phenotype transition only high confidence edges for this genotype
-       breaks = ape::Nedge(tr)/4,
+       breaks = ape::Nedge(tr) / 4,
        col = grDevices::rgb(0, 0, 0, 0.25),
        border = FALSE,
        ylab = "Count",
@@ -250,7 +250,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
   }
   # end update trans_edge_mat
   ph_trans <-
-    abs(pheno_recon_ordered_by_edges[ , 1] - pheno_recon_ordered_by_edges[ , 2])
+    abs(pheno_recon_ordered_by_edges[, 1] - pheno_recon_ordered_by_edges[, 2])
 
   p_trans_mat <- matrix(ph_trans, nrow = length(ph_trans), ncol = 1)
   colnames(p_trans_mat) <- "delta_pheno"
@@ -267,19 +267,19 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
 
   row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:ape::Nedge(tr))
   # end heatmap prep
-  ann_colors = list(
+  ann_colors <- list(
     locus = c(not_sig = "white", sig = "blue")
   )
 
   sorted_trans_edge_mat <-
-    trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[ , 1])],
+    trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[, 1])],
                          row.names(trans_edge_mat)), ]
   ordered_by_p_val <-
-    sorted_trans_edge_mat[ ,
-                           match(row.names(log_p_value)[order(log_p_value[ , 1])],
+    sorted_trans_edge_mat[,
+                           match(row.names(log_p_value)[order(log_p_value[, 1])],
                                  colnames(sorted_trans_edge_mat))]
   column_annot_ordered_by_p_val <-
-    column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])],
+    column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
                        row.names(column_annot)), ]
   colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
     c("locus", "-ln(p-val)")
@@ -346,27 +346,27 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                     mar = c(4, 4, 4, 4))
 
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
-      plot_tree_with_colored_edges(tr,
-                                   geno_reconstruction,
-                                   geno_confidence,
-                                   "grey",
-                                   "red",
-                                   paste0(row.names(pval_all_transition$hit_pvals)[j],
-                                          "\n Genotype reconstruction"),
-                                   "recon",
-                                   j,
-                                   "Wild type",
-                                   "Variant")
-      plot_tree_with_colored_edges(tr,
-                                   geno_transition,
-                                   geno_confidence,
-                                   "grey",
-                                   "red",
-                                   "Genotype transition",
-                                   "trans",
-                                   j,
-                                   "No transition",
-                                   "Transition")
+      plot_tr_w_color_edges(tr,
+                            geno_reconstruction,
+                            geno_confidence,
+                            "grey",
+                            "red",
+                            paste0(row.names(pval_all_transition$hit_pvals)[j],
+                                   "\n Genotype reconstruction"),
+                            "recon",
+                            j,
+                            "Wild type",
+                            "Variant")
+      plot_tr_w_color_edges(tr,
+                            geno_transition,
+                            geno_confidence,
+                            "grey",
+                            "red",
+                            "Genotype transition",
+                            "trans",
+                            j,
+                            "No transition",
+                            "Transition")
       hist_abs_delta_pheno_all_edges(p_trans_mat,
                                      geno_confidence,
                                      tr,
@@ -525,7 +525,7 @@ make_manhattan_plot <- function(outdir,
   }
 } #end make_manhattan_plot()
 
-#' plot_tree_with_colored_edges
+#' plot_tr_w_color_edges
 #'
 #' Plot a phylogenetic tree with certain edges highlighted.
 #'
@@ -543,16 +543,16 @@ make_manhattan_plot <- function(outdir,
 #'
 #' @return Plot of a tree with certain edges colored.
 #'
-plot_tree_with_colored_edges <- function(tr,
-                                         edges_to_highlight,
-                                         geno_confidence,
-                                         edge_color_na,
-                                         edge_color_bright,
-                                         title,
-                                         trans_or_recon,
-                                         index,
-                                         legend_baseline,
-                                         legend_other){
+plot_tr_w_color_edges <- function(tr,
+                                  edges_to_highlight,
+                                  geno_confidence,
+                                  edge_color_na,
+                                  edge_color_bright,
+                                  title,
+                                  trans_or_recon,
+                                  index,
+                                  legend_baseline,
+                                  legend_other){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_string(edge_color_na)
@@ -588,7 +588,7 @@ plot_tree_with_colored_edges <- function(tr,
                    ncol = 1,
                    lwd = 1,
                    cex = 0.5)
-} # end plot_tree_with_colored_edges()
+} # end plot_tr_w_color_edges()
 
 #' make_ann_colors
 #'
@@ -608,21 +608,21 @@ make_ann_colors <- function(geno_matrix){
   nas <- sum(is.na(geno_matrix)) > 1
 
   if (ones + zeros + nas == 3) {
-    ann_colors = list(pheno_presence = c(na = "grey",
+    ann_colors <- list(pheno_presence = c(na = "grey",
                                          absent = "white",
                                          present = "red"))
   } else if (ones == 1 && zeros == 1 && nas == 0) {
-    ann_colors = list(pheno_presence = c(absent = "white", present = "red"))
+    ann_colors <- list(pheno_presence = c(absent = "white", present = "red"))
   } else if (ones == 1 && zeros == 0 && nas == 1) {
-    ann_colors = list(pheno_presence = c(na = "grey", present = "red"))
+    ann_colors <- list(pheno_presence = c(na = "grey", present = "red"))
   } else if (ones == 0 && zeros == 1 && nas == 1) {
-    ann_colors = list(pheno_presence = c(na = "grey", absent = "white"))
+    ann_colors <- list(pheno_presence = c(na = "grey", absent = "white"))
   } else if (ones == 0 && zeros == 0 && nas == 1) {
-    ann_colors = list(pheno_presence = c(na = "grey"))
+    ann_colors <- list(pheno_presence = c(na = "grey"))
   } else if (ones == 0 && zeros == 1 && nas == 0) {
-    ann_colors = list(pheno_presence = c(absent = "white"))
+    ann_colors <- list(pheno_presence = c(absent = "white"))
   } else if (ones == 1 && zeros == 0 && nas == 0) {
-    ann_colors = list(pheno_presence = c(present = "red"))
+    ann_colors <-list(pheno_presence = c(present = "red"))
   } else {
     stop("No ones, zeroes, or NAs present in g_mat")
   }
@@ -684,7 +684,8 @@ discrete_plot_phyc <- function(tr,
   check_is_string(name)
   check_num_between_0_and_1(fdr)
   check_if_permutation_num_valid(num_perm)
-  if (ncol(recon_hit_vals) != 1 | nrow(recon_hit_vals) != length(geno_confidence)) {
+  if (ncol(recon_hit_vals) != 1 |
+      nrow(recon_hit_vals) != length(geno_confidence)) {
     stop("Dimensions of hit p-values dataframe are incorrect.")
   } # Don't change to check_dimensions because input is dataframe, not matrix.
   check_equal(length(p_recon_edges), ape::Nedge(tr))
@@ -714,13 +715,13 @@ discrete_plot_phyc <- function(tr,
 
   grDevices::pdf(fname)
 
-  graphics::par(mfrow = c(1,1))
+  graphics::par(mfrow = c(1, 1))
   make_manhattan_plot(dir, name, recon_hit_vals, fdr, prefix)
 
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
 
   for (i in 1:length(g_trans_edges)) {
-    g_trans_mat[ , i] <- g_trans_edges[[i]]
+    g_trans_mat[, i] <- g_trans_edges[[i]]
     g_trans_mat[geno_confidence[[i]] == 0, i] <- NA
   }
 
@@ -732,7 +733,7 @@ discrete_plot_phyc <- function(tr,
   row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
 
   temp_g_trans_mat <- cbind(phenotype_annotation, g_trans_mat)
-  g_trans_mat <- temp_g_trans_mat[order(temp_g_trans_mat[,1],
+  g_trans_mat <- temp_g_trans_mat[order(temp_g_trans_mat[, 1],
                                         na.last = FALSE,
                                         decreasing = FALSE ),
                                   2:ncol(temp_g_trans_mat),
@@ -760,44 +761,44 @@ discrete_plot_phyc <- function(tr,
   }
 
   ordered_by_p_val <-
-    g_trans_mat[ ,
-                 match(row.names(log_p_value)[order(log_p_value[ , 1])],
+    g_trans_mat[,
+                 match(row.names(log_p_value)[order(log_p_value[, 1])],
                        colnames(g_trans_mat)),
                  drop = FALSE]
   column_annot_ordered_by_p_val <-
-    column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])],
+    column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
                         row.names(column_annot)), ]
 
   # TODO: make sure this kind of annotation steps gets generalized to more
   # TODO: locations -- I think I wrote a function like this somewhere else.
-  if (length(unique(phenotype_annotation[ ,1])) == 3) {
-    pheno_presence_col = c( na = "grey", absence = "white", presence = "red")
-  } else if (length(unique(phenotype_annotation[ ,1])) == 2) {
-    if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 0)) == 2) {
-      pheno_presence_col = c(na = "grey", absence = "white")
-    } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 1)) == 2) {
-      pheno_presence_col = c( na = "grey", presence = "red")
-    } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(1, 0)) == 2) {
-      pheno_presence_col = c(absence = "white", presence = "red")
+  if (length(unique(phenotype_annotation[, 1])) == 3) {
+    pheno_presence_col <- c( na = "grey", absence = "white", presence = "red")
+  } else if (length(unique(phenotype_annotation[, 1])) == 2) {
+    if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 0)) == 2) {
+      pheno_presence_col <- c(na = "grey", absence = "white")
+    } else if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 1)) == 2) {
+      pheno_presence_col <- c( na = "grey", presence = "red")
+    } else if (sum(unique(phenotype_annotation[, 1]) %in% c(1, 0)) == 2) {
+      pheno_presence_col <- c(absence = "white", presence = "red")
     }
-  } else if (length(unique(phenotype_annotation[ ,1])) == 1) {
-    pheno_presence_col = c(presence = "red")
-    if (unique(phenotype_annotation[ ,1]) == -1) {
-      pheno_presence_col = c(na = "grey")
-    } else if (unique(phenotype_annotation[ ,1]) == 0) {
-      pheno_presence_col = c(absence = "white")
+  } else if (length(unique(phenotype_annotation[, 1])) == 1) {
+    pheno_presence_col <- c(presence = "red")
+    if (unique(phenotype_annotation[, 1]) == -1) {
+      pheno_presence_col <- c(na = "grey")
+    } else if (unique(phenotype_annotation[, 1]) == 0) {
+      pheno_presence_col <- c(absence = "white")
     }
   }
 
-  if (length(unique(column_annot_ordered_by_p_val[ ,1])) == 2) {
-    locus_col = c(not_sig = "white", sig = "blue")
-  } else if (length(unique(column_annot_ordered_by_p_val[ ,1])) == 1) {
+  if (length(unique(column_annot_ordered_by_p_val[, 1])) == 2) {
+    locus_col <- c(not_sig = "white", sig = "blue")
+  } else if (length(unique(column_annot_ordered_by_p_val[, 1])) == 1) {
     locus_col = c(sig = "blue")
-    if (unique(column_annot_ordered_by_p_val[ ,1]) == "not_sig") {
-      locus_col = c(not_sig = "white")
+    if (unique(column_annot_ordered_by_p_val[, 1]) == "not_sig") {
+      locus_col <- c(not_sig = "white")
     }
   }
-  ann_colors = list(locus = locus_col, pheno_presence = pheno_presence_col)
+  ann_colors <- list(locus = locus_col, pheno_presence = pheno_presence_col)
 
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (plotting_logical) {
@@ -831,28 +832,28 @@ discrete_plot_phyc <- function(tr,
                     oma = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4))
       # Phenotype
-      plot_tree_with_colored_edges(tr,
-                                   pheno_as_list,
-                                   pheno_conf_as_list,
-                                   "grey",
-                                   "red",
-                                   paste0("\n Phenotype reconstruction"),
-                                   "recon",
-                                   1,
-                                   "Wild type",
-                                   "Variant")
+      plot_tr_w_color_edges(tr,
+                            pheno_as_list,
+                            pheno_conf_as_list,
+                            "grey",
+                            "red",
+                            paste0("\n Phenotype reconstruction"),
+                            "recon",
+                            1,
+                            "Wild type",
+                            "Variant")
       # Genotype
-      plot_tree_with_colored_edges(tr,
-                                   g_trans_edges,
-                                   geno_confidence,
-                                   "grey",
-                                   "red",
-                                   paste0(row.names(recon_hit_vals)[j],
-                                          "\nGenotype transition"),
-                                   "recon",
-                                   j,
-                                   "No trasition",
-                                   "Transition")
+      plot_tr_w_color_edges(tr,
+                            g_trans_edges,
+                            geno_confidence,
+                            "grey",
+                            "red",
+                            paste0(row.names(recon_hit_vals)[j],
+                                   "\nGenotype transition"),
+                            "recon",
+                            j,
+                            "No trasition",
+                            "Transition")
       # Permutation test
       # TODO change to loop through sig hits
       max_x <- max(recon_perm_obs_results$permuted_count[[j]],
@@ -1134,28 +1135,28 @@ discrete_plot_trans  <- function(tr,
                     mar = c(4, 4, 4, 4))
       # Plot phenotype
       p_trans_edges_as_list <- list(p_trans_edges)
-      plot_tree_with_colored_edges(tr,
-                                   p_trans_edges_as_list,
-                                   pheno_conf_as_list,
-                                   "grey",
-                                   "red",
-                                   paste0("\n Phenotype transitions"),
-                                   "recon",
-                                   1,
-                                   "No transition",
-                                   "Transition")
+      plot_tr_w_color_edges(tr,
+                            p_trans_edges_as_list,
+                            pheno_conf_as_list,
+                            "grey",
+                            "red",
+                            paste0("\n Phenotype transitions"),
+                            "recon",
+                            1,
+                            "No transition",
+                            "Transition")
       # Plot genotype
-      plot_tree_with_colored_edges(tr,
-                                   g_trans_edges,
-                                   geno_confidence,
-                                   "grey",
-                                   "red",
-                                   paste0(row.names(trans_hit_vals)[j],
-                                          "\n Genotype transitions"),
-                                   "recon",
-                                   j,
-                                   "No transition",
-                                   "Transition")
+      plot_tr_w_color_edges(tr,
+                            g_trans_edges,
+                            geno_confidence,
+                            "grey",
+                            "red",
+                            paste0(row.names(trans_hit_vals)[j],
+                                   "\n Genotype transitions"),
+                            "recon",
+                            j,
+                            "No transition",
+                            "Transition")
       # Plot permutation test
       # TODO change to loop through sig hits
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
