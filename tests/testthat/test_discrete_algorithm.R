@@ -19,7 +19,8 @@ test_that("calculate_permutation_based_p_value returns a non-significant p-value
   permuted_tests <- rnorm(n = nperm, mean = 0)
   real_test <- 0
   alpha <- 0.01
-  expect_true(calculate_permutation_based_p_value(permuted_tests, real_test, nperm) > alpha)
+  expect_true(calculate_permutation_based_p_value(permuted_tests,
+                                                  real_test, nperm) > alpha)
 })
 
 # test count_hits_on_edges
@@ -36,9 +37,13 @@ test_that("count_hits_on_edges returns 3 edges shared and 7 edges only with
   }
   num_pheno_and_geno_present <- 3
   num_just_geno_present <- num_edge - num_pheno_and_geno_present
-  temp_pheno_recon <- c(rep(1, num_pheno_and_geno_present), rep(0, num_just_geno_present))
+  temp_pheno_recon <- c(rep(1, num_pheno_and_geno_present),
+                        rep(0, num_just_geno_present))
 
-  results <- count_hits_on_edges(temp_geno_recon, temp_pheno_recon, temp_hi_conf_edges, temp_tree)
+  results <- count_hits_on_edges(temp_geno_recon,
+                                 temp_pheno_recon,
+                                 temp_hi_conf_edges,
+                                 temp_tree)
   expect_equal(results$both_present[1], num_pheno_and_geno_present)
   expect_equal(results$only_geno_present[1], num_just_geno_present)
 })
@@ -175,7 +180,7 @@ test_that("discrete_permutation returns expected results given this dummy
 test_that("count_empirical_both_present gives X given Y", {
   temp_pheno_vec <- c(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
   temp_hi_conf_edge <- NULL
-  temp_hi_conf_edge[[1]] <- c(0, 1 ,1, 0, 0, 1, 1, 0, 0, 1, 1, 1)
+  temp_hi_conf_edge[[1]] <- c(0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1)
   temp_hi_conf_edge[[2]] <- c(0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1)
   temp_permuted_mat <- matrix(stats::rbinom(120, 1, .5), ncol = 12, nrow = 10)
   temp_index <- 1

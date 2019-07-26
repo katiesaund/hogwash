@@ -385,12 +385,16 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                    "red")
 
       graphics::hist(log(results_all_trans$ks_statistics[[j]]),
-           breaks = perm/10, col = "grey", border = FALSE,
-           main = paste("Null distribution of KS statistic for all transitions.\n Red = Observed KS statistic.\n p-value = ",
-                        round(pval_all_transition$hit_pvals[j, 1], 10),
-                        "\np-value rank = ",
-                        rank(pval_all_transition$hit_pvals)[j],
-                        sep = ""),
+           breaks = perm / 10,
+           col = "grey",
+           border = FALSE,
+           main =
+             paste("Null distribution of KS statistic for all transitions.\n
+                   Red = Observed KS statistic.\n p-value = ",
+                   round(pval_all_transition$hit_pvals[j, 1], 10),
+                   "\np-value rank = ",
+                   rank(pval_all_transition$hit_pvals)[j],
+                   sep = ""),
            ylab = "Count",
            xlab = "ln(KS statistic)",
            xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])),
@@ -443,11 +447,11 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
   for (i in 1:ncol(trans_dir_edge_mat)) {
     temp_table <- delta_pheno_table
     temp_table[1, 1] <-
-      sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == 1),  1], na.rm = TRUE)
+      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == 1),  1], na.rm = TRUE)
     temp_table[2, 1] <-
-      sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == -1), 1], na.rm = TRUE)
+      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == -1), 1], na.rm = TRUE)
     temp_table[3, 1] <-
-      sum(p_trans_mat[which(trans_dir_edge_mat[ , i] == 0),  1], na.rm = TRUE)
+      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == 0),  1], na.rm = TRUE)
     all_tables[[i]] <- temp_table
   }
   names(all_tables) <- colnames(geno)
@@ -458,9 +462,9 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                                "geno_no_change")
   for (i in 1:ncol(trans_dir_edge_mat)) {
     temp_list <- delta_pheno_list
-    temp_list[[1]] <- p_trans_mat[which(trans_dir_edge_mat[ , i] == 1),  1]
-    temp_list[[2]] <- p_trans_mat[which(trans_dir_edge_mat[ , i] == -1), 1]
-    temp_list[[3]] <- p_trans_mat[which(trans_dir_edge_mat[ , i] == 0),  1]
+    temp_list[[1]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == 1),  1]
+    temp_list[[2]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == -1), 1]
+    temp_list[[3]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == 0),  1]
     all_lists[[i]] <- temp_list
     names(all_lists)[i] <- colnames(trans_dir_edge_mat)[i]
   }
@@ -501,11 +505,11 @@ make_manhattan_plot <- function(outdir,
   neg_log_p_value <- data.frame(-log(pval_hits))
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
   colnames(neg_log_p_with_num)[1] <- "locus"
-  sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[ , 2] > -log(fdr))
-  ymax <- max(-log(0.01), neg_log_p_with_num[ , 2, drop = TRUE])
+  sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[, 2] > -log(fdr))
+  ymax <- max(-log(0.01), neg_log_p_with_num[, 2, drop = TRUE])
   with(neg_log_p_with_num,
-       graphics::plot(x = neg_log_p_with_num[ , 1],
-            y = neg_log_p_with_num[ , 2, drop = TRUE],
+       graphics::plot(x = neg_log_p_with_num[, 1],
+            y = neg_log_p_with_num[, 2, drop = TRUE],
             type = "p",
             main = paste(trans_or_recon, geno_pheno_name, sep = " "),
             col = grDevices::rgb(0, 0, 0, 0.3),
@@ -517,8 +521,8 @@ make_manhattan_plot <- function(outdir,
   graphics::abline(h = -log(fdr),
                    col = "red")
   if (nrow(sig_temp) > 0) {
-    graphics::text(x = sig_temp[ , 1],
-                   y = sig_temp[ , 2],
+    graphics::text(x = sig_temp[, 1],
+                   y = sig_temp[, 2],
                    labels = row.names(sig_temp),
                    pos = 1,
                    cex = 0.7)
@@ -622,7 +626,7 @@ make_ann_colors <- function(geno_matrix){
   } else if (ones == 0 && zeros == 1 && nas == 0) {
     ann_colors <- list(pheno_presence = c(absent = "white"))
   } else if (ones == 1 && zeros == 0 && nas == 0) {
-    ann_colors <-list(pheno_presence = c(present = "red"))
+    ann_colors <- list(pheno_presence = c(present = "red"))
   } else {
     stop("No ones, zeroes, or NAs present in g_mat")
   }
@@ -793,7 +797,7 @@ discrete_plot_phyc <- function(tr,
   if (length(unique(column_annot_ordered_by_p_val[, 1])) == 2) {
     locus_col <- c(not_sig = "white", sig = "blue")
   } else if (length(unique(column_annot_ordered_by_p_val[, 1])) == 1) {
-    locus_col = c(sig = "blue")
+    locus_col <- c(sig = "blue")
     if (unique(column_annot_ordered_by_p_val[, 1]) == "not_sig") {
       locus_col <- c(not_sig = "white")
     }
@@ -806,7 +810,8 @@ discrete_plot_phyc <- function(tr,
 
     pheatmap::pheatmap(
       ordered_by_p_val,
-      main = paste0("Edges:\nGenotype transition with phenotype presence/absence"),
+      main = paste0(
+        "Edges:\nGenotype transition with phenotype presence/absence"),
       cluster_cols  = FALSE,
       na_col = "grey",
       cluster_rows  = FALSE,
@@ -859,15 +864,17 @@ discrete_plot_phyc <- function(tr,
       max_x <- max(recon_perm_obs_results$permuted_count[[j]],
                    recon_perm_obs_results$observed_overlap[j])
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
-                     breaks = num_perm/10,
+                     breaks = num_perm / 10,
                      xlim = c(0, max_x),
                      col = "grey",
                      border = FALSE,
                      ylab = "Count",
-                     xlab = "Edges with genotype transition & phenotype presence",
-                     main = paste0("Genotype transition & phenotype presence\npval=",
-                                   round(recon_hit_vals[j, 1], 4),
-                                   sep = ""))
+                     xlab =
+                       "Edges with genotype transition & phenotype presence",
+                     main = paste0(
+                       "Genotype transition & phenotype presence\npval=",
+                       round(recon_hit_vals[j, 1], 4),
+                       sep = ""))
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
                        col = "red")
       graphics::legend("topright",
@@ -918,7 +925,8 @@ discrete_plot_phyc <- function(tr,
         pheatmap::pheatmap(
           mat = g_mat,
           main = paste0(row.names(recon_hit_vals)[j],
-                        "\n Tree edges clustered by edge type\n Genotype transition edge\n& phenotype present edge"),
+                        "\n Tree edges clustered by edge type\n
+                        Genotype transition edge\n& phenotype present edge"),
           cluster_cols = FALSE,
           cluster_rows = FALSE,
           na_col = "grey",
@@ -1009,7 +1017,7 @@ discrete_plot_trans  <- function(tr,
   check_equal(length(tr_and_pheno_hi_conf), ape::Nedge(tr))
   check_equal(length(trans_perm_obs_results$permuted_count[[1]]), num_perm)
   check_class(trans_perm_obs_results$hit_pvals, "character")
-  check_class(trans_perm_obs_results$observed_overlap,"integer")
+  check_class(trans_perm_obs_results$observed_overlap, "integer")
 
   # Function -------------------------------------------------------------------
   image_width <- 250
@@ -1021,14 +1029,14 @@ discrete_plot_trans  <- function(tr,
 
   grDevices::pdf(fname)
 
-  graphics::par(mfrow = c(1,1))
+  graphics::par(mfrow = c(1, 1))
   make_manhattan_plot(dir, name, trans_hit_vals, fdr, "synchronous")
 
   # heatmaps
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
 
   for (i in 1:length(g_trans_edges)) {
-    g_trans_mat[ , i] <- g_trans_edges[[i]]
+    g_trans_mat[, i] <- g_trans_edges[[i]]
     g_trans_mat[geno_confidence[[i]] == 0, i] <- NA
   }
 
@@ -1041,7 +1049,7 @@ discrete_plot_trans  <- function(tr,
 
   temp_g_trans_mat <- cbind(phenotype_annotation, g_trans_mat)
   g_trans_mat <-
-    temp_g_trans_mat[order(temp_g_trans_mat[,1],
+    temp_g_trans_mat[order(temp_g_trans_mat[, 1],
                            na.last = FALSE, decreasing = FALSE ),
                      2:ncol(temp_g_trans_mat),
                      drop = FALSE]
@@ -1067,43 +1075,43 @@ discrete_plot_trans  <- function(tr,
   }
 
   ordered_by_p_val <-
-    g_trans_mat[ , match(row.names(log_p_value)[order(log_p_value[ , 1])],
+    g_trans_mat[, match(row.names(log_p_value)[order(log_p_value[, 1])],
                          colnames(g_trans_mat)),
                  drop = FALSE]
   column_annot_ordered_by_p_val <-
-    column_annot[match(row.names(log_p_value)[order(log_p_value[ , 1])],
+    column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
                        row.names(column_annot)), ]
 
   # TODO use the annotation function here instead of this redundant code
-  if (length(unique(phenotype_annotation[ ,1])) == 3) {
-    pheno_presence_col = c("-1" = "grey", "0" = "white", "1" = "red")
-  } else if (length(unique(phenotype_annotation[ ,1])) == 2) {
-    if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 0)) == 2) {
-      pheno_presence_col = c("-1" = "grey", "0" = "white")
-    } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(-1, 1)) == 2) {
-      pheno_presence_col = c("-1" = "grey", "1" = "red")
-    } else if (sum(unique(phenotype_annotation[ ,1]) %in% c(1, 0)) == 2) {
-      pheno_presence_col = c("0" = "white", "1" = "red")
+  if (length(unique(phenotype_annotation[, 1])) == 3) {
+    pheno_presence_col <- c("-1" = "grey", "0" = "white", "1" = "red")
+  } else if (length(unique(phenotype_annotation[, 1])) == 2) {
+    if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 0)) == 2) {
+      pheno_presence_col <- c("-1" = "grey", "0" = "white")
+    } else if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 1)) == 2) {
+      pheno_presence_col <- c("-1" = "grey", "1" = "red")
+    } else if (sum(unique(phenotype_annotation[, 1]) %in% c(1, 0)) == 2) {
+      pheno_presence_col <- c("0" = "white", "1" = "red")
     }
-  } else if (length(unique(phenotype_annotation[ ,1])) == 1) {
-    pheno_presence_col = c("1" = "red")
-    if (unique(phenotype_annotation[ ,1]) == -1) {
-      pheno_presence_col = c("-1" = "grey")
-    } else if (unique(phenotype_annotation[ ,1]) == 0) {
-      pheno_presence_col = c("0" = "white")
-    }
-  }
-
-  if (length(unique(column_annot_ordered_by_p_val[ ,1])) == 2) {
-    locus_col = c(not_sig = "white", sig = "blue")
-  } else if (length(unique(column_annot_ordered_by_p_val[ ,1])) == 1) {
-    locus_col = c(sig = "blue")
-    if (unique(column_annot_ordered_by_p_val[ ,1]) == "not_sig") {
-      locus_col = c(not_sig = "white")
+  } else if (length(unique(phenotype_annotation[, 1])) == 1) {
+    pheno_presence_col <- c("1" = "red")
+    if (unique(phenotype_annotation[, 1]) == -1) {
+      pheno_presence_col <- c("-1" = "grey")
+    } else if (unique(phenotype_annotation[, 1]) == 0) {
+      pheno_presence_col <- c("0" = "white")
     }
   }
 
-  ann_colors = list(locus = locus_col, pheno_presence = pheno_presence_col)
+  if (length(unique(column_annot_ordered_by_p_val[, 1])) == 2) {
+    locus_col <- c(not_sig = "white", sig = "blue")
+  } else if (length(unique(column_annot_ordered_by_p_val[, 1])) == 1) {
+    locus_col <- c(sig = "blue")
+    if (unique(column_annot_ordered_by_p_val[, 1]) == "not_sig") {
+      locus_col <- c(not_sig = "white")
+    }
+  }
+
+  ann_colors <- list(locus = locus_col, pheno_presence = pheno_presence_col)
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {
     cell_width_value <- image_width / ncol(ordered_by_p_val)
@@ -1162,7 +1170,7 @@ discrete_plot_trans  <- function(tr,
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
                    trans_perm_obs_results$observed_overlap[j])
       graphics::hist(trans_perm_obs_results$permuted_count[[j]],
-           breaks = num_perm/10,
+           breaks = num_perm / 10,
            xlim = c(0, max_x),
            col = "grey",
            border = FALSE,
@@ -1176,7 +1184,7 @@ discrete_plot_trans  <- function(tr,
                        col = "red")
 
       # edge heatmap - heatmap is tree edges, annotation is phenotype edges
-      graphics::par(mfrow = c(1,1))
+      graphics::par(mfrow = c(1, 1))
       # TOD -1 should be NA but it won't work correctedly
       p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1
       p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
@@ -1190,14 +1198,14 @@ discrete_plot_trans  <- function(tr,
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_transition"
       temp_g_mat <- cbind(g_mat, phenotype_annotation)
-      g_mat <- temp_g_mat[order(temp_g_mat[ ,2],
-                                temp_g_mat[,1],
+      g_mat <- temp_g_mat[order(temp_g_mat[, 2],
+                                temp_g_mat[, 1],
                                 na.last = FALSE,
-                                decreasing = FALSE ),
+                                decreasing = FALSE),
                           1,
                           drop = FALSE]
 
-      ann_colors = list(pheno_transition = c(na = "grey",
+      ann_colors <- list(pheno_transition = c(na = "grey",
                                              no_transition = "white",
                                              transition = "red"))
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)

@@ -145,7 +145,7 @@ test_that("check_num_between_0_and_1 gives errors for non-numeric inputs", {
 # test check_if_dir_exists -----------------------------------------------------
 test_that("check_if_dir_exists gives an error when dir doesn't exist", {
   # Set up
-  temp_dir <- "~/fake/directory/"
+  temp_dir <- "/fake/directory/"
 
   # Test
   expect_error(check_if_dir_exists(temp_dir))

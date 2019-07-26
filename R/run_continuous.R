@@ -50,23 +50,21 @@ run_continuous <- function(args){
       geno_recon_ordered_by_edges <-
       rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)) {
-      geno_conf_ordered_by_edges[[k]] <-
-        reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf,
-                                        args$tree)
-      geno_recon_ordered_by_edges[[k]] <-
-        reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_recon,
-                                        args$tree)
+      geno_conf_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(
+        AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
+      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(
+        AR$geno_recon_and_conf[[k]]$tip_and_node_recon, args$tree)
     }
   }
-  hi_conf <-
-    prepare_high_confidence_objects(geno_trans_synchronous,
-                                    args$tree,
-                                    AR$pheno_recon_and_conf$tip_and_node_rec_conf,
-                                    args$bootstrap_cutoff,
-                                    genotype,
-                                    geno_conf_ordered_by_edges,
-                                    geno_recon_ordered_by_edges,
-                                    geno$snps_per_gene)
+  hi_conf <- prepare_high_confidence_objects(
+    geno_trans_synchronous,
+    args$tree,
+    AR$pheno_recon_and_conf$tip_and_node_rec_conf,
+    args$bootstrap_cutoff,
+    genotype,
+    geno_conf_ordered_by_edges,
+    geno_recon_ordered_by_edges,
+    geno$snps_per_gene)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   results_all_transitions <-

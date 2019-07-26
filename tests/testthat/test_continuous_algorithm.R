@@ -119,10 +119,10 @@ test_that("calc_sig returns a significant p-value when phenotype change is
   expect_equal(results$all_edges_median[[1]],
                median(abs(temp_pheno[, 1] - temp_pheno[, 2])))
   expect_equal(results$trans_median[[1]],
-               median(abs(temp_pheno[4:7 , 1] - temp_pheno[4:7 , 2])))
+               median(abs(temp_pheno[4:7, 1] - temp_pheno[4:7, 2])))
   expect_equal(round(results$observed_ks_stat[1], 2), 1)
   expect_equal(results$observed_pheno_non_trans_delta[[1]],
-               abs(temp_pheno[c(1:3,8), 1] - temp_pheno[c(1:3,8), 2]))
+               abs(temp_pheno[c(1:3, 8), 1] - temp_pheno[c(1:3, 8), 2]))
   expect_equal(round(results$observed_pheno_trans_delta[[1]], 3),
                abs(temp_pheno[4:7, 1] - temp_pheno[4:7, 2]))
   expect_equal(round(results$ks_statistics[[1]][1:5], 3),
@@ -163,12 +163,12 @@ test_that("calc_sig returns a non-significant p-value when phenotype change is
   expect_equal(results$all_edges_median[[1]],
                median(abs(temp_pheno[, 1] - temp_pheno[, 2])))
   expect_equal(results$trans_median[[1]],
-               median(abs(temp_pheno[4:6 , 1] - temp_pheno[4:6 , 2])))
+               median(abs(temp_pheno[4:6, 1] - temp_pheno[4:6, 2])))
   expect_equal(round(results$observed_ks_stat[1], 2), 0)
   expect_equal(results$observed_pheno_non_trans_delta[[1]],
-               abs(temp_pheno[1:3 , 1] - temp_pheno[1:3 , 2]))
+               abs(temp_pheno[1:3, 1] - temp_pheno[1:3, 2]))
   expect_equal(round(results$observed_pheno_trans_delta[[1]], 3),
-               abs(temp_pheno[4:6 , 1] - temp_pheno[4:6 , 2]))
+               abs(temp_pheno[4:6, 1] - temp_pheno[4:6, 2]))
 })
 
 test_that("calc_sig returns an error when the only confident edges are

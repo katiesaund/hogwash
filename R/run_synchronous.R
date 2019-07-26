@@ -59,15 +59,16 @@ run_synchronous <- function(args){
                                         args$tree)
     }
   }
-  hi_conf <-
-    prepare_high_confidence_objects(geno_trans_synchronous,
-                                    args$tree,
-                                    AR$pheno_recon_and_conf$tip_and_node_rec_conf,
-                                    args$bootstrap_cutoff,
-                                    genotype,
-                                    geno_conf_ordered_by_edges,
-                                    geno_recon_ordered_by_edges,
-                                    geno$snps_per_gene)
+  hi_conf <- prepare_high_confidence_objects(
+    geno_trans_synchronous,
+    args$tree,
+    AR$pheno_recon_and_conf$tip_and_node_rec_conf,
+    args$bootstrap_cutoff,
+    genotype,
+    geno_conf_ordered_by_edges,
+    geno_recon_ordered_by_edges,
+    geno$snps_per_gene)
+
   genotype_transition_edges <- rep(list(0), ncol(hi_conf$genotype))
   for (k in 1:ncol(hi_conf$genotype)) {
     genotype_transition_edges[[k]] <-

@@ -174,8 +174,9 @@ test_that("prepare_genotype gives expected genotype for an not grouped input", {
 test_that("prepare_ungrouped_genotype", {
   set.seed(1)
   temp_tree <- ape::rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree),
-                               ape::Nedge(temp_tree))
+  temp_tree$edge.length <-
+    rep(sum(temp_tree$edge.length) / ape::Nedge(temp_tree),
+        ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <-
@@ -218,7 +219,8 @@ test_that("prepare_grouped_genotype", {
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
-    rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
+    rep(sum(temp_tree$edge.length) / ape::Nedge(temp_tree),
+        ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <-
@@ -269,8 +271,9 @@ test_that("prepare_grouped_genotype", {
 test_that("group_genotypes does X given Y", {
   set.seed(1)
   temp_tree <- ape::rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree),
-                               ape::Nedge(temp_tree))
+  temp_tree$edge.length <-
+    rep(sum(temp_tree$edge.length) / ape::Nedge(temp_tree),
+        ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   set.seed(1)

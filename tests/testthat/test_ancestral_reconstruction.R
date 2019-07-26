@@ -161,12 +161,15 @@ test_that("continuous_ancestral_reconstruction works given valid inputs", {
   expect_identical(length(dummy_pheno2$ML_anc_rec), expected_length)
 
   # tips should be included in tip and node reconstruction
-  expect_identical(unname(dummy_pheno1$tip_and_node_recon[1:ape::Ntip(temp_tree)]),
-                   test_pheno_mat_1[, 1, drop = TRUE])
+  expect_identical(
+    unname(dummy_pheno1$tip_and_node_recon[1:ape::Ntip(temp_tree)]),
+    test_pheno_mat_1[, 1, drop = TRUE])
 
   # node reconstruction should be included in tip and node reconstruction
-  expect_identical(dummy_pheno1$tip_and_node_recon[(ape::Ntip(temp_tree) + 1):(ape::Ntip(temp_tree) + ape::Nnode(temp_tree))],
-                   dummy_pheno1$ML_anc_rec)
+  expect_identical(
+    dummy_pheno1$tip_and_node_recon[(
+      ape::Ntip(temp_tree) + 1):(ape::Ntip(temp_tree) + ape::Nnode(temp_tree))],
+    dummy_pheno1$ML_anc_rec)
 })
 
 # test continuous_get_recon_confidence -----------------------------------------
@@ -351,7 +354,7 @@ test_that("pick_recon_model works given valid input", {
   tree <- ape::rtree(num_col, rooted = TRUE)
   tree$node.label <- rep(100, ape::Nnode(tree))
   num_cells <- num_col * ape::Ntip(tree)
-  test_mat <- matrix(rep(c(1,0), num_cells),
+  test_mat <- matrix(rep(c(1, 0), num_cells),
                      nrow = ape::Ntip(tree),
                      ncol = num_col)
   discrete_or_continuous <- "discrete"
@@ -412,7 +415,7 @@ test_that("pick_recon_model gives an error for invalid input", {
   tree <- ape::rtree(num_col, rooted = TRUE)
   tree$node.label <- rep(100, ape::Nnode(tree))
   num_cells <- num_col * ape::Ntip(tree)
-  test_mat <- matrix(rep(c(1,0), num_cells),
+  test_mat <- matrix(rep(c(1, 0), num_cells),
                      nrow = ape::Ntip(tree),
                      ncol = num_col)
   discrete_or_continuous <- "discrete"
@@ -433,7 +436,7 @@ test_that("pick_recon_model gives an error when it given a bad index", {
   tree <- ape::rtree(num_col, rooted = TRUE)
   tree$node.label <- rep(100, ape::Nnode(tree))
   num_cells <- num_col * ape::Ntip(tree)
-  test_mat <- matrix(rep(c(1,0), num_cells),
+  test_mat <- matrix(rep(c(1, 0), num_cells),
                      nrow = ape::Ntip(tree),
                      ncol = num_col)
   discrete_or_continuous <- "discrete"
@@ -473,7 +476,7 @@ test_that("pick_recon_model returns 'ER' for this test data", {
   tree <- ape::rtree(num_col, rooted = TRUE)
   tree$node.label <- rep(100, ape::Nnode(tree))
   num_cells <- num_col * ape::Ntip(tree)
-  test_mat <- matrix(rep(c(1,0), num_cells),
+  test_mat <- matrix(rep(c(1, 0), num_cells),
                      nrow = ape::Ntip(tree),
                      ncol = num_col)
   discrete_or_continuous <- "discrete"
@@ -496,7 +499,7 @@ test_that("pick_recon_model returns 'ARD' for this test particular data", {
   tree <- ape::rtree(num_col, rooted = TRUE)
   tree$node.label <- rep(100, ape::Nnode(tree))
   num_cells <- num_col * ape::Ntip(tree)
-  test_mat <- matrix(rep(c(1,1,1,1,1,1,1,0), num_cells),
+  test_mat <- matrix(rep(c(1, 1, 1, 1, 1, 1, 1, 0), num_cells),
                      nrow = ape::Ntip(tree),
                      ncol = num_col)
   discrete_or_continuous <- "discrete"
@@ -575,6 +578,8 @@ test_that("prepare_ancestral_reconstructions works for valid input", {
   expect_equal(ncol(temp_AR$pheno_recon_and_conf$recon_edge_mat), 2)
   expect_equal(temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf,
                rep(1, ape::Ntip(temp_tree) + ape::Nnode(temp_tree)))
-  expect_equal(unname(temp_AR$pheno_recon_and_conf$tip_and_node_recon[1:ape::Ntip(temp_tree)]),
-               unname(temp_pheno[, 1, drop = TRUE]))
+  expect_equal(
+    unname(
+      temp_AR$pheno_recon_and_conf$tip_and_node_recon[1:ape::Ntip(temp_tree)]),
+    unname(temp_pheno[, 1, drop = TRUE]))
 })

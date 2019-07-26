@@ -58,9 +58,11 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
       stop("tree invalid")
     }
     parent_node[i] <- node_recon[tr$edge[i, older] - ape::Ntip(tr)]
-    if (is_tip(tr$edge[i, younger], tr)) {# child is a tip
-      child_node[i]  <- mat[ , num][tr$edge[i, younger]]
-    } else {# child is internal nodes
+    if (is_tip(tr$edge[i, younger], tr)) {
+      # child is a tip
+      child_node[i]  <- mat[, num][tr$edge[i, younger]]
+    } else {
+      # child is internal nodes
       child_node[i]  <- node_recon[tr$edge[i, younger] - ape::Ntip(tr)]
     }
 
@@ -105,7 +107,7 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
 #' @param genotype_confidence List of vectors. Length(list) = number of
 #'  genotypes. Length(vector) = Nedge(tr). Binary.
 #'
-#' @return has_at_least_two_high_confidence_transition_edges. Logical vector.
+#' @return at_least_two_hi_conf_trans_ed Logical vector.
 #'  Length == length(genotype_transition) == length(genotype_confidence).
 #' @noRd
 keep_at_least_two_high_conf_trans_edges <- function(genotype_transition,
@@ -118,17 +120,17 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition,
   check_if_binary_vector(genotype_confidence[[1]])
 
   # Function -------------------------------------------------------------------
-  has_at_least_two_high_confidence_transition_edges <-
+  at_least_two_hi_conf_trans_ed <-
     rep(FALSE, length(genotype_transition))
   for (p in 1:length(genotype_transition)) {
     if (sum(genotype_transition[[p]]$transition *
             genotype_confidence[[p]]) > 1) {
-      has_at_least_two_high_confidence_transition_edges[p] <- TRUE
+      at_least_two_hi_conf_trans_ed[p] <- TRUE
     }
   }
 
   # Check and return output ----------------------------------------------------
-  return(has_at_least_two_high_confidence_transition_edges)
+  return(at_least_two_hi_conf_trans_ed)
 } # end keep_at_least_two_high_conf_trans_edges()
 
 #' keep_hits_with_more_change_on_trans_edges
@@ -184,11 +186,11 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
   # Keep only hits with transition edge median delta phenotype higher than all
   #   edge delta phenotype median.
   temp <-
-    pvals$hit_pvals[(results$trans_median > results$all_edges_median),,
+    pvals$hit_pvals[(results$trans_median > results$all_edges_median), ,
                     drop = FALSE]
 
   # Keep only those that are also significant after FDR correction.
-  hits <- temp[temp[, 1] < fdr,, drop = FALSE]
+  hits <- temp[temp[, 1] < fdr, , drop = FALSE]
   colnames(hits) <- "fdr_corrected_pvals"
 
   # Check and return output ----------------------------------------------------
