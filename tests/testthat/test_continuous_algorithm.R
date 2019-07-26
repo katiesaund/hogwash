@@ -22,6 +22,50 @@ test_that("run_ks_test gives an error when indices too few to run ks.test()", {
   expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
 })
 
+test_that("run_ks_test returns an error for invalid input", {
+  set.seed(1)
+  temp_pheno <- temp_pheno <- matrix(rnorm(20), ncol = 2)
+  num_edges <- nrow(temp_pheno)
+  trans_index <- "trans_index"
+  non_trans_index <- c(9:10)
+  answer <- 0.375
+  names(answer) <- "D"
+  expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
+})
+
+test_that("run_ks_test returns an error for invalid input", {
+  set.seed(1)
+  temp_pheno <- temp_pheno <- matrix(rnorm(20), ncol = 2)
+  num_edges <- nrow(temp_pheno)
+  trans_index <- c(1:8)
+  non_trans_index <- c(9:100)
+  answer <- 0.375
+  names(answer) <- "D"
+  expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
+})
+
+test_that("run_ks_test returns an error for invalid input", {
+  set.seed(1)
+  temp_pheno <- temp_pheno <- matrix(rnorm(20), ncol = 2)
+  num_edges <- nrow(temp_pheno)
+  trans_index <- c(11:100)
+  non_trans_index <- c(9:10)
+  answer <- 0.375
+  names(answer) <- "D"
+  expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
+})
+
+test_that("run_ks_test returns an error for invalid input", {
+  set.seed(1)
+  temp_pheno <- temp_pheno <- matrix(rnorm(20), ncol = 2)
+  num_edges <- nrow(temp_pheno)
+  trans_index <- c(1:8)
+  non_trans_index <- "non_trans_index"
+  answer <- 0.375
+  names(answer) <- "D"
+  expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
+})
+
 # test get_sig_hits_while_correcting_for_multiple_testing
 test_that("get_sig_hit_and_mult_test_corr works with valid input", {
   set.seed(1)
@@ -223,6 +267,27 @@ test_that("get_hi_conf_tran_indices returns only high confidence transition
     get_hi_conf_tran_indices(temp_geno_trans, temp_conf, index, temp_tree)
   expect_equal(indices$trans_index, c(1, 3, 7))
   expect_equal(indices$non_trans_index, c(2, 6, 8))
+})
+
+
+test_that("get_hi_conf_tran_indices returns only high confidence transition
+           edges given this test data", {
+  num_isolates <- 5
+  num_loci <- 8
+  set.seed(1)
+  temp_tree <- ape::rtree(num_isolates)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_geno_trans <- temp_conf <- rep(list(NULL), num_loci)
+  for (i in 1:num_loci) {
+    temp_geno_trans[[i]]$transition <- c(1, 0, 1, 0, 1, 0, 1, 0)
+    temp_geno_trans[[i]]$trans_dir <- c(1, 0, -1, 0, 1, 0, -1, 0)
+    temp_conf[[i]] <- c(1, 1, 1, 0, 0, 1, 1, 1)
+  }
+  index <- 0
+  expect_error(get_hi_conf_tran_indices(temp_geno_trans,
+                                        temp_conf,
+                                        index,
+                                        temp_tree))
 })
 
 
