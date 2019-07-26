@@ -23,7 +23,7 @@ save_synchronous <- function(hogwash_synchronous, file_name){
   save(hogwash_synchronous, file = file_name)
 } # end save_synchronous()
 
-#' save_convergence
+#' save_phyc
 #'
 #' @description Save the results of the PhyC Test in an rdata object
 #'  called hogwash_synchronous
@@ -32,9 +32,9 @@ save_synchronous <- function(hogwash_synchronous, file_name){
 #' @param file_name Character.
 #'
 #' @noRd
-save_convergence <- function(hogwash_phyc, file_name){
+save_phyc <- function(hogwash_phyc, file_name){
   save(hogwash_phyc, file = file_name)
-} # end save_convergence()
+} # end save_phyc()
 
 #' save_results_as_r_object
 #'
@@ -48,7 +48,6 @@ save_convergence <- function(hogwash_phyc, file_name){
 #'
 #' @noRd
 save_results_as_r_object <- function(dir, name, object, prefix, group_logical){
-  # TODO Chance convergence to phyc
   # Check inputs ---------------------------------------------------------------
   check_is_string(dir)
   check_if_dir_exists(dir)
@@ -67,8 +66,8 @@ save_results_as_r_object <- function(dir, name, object, prefix, group_logical){
     save_continuous(object, fname)
   } else if (prefix == "synchronous") {
     save_synchronous(object, fname)
-  } else if (prefix == "convergence") {
-    save_convergence(object, fname)
+  } else if (prefix == "phyc") {
+    save_phyc(object, fname)
   } else {
     stop("test name incorrect")
   }

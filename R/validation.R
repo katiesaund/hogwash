@@ -585,8 +585,7 @@ check_str_is_test_name <- function(test_name){
   check_class(test_name, "character")
 
   # Function -------------------------------------------------------------------
-  valid_names <- c("continuous", "synchronous", "phyc", "convergence")
-  # TODO remove convergence from valid_names once this change is propograted through all of the code.
+  valid_names <- c("continuous", "synchronous", "phyc")
   if (!(test_name %in% valid_names)) {
     stop("Test name must be either continuous, synchronous, or phyc")
   }

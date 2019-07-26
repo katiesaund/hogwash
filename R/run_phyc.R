@@ -118,14 +118,14 @@ run_phyc <- function(args){
                      g_trans_edges = genotype_transition_edges,
                      p_trans_edges = pheno_trans$transition,
                      snp_in_gene = geno$snps_per_gene,
-                     prefix = "convergence",
+                     prefix = "phyc",
                      grouped_logical = args$group_genotype)
 
   results_object$contingency_table <-
     create_contingency_table(genotype_transition_edges,
                              pheno_recon_ordered_by_edges,
                              hi_conf$genotype,
-                             "convergence")
+                             "phyc")
   results_object$hit_pvals <- corrected_pvals_recon$hit_pvals
   results_object$sig_pvals <- corrected_pvals_recon$sig_pvals
   results_object$high_confidence_transition_edges <-
@@ -137,6 +137,6 @@ run_phyc <- function(args){
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,
-                           "convergence",
+                           "phyc",
                            args$group_genotype)
 } # end run_phyc()
