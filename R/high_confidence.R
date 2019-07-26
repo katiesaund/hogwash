@@ -195,11 +195,11 @@ prepare_high_confidence_objects <- function(genotype_transition,
   tree_conf_ordered_by_edges <- reorder_tip_and_node_to_edge(tree_conf, tr)
   short_edges <- identify_short_edges(tr)
 
+
+
   high_confidence_edges <-
     pheno_conf_ordered_by_edges + tree_conf_ordered_by_edges + short_edges == 3
-  if (length(high_confidence_edges) != ape::Nedge(tr)) {
-    stop("Confidence should correspond to each tree edge")
-  }
+  check_equal(length(high_confidence_edges), ape::Nedge(tr))
   all_high_confidence_edges <- rep(list(0), ncol(geno))
 
   # ADD IN GENO RECONSTRUCTION CONFIDENCE

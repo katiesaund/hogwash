@@ -64,6 +64,17 @@ column is always less than second column by 5, but
   expect_equal(calculate_phenotype_change_on_edge(2:4, temp_pheno), rep(5, 3))
 })
 
+test_that("calculate_phenotype_change_on_edge gives error for invalid input", {
+  temp_pheno <- matrix(-5:4, ncol = 2)
+  expect_error(calculate_phenotype_change_on_edge(9:10, temp_pheno))
+})
+
+test_that("calculate_phenotype_change_on_edge gives error for invalid input", {
+  temp_pheno <- matrix(-5:4, ncol = 2)
+  expect_error(calculate_phenotype_change_on_edge(matrix(NA), temp_pheno))
+})
+
+
 # test calc_raw_diff
 test_that("calc_raw_diff returns a list of -5s, when first column is always
           greater than second column by 5", {

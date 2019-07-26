@@ -62,3 +62,40 @@ test_that("remove_rare_or_common_geno removes no columns when all rows are two
   expect_equal(length(temp_results$dropped_genotype_names), 0)
   expect_identical(colnames(temp_results$mat), letters[1:5])
 })
+
+# test get_dropped_genotypes
+test_that("get_dropped_genotypes works with valid input", {
+  temp_geno <- matrix(c(0, 1, 1, 0, 0,
+                        1, 1, 0, 0, 0,
+                        1, 0, 0, 0, 1,
+                        0, 0, 1, 1, 0,
+                        0, 0, 0, 1, 1),
+                      ncol = 5,
+                      nrow = 5)
+  temp_keepers <- c(TRUE, TRUE, FALSE, FALSE, FALSE)
+  expect_error(get_dropped_genotypes(temp_geno, temp_keepers), NA)
+})
+
+test_that("get_dropped_genotypes gives error with invalid input", {
+  temp_geno <- matrix(c(0, 1, 1, 0, 0,
+                        1, 1, 0, 0, 0,
+                        1, 0, 0, 0, 1,
+                        0, 0, 1, 1, 0,
+                        0, 0, 0, 1, 1),
+                      ncol = 5,
+                      nrow = 5)
+  temp_keepers <- "keeper"
+  expect_error(get_dropped_genotypes(temp_geno, temp_keepers))
+})
+
+test_that("get_dropped_genotypes gives error with invalid input", {
+  temp_geno <- matrix(c(0, 1, 1, 0, 0,
+                        1, 1, 0, 0, 0,
+                        1, 0, 0, 0, 1,
+                        0, 0, 1, 1, 0,
+                        0, 0, 0, 1, 1),
+                      ncol = 5,
+                      nrow = 5)
+  temp_keepers <- c(TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE)
+  expect_error(get_dropped_genotypes(temp_geno, temp_keepers))
+})

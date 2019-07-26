@@ -5,8 +5,7 @@ context("High confidence") #----------------------------------------------#
 test_that("discretize_conf_with_cutoff should give this expected result", {
   temp_vector <- c(1:100)
   temp_threshold <- 50
-  expect_equal(discretize_conf_with_cutoff(temp_vector,
-                                                     temp_threshold),
+  expect_equal(discretize_conf_with_cutoff(temp_vector, temp_threshold),
                c(rep(0, 49), rep(1, 51)))
 })
 
@@ -14,9 +13,14 @@ test_that("discretize_conf_with_cutoff should give this expected result -
           now with fractions", {
   temp_vector <- seq(from = 0, to = 1, by = 0.1)
   temp_threshold <- 0.5
-  expect_equal(discretize_conf_with_cutoff(temp_vector,
-                                                     temp_threshold),
+  expect_equal(discretize_conf_with_cutoff(temp_vector, temp_threshold),
                c(rep(0, 5), rep(1, 6)))
+})
+
+test_that("discretize_conf_with_cutoff gives error for invalid input", {
+  temp_vector <- "fake"
+  temp_threshold <- 0.5
+  expect_error(discretize_conf_with_cutoff(temp_vector, temp_threshold))
 })
 
 # test report_num_high_confidence_trans_edge
@@ -37,6 +41,71 @@ test_that("report_num_high_confidence_trans_edge returns expected outcome for
                                                      fake_hi_conf_edges,
                                                      fake_geno_names),
                expected_result)
+})
+
+test_that("report_num_high_confidence_trans_edge error for invalid input", {
+  fake_geno_names <- letters[1:3]
+  fake_trans <- fake_hi_conf_edges <- rep(list(NULL), length(fake_geno_names))
+  for (i in 1:length(fake_geno_names)) {
+    fake_trans[[i]]$transition <- matrix(0)
+    fake_hi_conf_edges[[i]] <- c(1, 0, 1)
+  }
+  expected_result <- c(2, 0, 1)
+  names(expected_result) <- fake_geno_names
+  expect_error(report_num_high_confidence_trans_edge(fake_trans,
+                                                     fake_hi_conf_edges,
+                                                     fake_geno_names))
+})
+
+test_that("report_num_high_confidence_trans_edge error for invalid input", {
+  fake_geno_names <- letters[1:3]
+  fake_trans <- fake_hi_conf_edges <- rep(list(NULL), length(fake_geno_names))
+  for (i in 1:length(fake_geno_names)) {
+    fake_trans[[i]]$transition <- c(1, 1, 1)
+    fake_hi_conf_edges[[i]] <- matrix(0)
+  }
+  fake_trans[[1]]$transition <- c(1, 1, 1)
+  fake_trans[[2]]$transition <- c(0, 0, 0)
+  fake_trans[[3]]$transition <- c(1, 1, 0)
+  expected_result <- c(2, 0, 1)
+  names(expected_result) <- fake_geno_names
+  expect_error(report_num_high_confidence_trans_edge(fake_trans,
+                                                     fake_hi_conf_edges,
+                                                     fake_geno_names))
+})
+
+
+test_that("report_num_high_confidence_trans_edge error for invalid input", {
+  fake_geno_names <- letters[1:3]
+  fake_trans <- fake_hi_conf_edges <- rep(list(NULL), length(fake_geno_names))
+  for (i in 1:length(fake_geno_names)) {
+    fake_trans[[i]]$transition <- c(1, 1, 1)
+    fake_hi_conf_edges[[i]] <- c(1, 0, 1)
+  }
+  fake_trans[[1]]$transition <- c(1, 1, 1)
+  fake_trans[[2]]$transition <- c(0, 0, 0)
+  fake_trans[[3]]$transition <- c(1, 1, 0)
+  expected_result <- c(2, 0, 1)
+  names(expected_result) <- matrix(0)
+  expect_error(report_num_high_confidence_trans_edge(fake_trans,
+                                                     fake_hi_conf_edges,
+                                                     matrix(0)))
+})
+test_that("report_num_high_confidence_trans_edge error for invalid input", {
+  fake_geno_names <- c(1, 2, 3)
+  fake_trans <- fake_hi_conf_edges <- rep(list(NULL), length(fake_geno_names))
+  for (i in 1:length(fake_geno_names)) {
+    fake_trans[[i]]$transition <- c(1, 1, 1)
+    fake_hi_conf_edges[[i]] <- c(1, 0, 1)
+  }
+  fake_trans[[1]]$transition <- c(1, 1, 1)
+  fake_trans[[2]]$transition <- c(0, 0, 0)
+  fake_trans[[3]]$transition <- c(1, 1, 0)
+  expected_result <- c(2, 0, 1)
+  names(expected_result) <- fake_geno_names
+  expect_error(report_num_high_confidence_trans_edge(fake_trans,
+                                                     fake_hi_conf_edges,
+                                                     fake_geno_names))
 })
 
 # test assign_high_confidence_to_transition_edges
