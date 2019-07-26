@@ -383,7 +383,7 @@ calculate_genotype_significance <- function(mat,
 #' power while bounding error.
 #'
 #' @details Note, implementation of FDR is different from the choice of
-#'   bonferroni in the original phyC paper.
+#'   bonferroni in the phyC paper.
 #'
 #' @param hit_values Numeric. Vector of the empirical p-value for each genotype.
 #'   Each entry corresponds to respective column in genotype_matrix. Should be

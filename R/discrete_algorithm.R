@@ -60,7 +60,7 @@ count_hits_on_edges <- function(genotype_transition_edges,
                                 high_confidence_edges,
                                 tr){
   # TODO This approach assumes that the genotype_transition_edges being fed
-  # TODO   into it are all 0 > 1 for original phyC. Not sure if there is an
+  # TODO   into it are all 0 > 1 for phyC. Not sure if there is an
   # TODO   assumption in place for the overlap test.
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -216,7 +216,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
                                      high_confidence_edges,
                                      i)
 
-      # Note on nomeclature from the original phyC paper supplement page 7:
+      # Note on nomeclature from the phyC paper supplement page 7:
       # https://media.nature.com/original/nature-assets/ng/journal/v45/n10/extref/ng.2747-S1.pdf
       # X -> G on R is the same as
       #   sum(empirical_both_present >= both_present[i])

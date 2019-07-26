@@ -630,7 +630,7 @@ make_ann_colors <- function(geno_matrix){
   return(ann_colors)
 }
 
-#' discrete_plot_orig
+#' discrete_plot_phyc
 #'
 #' @description Plot PhyC results.
 #'
@@ -663,7 +663,7 @@ make_ann_colors <- function(geno_matrix){
 #'   corresponds to one genotype.
 #'
 #' @return  Plots printed into one pdf.
-discrete_plot_orig <- function(tr,
+discrete_plot_phyc <- function(tr,
                                dir,
                                name,
                                fdr,
@@ -936,7 +936,7 @@ discrete_plot_orig <- function(tr,
   }
 
   grDevices::dev.off()
-} # end discrete_plot_orig()
+} # end discrete_plot_phyc()
 
 #' discrete_plot_trans
 #'

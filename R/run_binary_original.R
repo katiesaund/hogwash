@@ -107,7 +107,7 @@ run_binary_original <- function(args){
 
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
-  discrete_plot_orig(tr = args$tree,
+  discrete_plot_phyc(tr = args$tree,
                      dir = args$output_dir,
                      name = args$output_name,
                      fdr = args$fdr,
