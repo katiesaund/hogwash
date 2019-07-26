@@ -53,8 +53,6 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   p_non_trans_delta <-
     calculate_phenotype_change_on_edge(non_t_index, phenotype_by_edges)
 
-  # withCalligHandlers suppresses the warning message:
-  # 'cannot compute exact p-value with ties'
   set.seed(1)
   ks_results <-  withCallingHandlers(stats::ks.test(p_trans_delta,
                                                     p_non_trans_delta),

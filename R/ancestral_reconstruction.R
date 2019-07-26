@@ -268,7 +268,7 @@ discrete_ancestral_reconstruction <- function(tr,
     as.numeric(colnames(reconstruction$lik.anc)[apply(reconstruction$lik.anc,
                                                       1,
                                                       which.max)])
-  names(ML_anc_rec) <- c((ape::Ntip(tr) + 1):(ape::Ntip(tr) + ape::Nnode(tr)))
+  names(ML_anc_rec) <- c( (ape::Ntip(tr) + 1):(ape::Ntip(tr) + ape::Nnode(tr)))
   tip_and_node_recon <- c(mat[, num, drop = TRUE], ML_anc_rec)
   names(tip_and_node_recon) <- c(1:sum(ape::Ntip(tr), ape::Nnode(tr)))
 
@@ -405,7 +405,8 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   } else {
     # Pick best of ER and ARD
     p_ER_ARD <-
-      1 - stats::pchisq(2 * abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
+      1 - stats::pchisq(
+        2 * abs(ERreconstruction$loglik - ARDreconstruction$loglik), 1)
     if (p_ER_ARD < alpha &
         stats::AIC(ERreconstruction) >
         (significant_difference_in_AIC + stats::AIC(ARDreconstruction))) {

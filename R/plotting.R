@@ -275,9 +275,10 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
     trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[, 1])],
                          row.names(trans_edge_mat)), ]
   ordered_by_p_val <-
-    sorted_trans_edge_mat[,
-                           match(row.names(log_p_value)[order(log_p_value[, 1])],
-                                 colnames(sorted_trans_edge_mat))]
+    sorted_trans_edge_mat[, match(
+      row.names(log_p_value)[order(log_p_value[, 1])],
+      colnames(sorted_trans_edge_mat))]
+
   column_annot_ordered_by_p_val <-
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
                        row.names(column_annot)), ]
@@ -407,7 +408,7 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
         substr(colnames(sorted_trans_edge_mat), 1, 20)
 
       pheatmap::pheatmap(
-        sorted_trans_edge_mat[ , j, drop = FALSE],
+        sorted_trans_edge_mat[, j, drop = FALSE],
         main = paste0(row.names(pval_all_transition$hit_pvals)[j],
                       "\n Tree edges: hi conf trans vs delta pheno"),
         cluster_cols = FALSE,
@@ -898,10 +899,10 @@ discrete_plot_phyc <- function(tr,
       row.names(g_mat) <- c(1:nrow(g_mat))
       colnames(g_mat) <- "genotype_transition"
       temp_g_mat <- cbind(g_mat, phenotype_annotation)
-      g_mat <- temp_g_mat[order(temp_g_mat[,2],
-                                temp_g_mat[,1],
+      g_mat <- temp_g_mat[order(temp_g_mat[, 2],
+                                temp_g_mat[, 1],
                                 na.last = FALSE,
-                                decreasing = FALSE ),
+                                decreasing = FALSE),
                           1,
                           drop = FALSE]
       plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)

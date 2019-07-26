@@ -83,17 +83,23 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
   for (j in 1:length(unique_genes)) {
     # Matrix of just the SNPs found in gene "j"
     temp_mat <-
-      tip_nod_by_mat_recon_w_gene_id[1:(nrow(tip_nod_by_mat_recon_w_gene_id) - 1),
-                                              tip_nod_by_mat_recon_w_gene_id[nrow(tip_nod_by_mat_recon_w_gene_id), ] == unique_genes[j],
-                                              drop = FALSE]
+      tip_nod_by_mat_recon_w_gene_id[1:(
+        nrow(tip_nod_by_mat_recon_w_gene_id) - 1),
+        tip_nod_by_mat_recon_w_gene_id[nrow(
+          tip_nod_by_mat_recon_w_gene_id), ] == unique_genes[j],
+        drop = FALSE]
     temp_recon_times_confi <-
-      recon_times_confi_with_gene_id[1:(nrow(recon_times_confi_with_gene_id) - 1),
-                                     recon_times_confi_with_gene_id[nrow(recon_times_confi_with_gene_id), ] == unique_genes[j],
-                                     drop = FALSE]
+      recon_times_confi_with_gene_id[1:(
+        nrow(recon_times_confi_with_gene_id) - 1),
+        recon_times_confi_with_gene_id[nrow(
+          recon_times_confi_with_gene_id), ] == unique_genes[j],
+        drop = FALSE]
     temp_conf <-
-      tip_node_by_snp_mat_conf_w_id[1:(nrow(tip_node_by_snp_mat_conf_w_id) - 1),
-                                    tip_node_by_snp_mat_conf_w_id[nrow(tip_node_by_snp_mat_conf_w_id), ] == unique_genes[j],
-                                    drop = FALSE]
+      tip_node_by_snp_mat_conf_w_id[1:(
+        nrow(tip_node_by_snp_mat_conf_w_id) - 1),
+        tip_node_by_snp_mat_conf_w_id[nrow(
+          tip_node_by_snp_mat_conf_w_id), ] == unique_genes[j],
+        drop = FALSE]
     class(temp_mat) <-
       class(temp_recon_times_confi) <-
       class(temp_conf) <-
@@ -199,10 +205,10 @@ build_gene_trans_from_snp_trans <- function(tr,
     colnames(trans_dir_edges_by_snp_mat) <-
     colnames(geno)
 
-  transition_edges_by_snp_mat_with_gene_id <-
+  trans_ed_by_snp_mat_w_id <-
     rbind(transition_edges_by_snp_mat,
           unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
-  trans_dir_edges_by_snp_mat_with_gene_id <-
+  trans_dir_ed_by_snp_mat_w_id <-
     rbind(trans_dir_edges_by_snp_mat,
           unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
 
@@ -215,18 +221,22 @@ build_gene_trans_from_snp_trans <- function(tr,
 
   for (j in 1:length(unique_genes)) {
     temp_mat <-
-      transition_edges_by_snp_mat_with_gene_id[1:(nrow(transition_edges_by_snp_mat_with_gene_id) - 1),
-                                               transition_edges_by_snp_mat_with_gene_id[nrow(transition_edges_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
+      trans_ed_by_snp_mat_w_id[1:(
+        nrow(trans_ed_by_snp_mat_w_id) - 1),
+        trans_ed_by_snp_mat_w_id[nrow(
+          trans_ed_by_snp_mat_w_id), ] == unique_genes[j], drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
-    gene_transition_mat_built_from_snps[,j] <- temp_column
+    gene_transition_mat_built_from_snps[, j] <- temp_column
 
     temp_dir_mat <-
-      trans_dir_edges_by_snp_mat_with_gene_id[1:(nrow(trans_dir_edges_by_snp_mat_with_gene_id) - 1),
-                                              trans_dir_edges_by_snp_mat_with_gene_id[nrow(trans_dir_edges_by_snp_mat_with_gene_id), ] == unique_genes[j], drop = FALSE]
+      trans_dir_ed_by_snp_mat_w_id[1:(
+        nrow(trans_dir_ed_by_snp_mat_w_id) - 1),
+        trans_dir_ed_by_snp_mat_w_id[nrow(
+          trans_dir_ed_by_snp_mat_w_id), ] == unique_genes[j], drop = FALSE]
     class(temp_dir_mat) <- "numeric"
     temp_dir_column <- rowSums(temp_dir_mat)
-    gene_trans_dir_mat_built_from_snps[,j] <- temp_dir_column
+    gene_trans_dir_mat_built_from_snps[, j] <- temp_dir_column
   }
 
   gene_transition_mat_built_from_snps <- gene_transition_mat_built_from_snps > 0
@@ -297,8 +307,10 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 
   for (j in 1:length(unique_genes)) {
     temp_mat <-
-      snp_geno_with_gene_id[1:(nrow(snp_geno_with_gene_id) - 1),
-                            snp_geno_with_gene_id[nrow(snp_geno_with_gene_id), ] == unique_genes[j], drop = FALSE]
+      snp_geno_with_gene_id[1:(
+        nrow(snp_geno_with_gene_id) - 1),
+        snp_geno_with_gene_id[nrow(
+          snp_geno_with_gene_id), ] == unique_genes[j], drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
     samples_by_genes[,j] <- temp_column

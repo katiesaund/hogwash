@@ -79,7 +79,9 @@ count_hits_on_edges <- function(genotype_transition_edges,
   })
 
   only_geno_present <- sapply(1:length(high_confidence_edges), function(x) {
-    sum(genotype_transition_edges[[x]][as.logical(high_confidence_edges[[x]])]) - both_present[x]
+    sum(
+      genotype_transition_edges[[x]][as.logical(high_confidence_edges[[x]])]) -
+      both_present[x]
   })
 
   # Check and return output ----------------------------------------------------
@@ -218,13 +220,12 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
                                      i)
 
 # Note on nomeclature from the phyC paper supplement page 7:
-# X -> G on R is the same as
-#   sum(empirical_both_present >= both_present[i])
-# X -> G on S is the same as
-#   sum(empirical_only_geno_present <= only_geno_present[i])
-# Note: sum(empirical_both_present >= both_present[i]) always equals
-#       sum(empirical_only_geno_present <= only_geno_present[i])
-#       so we only need to include one in the p-value calculation.
+# X -> G on R is the same as sum(empirical_both_present >= both_present[i])
+# X -> G on S is the same
+# as sum(empirical_only_geno_present <= only_geno_present[i])
+# Note: sum(empirical_both_present >= both_present[i]) always
+# equals sum(empirical_only_geno_present <= only_geno_present[i])
+# so we only need to include one in the p-value calculation.
 
       pval <- calculate_permutation_based_p_value(empirical_both_present,
                                                   both_present[i],

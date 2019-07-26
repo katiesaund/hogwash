@@ -52,11 +52,11 @@ run_synchronous <- function(args){
       rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)) {
       geno_conf_ordered_by_edges[[k]] <-
-        reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf,
-                                        args$tree)
+        reorder_tips_and_nodes_to_edges(
+          AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
       geno_recon_ordered_by_edges[[k]] <-
-        reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_recon,
-                                        args$tree)
+        reorder_tips_and_nodes_to_edges(
+          AR$geno_recon_and_conf[[k]]$tip_and_node_recon, args$tree)
     }
   }
   hi_conf <- prepare_high_confidence_objects(
