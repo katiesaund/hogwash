@@ -70,13 +70,13 @@ run_continuous <- function(args){
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   results_all_transitions <-
-    calculate_genotype_significance(hi_conf$genotype,
-                                    args$perm,
-                                    hi_conf$genotype_transition,
-                                    args$tree,
-                                    AR$pheno_recon_and_conf$recon_edge_mat,
-                                    hi_conf$high_conf_ordered_by_edges,
-                                    hi_conf$geno_recon_edge)
+    calc_sig(hi_conf$genotype,
+             args$perm,
+             hi_conf$genotype_transition,
+             args$tree,
+             AR$pheno_recon_and_conf$recon_edge_mat,
+             hi_conf$high_conf_ordered_by_edges,
+             hi_conf$geno_recon_edge)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_all_transitions <-

@@ -237,7 +237,7 @@ calculate_empirical_pheno_delta <- function(perm,
   return(empirical_ks_stat)
 } # end calculate_empirical_pheno_delta()
 
-#' calculate_genotype_significance
+#' calc_sig
 #'
 #' @description Run Kolmogorov-Smirnov test to find out if the phenotype change
 #'   on transition edges is significantly different from phenotype change on
@@ -282,7 +282,7 @@ calculate_empirical_pheno_delta <- function(perm,
 #'      between 1 and 0.
 #'
 #' @noRd
-calculate_genotype_significance <- function(mat,
+calc_sig <- function(mat,
                                             permutations,
                                             genotype_transition_list,
                                             tr,
@@ -373,7 +373,7 @@ calculate_genotype_significance <- function(mat,
                   "num_genotypes" = ncol(mat),
                   "observed_ks_stat" = observed_ks_stat)
   return(results)
-} # end calculate_genotype_significance()
+} # end calc_sig()
 
 #' get_sig_hit_and_mult_test_corr
 #'
