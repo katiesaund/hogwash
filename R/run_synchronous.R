@@ -1,4 +1,4 @@
-#' run_binary_transition
+#' run_synchronous
 #'
 #' @description Run Synchronous algorithm.
 #'
@@ -7,7 +7,7 @@
 #' @return Saves two files: a pdf with plots of results and a .rda with log and
 #'    all relevant results.
 #' @noRd
-run_binary_transition <- function(args){
+run_synchronous <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
   results_object$log <- utils::capture.output(utils::sessionInfo())
@@ -127,4 +127,4 @@ run_binary_transition <- function(args){
                            results_object,
                            "synchronous",
                            args$group_genotype)
-} # end run_binary_transition()
+} # end run_synchronous()

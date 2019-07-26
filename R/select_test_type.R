@@ -15,7 +15,7 @@ select_test_type <- function(args){
   if (args$discrete_or_continuous == "continuous") {
     run_continuous(args)
   } else {
-    run_binary_transition(args)
+    run_synchronous(args)
     run_phyc(args)
   }
 } # end select_test_type()
