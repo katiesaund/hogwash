@@ -1,16 +1,14 @@
+#' identify_short_edges
+#'
+#' @description Removes any edges that make up a 10% or more of the total tr
+#'  length.
+#' @param tr  Phylo.
+#'
+#' @return short_edges. Binary vector. Length = Nedge(tr). Each entry
+#'  corresponds to an edge. 0 == long edge (low confidence in reconstruction
+#'  value). 1 == short edge (high confidence in reconstruction value).
+#' @noRd
 identify_short_edges <- function(tr){
-  # Function description -------------------------------------------------------
-  # Removes any edges that make up a 10% or more of the total tr length.
-  #
-  # Input:
-  # Tr. Phylo.
-  #
-  # Output:
-  # short_edges. Binary vector. Length = Nedge(tr). Each entry corresponds to
-  #                             an edge. 0 == long edge (low confidence in
-  #                             reconstruction value). 1 == short edge (high
-  #                             confidence in reconstruction value).
-  #
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
 
@@ -28,40 +26,34 @@ identify_short_edges <- function(tr){
 
   # Return output --------------------------------------------------------------
   check_if_binary_vector(short_edges)
-  if (length(short_edges) != ape::Nedge(tr)) {
-    stop("Short_edges should have length == Nedge(tr)")
-  }
+  check_equal(length(short_edges), ape::Nedge(tr))
   return(short_edges)
 } # end identify_short_edges()
 
+#' get_bootstrap_confidence
+#'
+#' @description Extracts the bootstrap confidence stored in the node.labels of
+#'  the tree, convertns them to a fraction between 0 and 1, and then classifies
+#'  each node as high or low confidence based on the input confidence threshold.
+#'
+#' @details This method requires that the bootstrap values be assigned to node
+#'  labels. It makes an assumption that the bootstrap values are stored as
+#'   numbers between 1 and 100, that need to then be converted to from this
+#'   percentage to a fraction. A better input would be Bayesian posterior
+#'   probabilities than ML derived bootstrap values...but most of what we're
+#'   working with is boostrap values.
+#'
+#' @param tr Phylo.
+#' @param confidence_threshold Numeric. Between 0 and 1.
+#'
+#' @return tree_tip_and_node_confidence. Binary vector. Length = Ntip(tr) +
+#'  Nnode(tr). The first section is the tip confidence, which is always, by
+#'  definition 1. Then the remaining entries correspond to the nodes and is
+#'  either 0 or 1.
+#'
+#'  @noRd
+#'
 get_bootstrap_confidence <- function(tr, confidence_threshold){
-  # Function description -------------------------------------------------------
-  # Extracts the bootstrap confidence stored in the node.labels of the tree,
-  # convertns them to a fraction between 0 and 1, and then classifies each
-  # node as high or low confidence based on the input confidence threshold.
-  #
-  # Notes:
-  # This method requires that the bootstrap values be assigned to node
-  # labels.
-  #
-  # It makes an assumption that the bootstrap values are stored as numbers
-  # between 1 and 100, that need to then be converted to from this percentage
-  # to a fraction.
-  #
-  # A better input would be Bayesian posterior probabilities than ML derived
-  # bootstrap values...but most of what we're working with is boostrap values.
-  #
-  # Input:
-  # Tr. Phylo.
-  # confidence_threshold. Numeric. Between 0 and 1.
-  #
-  # Output:
-  # tree_tip_and_node_confidence.  Binary vector. Length = Ntip(tr) + Nnode(tr).
-  #                                The first section is the tip confidence,
-  #                                which is always, by definition 1. Then the
-  #                                remaining entries correspond to the nodes
-  #                                and is either 0 or 1.
-  #
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_number(confidence_threshold)
@@ -82,24 +74,21 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
 
   # Check and return output ----------------------------------------------------
   check_if_binary_vector(tree_tip_and_node_confidence)
-  if (length(tree_tip_and_node_confidence) != sum(ape::Ntip(tr) + ape::Nnode(tr))) {
-    stop("tree confidence made incorrectly")
-  }
-
+  check_equal(length(tree_tip_and_node_confidence), sum(ape::Ntip(tr) + ape::Nnode(tr)))
   return(tree_tip_and_node_confidence)
 } # end get_bootstrap_confidence()
 
+#' reorder_tips_and_nodes_to_edges
+#'
+#' @description Reorder a vector organzied by tips then nodes into a vector
+#'  organized by tree edges.
+#'
+#' @param tips_and_node_vector Numeric vector. Length = Ntip(tr) + Nnode(tr).
+#' @param tr Phylo.
+#'
+#' @return ordered_by_edges. Numeric vector. Length = Nedge(tr).
+#' @noRd
 reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
-  # Function description -------------------------------------------------------
-  # Convert
-  #
-  # Input:
-  # Tr. Phylo.
-  # tips_and_node_vector. ?
-  #
-  # Output:
-  # ordered_by_edges ?
-  #
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
   # TODO add check of length of edges vs tips_and_node_vector
