@@ -107,7 +107,7 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
 
   # Function -------------------------------------------------------------------
   # GRAB THE IDS OF THE TRANSITION EDGES
-  trans_index     <- c(1:ape::Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
+  trans_index <- c(1:ape::Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
   non_trans_index <- c(1:ape::Nedge(tr))[!geno_tran[[index]]$transition]
   # [1] EX:  8 12 13 16 19 26 27 31 37 44 52 56 64 67 68 76 77 80 89 92 97 98
   # THESE EDGES ARE DEFINED BY THE NODES IN THE CORRESPONDING ROWS OF tr$edge
@@ -174,13 +174,15 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   }
   permuted_trans_index_mat <- matrix(nrow = perm, ncol = num_trans_edges)
   set.seed(1) # for reproducability of the sample() function
-  for (j in 1:perm) {  # create a random sample of the tr
+
+  # create a random sample of the tr
+  for (j in 1:perm) {
     permuted_trans_index_mat[j, ] <- sample(1:num_hi_conf_edges,
                                         size = num_trans_edges,
                                         replace = TRUE,
                                         prob = tr$edge.length[hi_conf_edges] /
                                           sum(tr$edge.length[hi_conf_edges]))
-  } # end for (j)
+  }
   # permuted_trans_index_mat is my new, permuted "indices$trans_index" where
   # each row is a new, fake list of transition genotype branches.
   # TODO BUT CAVEAT: these are just fake/null transitions and some of them are
@@ -283,14 +285,16 @@ calculate_empirical_pheno_delta <- function(perm,
 #'
 #' @noRd
 calc_sig <- function(mat,
-                                            permutations,
-                                            genotype_transition_list,
-                                            tr,
-                                            pheno_recon_ordered_by_edges,
-                                            genotype_confidence,
-                                            genotype_reconstruction){
-  # TODO double check that genotype_reconstruction is not needed in this function
-  # TODO If that's true, then remove and propogate the change and test after implementation.
+                     permutations,
+                     genotype_transition_list,
+                     tr,
+                     pheno_recon_ordered_by_edges,
+                     genotype_confidence,
+                     genotype_reconstruction){
+  # TODO double check that genotype_reconstruction is not needed in this
+  # TODO   function
+  # TODO If that's true, then remove and propogate the change and test after
+  # TODO   implementation.
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_permutation_num_valid(permutations)

@@ -45,4 +45,3 @@
 #'   \item{node.lables}{Bootstrap values for each node}
 #'  }
 "tree"
-

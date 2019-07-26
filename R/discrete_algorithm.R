@@ -183,7 +183,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
   }
 
   # For each genotype from the genotype_matrix:
-  record_of_redistributed_both_present <- rep(list(0), num_genotypes)
+  record_redistrib_both_present <- rep(list(0), num_genotypes)
   for (i in 1:num_genotypes) { # looping over each genotype in the genotype_mat
     if (num_edges_with_geno_trans[i] > num_hi_conf_edges[i]) {
       stop("Too many hits on the branches")
@@ -229,14 +229,14 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
                                                   both_present[i],
                                                   permutations)
       hit_pvals[i] <- format(round(pval, 20), nsmall = 20)
-      record_of_redistributed_both_present[[i]] <- empirical_both_present
+      record_redistrib_both_present[[i]] <- empirical_both_present
     }
   }
   names(hit_pvals) <- colnames(mat)
 
   # Return output --------------------------------------------------------------
   results <- list("hit_pvals" = hit_pvals,
-                  "permuted_count" = record_of_redistributed_both_present,
+                  "permuted_count" = record_redistrib_both_present,
                   "observed_overlap" = both_present)
   return(results)
 } # end discrete_calculate_pvals()

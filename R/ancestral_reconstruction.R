@@ -376,7 +376,7 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
   # Test ER vs ARD
   set.seed(1)
-  ERreconstruction  <- ape::ace(mat[ , num, drop = TRUE],
+  ERreconstruction  <- ape::ace(mat[, num, drop = TRUE],
                            tr,
                            type = disc_cont,
                            method = recon_method,
@@ -388,7 +388,7 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
   # preferred in this case use the following warning catching:
   error_msg <- "ARD_bad_fit"
   set.seed(1)
-  ARDreconstruction <- tryCatch(ape::ace(mat[ , num, drop = TRUE],
+  ARDreconstruction <- tryCatch(ape::ace(mat[, num, drop = TRUE],
                                     tr,
                                     type = disc_cont,
                                     method = recon_method,
