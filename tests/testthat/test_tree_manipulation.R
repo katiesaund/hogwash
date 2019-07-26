@@ -1,31 +1,6 @@
 context("Tree manipulation functions") #---------------------------------------#
 
-# TODO test reorder_tips_and_nodes_to_edges() -- see if this function ever gets
-# TODO   used before writing unit tests
-# reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
-#   # Function description -------------------------------------------------------
-#   # TODO ??
-#   #
-#   # Input:
-#   # Tr. Phylo.
-#   # tips_and_node_vector. ?
-#   #
-#   # Output:
-#   # ordered_by_edges ?
-#   #
-#   # Check input ----------------------------------------------------------------
-#   check_tree_is_valid(tr)
-#   # TODO add check of length of edges vs tips_and_node_vector
-#
-#   # Function -------------------------------------------------------------------
-#   ordered_by_edges <- rep(NA, Nedge(tr))
-#   for (i in 1:Nedge(tr)){
-#     ordered_by_edges[i] <- tips_and_node_vector[tr$edge[i, 2]]
-#   }
-#
-#   # Return output --------------------------------------------------------------
-#   return(ordered_by_edges)
-# } # end reorder_tips_and_nodes_to_edges()
+# TODO test reorder_tip_and_node_to_edge()
 
 # test identify_short_edges
 test_that("identify_short_edges returns the only 1s in this test tree", {

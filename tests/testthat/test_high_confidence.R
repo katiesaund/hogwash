@@ -112,11 +112,11 @@ test_that("prepare_high_confidence_objects returns objects of expected sizes for
     rep(list(0), ncol(temp_geno))
   for (k in 1:ncol(temp_geno)) {
     temp_geno_conf_order_by_edges[[k]] <-
-      reorder_tips_and_nodes_to_edges(
+      reorder_tip_and_node_to_edge(
         temp_AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf,
         temp_tree)
     temp_geno_recon_ord_by_edges[[k]] <-
-      reorder_tips_and_nodes_to_edges(
+      reorder_tip_and_node_to_edge(
         temp_AR$geno_recon_and_conf[[k]]$tip_and_node_recon,
         temp_tree)
   }

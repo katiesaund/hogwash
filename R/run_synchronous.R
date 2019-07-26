@@ -51,10 +51,10 @@ run_synchronous <- function(args){
       rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)) {
       geno_conf_ordered_by_edges[[k]] <-
-        reorder_tips_and_nodes_to_edges(
+        reorder_tip_and_node_to_edge(
           AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
       geno_recon_ordered_by_edges[[k]] <-
-        reorder_tips_and_nodes_to_edges(
+        reorder_tip_and_node_to_edge(
           AR$geno_recon_and_conf[[k]]$tip_and_node_recon, args$tree)
     }
   }
@@ -116,9 +116,9 @@ run_synchronous <- function(args){
                              "synchronous")
   results_object$hit_pvals <- corrected_pvals_trans$hit_pvals
   results_object$sig_pvals <- corrected_pvals_trans$sig_pvals
-  results_object$high_confidence_transition_edges <-
-    hi_conf$high_confidence_transition_edges
-  results_object$num_high_confidence_transition_edges <-
+  results_object$hi_confidence_transition_edge <-
+    hi_conf$hi_confidence_transition_edge
+  results_object$num_hi_conf_transition_edge <-
     hi_conf$num_high_conf_trans_edges
   results_object$dropped_genotypes <- hi_conf$dropped_genotypes
   save_results_as_r_object(args$output_dir,

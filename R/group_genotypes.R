@@ -213,8 +213,8 @@ build_gene_trans_from_snp_trans <- function(tr,
           unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
 
   unique_genes <- unique(gene_to_snp_lookup_table[, 2])
-  gene_transition_mat_built_from_snps <-
-    gene_trans_dir_mat_built_from_snps <-
+  gene_trans_mat_built_from_snp <-
+    gene_trans_dir_mat_blt_frm_snp <-
     matrix(0,
            nrow = nrow(transition_edges_by_snp_mat),
            ncol = length(unique_genes))
@@ -227,7 +227,7 @@ build_gene_trans_from_snp_trans <- function(tr,
           trans_ed_by_snp_mat_w_id), ] == unique_genes[j], drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
-    gene_transition_mat_built_from_snps[, j] <- temp_column
+    gene_trans_mat_built_from_snp[, j] <- temp_column
 
     temp_dir_mat <-
       trans_dir_ed_by_snp_mat_w_id[1:(
@@ -236,32 +236,32 @@ build_gene_trans_from_snp_trans <- function(tr,
           trans_dir_ed_by_snp_mat_w_id), ] == unique_genes[j], drop = FALSE]
     class(temp_dir_mat) <- "numeric"
     temp_dir_column <- rowSums(temp_dir_mat)
-    gene_trans_dir_mat_built_from_snps[, j] <- temp_dir_column
+    gene_trans_dir_mat_blt_frm_snp[, j] <- temp_dir_column
   }
 
-  gene_transition_mat_built_from_snps <- gene_transition_mat_built_from_snps > 0
-  class(gene_transition_mat_built_from_snps) <- "numeric"
-  colnames(gene_transition_mat_built_from_snps) <- unique_genes
-  row.names(gene_transition_mat_built_from_snps) <-
-    c(1:nrow(gene_transition_mat_built_from_snps))
+  gene_trans_mat_built_from_snp <- gene_trans_mat_built_from_snp > 0
+  class(gene_trans_mat_built_from_snp) <- "numeric"
+  colnames(gene_trans_mat_built_from_snp) <- unique_genes
+  row.names(gene_trans_mat_built_from_snp) <-
+    c(1:nrow(gene_trans_mat_built_from_snp))
 
-  gene_trans_dir_mat_built_from_snps <- gene_trans_dir_mat_built_from_snps > 0
-  class(gene_trans_dir_mat_built_from_snps) <- "numeric"
-  colnames(gene_trans_dir_mat_built_from_snps) <- unique_genes
-  row.names(gene_trans_dir_mat_built_from_snps) <-
-    c(1:nrow(gene_trans_dir_mat_built_from_snps))
+  gene_trans_dir_mat_blt_frm_snp <- gene_trans_dir_mat_blt_frm_snp > 0
+  class(gene_trans_dir_mat_blt_frm_snp) <- "numeric"
+  colnames(gene_trans_dir_mat_blt_frm_snp) <- unique_genes
+  row.names(gene_trans_dir_mat_blt_frm_snp) <-
+    c(1:nrow(gene_trans_dir_mat_blt_frm_snp))
 
   gene_transition_list_built_from_snps <- rep(list(0), length(unique_genes))
   for (m in 1:length(unique_genes)) {
     gene_transition_list_built_from_snps[[m]] <-
-      gene_transition_mat_built_from_snps[, m, drop = TRUE]
+      gene_trans_mat_built_from_snp[, m, drop = TRUE]
   }
   names(gene_transition_list_built_from_snps) <- unique_genes
 
   gene_trans_dir_list_built_from_snps <- rep(list(0), length(unique_genes))
   for (m in 1:length(unique_genes)) {
     gene_trans_dir_list_built_from_snps[[m]] <-
-      gene_trans_dir_mat_built_from_snps[, m, drop = TRUE]
+      gene_trans_dir_mat_blt_frm_snp[, m, drop = TRUE]
   }
   names(gene_trans_dir_list_built_from_snps) <- unique_genes
 
@@ -313,7 +313,7 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
           snp_geno_with_gene_id), ] == unique_genes[j], drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
-    samples_by_genes[,j] <- temp_column
+    samples_by_genes[, j] <- temp_column
   }
 
   samples_by_genes <- samples_by_genes > 0
@@ -348,19 +348,20 @@ prepare_grouped_genotype <- function(geno, lookup){
   check_if_binary_matrix(geno)
 
   # Function -------------------------------------------------------------------
-  genotypes_to_drop_because_not_present <-
+  geno_to_drop_bc_not_present <-
     c(colnames(geno)[colSums(geno) == 0],
       colnames(geno)[colSums(geno) == nrow(geno)])
 
   # we don't want to remove snps that are too rare or too common until snps are
   # grouped into genes, then run on the grouped genes. But we need to remove
   # SNPs that don't occur for ace to work.
-  genotype <- geno[,colSums(geno) > 0]
-  genotype <- genotype[,colSums(genotype) < nrow(genotype)]
+  genotype <- geno[, colSums(geno) > 0]
+  genotype <- genotype[, colSums(genotype) < nrow(genotype)]
 
-  # TODO replace the magic numbers in the next four lines. Group into a function?
+  # TODO replace the magic numbers in the next four lines.
+  # TODO Group into a function?
   gene_snp_lookup <-
-    lookup[!(lookup[, 1] %in% genotypes_to_drop_because_not_present),
+    lookup[!(lookup[, 1] %in% geno_to_drop_bc_not_present),
            , drop = FALSE]
   gene_snp_lookup <-
     gene_snp_lookup[gene_snp_lookup[, 1] %in% colnames(genotype),
@@ -462,7 +463,7 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
 #'
 #' @param tr Phylo.
 #' @param geno Binary matrix. Nrow = Ntip(tr). Ncol = Number of genotypes.
-#' @param genotype_reconstruction_and_confidence List of Lists of four objects.
+#' @param geno_recon_and_conf List of Lists of four objects.
 #'   Length of list == number of genotypes.
 #'   * $node_anc_rec. Reconstructed values correspond to each ancestral node.
 #'   * $tip_and_node_recon. Reconstructed values corresponding to tips and
@@ -495,7 +496,7 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
 #'
 group_genotypes <- function(tr,
                             geno,
-                            genotype_reconstruction_and_confidence,
+                            geno_reconstruction_and_conf,
                             genotype_transition_sync,
                             genotype_transition_phyc,
                             lookup,
@@ -508,14 +509,14 @@ group_genotypes <- function(tr,
                    min_rows = ape::Ntip(tr),
                    exact_cols = NULL,
                    min_cols = 1)
-  check_equal(length(genotype_reconstruction_and_confidence), ncol(geno))
-  check_equal(length(genotype_reconstruction_and_confidence[[1]]$node_anc_rec),
+  check_equal(length(geno_reconstruction_and_conf), ncol(geno))
+  check_equal(length(geno_reconstruction_and_conf[[1]]$node_anc_rec),
               ape::Nnode(tr))
-  check_equal(length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_recon),
+  check_equal(length(geno_reconstruction_and_conf[[1]]$tip_and_node_recon),
               c(ape::Nnode(tr) + ape::Ntip(tr)))
-  check_equal(length(genotype_reconstruction_and_confidence[[1]]$tip_and_node_rec_conf),
+  check_equal(length(geno_reconstruction_and_conf[[1]]$tip_and_node_rec_conf),
               c(ape::Nnode(tr) + ape::Ntip(tr)))
-  check_equal(nrow(genotype_reconstruction_and_confidence[[1]]$recon_edge_mat),
+  check_equal(nrow(geno_reconstruction_and_conf[[1]]$recon_edge_mat),
               ape::Nedge(tr))
   check_equal(length(genotype_transition_sync), ncol(geno))
   check_equal(length(genotype_transition_sync[[1]]$transition), ape::Nedge(tr))
@@ -531,7 +532,7 @@ group_genotypes <- function(tr,
   geno_recon_and_conf_tip_node <-
     build_gene_anc_recon_and_conf_from_snp(tr,
                                            geno,
-                                           genotype_reconstruction_and_confidence,
+                                           geno_reconstruction_and_conf,
                                            lookup)
   genotype_transition_sync <-
     build_gene_trans_from_snp_trans(tr, geno, genotype_transition_sync, lookup)
@@ -560,11 +561,11 @@ group_genotypes <- function(tr,
     rep(list(0), ncol(geno))
   for (k in 1:ncol(geno)) {
     geno_recon_ordered_by_edges[[k]] <-
-      reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_recon[[k]],
-                                      tr)
+      reorder_tip_and_node_to_edge(
+        geno_recon_and_confidence_tip_node_recon[[k]], tr)
     geno_conf_ordered_by_edges[[k]] <-
-      reorder_tips_and_nodes_to_edges(geno_recon_and_confidence_tip_node_confidence[[k]],
-                                      tr)
+      reorder_tip_and_node_to_edge(
+        geno_recon_and_confidence_tip_node_confidence[[k]], tr)
   }
 
   # Return output --------------------------------------------------------------

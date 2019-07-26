@@ -79,7 +79,7 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
   return(tree_tip_and_node_confidence)
 } # end get_bootstrap_confidence()
 
-#' reorder_tips_and_nodes_to_edges
+#' reorder_tip_and_node_to_edge
 #'
 #' @description Reorder a vector organzied by tips then nodes into a vector
 #'  organized by tree edges.
@@ -89,7 +89,7 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
 #'
 #' @return ordered_by_edges. Numeric vector. Length = Nedge(tr).
 #' @noRd
-reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
+reorder_tip_and_node_to_edge <- function(tips_and_node_vector, tr){
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
   # TODO add check of length of edges vs tips_and_node_vector
@@ -102,4 +102,4 @@ reorder_tips_and_nodes_to_edges <- function(tips_and_node_vector, tr){
 
   # Return output --------------------------------------------------------------
   return(ordered_by_edges)
-}# end reorder_tips_and_nodes_to_edges()
+}# end reorder_tip_and_node_to_edge()

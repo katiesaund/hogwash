@@ -49,9 +49,9 @@ run_continuous <- function(args){
       geno_recon_ordered_by_edges <-
       rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)) {
-      geno_conf_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(
+      geno_conf_ordered_by_edges[[k]] <- reorder_tip_and_node_to_edge(
         AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
-      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(
+      geno_recon_ordered_by_edges[[k]] <- reorder_tip_and_node_to_edge(
         AR$geno_recon_and_conf[[k]]$tip_and_node_recon, args$tree)
     }
   }
@@ -116,7 +116,7 @@ run_continuous <- function(args){
     hi_conf$dropped_genotypes
   results_object$genotype_transition_edge_matrix <-
     trans_mat_results$trans_dir_edge_mat
-  results_object$phenotype_transition_edge_matrix <-
+  results_object$phenotype_transition_edges <-
     trans_mat_results$p_trans_mat
   results_object$delta_pheno_table <-
     trans_mat_results$delta_pheno_table

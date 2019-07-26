@@ -144,7 +144,7 @@ assign_high_confidence_to_transition_edges <- function(tr,
 #'
 #' @return List of objects.
 #'  * dropped_genotypes Character vector. Names of the genotypes not being kept.
-#'  * high_confidence_transition_edges. List.
+#'  * hi_confidence_transition_edge. List.
 #'  * genotype. Matrix.
 #'  * snps_per_gene. Either Null or named table where names are genotypes and
 #'       the Values are number of not-yet-grouped-genotypes that go into the
@@ -190,9 +190,9 @@ prepare_high_confidence_objects <- function(genotype_transition,
 
   # Function -------------------------------------------------------------------
   pheno_conf_ordered_by_edges <-
-    reorder_tips_and_nodes_to_edges(pheno_tip_node_recon_conf, tr)
+    reorder_tip_and_node_to_edge(pheno_tip_node_recon_conf, tr)
   tree_conf <- get_bootstrap_confidence(tr, boot_threshold)
-  tree_conf_ordered_by_edges <- reorder_tips_and_nodes_to_edges(tree_conf, tr)
+  tree_conf_ordered_by_edges <- reorder_tip_and_node_to_edge(tree_conf, tr)
   short_edges <- identify_short_edges(tr)
 
   high_confidence_edges <-
@@ -238,7 +238,7 @@ prepare_high_confidence_objects <- function(genotype_transition,
   # Return output --------------------------------------------------------------
   results <-
     list("dropped_genotypes" = dropped_genotypes,
-          "high_confidence_transition_edges" = only_high_conf_geno_trans,
+          "hi_confidence_transition_edge" = only_high_conf_geno_trans,
           "genotype" = geno,
           "snps_per_gene" = snps_in_each_gene,
           "genotype_transition" = genotype_transition,
