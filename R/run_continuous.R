@@ -1,7 +1,17 @@
+#' run_continuous
+#'
+#' @description Run Continuous algorithm.
+#'
+#' @param args Object with all of the inputs necessary to run gwas.
+#'
+#' @return Saves two files: a pdf with plots of results and a .rda with log and
+#'    all relevant results.
+#' @noRd
+#'
 run_continuous <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
-  results_object$log <- utils::capture.output(utils::sessionInfo()) # log session info
+  results_object$log <- utils::capture.output(utils::sessionInfo())
   args$tree <- format_tree(args$tree)
 
   geno <- prepare_genotype(args$group_genotype,
@@ -15,10 +25,14 @@ run_continuous <- function(args){
                                           args$phenotype,
                                           genotype,
                                           args$discrete_or_continuous)
-  geno_trans_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For discrete concomitant and continuous tests.
+  # Include all transition edges (WT -> mutant and mutant -> WT). For discrete
+  #  concomitant and continuous tests.
+  geno_trans_concomitant <- AR$geno_trans
+
+  # Keep only WT -> mutant transitions.
   geno_trans_original <-
     prepare_genotype_transitions_for_original_discrete_test(genotype,
-                                                            geno_trans_concomitant) # Keep only WT -> mutant transitions.
+                                                            geno_trans_concomitant)
 
   if (args$group_genotype) {
     grouped_geno <- group_genotypes(args$tree,
@@ -35,7 +49,8 @@ run_continuous <- function(args){
     results_object$convergence_not_possible_genotypes <-
       grouped_geno$convergence_not_possible_genotypes
   } else {
-    geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <-
+    geno_conf_ordered_by_edges <-
+      geno_recon_ordered_by_edges <-
       rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)) {
       geno_conf_ordered_by_edges[[k]] <-
@@ -71,7 +86,8 @@ run_continuous <- function(args){
     get_sig_hits_while_correcting_for_multiple_testing(results_all_transitions$pvals,
                                                        args$fdr)
 
-  # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES #
+  # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON
+  #  TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES #
   all_transitions_sig_hits <-
     keep_hits_with_more_change_on_trans_edges(results_all_transitions,
                                               corrected_pvals_all_transitions,
@@ -114,5 +130,9 @@ run_continuous <- function(args){
   results_object$delta_pheno_list <- trans_mat_results$delta_pheno_list
   results_object$hit_pvals <- corrected_pvals_all_transitions$hit_pvals
   results_object$sig_hits <- all_transitions_sig_hits
-  save_results_as_r_object(args$output_dir, args$output_name, results_object, "continuous", args$group_genotype)
+  save_results_as_r_object(args$output_dir,
+                           args$output_name,
+                           results_object,
+                           "continuous",
+                           args$group_genotype)
 } # end run_continuous()
