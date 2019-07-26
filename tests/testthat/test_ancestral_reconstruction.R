@@ -320,6 +320,24 @@ test_that("discrete_ancestral_reconstruction gives error for invalid input", {
                                                    reconstruction_method))
 })
 
+test_that("discrete_ancestral_reconstruction gives error for invalid input", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(9, rooted = TRUE)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  num_col <- 9
+  num_cells <- num_col * ape::Ntip(temp_tree)
+  test_mat <- matrix(rep(c(1, 0), num_cells),
+                     nrow = ape::Ntip(temp_tree),
+                     ncol = num_col)
+  reconstruction_method <- "ML"
+  expect_error(discrete_ancestral_reconstruction(temp_tree,
+                                                 test_mat,
+                                                 1,
+                                                 "continuous",
+                                                 reconstruction_method))
+})
+
 test_that("discrete_ancestral_reconstruction throws error given bogus inputs", {
   # Set up
   set.seed(1)

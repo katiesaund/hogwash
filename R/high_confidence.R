@@ -59,9 +59,6 @@ report_num_high_confidence_trans_edge <- function(genotype_transition,
   if (!is.vector(high_conf_edges[[1]])) {
     stop("Input must have a vector.")
   }
-  if (!is.vector(geno_names)) {
-    stop("Input must be a vector.")
-  }
   if (!is.character(geno_names[1])) {
     stop("Input must be a character vector.")
   }

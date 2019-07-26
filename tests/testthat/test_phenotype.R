@@ -74,6 +74,13 @@ test_that("calculate_phenotype_change_on_edge gives error for invalid input", {
   expect_error(calculate_phenotype_change_on_edge(matrix(NA), temp_pheno))
 })
 
+test_that("calculate_phenotype_change_on_edge gives error for invalid input", {
+  temp_pheno <- matrix(-5:4, ncol = 2)
+  expect_error(calculate_phenotype_change_on_edge(matrix(c(0, 0, 3)),
+                                                  temp_pheno))
+})
+
+
 
 # test calc_raw_diff
 test_that("calc_raw_diff returns a list of -5s, when first column is always
@@ -101,10 +108,20 @@ test_that("calc_raw_diff returns a list of 5s, when first column is always less
 })
 
 test_that("calc_raw_diff returns a list of 5s, when first column is always less
-than second column by 5, but
-          this time only on a subset of edges", {
+           than second column by 5, but this time only on a subset of edges", {
             temp_pheno <- matrix(-5:4, ncol = 2)
             expect_equal(calc_raw_diff(2:4, temp_pheno), rep(-5, 3))
+})
+
+
+test_that("calc_raw_diff gives error for invalid input", {
+             temp_pheno <- matrix(-5:4, ncol = 2)
+             expect_error(calc_raw_diff(10:12, temp_pheno))
+})
+
+test_that("calc_raw_diff gives error for invalid input", {
+  temp_pheno <- matrix(-5:4, ncol = 2)
+  expect_error(calc_raw_diff(matrix(c(1, 1, 1)), temp_pheno))
 })
 
 # test check_if_phenotype_normal
@@ -128,9 +145,14 @@ test_that("check_if_phenotype_normal doesn't give any message when phenotype is
 })
 
 test_that("check_if_phenotype_normal does nothing when phenotype is
-          'discrete'", {
+          discrete", {
   phenotype <- matrix(c(1, 0, 1, 1, 1, 1, 1, 0), ncol = 1)
   expect_silent(check_if_phenotype_normal(phenotype, "discrete"))
+})
+
+test_that("check_if_phenotype_normal gives error for invalid input", {
+  phenotype <- matrix(c(letters[1:10]), ncol = 1)
+  expect_error(check_if_phenotype_normal(phenotype, "discrete"))
 })
 
 # # test check_if_convergence_occurs
