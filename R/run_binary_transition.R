@@ -1,7 +1,16 @@
+#' run_binary_transition
+#'
+#' @description Run Synchronous algorithm.
+#'
+#' @param args Object with all of the inputs necessary to run gwas.
+#'
+#' @return Saves two files: a pdf with plots of results and a .rda with log and
+#'    all relevant results.
+#' @noRd
 run_binary_transition <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
-  results_object$log <- utils::capture.output(utils::sessionInfo()) # log session info
+  results_object$log <- utils::capture.output(utils::sessionInfo())
   args$tree <- format_tree(args$tree)
   geno <- prepare_genotype(args$group_genotype,
                            args$genotype,
@@ -15,11 +24,14 @@ run_binary_transition <- function(args){
                                           args$phenotype,
                                           genotype,
                                           args$discrete_or_continuous)
+  # Include all transition edges (WT -> mutant and mutant -> WT). For discrete
+  #  concomitant and continuous tests.
+  geno_trans_concomitant <- AR$geno_trans
 
-  geno_trans_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For discrete concomitant and continuous tests.
+  # Keep only WT -> mutant transitions.
   geno_trans_original <-
     prepare_genotype_transitions_for_original_discrete_test(genotype,
-                                                            AR$geno_trans) # Keep only WT -> mutant transitions.
+                                                            AR$geno_trans)
 
   if (args$group_genotype) {
     grouped_geno <- group_genotypes(args$tree,
@@ -29,11 +41,11 @@ run_binary_transition <- function(args){
                                     geno_trans_original,
                                     geno$gene_snp_lookup,
                                     geno$unique_genes)
-    genotype                    <- grouped_geno$genotype
+    genotype <- grouped_geno$genotype
     geno_recon_ordered_by_edges <- grouped_geno$geno_recon_ordered_by_edges
     geno_conf_ordered_by_edges  <- grouped_geno$geno_conf_ordered_by_edges
-    geno_trans_concomitant      <- grouped_geno$geno_trans_concomitant
-    geno_trans_original         <- grouped_geno$geno_trans_original
+    geno_trans_concomitant <- grouped_geno$geno_trans_concomitant
+    geno_trans_original <- grouped_geno$geno_trans_original
     results_object$convergence_not_possible_genotypes <-
       grouped_geno$convergence_not_possible_genotypes
   } else {
@@ -87,7 +99,8 @@ run_binary_transition <- function(args){
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
   discrete_plot_trans(tr = args$tree, dir = args$output_dir,
-                     name = args$output_name, fdr = args$fdr,
+                     name = args$output_name,
+                     fdr = args$fdr,
                      num_perm = args$perm,
                      trans_hit_vals = corrected_pvals_trans$hit_pvals,
                      trans_perm_obs_results = disc_trans_results,
@@ -111,5 +124,9 @@ run_binary_transition <- function(args){
   results_object$num_high_confidence_transition_edges <-
     hi_conf$num_high_confidence_transition_edges
   results_object$dropped_genotypes <- hi_conf$dropped_genotypes
-  save_results_as_r_object(args$output_dir, args$output_name, results_object, "synchronous", args$group_genotype)
+  save_results_as_r_object(args$output_dir,
+                           args$output_name,
+                           results_object,
+                           "synchronous",
+                           args$group_genotype)
 } # end run_binary_transition()
