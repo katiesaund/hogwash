@@ -1,57 +1,84 @@
-# TODO: go through script line by and line and write unit tests for any untested functions.
-# TODO clean up script flow to make process more clear. Replace if / else with functions? How else to improve it?
-#' Run PhyC algorithm.
+#' run_binary_original
 #'
-#' @param args
+#' @description Run PhyC algorithm.
+#'
+#' @param args Object with all of the inputs necessary to run gwas.
 #'
 #' @noRd
 #'
 #' @return Saves two files: a pdf with plots of results and a .rda with log and
 #'    all relevant results.
 run_binary_original <- function(args){
+  # TODO rename run_binary_original to run_phyc().
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
-  results_object$log <- utils::capture.output(utils::sessionInfo()) # log session info
-
+  results_object$log <- utils::capture.output(utils::sessionInfo())
   args$tree <- format_tree(args$tree)
-
-  geno <- prepare_genotype(args$group_genotype, args$genotype, args$tree, args$gene_snp_lookup)
+  geno <- prepare_genotype(args$group_genotype,
+                           args$genotype,
+                           args$tree,
+                           args$gene_snp_lookup)
   genotype <- geno$genotype
-  results_object$convergence_not_possible_genotypes <- geno$convergence_not_possible_genotypes
+  results_object$convergence_not_possible_genotypes <-
+    geno$convergence_not_possible_genotypes
 
-  AR <- prepare_ancestral_reconstructions(args$tree, args$phenotype, genotype, args$discrete_or_continuous)
+  AR <- prepare_ancestral_reconstructions(args$tree,
+                                          args$phenotype,
+                                          genotype,
+                                          args$discrete_or_continuous)
 
-  geno_trans_concomitant <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For discrete concomitant and continuous tests.
-  geno_trans_original    <- prepare_genotype_transitions_for_original_discrete_test(genotype, geno_trans_concomitant) # Keep only WT -> mutant transitions.
 
+  # Include all transition edges (WT -> mutant and mutant -> WT). For discrete
+  #  concomitant and continuous tests.
+  geno_trans_concomitant <- AR$geno_trans
+
+  # Keep only WT -> mutant transitions.
+  geno_trans_original <-
+    prepare_genotype_transitions_for_original_discrete_test(genotype,
+                                                            geno_trans_concomitant)
   if (args$group_genotype) {
-    grouped_geno                <- group_genotypes(args$tree, genotype, AR$geno_recon_and_conf, geno_trans_concomitant, geno_trans_original, geno$gene_snp_lookup, geno$unique_genes)
-    genotype                    <- grouped_geno$genotype
+    grouped_geno <- group_genotypes(args$tree,
+                                    genotype,
+                                    AR$geno_recon_and_conf,
+                                    geno_trans_concomitant,
+                                    geno_trans_original,
+                                    geno$gene_snp_lookup,
+                                    geno$unique_genes)
+    genotype <- grouped_geno$genotype
     geno_recon_ordered_by_edges <- grouped_geno$geno_recon_ordered_by_edges
-    geno_conf_ordered_by_edges  <- grouped_geno$geno_conf_ordered_by_edges
-    geno_trans_concomitant      <- grouped_geno$geno_trans_concomitant
-    geno_trans_original         <- grouped_geno$geno_trans_original
-    results_object$convergence_not_possible_genotypes <- grouped_geno$convergence_not_possible_genotypes
+    geno_conf_ordered_by_edges <- grouped_geno$geno_conf_ordered_by_edges
+    geno_trans_concomitant <- grouped_geno$geno_trans_concomitant
+    geno_trans_original <- grouped_geno$geno_trans_original
+    results_object$convergence_not_possible_genotypes <-
+      grouped_geno$convergence_not_possible_genotypes
   } else {
-    geno_conf_ordered_by_edges <- geno_recon_ordered_by_edges <- rep(list(0), ncol(genotype))
+    geno_conf_ordered_by_edges <-
+      geno_recon_ordered_by_edges <-
+      rep(list(0), ncol(genotype))
     for (k in 1:ncol(genotype)) {
-      geno_conf_ordered_by_edges[[k]]  <- reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
-      geno_recon_ordered_by_edges[[k]] <- reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_recon,    args$tree)
+      geno_conf_ordered_by_edges[[k]] <-
+        reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf,
+                                        args$tree)
+      geno_recon_ordered_by_edges[[k]] <-
+        reorder_tips_and_nodes_to_edges(AR$geno_recon_and_conf[[k]]$tip_and_node_recon,
+                                        args$tree)
     }
   }
 
-  hi_conf <- prepare_high_confidence_objects(geno_trans_original,
-                                             args$tree,
-                                             AR$pheno_recon_and_conf$tip_and_node_rec_conf,
-                                             args$bootstrap_cutoff,
-                                             genotype,
-                                             geno_conf_ordered_by_edges,
-                                             geno_recon_ordered_by_edges,
-                                             geno$snps_per_gene)
+  hi_conf <-
+    prepare_high_confidence_objects(geno_trans_original,
+                                    args$tree,
+                                    AR$pheno_recon_and_conf$tip_and_node_rec_conf,
+                                    args$bootstrap_cutoff,
+                                    genotype,
+                                    geno_conf_ordered_by_edges,
+                                    geno_recon_ordered_by_edges,
+                                    geno$snps_per_gene)
 
   genotype_transition_edges <- rep(list(0), ncol(hi_conf$genotype))
   for (k in 1:ncol(hi_conf$genotype)) {
-    genotype_transition_edges[[k]] <- hi_conf$genotype_transition[[k]]$transition
+    genotype_transition_edges[[k]] <-
+      hi_conf$genotype_transition[[k]]$transition
   }
 
   pheno_trans <- identify_transition_edges(args$tree,
@@ -64,12 +91,14 @@ run_binary_original <- function(args){
                                     args$tree)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
-  disc_recon_results <- discrete_calculate_pvals(genotype_transition_edges,
-                                                 pheno_recon_ordered_by_edges,
-                                                 args$tree,
-                                                 hi_conf$genotype,
-                                                 args$perm, args$fdr,
-                                                 hi_conf$high_conf_ordered_by_edges)
+  disc_recon_results <-
+    discrete_calculate_pvals(genotype_transition_edges,
+                             pheno_recon_ordered_by_edges,
+                             args$tree,
+                             hi_conf$genotype,
+                             args$perm,
+                             args$fdr,
+                             hi_conf$high_conf_ordered_by_edges)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_recon <-
@@ -78,8 +107,10 @@ run_binary_original <- function(args){
 
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
-  discrete_plot_orig(tr = args$tree, dir = args$output_dir,
-                     name = args$output_name, fdr = args$fdr,
+  discrete_plot_orig(tr = args$tree,
+                     dir = args$output_dir,
+                     name = args$output_name,
+                     fdr = args$fdr,
                      num_perm = args$perm,
                      recon_hit_vals = corrected_pvals_recon$hit_pvals,
                      p_recon_edges = pheno_recon_ordered_by_edges,
