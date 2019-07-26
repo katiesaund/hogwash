@@ -24,8 +24,8 @@ run_binary_transition <- function(args){
                                           args$phenotype,
                                           genotype,
                                           args$discrete_or_continuous)
-  # Include all transition edges (WT -> mutant and mutant -> WT). For discrete
-  #  concomitant and continuous tests.
+  # Include all transition edges (WT -> mutant and mutant -> WT). For
+  #  synchronous and continuous tests.
   geno_trans_synchronous <- AR$geno_trans
 
   # Keep only WT -> mutant transitions.
