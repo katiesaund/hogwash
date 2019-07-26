@@ -1,6 +1,6 @@
 context("Run binary original") #-----------------------------------------------#
 
-test_that("run_binary_original() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
+test_that("run_phyc() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::antibiotic_resistance
@@ -20,10 +20,10 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   } else {
     args$gene_snp_lookup <- NULL
   }
-  expect_error(run_binary_original(args), NA)
+  expect_error(run_phyc(args), NA)
 })
 
-test_that("run_binary_original() doesn't give any errors when given a discrete phenotype and snps (do not group into genes)" ,{
+test_that("run_phyc() doesn't give any errors when given a discrete phenotype and snps (do not group into genes)" ,{
   args                        <- NULL
   args$test                   <- FALSE
   args$phenotype              <- hogwash::antibiotic_resistance
@@ -39,6 +39,6 @@ test_that("run_binary_original() doesn't give any errors when given a discrete p
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- FALSE
   args$gene_snp_lookup <- NULL
-  expect_error(run_binary_original(args), NA)
+  expect_error(run_phyc(args), NA)
 })
 

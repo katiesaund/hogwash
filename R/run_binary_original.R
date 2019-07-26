@@ -1,4 +1,4 @@
-#' run_binary_original
+#' run_phyc
 #'
 #' @description Run PhyC algorithm.
 #'
@@ -8,8 +8,7 @@
 #'
 #' @return Saves two files: a pdf with plots of results and a .rda with log and
 #'    all relevant results.
-run_binary_original <- function(args){
-  # TODO rename run_binary_original to run_phyc().
+run_phyc <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
   results_object$log <- utils::capture.output(utils::sessionInfo())
@@ -141,4 +140,4 @@ run_binary_original <- function(args){
                            results_object,
                            "convergence",
                            args$group_genotype)
-} # end run_binary_original()
+} # end run_phyc()

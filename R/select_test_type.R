@@ -16,6 +16,6 @@ select_test_type <- function(args){
     run_continuous(args)
   } else {
     run_binary_transition(args)
-    run_binary_original(args)
+    run_phyc(args)
   }
 } # end select_test_type()
