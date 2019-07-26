@@ -1,104 +1,123 @@
-context("Phenotype") #----------------------------------------------#
+context("Phenotype") #---------------------------------------------------------#
 
 # test assign_pheno_type()
-test_that("assign_pheno_type returns discrete for a discrete phenotype matrix", {
+test_that("assign_pheno_type returns discrete for a discrete phenotype
+          matrix", {
   phenotype <- matrix(0, nrow = 10, ncol = 1)
   expect_identical(assign_pheno_type(phenotype), "discrete")
 })
 
-test_that("assign_pheno_type returns continuous for a continuous phenotype matrix", {
+test_that("assign_pheno_type returns continuous for a continuous phenotype
+          matrix", {
   phenotype <- matrix(1.5, nrow = 10, ncol = 1)
   expect_identical(assign_pheno_type(phenotype), "continuous")
 })
 
-test_that("assign_pheno_type gives an error if phenotype is a vector, NA, or Null", {
+test_that("assign_pheno_type gives an error if phenotype is a vector, NA, or
+          Null", {
   expect_error(assign_pheno_type(rep(1.5, 10)))
   expect_error(assign_pheno_type(NA))
   expect_error(assign_pheno_type(NULL))
 })
 
-test_that("assign_pheno_type gives an error if phenotype is a matrix of strings", {
+test_that("assign_pheno_type gives an error if phenotype is a matrix of
+          strings", {
   phenotype <- matrix(letters[1:10], nrow = 10, ncol = 1)
   expect_error(assign_pheno_type(phenotype))
 })
 
-test_that("assign_pheno_type gives an error if phenotype is a matrix of with two columns", {
+test_that("assign_pheno_type gives an error if phenotype is a matrix of with two
+          columns", {
   phenotype <- matrix(1:20, nrow = 10, ncol = 2)
   expect_error(assign_pheno_type(phenotype))
 })
 
 # test calculate_phenotype_change_on_edge
-test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always greater than second column by 5", {
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first
+          column is always greater than second column by 5", {
   temp_pheno <- matrix(1:10, ncol = 2)
   expect_equal(calculate_phenotype_change_on_edge(1:5, temp_pheno), rep(5, 5))
 })
 
-test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always less than second column by 5", {
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first
+          column is always less than second column by 5", {
   temp_pheno <- matrix(10:1, ncol = 2)
   expect_equal(calculate_phenotype_change_on_edge(1:5, temp_pheno), rep(5, 5))
 })
 
-test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always less than second column by 5", {
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first
+          column is always less than second column by 5", {
   temp_pheno <- matrix(-10:-1, ncol = 2)
   expect_equal(calculate_phenotype_change_on_edge(1:5, temp_pheno), rep(5, 5))
 })
 
-test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always less than second column by 5", {
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first
+          column is always less than second column by 5", {
   temp_pheno <- matrix(-5:4, ncol = 2)
   expect_equal(calculate_phenotype_change_on_edge(1:5, temp_pheno), rep(5, 5))
 })
 
-test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first column is always less than second column by 5, but
+test_that("calculate_phenotype_change_on_edge returns a list of 5s, when first
+column is always less than second column by 5, but
           this time only on a subset of edges", {
   temp_pheno <- matrix(-5:4, ncol = 2)
   expect_equal(calculate_phenotype_change_on_edge(2:4, temp_pheno), rep(5, 3))
 })
 
 # test calc_raw_diff
-test_that("calc_raw_diff returns a list of -5s, when first column is always greater than second column by 5", {
+test_that("calc_raw_diff returns a list of -5s, when first column is always
+          greater than second column by 5", {
   temp_pheno <- matrix(1:10, ncol = 2)
   expect_equal(calc_raw_diff(1:5, temp_pheno), rep(-5, 5))
 })
 
-test_that("calc_raw_diff returns a list of 5s, when first column is always less than second column by 5", {
+test_that("calc_raw_diff returns a list of 5s, when first column is always
+          less than second column by 5", {
   temp_pheno <- matrix(10:1, ncol = 2)
   expect_equal(calc_raw_diff(1:5, temp_pheno), rep(5, 5))
 })
 
-test_that("calc_raw_diff returns a list of 5s, when first column is always less than second column by 5", {
+test_that("calc_raw_diff returns a list of 5s, when first column is always less
+          than second column by 5", {
   temp_pheno <- matrix(-10:-1, ncol = 2)
   expect_equal(calc_raw_diff(1:5, temp_pheno), rep(-5, 5))
 })
 
-test_that("calc_raw_diff returns a list of 5s, when first column is always less than second column by 5", {
+test_that("calc_raw_diff returns a list of 5s, when first column is always less
+          than second column by 5", {
   temp_pheno <- matrix(-5:4, ncol = 2)
   expect_equal(calc_raw_diff(1:5, temp_pheno), rep(-5, 5))
 })
 
-test_that("calc_raw_diff returns a list of 5s, when first column is always less than second column by 5, but
+test_that("calc_raw_diff returns a list of 5s, when first column is always less
+than second column by 5, but
           this time only on a subset of edges", {
             temp_pheno <- matrix(-5:4, ncol = 2)
             expect_equal(calc_raw_diff(2:4, temp_pheno), rep(-5, 3))
 })
 
 # test check_if_phenotype_normal
-test_that("check_if_phenotype_normal prints a statement that the data is not normal when the input is 1:100", {
+test_that("check_if_phenotype_normal prints a statement that the data is not
+          normal when the input is 1:100", {
   phenotype <- matrix(1:100, ncol = 1)
   expect_output(check_if_phenotype_normal(phenotype, "continuous"))
 })
 
-test_that("check_if_phenotype_normal prints a statement when the input is all the same number", {
+test_that("check_if_phenotype_normal prints a statement when the input is all
+          the same number", {
   phenotype <- matrix(10, ncol = 1)
   expect_error(check_if_phenotype_normal(phenotype, "continuous"))
 })
 
-test_that("check_if_phenotype_normal doesn't give any message when phenotype is from a normal distribution", {
+test_that("check_if_phenotype_normal doesn't give any message when phenotype is
+          from a normal distribution", {
   set.seed(1)
   phenotype <- matrix(rnorm(n = 100), ncol = 1)
   expect_silent(check_if_phenotype_normal(phenotype, "continuous"))
 })
 
-test_that("check_if_phenotype_normal does nothing when phenotype is 'discrete'", {
+test_that("check_if_phenotype_normal does nothing when phenotype is
+          'discrete'", {
   phenotype <- matrix(c(1, 0, 1, 1, 1, 1, 1, 0), ncol = 1)
   expect_silent(check_if_phenotype_normal(phenotype, "discrete"))
 })
@@ -106,14 +125,16 @@ test_that("check_if_phenotype_normal does nothing when phenotype is 'discrete'",
 # # test check_if_convergence_occurs
 # # check_if_convergence_occurs <- function(pheno, tree, continuous_or_discrete){
 #
-# test_that("check_if_convergence_occurs prints 'white noise model better' for this specific test set", {
+# test_that("check_if_convergence_occurs prints 'white noise model better' for
+#            this specific test set", {
 #   temp_pheno <- matrix(c(10, 1, 10, 1, 10, 1, 10, 1, 10, 1), ncol = 1)
 #   set.seed(1)
 #   temp_tree <- ape::rtree(10)
 #   temp_tree$node.labels <- rep(100, ape::Nnode(temp_tree))
 #   temp_type <- "continuous"
 #   row.names(temp_pheno) <- temp_tree$tip.label
-#   expect_output(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type), "white noise model better")
+#   expect_output(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type),
+#                 "white noise model better")
 # })
 #
 #
@@ -127,7 +148,8 @@ test_that("check_if_phenotype_normal does nothing when phenotype is 'discrete'",
 #   expect_silent(check_if_convergence_occurs(temp_pheno, temp_tree, temp_type))
 # })
 #
-# test_that("check_if_convergence_occurs gives error when phenotype is incorrectly formatted", {
+# test_that("check_if_convergence_occurs gives error when phenotype is
+#            incorrectly formatted", {
 #   set.seed(1)
 #   temp_tree <- ape::rtree(5)
 #   temp_pheno <- rnorm(1:5)

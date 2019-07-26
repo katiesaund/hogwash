@@ -1,4 +1,4 @@
-context("Output generation") #----------------------------------------------------#
+context("Output generation") #-------------------------------------------------#
 
 test_that("create_contingency_table() doesn't give error for synchronous" ,{
   geno_edges <- list(c(0, 0, 0, 0), c(0, 0, 1, 1), c(1, 1, 1, 1))
