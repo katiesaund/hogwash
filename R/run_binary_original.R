@@ -32,9 +32,8 @@ run_phyc <- function(args){
   geno_trans_synchronous <- AR$geno_trans
 
   # Keep only WT -> mutant transitions.
-  geno_trans_phyc <-
-    prepare_genotype_transitions_for_original_discrete_test(genotype,
-                                                            geno_trans_synchronous)
+  geno_trans_phyc <- prep_geno_trans_for_phyc(genotype, geno_trans_synchronous)
+
   if (args$group_genotype) {
     grouped_geno <- group_genotypes(args$tree,
                                     genotype,

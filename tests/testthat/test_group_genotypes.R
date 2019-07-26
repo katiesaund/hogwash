@@ -201,7 +201,7 @@ test_that("group_genotypes does X given Y", {
   genotype <- geno$genotype
   AR <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, genotype, temp_continuous)
   geno_trans_synchronous <- AR$geno_trans # Include all transition edges (WT -> mutant and mutant -> WT). For synchronous and continuous tests.
-  geno_trans_phyc <- prepare_genotype_transitions_for_original_discrete_test(genotype, geno_trans_synchronous) # Keep only WT -> mutant transitions.
+  geno_trans_phyc <- prep_geno_trans_for_phyc(genotype, geno_trans_synchronous) # Keep only WT -> mutant transitions.
 
   temp_results <- group_genotypes(temp_tree, genotype, AR$geno_recon_and_conf, geno_trans_synchronous, geno_trans_phyc, geno$gene_snp_lookup, geno$unique_genes)
   expect_equal(length(temp_results$geno_recon_ordered_by_edges), ncol(temp_results$genotype))

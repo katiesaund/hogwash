@@ -81,8 +81,8 @@ test_that("keep_hits_with_more_change_on_trans_edges does X given Y", {
   expect_equivalent(row.names(results), c("a", "b"))
 })
 
-# test prepare_genotype_transitions_for_original_discrete_test
-test_that("prepare_genotype_transitions_for_original_discrete_test returns a $transition vector that corresponds only to positive values in $trans_dir", {
+# test prep_geno_trans_for_phyc
+test_that("prep_geno_trans_for_phyc returns a $transition vector that corresponds only to positive values in $trans_dir", {
   set.seed(1)
   temp_tree <- ape::rtree(5)
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
@@ -92,7 +92,7 @@ test_that("prepare_genotype_transitions_for_original_discrete_test returns a $tr
   temp_recon <- temp_trans <- rep(list(0), ncol(temp_geno))
   temp_pheno <- matrix(c(0, 1, 2, 3, 4), nrow = ape::Ntip(temp_tree), ncol = 1)
   temp_AR  <- prepare_ancestral_reconstructions(temp_tree, temp_pheno, temp_geno, "continuous")
-  temp_results <- prepare_genotype_transitions_for_original_discrete_test(temp_geno, temp_AR$geno_trans)
+  temp_results <- prep_geno_trans_for_phyc(temp_geno, temp_AR$geno_trans)
 
   expect_equal(temp_results[[1]]$transition, c(0, 1, 0, 0, 0, 0, 0, 1))
   expect_equal(temp_results[[1]]$trans_dir, c(0, 1, 0, 0, 0, 0, 0, 1))

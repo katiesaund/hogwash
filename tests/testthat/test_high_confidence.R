@@ -71,7 +71,7 @@ test_that("prepare_high_confidence_objects returns objects of expected sizes for
     temp_AR$geno_recon_and_conf[[i]]$tip_and_node_rec_conf <- rep(1, ape::Ntip(temp_tree) + ape::Nnode(temp_tree))
   }
 
-  temp_trans_original <- prepare_genotype_transitions_for_original_discrete_test(temp_geno, temp_trans) # Keep only WT -> mutant transitions.
+  temp_trans_original <- prep_geno_trans_for_phyc(temp_geno, temp_trans) # Keep only WT -> mutant transitions.
 
   temp_bootstrap <- 0.5
   temp_snps_per_gene <- NULL

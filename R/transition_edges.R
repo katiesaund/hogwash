@@ -192,7 +192,7 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
   return(hits)
 } # end keep_hits_with_more_change_on_trans_edges()
 
-#' prepare_genotype_transitions_for_original_discrete_test
+#' prep_geno_trans_for_phyc
 #'
 #' @description Discrete testing requires two different definitions of genotype
 #'  transition, one for PhyC and one for Synchronous Test. This function
@@ -209,8 +209,7 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
 #'
 #' @return genotype_transition. List with $transition and $trans_dir.
 #' @noRd
-prepare_genotype_transitions_for_original_discrete_test <-
-  function(geno, genotype_transition){
+prep_geno_trans_for_phyc <- function(geno, genotype_transition){
   # Check inputs ---------------------------------------------------------------
   check_if_binary_matrix(geno)
   check_equal(length(genotype_transition), ncol(geno))
@@ -230,4 +229,4 @@ prepare_genotype_transitions_for_original_discrete_test <-
 
   # Return output --------------------------------------------------------------
   return(genotype_transition)
-} # prepare_genotype_transitions_for_original_discrete_test
+} # end prep_geno_trans_for_phyc()
