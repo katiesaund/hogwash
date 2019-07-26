@@ -62,4 +62,3 @@ test_that("remove_rare_or_common_geno removes no columns when all rows are two
   expect_equal(length(temp_results$dropped_genotype_names), 0)
   expect_identical(colnames(temp_results$mat), letters[1:5])
 })
-

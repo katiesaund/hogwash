@@ -122,7 +122,7 @@ test_that("check_num_between_0_and_1 does not give errors for valid inputs", {
   # Test
   expect_error(check_num_between_0_and_1(0), NA)
   expect_error(check_num_between_0_and_1(1), NA)
-  expect_error(check_num_between_0_and_1(1/2), NA)
+  expect_error(check_num_between_0_and_1(1 / 2), NA)
   expect_error(check_num_between_0_and_1(0.00000001), NA)
 })
 
@@ -145,7 +145,7 @@ test_that("check_num_between_0_and_1 gives errors for non-numeric inputs", {
 # test check_if_dir_exists -----------------------------------------------------
 test_that("check_if_dir_exists gives an error when dir doesn't exist", {
   # Set up
-  temp_dir <- "/fake/directory/"
+  temp_dir <- "~/fake/directory/"
 
   # Test
   expect_error(check_if_dir_exists(temp_dir))
@@ -189,7 +189,7 @@ test_that("check_if_permutation_num_valid gives an error whem perm = 0", {
 test_that("check_if_permutation_num_valid gives an error whem perm = '20' (a
           character)", {
   # Set up
-  temp_perm <- '20'
+  temp_perm <- "20"
 
   # Test
   expect_error(check_if_permutation_num_valid(temp_perm))
@@ -246,7 +246,7 @@ test_that("check_is_string gives an error when x = NULL", {
 
 test_that("check_is_string doesn't give an error when x = 'this is a string'", {
   # Set up
-  temp <- 'this is a string'
+  temp <- "this is a string"
 
   # Test
   expect_error(check_is_string(temp), NA)
@@ -619,16 +619,16 @@ test_that("check_if_binary_matrix gives an error when x is
 # test check_file_exists -------------------------------------------------------
 test_that("check_file_exists gives an error when x is 'fake_file_name.txt'", {
   # Set up
-  temp <- 'fake_file_name.txt'
+  temp <- "fake_file_name.txt"
 
   # Test
   expect_error(check_file_exists(temp))
 })
 
 test_that("check_file_exists doesn't give an error when x is
-          'test_validation.R'", {
+          test_validation.R", {
   # Set up
-  temp <- 'test_validation.R'
+  temp <- "test_validation.R"
 
   # Test
   expect_error(check_file_exists(temp), NA)
@@ -757,15 +757,15 @@ test_that("check_is_number doesn't give an error when x = pi", {
 
 test_that("check_is_number doesn't give an error when x = -1/7", {
   # Set up
-  temp <- -1/7
+  temp <- -1 / 7
 
   # Test
   expect_error(check_is_number(temp), NA)
 })
 
-test_that("check_is_number gives an error when x = 'a'", {
+test_that("check_is_number gives an error when x = a", {
   # Set up
-  temp <- 'a'
+  temp <- "a"
 
   # Test
   expect_error(check_is_number(temp))
@@ -873,7 +873,9 @@ test_that("check_node_is_in_tree gives an error when
   temp$node.label <- c(1:ape::Nnode(temp))
 
   # Test
-  expect_error(check_node_is_in_tree(node_val = ape::Nnode(temp) + ape::Ntip(temp) + 1,
+  expect_error(check_node_is_in_tree(node_val = sum(ape::Nnode(temp) +
+                                                      ape::Ntip(temp) +
+                                                      1),
                                      tr = temp))
 })
 
@@ -915,7 +917,7 @@ test_that("check_convergence_possible gives an error 'discrete' and all
           values = 0", {
   # Set up
   disc_cont <- "discrete"
-  temp_vec <- c(0,0,0,0,0,0,0,0)
+  temp_vec <- c(0, 0, 0, 0, 0, 0, 0, 0)
 
   # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
@@ -923,10 +925,10 @@ test_that("check_convergence_possible gives an error 'discrete' and all
 })
 
 test_that("check_convergence_possible doesn't give an error 'discrete' and
-          values = c(1,0,1,0,1,0,1,0)", {
+          values = c(1, 0, 1, 0, 1, 0, 1, 0)", {
   # Set up
   disc_cont <- "discrete"
-  temp_vec <- c(1,0,1,0,1,0,1,0)
+  temp_vec <- c(1, 0, 1, 0, 1, 0, 1, 0)
 
   # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
@@ -935,10 +937,10 @@ test_that("check_convergence_possible doesn't give an error 'discrete' and
 
 
 test_that("check_convergence_possible throws error given 'foobar' but valid
-          values = c(1,0,1,0,1,0,1,0)", {
+          values = c(1, 0, 1, 0, 1, 0, 1, 0)", {
   # Set up
   disc_cont <- "foobar"
-  temp_vec <- c(1,0,1,0,1,0,1,0)
+  temp_vec <- c(1, 0, 1, 0, 1, 0, 1, 0)
 
   # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
@@ -949,7 +951,7 @@ test_that("check_convergence_possible gives an error 'continuous' and all
           values = 0", {
   # Set up
   disc_cont <- "continuous"
-  temp_vec <- c(0,0,0,0,0,0,0,0)
+  temp_vec <- c(0, 0, 0, 0, 0, 0, 0, 0)
 
   # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
@@ -968,10 +970,10 @@ test_that("check_convergence_possible gives an error 'discrete' and
 })
 
 test_that("check_convergence_possible gives an error 'discrete' and all
-          values = 'a'", {
+          values = a", {
   # Set up
   disc_cont <- "discrete"
-  temp_vec <- rep('a', 10)
+  temp_vec <- rep("a", 10)
 
   # Test
   expect_error(check_convergence_possible(discrete_or_continuous = disc_cont,
@@ -1088,27 +1090,27 @@ test_that("check_if_g_mat_can_be_plotted returns FALSE for non-matrix,
 
 # test check_str_is_discrete_or_continuous -------------------------------------
 test_that("check_str_is_discrete_or_continuous gives no error when given
-          'discrete'", {
+          discrete", {
   # Set up
-  input <- 'discrete'
+  input <- "discrete"
 
   # Test
   expect_error(check_str_is_discrete_or_continuous(input), NA)
 })
 
 test_that("check_str_is_discrete_or_continuous gives no error when given
-          'continuous'", {
+          continuous", {
   # Set up
-  input <- 'continuous'
+  input <- "continuous"
 
   # Test
   expect_error(check_str_is_discrete_or_continuous(input), NA)
 })
 
 test_that("check_str_is_discrete_or_continuous gives an error when given
-          'foobar'", {
+          foobar", {
   # Set up
-  input <- 'foobar'
+  input <- "foobar"
 
   # Test
   expect_error(check_str_is_discrete_or_continuous(input))

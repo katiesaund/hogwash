@@ -74,7 +74,8 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
 
   # Check and return output ----------------------------------------------------
   check_if_binary_vector(tree_tip_and_node_confidence)
-  check_equal(length(tree_tip_and_node_confidence), sum(ape::Ntip(tr) + ape::Nnode(tr)))
+  check_equal(length(tree_tip_and_node_confidence),
+              sum(ape::Ntip(tr) + ape::Nnode(tr)))
   return(tree_tip_and_node_confidence)
 } # end get_bootstrap_confidence()
 

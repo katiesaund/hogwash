@@ -184,11 +184,11 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
   # Keep only hits with transition edge median delta phenotype higher than all
   #   edge delta phenotype median.
   temp <-
-    pvals$hit_pvals[(results$trans_median > results$all_edges_median), ,
+    pvals$hit_pvals[(results$trans_median > results$all_edges_median),,
                     drop = FALSE]
 
   # Keep only those that are also significant after FDR correction.
-  hits <- temp[temp[ , 1] < fdr, , drop = FALSE]
+  hits <- temp[temp[, 1] < fdr,, drop = FALSE]
   colnames(hits) <- "fdr_corrected_pvals"
 
   # Check and return output ----------------------------------------------------

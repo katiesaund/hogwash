@@ -31,7 +31,8 @@ context("Tree manipulation functions") #---------------------------------------#
 test_that("identify_short_edges returns the only 1s in this test tree", {
   set.seed(1)
   temp_tree <- ape::rtree(11)
-  expect_identical(identify_short_edges(temp_tree), rep(1, ape::Nedge(temp_tree)))
+  expect_identical(identify_short_edges(temp_tree),
+                   rep(1, ape::Nedge(temp_tree)))
 })
 
 test_that("identify_short_edges returns a zero for the branch made artificially

@@ -7,7 +7,10 @@ test_that("calculate_permutation_based_p_value returns a significant p-value
   permuted_tests <- rep(0.1, nperm)
   real_test <- 0.9
   alpha <- 0.01
-  expect_true(calculate_permutation_based_p_value(permuted_tests, real_test, nperm) < alpha)
+  expect_true(calculate_permutation_based_p_value(permuted_tests,
+                                                  real_test,
+                                                  nperm) <
+                alpha)
 })
 
 test_that("calculate_permutation_based_p_value returns a non-significant p-value
@@ -51,7 +54,10 @@ test_that("count_hits_on_edges returns 0 edges shared and 0 edges only with
     temp_geno_recon[[k]] <- temp_hi_conf_edges[[k]] <- rep(0, num_edge)
   }
   temp_pheno_recon <- rep(1, num_edge)
-  results <- count_hits_on_edges(temp_geno_recon, temp_pheno_recon, temp_hi_conf_edges, temp_tree)
+  results <- count_hits_on_edges(temp_geno_recon,
+                                 temp_pheno_recon,
+                                 temp_hi_conf_edges,
+                                 temp_tree)
   expect_equal(results$both_present[1], 0)
   expect_equal(results$only_geno_present[1], 0)
 })

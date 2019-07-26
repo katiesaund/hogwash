@@ -49,12 +49,12 @@ test_that("calc_sig gives expected results given valid inputs", {
   set.seed(1)
   temp_tree <- ape::rtree(num_isolates)
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
+  temp_geno <- matrix(c(0, 1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
-    temp_geno_trans[[i]]$transition <- c(1,0,1,0,1,0,1,0)
-    temp_geno_trans[[i]]$trans_dir <- c(1,0,-1,0,1,0,-1,0)
+    temp_geno_trans[[i]]$transition <- c(1, 0, 1, 0, 1, 0, 1, 0)
+    temp_geno_trans[[i]]$trans_dir <- c(1, 0, -1, 0, 1, 0, -1, 0)
     temp_conf[[i]] <- c(1, 1, 1, 0, 0, 1, 1, 1)
     temp_geno_recon[[i]] <- rep(1, ape::Nedge(temp_tree))
   }
@@ -91,7 +91,7 @@ test_that("calc_sig returns a significant p-value when phenotype change is
   set.seed(1)
   temp_tree <- ape::rtree(num_isolates)
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
+  temp_geno <- matrix(c(0, 1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
@@ -117,7 +117,7 @@ test_that("calc_sig returns a significant p-value when phenotype change is
   alpha <- 0.06
   expect_true(results$pvals[1] < alpha)
   expect_equal(results$all_edges_median[[1]],
-               median(abs(temp_pheno[ , 1] - temp_pheno[ , 2])))
+               median(abs(temp_pheno[, 1] - temp_pheno[, 2])))
   expect_equal(results$trans_median[[1]],
                median(abs(temp_pheno[4:7 , 1] - temp_pheno[4:7 , 2])))
   expect_equal(round(results$observed_ks_stat[1], 2), 1)
@@ -136,7 +136,7 @@ test_that("calc_sig returns a non-significant p-value when phenotype change is
   set.seed(1)
   temp_tree <- ape::rtree(num_isolates)
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
+  temp_geno <- matrix(c(0, 1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
@@ -161,7 +161,7 @@ test_that("calc_sig returns a non-significant p-value when phenotype change is
   alpha <- 0.01
   expect_true(results$pvals[1] > alpha)
   expect_equal(results$all_edges_median[[1]],
-               median(abs(temp_pheno[ , 1] - temp_pheno[ , 2])))
+               median(abs(temp_pheno[, 1] - temp_pheno[, 2])))
   expect_equal(results$trans_median[[1]],
                median(abs(temp_pheno[4:6 , 1] - temp_pheno[4:6 , 2])))
   expect_equal(round(results$observed_ks_stat[1], 2), 0)
@@ -178,7 +178,7 @@ test_that("calc_sig returns an error when the only confident edges are
   set.seed(1)
   temp_tree <- ape::rtree(num_isolates)
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_geno <- matrix(c(0,1), nrow = num_isolates, ncol = num_loci)
+  temp_geno <- matrix(c(0, 1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
   temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
@@ -214,8 +214,8 @@ test_that("get_hi_conf_tran_indices returns only high confidence transition
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_geno_trans <- temp_conf <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
-    temp_geno_trans[[i]]$transition <- c(1,0,1,0,1,0,1,0)
-    temp_geno_trans[[i]]$trans_dir <- c(1,0,-1,0,1,0,-1,0)
+    temp_geno_trans[[i]]$transition <- c(1, 0, 1, 0, 1, 0, 1, 0)
+    temp_geno_trans[[i]]$trans_dir <- c(1, 0, -1, 0, 1, 0, -1, 0)
     temp_conf[[i]] <- c(1, 1, 1, 0, 0, 1, 1, 1)
   }
   index <- 1
@@ -236,7 +236,7 @@ test_that("continuous_permutation is gives consistent results with this test
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_conf <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
-    temp_conf[[i]] <- rep(c(1, 0), ape::Nedge(temp_tree)/2)
+    temp_conf[[i]] <- rep(c(1, 0), ape::Nedge(temp_tree) / 2)
   }
   num <- 1
   index <- NULL
@@ -246,7 +246,8 @@ test_that("continuous_permutation is gives consistent results with this test
   odd_numbers <- seq(from = 1, to = 77, by = 2)
   expect_equal(results$hi_conf_edges, odd_numbers)
   expect_equal(nrow(results$permuted_trans_index_mat), perm)
-  expect_equal(ncol(results$permuted_trans_index_mat), length(index$trans_index))
+  expect_equal(ncol(results$permuted_trans_index_mat),
+               length(index$trans_index))
   expect_equal(results$permuted_trans_index_mat[1, 1:10],
                c(18, 8, 19, 5, 23, 25, 20, 21, 15, 38))
 })

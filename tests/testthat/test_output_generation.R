@@ -1,6 +1,6 @@
 context("Output generation") #-------------------------------------------------#
 
-test_that("create_contingency_table() doesn't give error for synchronous" ,{
+test_that("create_contingency_table() doesn't give error for synchronous", {
   geno_edges <- list(c(0, 0, 0, 0), c(0, 0, 1, 1), c(1, 1, 1, 1))
   pheno_edges <- c(1, 0, 1, 0)
   geno <- matrix(0, ncol = 3)
@@ -25,7 +25,7 @@ test_that("create_contingency_table() doesn't give error for synchronous" ,{
   expect_equal(temp_results, expected_results)
 })
 
-test_that("create_contingency_table() doesn't give error for phyc" ,{
+test_that("create_contingency_table() doesn't give error for phyc", {
   geno_edges <- list(c(0, 0, 0, 0), c(0, 0, 1, 1), c(1, 1, 1, 1))
   pheno_edges <- c(1, 0, 1, 0)
   geno <- matrix(0, ncol = 3)

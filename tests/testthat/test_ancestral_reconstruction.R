@@ -44,8 +44,8 @@ test_that("ancestral_reconstruction_by_ML with continuous input works.", {
   test_mat <- matrix(rnorm(num_cells, mean = 0, sd = 10),
                      nrow = ape::Ntip(temp_tree),
                      ncol = num_col)
-  test_pheno_mat_1 <- test_mat[ , 1, drop = FALSE]
-  test_pheno_mat_2 <- test_mat[ , 2, drop = FALSE]
+  test_pheno_mat_1 <- test_mat[, 1, drop = FALSE]
+  test_pheno_mat_2 <- test_mat[, 2, drop = FALSE]
   dummy_pheno1 <- ancestral_reconstruction_by_ML(temp_tree,
                                                  test_pheno_mat_1,
                                                  1,
@@ -94,9 +94,9 @@ test_that("ancestral_reconstruction_by_ML with discrete input works.", {
                     c(1, 1, 1, 1))
   expect_equivalent(dummy_pheno$tip_and_node_rec_conf,
                     c(1, 1, 1, 1, 1, 1, 1, 1, 0))
-  expect_equivalent(dummy_pheno$recon_edge_mat[ , 1, drop = TRUE],
+  expect_equivalent(dummy_pheno$recon_edge_mat[, 1, drop = TRUE],
                     c(1, 1, 1, 1, 1, 1, 1, 1))
-  expect_equivalent(dummy_pheno$recon_edge_mat[ , 2, drop = TRUE],
+  expect_equivalent(dummy_pheno$recon_edge_mat[, 2, drop = TRUE],
                     c(1, 1, 1, 1, 1, 1, 1, 0))
   expect_equivalent(dummy_geno$tip_and_node_recon,
                     c(0, 0, 0, 1, 1, 0, 0, 0, 1))
@@ -104,9 +104,9 @@ test_that("ancestral_reconstruction_by_ML with discrete input works.", {
                     c(0, 0, 0, 1))
   expect_equivalent(dummy_geno$tip_and_node_rec_conf,
                     c(1, 1, 1, 1, 1, 1, 1, 1, 0))
-  expect_equivalent(dummy_geno$recon_edge_mat[ , 1, drop = TRUE],
+  expect_equivalent(dummy_geno$recon_edge_mat[, 1, drop = TRUE],
                     c(0, 0, 0, 0, 0, 0, 1, 1))
-  expect_equivalent(dummy_geno$recon_edge_mat[ , 2, drop = TRUE],
+  expect_equivalent(dummy_geno$recon_edge_mat[, 2, drop = TRUE],
                     c(0, 0, 0, 0, 0, 1, 1, 1))
 })
 
@@ -135,8 +135,8 @@ test_that("continuous_ancestral_reconstruction works given valid inputs", {
   test_mat <- matrix(rnorm(num_cells, mean = 0, sd = 10),
                      nrow = ape::Ntip(temp_tree),
                      ncol = num_col)
-  test_pheno_mat_1 <- test_mat[ , 1, drop = FALSE]
-  test_pheno_mat_2 <- test_mat[ , 2, drop = FALSE]
+  test_pheno_mat_1 <- test_mat[, 1, drop = FALSE]
+  test_pheno_mat_2 <- test_mat[, 2, drop = FALSE]
   reconstruction_method <- "ML"
   data_type <- "continuous"
   index <- 1
@@ -162,7 +162,7 @@ test_that("continuous_ancestral_reconstruction works given valid inputs", {
 
   # tips should be included in tip and node reconstruction
   expect_identical(unname(dummy_pheno1$tip_and_node_recon[1:ape::Ntip(temp_tree)]),
-                   test_pheno_mat_1[ , 1, drop = TRUE])
+                   test_pheno_mat_1[, 1, drop = TRUE])
 
   # node reconstruction should be included in tip and node reconstruction
   expect_identical(dummy_pheno1$tip_and_node_recon[(ape::Ntip(temp_tree) + 1):(ape::Ntip(temp_tree) + ape::Nnode(temp_tree))],
@@ -517,8 +517,9 @@ test_that("prepare_ancestral_reconstructions works for valid input", {
   # Set up
   set.seed(1)
   temp_tree <- ape::rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree),
-                               ape::Nedge(temp_tree))
+  temp_tree$edge.length <-
+    rep(sum(temp_tree$edge.length) / ape::Nedge(temp_tree),
+        ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   set.seed(1)
@@ -575,5 +576,5 @@ test_that("prepare_ancestral_reconstructions works for valid input", {
   expect_equal(temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf,
                rep(1, ape::Ntip(temp_tree) + ape::Nnode(temp_tree)))
   expect_equal(unname(temp_AR$pheno_recon_and_conf$tip_and_node_recon[1:ape::Ntip(temp_tree)]),
-               unname(temp_pheno[ , 1, drop = TRUE]))
+               unname(temp_pheno[, 1, drop = TRUE]))
 })

@@ -4,8 +4,9 @@ context("Group genotypes") #---------------------------------------------------#
 test_that("build_gene_trans_from_snp_trans does X given Y", {
   set.seed(1)
   temp_tree <- ape::rtree(7)
-  temp_tree$edge.length <- rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree),
-                               ape::Nedge(temp_tree))
+  temp_tree$edge.length <-
+    rep(sum(temp_tree$edge.length) / ape::Nedge(temp_tree),
+        ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <-
@@ -33,8 +34,8 @@ test_that("build_gene_trans_from_snp_trans does X given Y", {
 
   snp_gene_key <- matrix(NA, nrow = ncol(genotype), ncol = 2)
   colnames(snp_gene_key) <- c("SNP", "GENE")
-  snp_gene_key[ , 1] <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
-  snp_gene_key[ , 2] <- c("GENE1", "GENE2", "GENE5", "GENE6", "GENE7", "GENE7")
+  snp_gene_key[, 1] <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
+  snp_gene_key[, 2] <- c("GENE1", "GENE2", "GENE5", "GENE6", "GENE7", "GENE7")
 
   AR <- prepare_ancestral_reconstructions(temp_tree,
                                           continuous_phenotype,
@@ -46,7 +47,7 @@ test_that("build_gene_trans_from_snp_trans does X given Y", {
                                                   AR$geno_trans,
                                                   snp_gene_key)
 
-  expect_true(length(temp_results) == length(unique(snp_gene_key[ , 2])))
+  expect_true(length(temp_results) == length(unique(snp_gene_key[, 2])))
   expect_equal(temp_results[[1]]$transition, AR$geno_trans[[1]]$transition)
   expect_equal(temp_results[[2]]$transition, AR$geno_trans[[2]]$transition)
   expect_equal(temp_results[[3]]$transition, AR$geno_trans[[3]]$transition)
@@ -64,7 +65,8 @@ test_that("prepare_genotype gives expected genotype for a grouped input", {
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
-    rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
+    rep(sum(temp_tree$edge.length) / ape::Nedge(temp_tree),
+        ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <-
@@ -97,16 +99,16 @@ test_that("prepare_genotype gives expected genotype for a grouped input", {
 
   temp_lookup <- matrix(NA, nrow = ncol(temp_geno), ncol = 2)
   colnames(temp_lookup) <- c("SNP", "GENE")
-  temp_lookup[ , 1] <-
+  temp_lookup[, 1] <-
     c("SNP1", "SNP2", "SNP3", "SNP4", "SNP5", "SNP6", "SNP7", "SNP8")
-  temp_lookup[ , 2] <-
+  temp_lookup[, 2] <-
     c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "GENE7", "GENE7")
 
   temp_logical <- TRUE
 
   temp_result <-
     prepare_genotype(temp_logical, temp_geno, temp_tree, temp_lookup)
-  expect_equal(temp_result$genotype, temp_geno[ , c(1, 2, 5, 6, 7, 8)])
+  expect_equal(temp_result$genotype, temp_geno[, c(1, 2, 5, 6, 7, 8)])
   expect_equal(temp_result$gene_snp_lookup, temp_lookup[c(1, 2, 5, 6, 7, 8), ])
   expect_equal(as.numeric(unname(temp_result$snps_per_gene)), c(1, 1, 1, 1, 2))
   expect_equal(temp_result$unique_genes,
@@ -117,7 +119,8 @@ test_that("prepare_genotype gives expected genotype for an not grouped input", {
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
-    rep(sum(temp_tree$edge.length)/ape::Nedge(temp_tree), ape::Nedge(temp_tree))
+    rep(sum(temp_tree$edge.length) / ape::Nedge(temp_tree),
+        ape::Nedge(temp_tree))
   temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
 
   genotype1 <-
@@ -150,9 +153,9 @@ test_that("prepare_genotype gives expected genotype for an not grouped input", {
 
   temp_lookup <- matrix(NA, nrow = ncol(temp_geno), ncol = 2)
   colnames(temp_lookup) <- c("SNP", "GENE")
-  temp_lookup[ , 1] <-
+  temp_lookup[, 1] <-
     c("SNP1", "SNP2", "SNP3", "SNP4", "SNP5", "SNP6", "SNP7", "SNP8")
-  temp_lookup[ , 2] <-
+  temp_lookup[, 2] <-
     c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "GENE7", "GENE7")
   temp_logical <- FALSE
   temp_result <- prepare_genotype(temp_logical,
@@ -161,7 +164,7 @@ test_that("prepare_genotype gives expected genotype for an not grouped input", {
                                   temp_lookup)
 
   expect_null(temp_result$snps_per_gene)
-  expect_equal(temp_result$genotype, temp_geno[ , c(1, 5, 6)])
+  expect_equal(temp_result$genotype, temp_geno[, c(1, 5, 6)])
   expect_equal(temp_result$convergence_not_possible_genotypes,
                c("SNP2", "SNP3", "SNP4", "SNP7", "SNP8"))
 
@@ -205,7 +208,7 @@ test_that("prepare_ungrouped_genotype", {
 
   temp_result <- prepare_ungrouped_genotype(temp_geno, temp_tree)
   expect_null(temp_result$snps_per_gene)
-  expect_equal(temp_result$genotype, temp_geno[ , c(1, 5, 6)])
+  expect_equal(temp_result$genotype, temp_geno[, c(1, 5, 6)])
   expect_equal(temp_result$convergence_not_possible_genotypes,
                c("SNP2", "SNP3", "SNP4", "SNP7", "SNP8"))
 })
@@ -248,14 +251,14 @@ test_that("prepare_grouped_genotype", {
 
   temp_lookup <- matrix(NA, nrow = ncol(temp_geno), ncol = 2)
   colnames(temp_lookup) <- c("SNP", "GENE")
-  temp_lookup[ , 1] <-
+  temp_lookup[, 1] <-
     c("SNP1", "SNP2", "SNP3", "SNP4", "SNP5", "SNP6", "SNP7", "SNP8")
-  temp_lookup[ , 2] <-
+  temp_lookup[, 2] <-
     c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "GENE7", "GENE7")
 
   temp_result <- prepare_grouped_genotype(temp_geno, temp_lookup)
 
-  expect_equal(temp_result$genotype, temp_geno[ , c(1, 2, 5, 6, 7, 8)])
+  expect_equal(temp_result$genotype, temp_geno[, c(1, 2, 5, 6, 7, 8)])
   expect_equal(temp_result$gene_snp_lookup, temp_lookup[c(1, 2, 5, 6, 7, 8), ])
   expect_equal(as.numeric(unname(temp_result$snps_per_gene)), c(1, 1, 1, 1, 2))
   expect_equal(temp_result$unique_genes,
@@ -306,9 +309,9 @@ test_that("group_genotypes does X given Y", {
 
   temp_lookup <- matrix(NA, nrow = ncol(temp_geno), ncol = 2)
   colnames(temp_lookup) <- c("SNP", "GENE")
-  temp_lookup[ , 1] <-
+  temp_lookup[, 1] <-
     c("SNP1", "SNP2", "SNP3", "SNP4", "SNP5", "SNP6", "SNP7", "SNP8")
-  temp_lookup[ , 2] <-
+  temp_lookup[, 2] <-
     c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "GENE7", "GENE7")
 
   temp_group_logical <- TRUE
