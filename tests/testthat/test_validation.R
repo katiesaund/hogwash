@@ -1166,7 +1166,8 @@ test_that("check_equal throws errors when given two not equal numbers", {
 })
 
 # test check_class -------------------------------------------------------------
-test_that("check_class doesn't throw error when given an object and expected class", {
+test_that("check_class doesn't throw error when given an object and expected
+          class", {
   # Test
   expect_error(check_class(1, "numeric"), NA)
   expect_error(check_class(c(1:10), "integer"), NA)
@@ -1176,7 +1177,8 @@ test_that("check_class doesn't throw error when given an object and expected cla
   expect_error(check_class(ape::rtree(2), "phylo"), NA)
 })
 
-test_that("check_class throws error when given an object and an incorrect class", {
+test_that("check_class throws error when given an object and an incorrect
+          class", {
   # Test
   expect_error(check_class(1, "integer"))
   expect_error(check_class(c(1:10), "character"))
