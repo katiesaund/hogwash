@@ -1,4 +1,4 @@
-context("Run binary original") #-----------------------------------------------#
+context("Run phyc") #-----------------------------------------------#
 
 test_that("run_phyc() doesn't give any errors when given a discrete phenotype and snps that group into genes" ,{
   args                        <- NULL

@@ -71,7 +71,7 @@ test_that("prepare_high_confidence_objects returns objects of expected sizes for
     temp_AR$geno_recon_and_conf[[i]]$tip_and_node_rec_conf <- rep(1, ape::Ntip(temp_tree) + ape::Nnode(temp_tree))
   }
 
-  temp_trans_original <- prep_geno_trans_for_phyc(temp_geno, temp_trans) # Keep only WT -> mutant transitions.
+  temp_trans_phyc <- prep_geno_trans_for_phyc(temp_geno, temp_trans) # Keep only WT -> mutant transitions.
 
   temp_bootstrap <- 0.5
   temp_snps_per_gene <- NULL
@@ -84,7 +84,7 @@ test_that("prepare_high_confidence_objects returns objects of expected sizes for
 
   temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf <- rep(1, ape::Nnode(temp_tree) + ape::Ntip(temp_tree))
 
-  temp_hi_conf_orig <- prepare_high_confidence_objects(temp_trans_original, temp_tree, temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf, temp_bootstrap, temp_geno, temp_geno_conf_ordered_by_edges, temp_geno_recon_ordered_by_edges, temp_snps_per_gene)
+  temp_hi_conf_orig <- prepare_high_confidence_objects(temp_trans_phyc, temp_tree, temp_AR$pheno_recon_and_conf$tip_and_node_rec_conf, temp_bootstrap, temp_geno, temp_geno_conf_ordered_by_edges, temp_geno_recon_ordered_by_edges, temp_snps_per_gene)
   expect_equal(temp_hi_conf_orig$genotype_transition[[1]]$transition, temp_hi_conf_orig$genotype_transition[[1]]$trans_dir)
   expect_equal(temp_hi_conf_orig$genotype_transition[[1]]$transition, c(0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 
