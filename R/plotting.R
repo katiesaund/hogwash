@@ -1091,7 +1091,7 @@ discrete_plot_phyc <- function(tr,
   grDevices::dev.off()
 } # end discrete_plot_phyc()
 
-#' discrete_plot_trans
+#' plot_synchronous_results
 #'
 #' @description Plot the synchronous test results.
 #'
@@ -1122,7 +1122,7 @@ discrete_plot_phyc <- function(tr,
 #'   corresponds to one genotype.
 #'
 #' @return  Plots printed into one pdf.
-discrete_plot_trans  <- function(tr,
+plot_synchronous_results  <- function(tr,
                                  dir,
                                  name,
                                  fdr,
@@ -1136,7 +1136,6 @@ discrete_plot_trans  <- function(tr,
                                  snp_in_gene,
                                  prefix,
                                  grouped_logical){
-  # TODO rename function to plot_synchronous_results
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -1162,6 +1161,8 @@ discrete_plot_trans  <- function(tr,
   check_equal(length(trans_perm_obs_results$permuted_count[[1]]), num_perm)
   check_class(trans_perm_obs_results$hit_pvals, "character")
   check_class(trans_perm_obs_results$observed_overlap, "integer")
+  check_str_is_test_name(prefix)
+  check_class(grouped_logical, "logical")
 
   # Function -------------------------------------------------------------------
   image_width <- 250
@@ -1389,4 +1390,4 @@ discrete_plot_trans  <- function(tr,
   }
   grDevices::dev.off()
   # TODO replace all magic numbers with variable names!
-} # end discrete_plot_trans()
+} # end plot_synchronous_results()
