@@ -863,5 +863,3 @@ test_that("make_ann_colors works for valid input", {
   expect_equal(names(results$pheno_presence), c("na", "absent", "present"))
   expect_equivalent(results$pheno_presence, c("grey", "white", "red"))
 })
-
-
