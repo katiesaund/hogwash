@@ -8,7 +8,8 @@
 #'  Names(pheno_vector) == tr$tip.label.
 #' @param pheno_anc_rec Vector. Length = Nnode(tr).
 #'
-#' @return A tree plot.
+#' @return A tree plot where the tree edges are filled in with colors
+#'  corresponding to the phenotypic trait values.
 #'
 #' @noRd
 plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
@@ -16,7 +17,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   check_tree_is_valid(tr)
   check_equal(length(pheno_vector), ape::Ntip(tr))
   check_equal(length(pheno_anc_rec), ape::Nnode(tr))
-  if (names(pheno_vector) != tr$tip.label) {
+  if (!identical(names(pheno_vector), tr$tip.label)) {
     stop("Phenotype vector must have same names as tree tips.")
   }
 
@@ -68,6 +69,25 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
                                          index,
                                          non_trans_color,
                                          trans_color){
+  # Check inputs ---------------------------------------------------------------
+  check_is_number(index)
+  if (index > length(geno_transition)) {
+    stop("Index must correspond to one of the genotypes")
+  }
+  check_equal(length(geno_transition), length(geno_confidence))
+  check_dimensions(pheno_recon_ordered_by_edges,
+                   ape::Nedge(tr),
+                   ape::Nedge(tr),
+                   2,
+                   2)
+  check_for_root_and_bootstrap(tr)
+  check_is_string(non_trans_color)
+  check_is_string(trans_color)
+  if (non_trans_color == trans_color) {
+    stop("These tree edges need to be different colors")
+  }
+
+  # Function -------------------------------------------------------------------
   trans_index <-
     c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
   non_trans_index <- c(1:ape::Nedge(tr))[!geno_transition[[index]]$transition]
@@ -81,10 +101,10 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
                                        pheno_recon_ordered_by_edges)
 
   graphics::hist(raw_non_trans_delta,
-       main = paste("Raw delta phenotype on only high confidence edges\n # trans
-                    edge= ",
-                    length(raw_trans_delta), "\n# non trans edge =",
-                    length(raw_non_trans_delta), sep = ""),
+       main = paste(
+         "Raw delta phenotype on high confidence edges\n # transition edge= ",
+         length(raw_trans_delta), "\n# non transition edge =",
+         length(raw_non_trans_delta), sep = ""),
        breaks = ape::Nedge(tr) / 4,
        col = non_trans_color,
        border = FALSE,
@@ -124,6 +144,19 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
                                          index,
                                          non_trans_color,
                                          trans_color){
+  # Check inputs ---------------------------------------------------------------
+  check_is_number(index)
+  if (index > length(all_trans)) {
+    stop("Index must correspond to one of the genotypes")
+  }
+  check_for_root_and_bootstrap(tr)
+  check_is_string(non_trans_color)
+  check_is_string(trans_color)
+  if (non_trans_color == trans_color) {
+    stop("These tree edges need to be different colors")
+  }
+
+  # Function -------------------------------------------------------------------
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::hist(all_trans$observed_pheno_non_trans_delta[[index]],
        breaks = ape::Nedge(tr) / 4,
@@ -171,6 +204,15 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
                                            geno_confidence,
                                            tr,
                                            index){
+  # Check inputs ---------------------------------------------------------------
+  check_is_number(index)
+  if (index > length(geno_confidence)) {
+    stop("Index must correspond to one of the genotypes")
+  }
+  check_for_root_and_bootstrap(tr)
+  # TODO add tests for p_trans_mat
+
+  # Function -------------------------------------------------------------------
   edge_num <- length(unlist(p_trans_mat))
   hi_edge_num <-
     length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
