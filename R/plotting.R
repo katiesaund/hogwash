@@ -189,12 +189,16 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
                     all_trans$observed_pheno_non_trans_delta[[index]])))
 } # end hist_abs_hi_conf_delta_pheno()
 
-#' Plot a histogram to show the change in phenotype on each tree edge. Plot
-#'   phenotype change as absolute value change. First, plot all tree edge values
-#'   then overlay only the high confidence edges.
+#' hist_abs_delta_pheno_all_edges
+#'
+#' @description Plot a histogram to show the change in phenotype on each tree
+#'  edge. Plot phenotype change as absolute value change. First, plot all tree
+#'  edge values then overlay only the high confidence edges.
 #'
 #' @noRd
-#' @param p_trans_mat TODO
+#' @param p_trans_mat Numeric matrix. Dim: ncol == 1, nrow == Nedge(tree).
+#'  Values are the absolute value in the change of the phenotype on that edge.
+#'   Each row corresponds to one tree edge.
 #' @param geno_confidence List of vectors. Each list corresponds to 1 genotype.
 #'   Each vector entry corresponds to 1 tree edge. 1 == high confidence edge.
 #'   0 == low confidence edge.
@@ -213,7 +217,12 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
     stop("Index must correspond to one of the genotypes")
   }
   check_for_root_and_bootstrap(tr)
-  # TODO add tests for p_trans_mat
+  check_dimensions(p_trans_mat,
+                   exact_rows = ape::Nedge(tr),
+                   min_rows = ape::Nedge(tr),
+                   exact_cols = 1,
+                   min_cols = 1)
+  check_equal(length(geno_confidence[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
   edge_num <- length(unlist(p_trans_mat))

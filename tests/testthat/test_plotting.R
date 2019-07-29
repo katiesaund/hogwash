@@ -315,3 +315,74 @@ test_that("hist_abs_hi_conf_delta_pheno gives errors for invalid inputs", {
                                             temp_non_trans_color,
                                             temp_trans_color))
 })
+
+# test hist_abs_delta_pheno_all_edges
+test_that("hist_abs_delta_pheno_all_edges works for valid inputs", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_pheno_mat <- matrix(abs(rnorm(ape::Nedge(temp_tree), 0, 10)), ncol = 1)
+  temp_index <- 1
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(0, 0, 0, 1, 1, 1, 1, 1)
+  expect_error(hist_abs_delta_pheno_all_edges(temp_pheno_mat,
+                                              temp_conf,
+                                              temp_tree,
+                                              temp_index),
+               NA)
+})
+
+test_that("hist_abs_delta_pheno_all_edges gives error for invalid inputs", {
+  temp_tree <- "tree"
+  temp_pheno_mat <- matrix(abs(rnorm(8, 0, 10)), ncol = 1)
+  temp_index <- 1
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(0, 0, 0, 1, 1, 1, 1, 1)
+  expect_error(hist_abs_delta_pheno_all_edges(temp_pheno_mat,
+                                              temp_conf,
+                                              temp_tree,
+                                              temp_index))
+})
+
+
+test_that("hist_abs_delta_pheno_all_edges gives error for invalid inputs", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_pheno_mat <- c(0, 0, 1)
+  temp_index <- 1
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(0, 0, 0, 1, 1, 1, 1, 1)
+  expect_error(hist_abs_delta_pheno_all_edges(temp_pheno_mat,
+                                              temp_conf,
+                                              temp_tree,
+                                              temp_index))
+})
+
+test_that("hist_abs_delta_pheno_all_edges gives error for invalid inputs", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_pheno_mat <- matrix(abs(rnorm(ape::Nedge(temp_tree), 0, 10)), ncol = 1)
+  temp_index <- 10
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(0, 0, 0, 1, 1, 1, 1, 1)
+  expect_error(hist_abs_delta_pheno_all_edges(temp_pheno_mat,
+                                              temp_conf,
+                                              temp_tree,
+                                              temp_index))
+})
+
+test_that("hist_abs_delta_pheno_all_edges gives error for invalid inputs", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_pheno_mat <- matrix(abs(rnorm(ape::Nedge(temp_tree), 0, 10)), ncol = 1)
+  temp_index <- 1
+  temp_conf <- NULL
+  temp_conf[[1]] <- 0
+  expect_error(hist_abs_delta_pheno_all_edges(temp_pheno_mat,
+                                              temp_conf,
+                                              temp_tree,
+                                              temp_index))
+})
