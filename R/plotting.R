@@ -263,18 +263,61 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #' @param fdr Number. False discovery rate.
 #' @param dir Character. Output path.
 #' @param name Character. Output name.
-#' @param pval_all_transition TODO
-#' @param pheno_vector Vector.
+#' @param pval_all_transition List of two data.frames.
+#'  * $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names =
+#'       genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
+#'  * $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are
+#'       significant after FDR correction. Column name =
+#'       "fdr_corrected_pvals[fdr_corrected_pvals < fdr]".
+#'       Row.names = genotypes. Nrow = is variable-- could be between 0 and
+#'       max number of genotypes. It will only have rows if the corrected
+#'       p-value is less than the fdr value.
+#' @param pheno_vector Vector. Length = Ntip(tr).
 #' @param perm Number.
-#' @param results_all_trans TODO
-#' @param pheno_anc_rec TODO
-#' @param geno_reconstruction TODO
-#' @param geno_confidence TODO
-#' @param geno_transition TODO
-#' @param geno TODO
-#' @param pheno_recon_ordered_by_edges TODO
-#' @param tr_and_pheno_hi_conf TODO
-#' @param all_trans_sig_hits TODO
+#' @param results_all_trans List of 8.
+#'  * $pvals. Named numeric vector. Length == number of genotypes. Values
+#'      between 1 and 0. Names are genotype names.
+#'  * $ks_statistics. List of numeric vectors. Length of list == number of
+#'      genotypes. Each vector has length == number of permutations. Values
+#'      between 1 and 0.
+#'  * $observed_pheno_trans_delta. List of numeric vectors. Length of list ==
+#'      number of genotypes. Vectors are of variable length because length is
+#'      the number of transition edges for that particular genotype. Vectors are
+#'      numeric.
+#'  * $observed_pheno_non_trans_delta. List of numeric vectors. Length of list
+#'       == number of genotypes. Vectors are of variable length because length
+#'       is the number of non-transition edges for that particular genotype.
+#'       Vectors are numeric.
+#'  * $trans_median. Numberic. Vector. Length = number of genotypes. Describes
+#'      median delta phenotype on all transition edges.
+#'  * $all_edges_median. Numeric vector. Length = number of genotypes. Describes
+#'      median delta phenotype on all edges.
+#'  * $num_genotypes. Integer. The number of genotypes.
+#'  * $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values
+#'      between 1 and 0.
+#' @param pheno_anc_rec Vector. The values of the ancestral reconstruction of
+#'  the phenotype at each internal node. Length = Nnode(tr).
+#' @param geno_reconstruction List of lists. Binary. Number of lists = number of
+#'   genotypes. Length(each individual list) == Nedge(tree).
+#' @param geno_confidence List. Each entry corresponds to one genotype.
+#'  Length = number of genotypes.
+#' @param geno_transition Object with two lists: $trans_dir and $transition.
+#'  Each list has an entry for each genotype. Each sublist has one value for
+#'  each tree edge.
+#' @param geno Matrix. Columns = genotypes, rows = samples. Binary.
+#' @param pheno_recon_ordered_by_edges Matrix. Dim: nrow = Nedge(tr) x ncol = 2.
+#'  Parent (older) node is 1st column. Child (younger) node is the 2nd column.
+#'  Ancestral reconstruction value of each node.
+#' @param tr_and_pheno_hi_conf List. Length(list) = ncol(mat) == number of
+#'   genotypes. Each entry is a vector with length == Nedge(tr). All entries are
+#'   0 (low confidence) or 1 (high confidence).
+#' @param all_trans_sig_hits Data.frame. 1 column. Colnum names =
+#'  "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are (1)
+#'  significant after multiple test correction and (2) have higher median delta
+#'  phenotype on transition edges than on all edges. Values are between 1 and 0.
+#'  Rownames are genotypes.
+#' @param group_logical Logical. Inidicates whether or not genotypes were
+#'  grouped.
 #'
 #' @return Plots continuous test resutlts.
 plot_significant_hits <- function(disc_cont,
@@ -302,8 +345,23 @@ plot_significant_hits <- function(disc_cont,
   check_num_between_0_and_1(fdr)
   check_if_dir_exists(dir)
   check_is_string(name)
-  check_if_vector(pheno_vector)
+  check_class(pval_all_transition$hit_pvals, "data.frame")
+  check_equal(length(pheno_vector), ape::Ntip(tr))
   check_if_permutation_num_valid(perm)
+  check_equal(length(results_all_trans$ks_statistics), ncol(geno))
+  check_equal(length(pheno_anc_rec), ape::Nnode(tr))
+  check_equal(length(geno_reconstruction), ncol(geno))
+  check_equal(length(geno_reconstruction[[1]]), ape::Nedge(tr))
+  check_equal(length(geno_confidence), ncol(geno))
+  check_equal(length(geno_transition[[1]]$transition), ape::Nedge(tr))
+  check_if_binary_matrix(geno)
+  check_dimensions(pheno_recon_ordered_by_edges,
+                   ape::Nedge(tr),
+                   ape::Nedge(tr),
+                   2,
+                   2)
+  check_equal(length(tr_and_pheno_hi_conf), ncol(geno))
+  check_class(group_logical, "logical")
 
   # Function -------------------------------------------------------------------
   trans_edge_mat <- NULL
