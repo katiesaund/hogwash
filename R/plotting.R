@@ -1,11 +1,12 @@
 #' plot_continuous_phenotype
 #'
-#' @description Plot the continuous phenotype on tree with the phenotype coloring the
-#'   branches.
+#' @description Plot the continuous phenotype on tree with the phenotype
+#'  coloring the branches.
 #'
 #' @param tr Phylo
-#' @param pheno_vector Vector
-#' @param pheno_anc_rec Vector
+#' @param pheno_vector Vector. Length = Ntip(tr).
+#'  Names(pheno_vector) == tr$tip.label.
+#' @param pheno_anc_rec Vector. Length = Nnode(tr).
 #'
 #' @return A tree plot.
 #'
@@ -13,7 +14,11 @@
 plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   # Check inputs ---------------------------------------------------------------
   check_tree_is_valid(tr)
-  # TODO add more checks
+  check_equal(length(pheno_vector), ape::Ntip(tr))
+  check_equal(length(pheno_anc_rec), ape::Nnode(tr))
+  if (names(pheno_vector) != tr$tip.label) {
+    stop("Phenotype vector must have same names as tree tips.")
+  }
 
   # Function -------------------------------------------------------------------
   plot_p_recon <- phytools::contMap(tr,
@@ -218,13 +223,23 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #' @param all_trans_sig_hits TODO
 #'
 #' @return Plots continuous test resutlts.
-plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
-                                  pval_all_transition, pheno_vector,
-                                  perm, results_all_trans,
-                                  pheno_anc_rec, geno_reconstruction,
-                                  geno_confidence, geno_transition, geno,
+plot_significant_hits <- function(disc_cont,
+                                  tr,
+                                  fdr,
+                                  dir,
+                                  name,
+                                  pval_all_transition,
+                                  pheno_vector,
+                                  perm,
+                                  results_all_trans,
+                                  pheno_anc_rec,
+                                  geno_reconstruction,
+                                  geno_confidence,
+                                  geno_transition,
+                                  geno,
                                   pheno_recon_ordered_by_edges,
-                                  tr_and_pheno_hi_conf, all_trans_sig_hits,
+                                  tr_and_pheno_hi_conf,
+                                  all_trans_sig_hits,
                                   group_logical){
   # Check inputs ---------------------------------------------------------------
   check_str_is_discrete_or_continuous(disc_cont)
@@ -345,7 +360,6 @@ plot_significant_hits <- function(disc_cont, tr, fdr, dir, name,
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4))
-
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
       plot_tr_w_color_edges(tr,
                             geno_reconstruction,
