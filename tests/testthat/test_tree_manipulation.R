@@ -1,6 +1,46 @@
 context("Tree manipulation functions") #---------------------------------------#
 
-# TODO test reorder_tip_and_node_to_edge()
+# test reorder_tip_and_node_to_edge
+test_that("reorder_tip_and_node_to_edge works for valid inputs", {
+  # Set up
+  # Assume a tree with 5 tips, 8 edges, and 4 nodes
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_tip_node <- c(rep(1, ape::Ntip(temp_tree)),
+                     rep(0, ape::Nnode(temp_tree)))
+
+  results <- reorder_tip_and_node_to_edge(temp_tip_node, temp_tree)
+
+  # Test
+  expect_equal(results, c(0, 1, 1, 0, 1, 0, 1, 1))
+})
+
+test_that("reorder_tip_and_node_to_edge gives errors for invalid inputs", {
+  # Set up
+  # Assume a tree with 5 tips, 8 edges, and 4 nodes
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_tip_node <- c(rep(1, ape::Ntip(temp_tree)),
+                     rep(0, ape::Nnode(temp_tree)))
+  temp_tree <- "bad_tree"
+
+  # Test
+  expect_error(reorder_tip_and_node_to_edge(temp_tip_node, temp_tree))
+})
+
+test_that("reorder_tip_and_node_to_edge gives errors for invalid inputs", {
+  # Set up
+  # Assume a tree with 5 tips, 8 edges, and 4 nodes
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_tip_node <- letters[1:9]
+
+  # Test
+  expect_error(reorder_tip_and_node_to_edge(temp_tip_node, temp_tree))
+})
 
 # test identify_short_edges
 test_that("identify_short_edges returns the only 1s in this test tree", {

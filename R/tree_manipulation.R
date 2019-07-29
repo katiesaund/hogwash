@@ -84,6 +84,12 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
 #' @description Reorder a vector organzied by tips then nodes into a vector
 #'  organized by tree edges.
 #'
+#'  @details This function grabs the value of each child from every node and
+#'   stores them in the order of the tree's edge matrix. This effectively
+#'   drops the value of the tree's root because the root is never a child and
+#'   therefore not in the child column of the edge matrix. Each node/tip that
+#'   is not the root is a child exactly once.
+#'
 #' @param tips_and_node_vector Numeric vector. Length = Ntip(tr) + Nnode(tr).
 #' @param tr Phylo.
 #'
@@ -92,7 +98,9 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
 reorder_tip_and_node_to_edge <- function(tips_and_node_vector, tr){
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
-  # TODO add check of length of edges vs tips_and_node_vector
+  check_for_root_and_bootstrap(tr)
+  check_equal(length(tips_and_node_vector), sum(ape::Ntip(tr), ape::Nnode(tr)))
+  check_is_number(tips_and_node_vector[1])
 
   # Function -------------------------------------------------------------------
   ordered_by_edges <- rep(NA, ape::Nedge(tr))
