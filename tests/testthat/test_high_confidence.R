@@ -1,6 +1,4 @@
 context("High confidence") #----------------------------------------------#
-# TODO write unit tests for assign_high_confidence_to_transition_edges
-
 # test discretize_conf_with_cutoff
 test_that("discretize_conf_with_cutoff should give this expected result -
           with fractions (numeric)", {

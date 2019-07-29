@@ -286,7 +286,7 @@ build_gene_trans_from_snp_trans <- function(tr,
 #'
 build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
   # Check input ----------------------------------------------------------------
-  # TODO add input checks
+
   # Function -------------------------------------------------------------------
   unique_genes <- unique(gene_to_snp_lookup_table[, 2])
   samples_by_genes <- matrix(0, nrow = nrow(geno), ncol = length(unique_genes))
@@ -352,8 +352,6 @@ prepare_grouped_genotype <- function(geno, lookup){
   genotype <- geno[, colSums(geno) > 0]
   genotype <- genotype[, colSums(genotype) < nrow(genotype)]
 
-  # TODO replace the magic numbers in the next four lines.
-  # TODO Group into a function?
   gene_snp_lookup <-
     lookup[!(lookup[, 1] %in% geno_to_drop_bc_not_present),
            , drop = FALSE]
@@ -495,7 +493,6 @@ group_genotypes <- function(tr,
                             genotype_transition_phyc,
                             lookup,
                             uni_genes){
-  # TODO
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_dimensions(geno,

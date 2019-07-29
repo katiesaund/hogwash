@@ -372,8 +372,6 @@ plot_continuous_results <- function(disc_cont,
   }
   colnames(trans_edge_mat) <- colnames(geno)
 
-  # TODO Update trans_edge_mat to exclude low confidence  edges, currently it
-  # includes transition edges (all high and some low confidence transitions)
   for (c in 1:ncol(trans_edge_mat)) {
     trans_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
@@ -1393,5 +1391,4 @@ plot_synchronous_results  <- function(tr,
     }
   }
   grDevices::dev.off()
-  # TODO replace all magic numbers with variable names!
 } # end plot_synchronous_results()

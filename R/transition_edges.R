@@ -89,13 +89,6 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
   return(results)
 } # end identify_transition_edges()
 
-
-
-# TODO the accuracy of this function assumes that the genotype_confidence input
-# TODO   is already the transition confidence as calculated by:
-# TODO   assign_high_confidence_to_transition_edges
-# TODO how to I add a check to make sure that's true? ^^^^
-
 #' keep_two_plus_hi_conf_tran_ed
 #'
 #' @description Since we're looking for convergence of transitions we need a

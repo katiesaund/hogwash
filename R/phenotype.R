@@ -147,7 +147,6 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
   }
 } # end check_if_phenotype_normal
 
-# TODO decide to keep or drop this function.
 # check_if_convergence_occurs <- function(pheno, tr, continuous_or_discrete){
 #   # Function description -------------------------------------------------------
 #   # Given the phenotype and tr, test if a Brownian motion model or a white
@@ -161,7 +160,6 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
 #   # continuous_or_discrete. String. Either 'continuous' or 'discrete'
 #   #
 #   # Outputs:
-#   # TODO? Plot?
 #   #
 #   # Check input ----------------------------------------------------------------
 #   check_tree_is_valid(tr)
