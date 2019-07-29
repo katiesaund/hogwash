@@ -252,7 +252,9 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
        add = TRUE)
 } # end hist_abs_delta_pheno_all_edges()
 
-#' Plot continuous phenotype results.
+#' plot_continuous_results
+#'
+#' @description Plot continuous phenotype results.
 #'
 #' @details Plot all genotype's -log(p-value) as a manhattan plot. If any hits
 #' are significant after FDR, then plot heatmaps & trees for each of these.
@@ -320,24 +322,24 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #'  grouped.
 #'
 #' @return Plots continuous test resutlts.
-plot_significant_hits <- function(disc_cont,
-                                  tr,
-                                  fdr,
-                                  dir,
-                                  name,
-                                  pval_all_transition,
-                                  pheno_vector,
-                                  perm,
-                                  results_all_trans,
-                                  pheno_anc_rec,
-                                  geno_reconstruction,
-                                  geno_confidence,
-                                  geno_transition,
-                                  geno,
-                                  pheno_recon_ordered_by_edges,
-                                  tr_and_pheno_hi_conf,
-                                  all_trans_sig_hits,
-                                  group_logical){
+plot_continuous_results <- function(disc_cont,
+                                    tr,
+                                    fdr,
+                                    dir,
+                                    name,
+                                    pval_all_transition,
+                                    pheno_vector,
+                                    perm,
+                                    results_all_trans,
+                                    pheno_anc_rec,
+                                    geno_reconstruction,
+                                    geno_confidence,
+                                    geno_transition,
+                                    geno,
+                                    pheno_recon_ordered_by_edges,
+                                    tr_and_pheno_hi_conf,
+                                    all_trans_sig_hits,
+                                    group_logical){
   # Check inputs ---------------------------------------------------------------
   check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
@@ -602,7 +604,7 @@ plot_significant_hits <- function(disc_cont,
                   "delta_pheno_table" = delta_pheno_table,
                   "delta_pheno_list" = delta_pheno_list )
   return(results)
-} # end plot_significant_hits()
+} # end plot_continuous_results()
 
 #' make_manhattan_plot
 #'
@@ -776,7 +778,7 @@ make_ann_colors <- function(geno_matrix){
   return(ann_colors)
 }
 
-#' discrete_plot_phyc
+#' plot_phyc_results
 #'
 #' @description Plot PhyC results.
 #'
@@ -809,7 +811,7 @@ make_ann_colors <- function(geno_matrix){
 #'   corresponds to one genotype.
 #'
 #' @return  Plots printed into one pdf.
-discrete_plot_phyc <- function(tr,
+plot_phyc_results <- function(tr,
                                dir,
                                name,
                                fdr,
@@ -1089,7 +1091,7 @@ discrete_plot_phyc <- function(tr,
   }
 
   grDevices::dev.off()
-} # end discrete_plot_phyc()
+} # end plot_phyc_results()
 
 #' plot_synchronous_results
 #'

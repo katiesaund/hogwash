@@ -101,21 +101,22 @@ run_phyc <- function(args){
     get_sig_hit_and_mult_test_corr(disc_recon_results$hit_pvals, args$fdr)
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
-  discrete_plot_phyc(tr = args$tree,
-                     dir = args$output_dir,
-                     name = args$output_name,
-                     fdr = args$fdr,
-                     num_perm = args$perm,
-                     recon_hit_vals = corrected_pvals_recon$hit_pvals,
-                     p_recon_edges = pheno_recon_ordered_by_edges,
-                     recon_perm_obs_results = disc_recon_results,
-                     tr_and_pheno_hi_conf = hi_conf$tr_and_pheno_hi_conf,
-                     geno_confidence = hi_conf$high_conf_ordered_by_edges,
-                     g_trans_edges = genotype_transition_edges,
-                     p_trans_edges = pheno_trans$transition,
-                     snp_in_gene = geno$snps_per_gene,
-                     prefix = "phyc",
-                     grouped_logical = args$group_genotype)
+  plot_phyc_results(
+    tr = args$tree,
+    dir = args$output_dir,
+    name = args$output_name,
+    fdr = args$fdr,
+    num_perm = args$perm,
+    recon_hit_vals = corrected_pvals_recon$hit_pvals,
+    p_recon_edges = pheno_recon_ordered_by_edges,
+    recon_perm_obs_results = disc_recon_results,
+    tr_and_pheno_hi_conf = hi_conf$tr_and_pheno_hi_conf,
+    geno_confidence = hi_conf$high_conf_ordered_by_edges,
+    g_trans_edges = genotype_transition_edges,
+    p_trans_edges = pheno_trans$transition,
+    snp_in_gene = geno$snps_per_gene,
+    prefix = "phyc",
+    grouped_logical = args$group_genotype)
 
   results_object$contingency_table <-
     create_contingency_table(genotype_transition_edges,
