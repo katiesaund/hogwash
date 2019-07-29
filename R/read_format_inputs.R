@@ -14,11 +14,22 @@
 #' @param perm  Number. Times to shuffle the data on the tree to create a null
 #'  distribution for the permutation test.
 #' @param fdr Number. False discovery rate. Between 0 and 1.
+#' @param bootstrap Numeric. Confidence threshold for tree bootstrap values.
+#' @param group_genotype_key Either NULL or a matrix. Dimenions: nrow = number
+#'  of unique genotypes, ncol = 2.
 #'
 #' @return discrete_or_continuous. Character. Either "discrete" or "continuous".
 #'  Describes the input phenotype.
 #' @noRd
-check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr){
+check_input_format <- function(pheno,
+                               tr,
+                               geno,
+                               name,
+                               dir,
+                               perm,
+                               fdr,
+                               bootstrap,
+                               group_genotype_key){
   # Check input ----------------------------------------------------------------
   check_dimensions(geno, ape::Ntip(tr), 2, NULL, 2)
   check_dimensions(pheno, ape::Ntip(tr), 2, 1, 1)
@@ -31,6 +42,15 @@ check_input_format <- function(pheno, tr, geno, name, dir, perm, fdr){
   check_if_dir_exists(dir)
   check_if_permutation_num_valid(perm)
   check_num_between_0_and_1(fdr)
+  check_num_between_0_and_1(bootstrap)
+  if (!is.null(group_genotype_key)) {
+    check_class(group_genotype_key, "matrix")
+    check_dimensions(group_genotype_key,
+                     min_rows = 1,
+                     exact_cols = 2,
+                     min_cols = 2)
+  }
+
 
   # Function -------------------------------------------------------------------
   discrete_or_continuous <- assign_pheno_type(pheno)

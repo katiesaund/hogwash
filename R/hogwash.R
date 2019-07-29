@@ -124,6 +124,8 @@ hogwash <- function(pheno,
                        args$output_name,
                        args$output_dir,
                        args$perm,
-                       args$fdr)
+                       args$fdr,
+                       args$bootstrap_cutoff,
+                       args$gene_snp_lookup)
   select_test_type(args)
 }
