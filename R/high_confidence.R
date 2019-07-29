@@ -219,9 +219,8 @@ prepare_high_confidence_objects <- function(genotype_transition,
                                           colnames(geno))
 
   # KEEP ONLY GENOTYPES WITH AT LEAST TWO HIGH CONFIDENCE TRANSITION EDGES
-  geno_to_keep <-
-    keep_at_least_two_high_conf_trans_edges(genotype_transition,
-                                            all_high_confidence_edges)
+  geno_to_keep <- keep_two_plus_hi_conf_tran_ed(genotype_transition,
+                                                all_high_confidence_edges)
   genotype_transition <- genotype_transition[geno_to_keep]
   geno_recon_edge <- geno_recon_edge[geno_to_keep]
   high_conf_ordered_by_edges <- all_high_confidence_edges[geno_to_keep]

@@ -28,8 +28,6 @@ test_that("run_ks_test returns an error for invalid input", {
   num_edges <- nrow(temp_pheno)
   trans_index <- "trans_index"
   non_trans_index <- c(9:10)
-  answer <- 0.375
-  names(answer) <- "D"
   expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
 })
 
@@ -39,8 +37,6 @@ test_that("run_ks_test returns an error for invalid input", {
   num_edges <- nrow(temp_pheno)
   trans_index <- c(1:8)
   non_trans_index <- c(9:100)
-  answer <- 0.375
-  names(answer) <- "D"
   expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
 })
 
@@ -50,8 +46,6 @@ test_that("run_ks_test returns an error for invalid input", {
   num_edges <- nrow(temp_pheno)
   trans_index <- c(11:100)
   non_trans_index <- c(9:10)
-  answer <- 0.375
-  names(answer) <- "D"
   expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
 })
 
@@ -61,8 +55,24 @@ test_that("run_ks_test returns an error for invalid input", {
   num_edges <- nrow(temp_pheno)
   trans_index <- c(1:8)
   non_trans_index <- "non_trans_index"
-  answer <- 0.375
-  names(answer) <- "D"
+  expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
+})
+
+test_that("run_ks_test returns an error for invalid input", {
+  set.seed(1)
+  temp_pheno <- temp_pheno <- matrix(rnorm(20), ncol = 2)
+  num_edges <- nrow(temp_pheno)
+  trans_index <- c(1:8)
+  non_trans_index <- matrix(1, 1, 1)
+  expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
+})
+
+test_that("run_ks_test returns an error for invalid input", {
+  set.seed(1)
+  temp_pheno <- temp_pheno <- matrix(rnorm(20), ncol = 2)
+  num_edges <- nrow(temp_pheno)
+  trans_index <- matrix(1, 1, 1)
+  non_trans_index <- c(1:8)
   expect_error(run_ks_test(trans_index, non_trans_index, temp_pheno))
 })
 

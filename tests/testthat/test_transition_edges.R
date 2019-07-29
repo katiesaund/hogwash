@@ -70,8 +70,8 @@ test_that("identify_transition_edges returns correct transition vector and
   expect_equivalent(temp_results$trans_dir, c(1, -1,  1, -1,  1, -1, -1, -1))
 })
 
-# test keep_at_least_two_high_conf_trans_edges
-test_that("keep_at_least_two_high_conf_trans_edges returns a vector
+# test keep_two_plus_hi_conf_tran_ed
+test_that("keep_two_plus_hi_conf_tran_ed returns a vector
           c(TRUE, FALSE) for this test genotype", {
   set.seed(1)
   temp_tree <- ape::rtree(5)
@@ -90,13 +90,42 @@ test_that("keep_at_least_two_high_conf_trans_edges returns a vector
                                                    "discrete")
     fake_confidence[[i]] <- rep(1, ape::Nedge(temp_tree))
   }
-  expect_equivalent(keep_at_least_two_high_conf_trans_edges(temp_results,
+  expect_equivalent(keep_two_plus_hi_conf_tran_ed(temp_results,
                                                             fake_confidence),
                     c(TRUE, FALSE))
   for (i in 1:2) {
     fake_confidence[[i]] <- rep(0, ape::Nedge(temp_tree))
   }
-  expect_equivalent(keep_at_least_two_high_conf_trans_edges(temp_results,
+  expect_equivalent(keep_two_plus_hi_conf_tran_ed(temp_results,
+                                                            fake_confidence),
+                    c(FALSE, FALSE))
+})
+
+test_that("keep_two_plus_hi_conf_tran_ed gives error for invalid input", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_geno <- cbind(c(1, 0, 1, 0, 1), c(1, 0, 0, 0, 0))
+  row.names(temp_geno) <- temp_tree$tip.label
+  fake_confidence <- temp_recon <- temp_results <- rep(list(0), ncol(temp_geno))
+  set.seed(1)
+  for (i in 1:2) {
+    temp_recon[[i]] <-
+      ancestral_reconstruction_by_ML(temp_tree, temp_geno, i, "discrete")
+    temp_results[[i]] <- identify_transition_edges(temp_tree,
+                                                   temp_geno,
+                                                   i,
+                                                   temp_recon[[i]]$node_anc_rec,
+                                                   "discrete")
+    fake_confidence[[i]] <- rep(1, ape::Nedge(temp_tree))
+  }
+  expect_equivalent(keep_two_plus_hi_conf_tran_ed(temp_results,
+                                                            fake_confidence),
+                    c(TRUE, FALSE))
+  for (i in 1:2) {
+    fake_confidence[[i]] <- rep(0, ape::Nedge(temp_tree))
+  }
+  expect_equivalent(keep_two_plus_hi_conf_tran_ed(temp_results,
                                                             fake_confidence),
                     c(FALSE, FALSE))
 })

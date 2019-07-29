@@ -96,7 +96,7 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
 # TODO   assign_high_confidence_to_transition_edges
 # TODO how to I add a check to make sure that's true? ^^^^
 
-#' keep_at_least_two_high_conf_trans_edges
+#' keep_two_plus_hi_conf_tran_ed
 #'
 #' @description Since we're looking for convergence of transitions we need a
 #'  second quality control step where we remove genotypes that have only 1
@@ -110,8 +110,8 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
 #' @return at_least_two_hi_conf_trans_ed Logical vector.
 #'  Length == length(genotype_transition) == length(genotype_confidence).
 #' @noRd
-keep_at_least_two_high_conf_trans_edges <- function(genotype_transition,
-                                                    genotype_confidence){
+keep_two_plus_hi_conf_tran_ed <- function(genotype_transition,
+                                          genotype_confidence){
   # Check inputs ---------------------------------------------------------------
   check_equal(length(genotype_transition), length(genotype_confidence))
   if (!is.vector(genotype_transition[[1]]$transition)) {
@@ -131,7 +131,7 @@ keep_at_least_two_high_conf_trans_edges <- function(genotype_transition,
 
   # Check and return output ----------------------------------------------------
   return(at_least_two_hi_conf_trans_ed)
-} # end keep_at_least_two_high_conf_trans_edges()
+} # end keep_two_plus_hi_conf_tran_ed()
 
 #' keep_hits_with_more_change_on_trans_edges
 #'
