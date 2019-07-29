@@ -850,6 +850,8 @@ discrete_plot_phyc <- function(tr,
   check_equal(length(recon_perm_obs_results$permuted_count[[1]]), num_perm)
   check_class(recon_perm_obs_results$hit_pvals, "character")
   check_class(recon_perm_obs_results$observed_overlap, "integer")
+  check_class(grouped_logical, "logical")
+  check_str_is_test_name(prefix)
 
   # Function -------------------------------------------------------------------
   image_width <- 250
