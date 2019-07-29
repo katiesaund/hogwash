@@ -132,7 +132,6 @@ test_that("hist_raw_conf_delta_pheno works gives error for invalid inputs", {
                                             temp_trans_color))
 })
 
-
 test_that("hist_raw_conf_delta_pheno works gives error for invalid inputs", {
   temp_trans <- temp_conf <- NULL
   temp_trans[[1]]$transition <- c(1, 1, 1, 1, 0, 0, 0, 0)
@@ -193,7 +192,7 @@ test_that("hist_raw_conf_delta_pheno works gives error for invalid inputs", {
   set.seed(1)
   temp_tree <- ape::rtree(5)
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_index <- 11
+  temp_index <- 1
   temp_non_trans_color <- "black"
   temp_trans_color <- "orange"
 
@@ -218,13 +217,99 @@ test_that("hist_raw_conf_delta_pheno works gives error for invalid inputs", {
   set.seed(1)
   temp_tree <- ape::rtree(5)
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_index <- 10
+  temp_index <- 1
   temp_non_trans_color <- "black"
   temp_trans_color <- "orange"
 
   expect_error(hist_raw_hi_conf_delta_pheno(temp_trans,
                                             temp_conf,
                                             temp_pheno,
+                                            temp_tree,
+                                            temp_index,
+                                            temp_non_trans_color,
+                                            temp_trans_color))
+})
+
+# test hist_abs_hi_conf_delta_pheno
+test_that("hist_abs_hi_conf_delta_pheno works for valid inputs", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_index <- 1
+  temp_non_trans_color <- "black"
+  temp_trans_color <- "orange"
+  temp_trans <- NULL
+  temp_trans$observed_pheno_non_trans_delta[[1]] <- c(0, 1, 1, 2)
+  temp_trans$observed_pheno_trans_delta[[1]] <- c(2, 3, 4, 5)
+  expect_error(hist_abs_hi_conf_delta_pheno(temp_trans,
+                                            temp_tree,
+                                            temp_index,
+                                            temp_non_trans_color,
+                                            temp_trans_color),
+               NA)
+})
+
+test_that("hist_abs_hi_conf_delta_pheno gives errors for invalid inputs", {
+  set.seed(1)
+  temp_tree <- "tree"
+  temp_index <- 1
+  temp_non_trans_color <- "black"
+  temp_trans_color <- "orange"
+  temp_trans <- NULL
+  temp_trans$observed_pheno_non_trans_delta[[1]] <- c(0, 1, 1, 2)
+  temp_trans$observed_pheno_trans_delta[[1]] <- c(2, 3, 4, 5)
+  expect_error(hist_abs_hi_conf_delta_pheno(temp_trans,
+                                            temp_tree,
+                                            temp_index,
+                                            temp_non_trans_color,
+                                            temp_trans_color))
+})
+
+test_that("hist_abs_hi_conf_delta_pheno gives errors for invalid inputs", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_index <- 10
+  temp_non_trans_color <- "black"
+  temp_trans_color <- "orange"
+  temp_trans <- NULL
+  temp_trans$observed_pheno_non_trans_delta[[1]] <- c(0, 1, 1, 2)
+  temp_trans$observed_pheno_trans_delta[[1]] <- c(2, 3, 4, 5)
+  expect_error(hist_abs_hi_conf_delta_pheno(temp_trans,
+                                            temp_tree,
+                                            temp_index,
+                                            temp_non_trans_color,
+                                            temp_trans_color))
+})
+
+test_that("hist_abs_hi_conf_delta_pheno gives errors for invalid inputs", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_index <- 1
+  temp_non_trans_color <- "orange"
+  temp_trans_color <- "orange"
+  temp_trans <- NULL
+  temp_trans$observed_pheno_non_trans_delta[[1]] <- c(0, 1, 1, 2)
+  temp_trans$observed_pheno_trans_delta[[1]] <- c(2, 3, 4, 5)
+  expect_error(hist_abs_hi_conf_delta_pheno(temp_trans,
+                                            temp_tree,
+                                            temp_index,
+                                            temp_non_trans_color,
+                                            temp_trans_color))
+})
+
+test_that("hist_abs_hi_conf_delta_pheno gives errors for invalid inputs", {
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_index <- 1
+  temp_non_trans_color <- "black"
+  temp_trans_color <- "orange"
+  temp_trans <- NULL
+  temp_trans$observed_pheno_non_trans_delta[[2]] <- c(0, 1, 1, 2)
+  temp_trans$observed_pheno_trans_delta[[2]] <- c(2, 3, 4, 5)
+  expect_error(hist_abs_hi_conf_delta_pheno(temp_trans,
                                             temp_tree,
                                             temp_index,
                                             temp_non_trans_color,

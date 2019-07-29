@@ -74,6 +74,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
   if (index > length(geno_transition)) {
     stop("Index must correspond to one of the genotypes")
   }
+  check_equal(length(geno_transition[[1]]$transition), ape::Nedge(tr))
   check_equal(length(geno_transition), length(geno_confidence))
   check_dimensions(pheno_recon_ordered_by_edges,
                    ape::Nedge(tr),
@@ -130,7 +131,9 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
 #'  tree edges.
 #'
 #' @noRd
-#' @param all_trans List of lists.
+#' @param all_trans List of 2 lists. $observed_pheno_non_trans_delta and
+#'  $observed_pheno_trans_delta. Position in each corresponds to one genotype.
+#'  Contains informatino about amount of phenotype change.
 #' @param tr Phylo.
 #' @param index Integer. Indexes which genotype is being plotted.
 #' @param non_trans_color Character. Color of non-transition histogram bars.
