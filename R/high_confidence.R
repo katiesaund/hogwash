@@ -183,7 +183,13 @@ prepare_high_confidence_objects <- function(genotype_transition,
   check_equal(length(geno_recon_edge[[1]]), ape::Nedge(tr))
   check_if_binary_vector(geno_conf_edge[[1]])
   check_if_binary_vector(geno_recon_edge[[1]])
-  # TODO add checks for snps_in_each_gene
+  if (!is.null(snps_in_each_gene)) {
+    if (length(snps_in_each_gene) < 1) {
+      stop("There should be more grouped genotypes")
+    }
+    check_is_number(snps_in_each_gene[1])
+    check_is_string(names(snps_in_each_gene)[1])
+  }
 
   # Function -------------------------------------------------------------------
   pheno_conf_ordered_by_edges <-
