@@ -420,8 +420,7 @@ plot_significant_hits <- function(disc_cont,
 
   grDevices::pdf(fname, width = 16, height = 20)
 
-  make_manhattan_plot(dir,
-                      name,
+  make_manhattan_plot(name,
                       pval_all_transition$hit_pvals,
                       fdr,
                       "continuous")
@@ -610,22 +609,21 @@ plot_significant_hits <- function(disc_cont,
 #' @description Create a manhattan plot of GWAS hit p-values.
 #'
 #' @noRd
-#' @param outdir. Character. Output dictory.
-#' @param geno_pheno_name Character.
+#' @param geno_pheno_name Character. Will be printed in title of manhattan plot.
 #' @param pval_hits Vector. P-values for all loci.
 #' @param fdr Number. False discorvery rate.
-#' @param trans_or_recon Character.
+#' @param test_name Character. Either "continuous", "synchronous", or "phyc".
+#'  Will be printed in title of manhattan plot.
 #'
 #' @return A manhattan plot of all of the hit values.
-make_manhattan_plot <- function(outdir,
-                                geno_pheno_name,
+make_manhattan_plot <- function(geno_pheno_name,
                                 pval_hits,
                                 fdr,
-                                trans_or_recon){
+                                test_name){
   # Check inputs ---------------------------------------------------------------
-  check_if_dir_exists(outdir)
+  check_is_string(geno_pheno_name)
   check_num_between_0_and_1(fdr)
-  # TODO add checks
+  check_str_is_test_name(test_name)
 
   # Function -------------------------------------------------------------------
   # Create negative log p-values with arbitrary locus numbers
@@ -638,7 +636,7 @@ make_manhattan_plot <- function(outdir,
        graphics::plot(x = neg_log_p_with_num[, 1],
             y = neg_log_p_with_num[, 2, drop = TRUE],
             type = "p",
-            main = paste(trans_or_recon, geno_pheno_name, sep = " "),
+            main = paste(test_name, geno_pheno_name, sep = " "),
             col = grDevices::rgb(0, 0, 0, 0.3),
             pch = 19,
             xlab = "Genetic locus",
@@ -847,7 +845,7 @@ discrete_plot_phyc <- function(tr,
   grDevices::pdf(fname)
 
   graphics::par(mfrow = c(1, 1))
-  make_manhattan_plot(dir, name, recon_hit_vals, fdr, prefix)
+  make_manhattan_plot(name, recon_hit_vals, fdr, prefix)
 
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
 
@@ -1157,7 +1155,7 @@ discrete_plot_trans  <- function(tr,
   grDevices::pdf(fname)
 
   graphics::par(mfrow = c(1, 1))
-  make_manhattan_plot(dir, name, trans_hit_vals, fdr, "synchronous")
+  make_manhattan_plot(name, trans_hit_vals, fdr, prefix)
 
   # heatmaps
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))

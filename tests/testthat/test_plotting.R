@@ -386,3 +386,61 @@ test_that("hist_abs_delta_pheno_all_edges gives error for invalid inputs", {
                                               temp_tree,
                                               temp_index))
 })
+
+# test make_manhattan_plot
+test_that("make_manhattan_lot works for valid input", {
+  # Set up
+  temp_name <- "test"
+  temp_pval <- seq(from = 0.05, to = 0.95, by = 0.05)
+  temp_fdr <- 0.15
+  temp_type <- "synchronous"
+
+  # Test
+  expect_error(make_manhattan_plot(temp_name, temp_pval, temp_fdr, temp_type),
+               NA)
+})
+
+test_that("make_manhattan_lot gives error for invalid input", {
+  # Set up
+  temp_name <- 5
+  temp_pval <- seq(from = 0.05, to = 0.95, by = 0.05)
+  temp_fdr <- 0.15
+  temp_type <- "synchronous"
+
+  # Test
+  expect_error(make_manhattan_plot(temp_name, temp_pval, temp_fdr, temp_type))
+})
+
+test_that("make_manhattan_lot gives error for invalid input", {
+  # Set up
+  temp_name <- "test"
+  temp_pval <- letters[1:5]
+  temp_fdr <- 0.15
+  temp_type <- "synchronous"
+
+  # Test
+  expect_error(make_manhattan_plot(temp_name, temp_pval, temp_fdr, temp_type))
+})
+
+test_that("make_manhattan_lot gives error for invalid input", {
+  # Set up
+  temp_name <- "test"
+  temp_pval <- seq(from = 0.05, to = 0.95, by = 0.05)
+  temp_fdr <- "foobar"
+  temp_type <- "synchronous"
+
+  # Test
+  expect_error(make_manhattan_plot(temp_name, temp_pval, temp_fdr, temp_type))
+})
+
+
+test_that("make_manhattan_lot gives error for invalid input", {
+  # Set up
+  temp_name <- "test"
+  temp_pval <- seq(from = 0.05, to = 0.95, by = 0.05)
+  temp_fdr <- 0.15
+  temp_type <- 5
+
+  # Test
+  expect_error(make_manhattan_plot(temp_name, temp_pval, temp_fdr, temp_type))
+})
