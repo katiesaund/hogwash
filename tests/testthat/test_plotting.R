@@ -444,3 +444,369 @@ test_that("make_manhattan_lot gives error for invalid input", {
   # Test
   expect_error(make_manhattan_plot(temp_name, temp_pval, temp_fdr, temp_type))
 })
+
+# test plot_tr_w_color_edges
+test_that("plot_tr_w_color_edges works for valid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other),
+               NA)
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- "foobar"
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "purple"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- 10
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- matrix(0, 1, 1)
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "foobar"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 10
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- c(1, 0, 1)
+  temp_legend_other <- "hi conf presence"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]] <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "recon"
+  temp_index <- 1
+  temp_legend_base <- "hi conf absence"
+  temp_legend_other <- matrix(0, 1, 1)
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other))
+})
+
+test_that("plot_tr_w_color_edges works for valid inputs on trans", {
+  # Set up
+  set.seed(1)
+  temp_tree <- ape::rtree(5)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_edges_to_highlight <- NULL
+  temp_edges_to_highlight[[1]]$transition <- c(1, 1, 1, 1, 0, 0, 0, 0)
+  temp_conf <- NULL
+  temp_conf[[1]] <- c(1, 1, 0, 0, 1, 1, 0, 0)
+  temp_low_conf_color <- "grey"
+  temp_bright_color <- "purple"
+  temp_title <- "test_title"
+  temp_type <- "trans"
+  temp_index <- 1
+  temp_legend_base <- "hi conf non-transition"
+  temp_legend_other <- "hi conf transition"
+
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other),
+               NA)
+})
+
+
+
+

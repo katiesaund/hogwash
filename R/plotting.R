@@ -668,7 +668,7 @@ make_manhattan_plot <- function(geno_pheno_name,
 #' @param trans_or_recon Character. Either "recon" or "trans."
 #' @param index Number.
 #' @param legend_baseline Character. Legend name for black lines.
-#' @param legend_other Character. Legend name for highlighted lines.
+#' @param legend_highlighted Character. Legend name for highlighted lines.
 #'
 #' @return Plot of a tree with certain edges colored.
 #'
@@ -681,22 +681,36 @@ plot_tr_w_color_edges <- function(tr,
                                   trans_or_recon,
                                   index,
                                   legend_baseline,
-                                  legend_other){
+                                  legend_highlighted){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_string(edge_color_na)
   check_is_string(edge_color_bright)
+  if (edge_color_na == edge_color_bright) {
+    stop("These tree edges need to be different colors")
+  }
   check_is_string(legend_baseline)
-  check_is_string(legend_other)
+  check_is_string(legend_highlighted)
   check_is_number(index)
+  if (index > length(edges_to_highlight)) {
+    stop("Index must select an item from edges_to_highlight")
+  }
+  check_equal(length(geno_confidence), length(edges_to_highlight))
+  check_equal(length(geno_confidence[[index]]), ape::Nedge(tr))
   check_is_string(trans_or_recon)
+  if (!trans_or_recon %in% c("recon", "trans")) {
+    stop("String must be trans or recon")
+  }
   check_is_string(title)
 
   # Function -------------------------------------------------------------------
-  edge_color <- rep("black", ape::Nedge(tr))
+  edge_color_baseline <- "black"
+  edge_color <- rep(edge_color_baseline, ape::Nedge(tr))
   if (trans_or_recon == "recon") {
+    check_equal(length(edges_to_highlight[[index]]), ape::Nedge(tr))
     edge_color[edges_to_highlight[[index]] == 1] <- edge_color_bright
   } else if (trans_or_recon == "trans") {
+    check_equal(length(edges_to_highlight[[index]]$transition), ape::Nedge(tr))
     edge_color[edges_to_highlight[[index]]$transition == 1] <- edge_color_bright
   }
   edge_color[geno_confidence[[index]] == 0] <- edge_color_na # grey out long
@@ -711,8 +725,10 @@ plot_tr_w_color_edges <- function(tr,
                  adj = 0)
   graphics::legend("topleft",
                    bty = "n",
-                   legend = c(legend_baseline, legend_other, "Low confidence"),
-                   col = c("black", edge_color_bright, edge_color_na),
+                   legend = c(legend_baseline, legend_highlighted, "Low confidence"),
+                   col = c(edge_color_baseline,
+                           edge_color_bright,
+                           edge_color_na),
                    lty = 1,
                    ncol = 1,
                    lwd = 1,
