@@ -283,9 +283,7 @@ check_rownames <- function(mat, tr){
   if (is.null(row.names(mat))) {
     stop("Matrix must have row.names()")
   }
-  if (is.null(tr$tip.label))  {
-    stop("Tree must have tip labels")
-  }
+
   if (sum(row.names(mat) != tr$tip.label) != 0) {
     stop("Matrix must be formatted with samples in matrix in the same order as
          tree$tip.label.")

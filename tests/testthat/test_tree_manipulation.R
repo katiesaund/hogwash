@@ -94,3 +94,20 @@ test_that("get_bootstrap_confidence returns error for incomplete node labels", {
   temp_treshold <- 0.5
   expect_error(get_bootstrap_confidence(temp_tree, temp_treshold))
 })
+
+
+test_that("get_bootstrap_confidence returns error for invalid input", {
+  set.seed(1)
+  temp_tree <- ape::rtree(10)
+  temp_tree$node.label[1:10] <- c(92:101)
+  temp_treshold <- 0.5
+  expect_error(get_bootstrap_confidence(temp_tree, temp_treshold))
+})
+
+test_that("get_bootstrap_confidence returns error for invalid input", {
+  set.seed(1)
+  temp_tree <- ape::rtree(10)
+  temp_tree$node.label[1:10] <- c(-5:4)
+  temp_treshold <- 0.5
+  expect_error(get_bootstrap_confidence(temp_tree, temp_treshold))
+})

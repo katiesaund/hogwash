@@ -34,10 +34,8 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
   tip_nodes_by_snp_mat_recon <-
     tip_nodes_by_snp_mat_confi <-
     matrix(0, nrow = (ape::Nnode(tr) + ape::Ntip(tr)), ncol = ncol(geno))
-  if (nrow(tip_nodes_by_snp_mat_recon) !=
-      length(g_recon_and_conf[[1]]$tip_and_node_recon)) {
-    stop("mismatch in size")
-  }
+  check_equal(nrow(tip_nodes_by_snp_mat_recon),
+              length(g_recon_and_conf[[1]]$tip_and_node_recon))
   for (k in 1:ncol(geno)) {
     tip_nodes_by_snp_mat_recon[, k] <-
       g_recon_and_conf[[k]]$tip_and_node_recon
@@ -52,9 +50,7 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
     colnames(tip_nodes_by_snp_mat_confi) <-
     colnames(geno)
 
-  if (nrow(gene_to_snp_lookup_table) != ncol(tip_nodes_by_snp_mat_recon)) {
-    stop("mismatch")
-  }
+  check_equal(nrow(gene_to_snp_lookup_table), ncol(tip_nodes_by_snp_mat_recon))
 
   recon_times_confi <- tip_nodes_by_snp_mat_recon * tip_nodes_by_snp_mat_confi
   tip_nod_by_mat_recon_w_gene_id <-
@@ -67,10 +63,8 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
     rbind(recon_times_confi,
           unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
 
-  if (nrow(tip_nod_by_mat_recon_w_gene_id) !=
-      (nrow(tip_nodes_by_snp_mat_recon) + 1)) {
-    stop("rbind didn't work")
-  }
+  check_equal(nrow(tip_nod_by_mat_recon_w_gene_id),
+              (nrow(tip_nodes_by_snp_mat_recon) + 1))
   unique_genes <- unique(gene_to_snp_lookup_table[, 2])
 
   gene_mat_built_from_snps <-

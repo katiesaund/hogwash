@@ -355,9 +355,7 @@ count_empirical_both_present <- function(permuted_mat,
   })
 
   # Check and return output ----------------------------------------------------
-  if (nrow(permuted_mat) != length(result)) {
-    stop("result dimension mismatch")
-  }
+  check_equal(nrow(permuted_mat), length(result))
   return(result)
 } # end count_empirical_both_present()
 
@@ -383,8 +381,6 @@ count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
     sum(permuted_mat[x, ]) - emp_both_present[x]
   })
   # Check & return output ------------------------------------------------------
-  if (nrow(permuted_mat) != length(result)) {
-    stop("result dimension mismatch")
-  }
+  check_equal(nrow(permuted_mat), length(result))
   return(result)
 } # end count_empirical_only_geno_present()

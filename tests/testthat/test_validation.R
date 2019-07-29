@@ -711,6 +711,7 @@ test_that("check_rownames gives an error when given a tree without
   temp_tree <- ape::rtree(10)
   temp_mat <- matrix(1:10, nrow = 10, ncol = 1)
   temp_tree$tip.label <- NULL
+
   # Test
   expect_error(check_rownames(mat = temp_mat, tr = temp_tree))
 })

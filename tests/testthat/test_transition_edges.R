@@ -119,15 +119,9 @@ test_that("keep_two_plus_hi_conf_tran_ed gives error for invalid input", {
                                                    "discrete")
     fake_confidence[[i]] <- rep(1, ape::Nedge(temp_tree))
   }
-  expect_equivalent(keep_two_plus_hi_conf_tran_ed(temp_results,
-                                                            fake_confidence),
-                    c(TRUE, FALSE))
-  for (i in 1:2) {
-    fake_confidence[[i]] <- rep(0, ape::Nedge(temp_tree))
-  }
-  expect_equivalent(keep_two_plus_hi_conf_tran_ed(temp_results,
-                                                            fake_confidence),
-                    c(FALSE, FALSE))
+  # Make input invalid:
+  temp_results[[1]]$transition <- matrix(1, 1, 1)
+  expect_error(keep_two_plus_hi_conf_tran_ed(temp_results, fake_confidence))
 })
 
 # test keep_hits_with_more_change_on_trans_edges
