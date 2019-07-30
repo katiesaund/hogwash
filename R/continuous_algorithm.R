@@ -211,19 +211,28 @@ calculate_empirical_pheno_delta <- function(perm,
                                             hi_conf_edge_nums,
                                             pheno_by_edges){
   # Check input ----------------------------------------------------------------
+  check_if_permutation_num_valid(perm)
+  check_dimensions(permuted_trans_mat,
+                   exact_rows = perm,
+                   min_rows = perm,
+                   exact_cols = NULL,
+                   min_cols = 1)
+  check_is_number(hi_conf_edge_nums[1])
+  check_class(pheno_by_edges, "matrix")
+  check_is_number(pheno_by_edges[1, 1])
 
   # Function -------------------------------------------------------------------
   empirical_ks_stat <- rep(NA, perm)
   for (k in 1:perm) {
-    permuted_trans_index     <- unique(permuted_trans_mat[k, ])
+    permuted_trans_index <- unique(permuted_trans_mat[k, ])
     permuted_non_trans_index <-
       c(1:length(hi_conf_edge_nums))[!(c(1:length(hi_conf_edge_nums))
                                        %in% unique(permuted_trans_mat[k, ]))]
-    empirical_results        <- run_ks_test(permuted_trans_index,
-                                            permuted_non_trans_index,
-                                            pheno_by_edges)
-    empirical_ks_stat[k]     <- empirical_results$statistic
-  } # end for (k)
+    empirical_results <- run_ks_test(permuted_trans_index,
+                                     permuted_non_trans_index,
+                                     pheno_by_edges)
+    empirical_ks_stat[k] <- empirical_results$statistic
+  }
   # Check and return output ----------------------------------------------------
   return(empirical_ks_stat)
 } # end calculate_empirical_pheno_delta()
