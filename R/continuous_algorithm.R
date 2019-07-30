@@ -245,7 +245,7 @@ calculate_empirical_pheno_delta <- function(perm,
 #'   statistics of the permuted values as compared to the observed (real) value.
 #'
 #' @param mat Matrix. Nrow(mat) == number of samples. Each column is a variant.
-#      Matrix is binary.
+#'  Matrix is binary.
 #' @param permutations Integer. Number of times to run the permutation test.
 #' @param genotype_transition_list List of lists.
 #'   Length(genotype_transition_list) == num genotypes. For each genotype there
@@ -287,8 +287,7 @@ calc_sig <- function(mat,
                      genotype_transition_list,
                      tr,
                      pheno_recon_ordered_by_edges,
-                     genotype_confidence,
-                     genotype_reconstruction){
+                     genotype_confidence){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_permutation_num_valid(permutations)
@@ -325,7 +324,7 @@ calc_sig <- function(mat,
                                         tr)
 
     # Run KS test to find out if the phenotype change on transition edges is
-    # significantly different from phenotype change on non-transition edges
+    #  significantly different from phenotype change on non-transition edges
     observed_results <- run_ks_test(indices$trans_index,
                                     indices$non_trans_index,
                                     pheno_recon_ordered_by_edges)
@@ -340,7 +339,7 @@ calc_sig <- function(mat,
                                     observed_results$pheno_non_trans_delta))
 
     # Create permuted transition index matrix and get edge numbers of the high
-    #   confidence edges
+    #  confidence edges
     perm_results <-
       continuous_permutation(indices, tr, genotype_confidence, permutations, i)
 
@@ -362,14 +361,15 @@ calc_sig <- function(mat,
   } # end for (i)
 
   # Return output --------------------------------------------------------------
-  results <- list("pvals" = pvals, "ks_statistics" = empirical_ks_stat_list,
-                  "observed_pheno_trans_delta" = observed_pheno_trans_delta,
-                  "observed_pheno_non_trans_delta" =
-                    observed_pheno_non_trans_delta,
-                  "trans_median" = trans_median,
-                  "all_edges_median" = all_edges_median,
-                  "num_genotypes" = ncol(mat),
-                  "observed_ks_stat" = observed_ks_stat)
+  results <-
+    list("pvals" = pvals,
+         "ks_statistics" = empirical_ks_stat_list,
+         "observed_pheno_trans_delta" = observed_pheno_trans_delta,
+         "observed_pheno_non_trans_delta" = observed_pheno_non_trans_delta,
+         "trans_median" = trans_median,
+         "all_edges_median" = all_edges_median,
+         "num_genotypes" = ncol(mat),
+         "observed_ks_stat" = observed_ks_stat)
   return(results)
 } # end calc_sig()
 

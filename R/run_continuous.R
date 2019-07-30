@@ -72,8 +72,7 @@ run_continuous <- function(args){
              hi_conf$genotype_transition,
              args$tree,
              AR$pheno_recon_and_conf$recon_edge_mat,
-             hi_conf$high_conf_ordered_by_edges,
-             hi_conf$geno_recon_edge)
+             hi_conf$high_conf_ordered_by_edges)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_all_trans <-

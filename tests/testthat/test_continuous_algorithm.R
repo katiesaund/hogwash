@@ -110,7 +110,6 @@ test_that("calc_sig gives expected results given valid inputs", {
     temp_geno_trans[[i]]$transition <- c(1, 0, 1, 0, 1, 0, 1, 0)
     temp_geno_trans[[i]]$trans_dir <- c(1, 0, -1, 0, 1, 0, -1, 0)
     temp_conf[[i]] <- c(1, 1, 1, 0, 0, 1, 1, 1)
-    temp_geno_recon[[i]] <- rep(1, ape::Nedge(temp_tree))
   }
   set.seed(1)
   temp_pheno <- matrix(rnorm(ape::Nedge(temp_tree) * 2),
@@ -121,8 +120,7 @@ test_that("calc_sig gives expected results given valid inputs", {
                       temp_geno_trans,
                       temp_tree,
                       temp_pheno,
-                      temp_conf,
-                      temp_geno_recon)
+                      temp_conf)
   expect_equal(results$num_genotypes, num_loci)
   expect_equal(round(results$observed_ks_stat[1], 3), 0.333)
   expect_equal(round(results$all_edges_median[1], 3), 0.993)
@@ -147,12 +145,11 @@ test_that("calc_sig returns a significant p-value when phenotype change is
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_geno <- matrix(c(0, 1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
-  temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
+  temp_geno_trans <- temp_conf <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
     temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1, 1, 0)
     temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1, 1, 1)
     temp_conf[[i]]                  <- c(1, 1, 1, 1, 1, 1, 1, 1)
-    temp_geno_recon[[i]]            <- c(1, 1, 1, 1, 1, 1, 1, 1)
   }
   set.seed(1)
   temp_pheno <-
@@ -166,8 +163,7 @@ test_that("calc_sig returns a significant p-value when phenotype change is
                       temp_geno_trans,
                       temp_tree,
                       temp_pheno,
-                      temp_conf,
-                      temp_geno_recon)
+                      temp_conf)
   alpha <- 0.06
   expect_true(results$pvals[1] < alpha)
   expect_equal(results$all_edges_median[[1]],
@@ -192,12 +188,11 @@ test_that("calc_sig returns a non-significant p-value when phenotype change is
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_geno <- matrix(c(0, 1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
-  temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
+  temp_geno_trans <- temp_conf <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
     temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
     temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
     temp_conf[[i]]                  <- c(1, 1, 1, 1, 1, 1)
-    temp_geno_recon[[i]]            <- c(1, 1, 1, 1, 1, 1)
   }
   set.seed(1)
   temp_pheno <- matrix(c(-15, -15, 10, 0, 10, 10, -10, 0, 7, 5, 25, 7),
@@ -210,8 +205,7 @@ test_that("calc_sig returns a non-significant p-value when phenotype change is
                       temp_geno_trans,
                       temp_tree,
                       temp_pheno,
-                      temp_conf,
-                      temp_geno_recon)
+                      temp_conf)
   alpha <- 0.01
   expect_true(results$pvals[1] > alpha)
   expect_equal(results$all_edges_median[[1]],
@@ -234,12 +228,11 @@ test_that("calc_sig returns an error when the only confident edges are
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_geno <- matrix(c(0, 1), nrow = num_isolates, ncol = num_loci)
   temp_perm <- 100
-  temp_geno_trans <- temp_conf <- temp_geno_recon <- rep(list(NULL), num_loci)
+  temp_geno_trans <- temp_conf <- rep(list(NULL), num_loci)
   for (i in 1:num_loci) {
     temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
     temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
     temp_conf[[i]]                  <- c(0, 0, 0, 1, 1, 1)
-    temp_geno_recon[[i]]            <- c(1, 1, 1, 1, 1, 1)
   }
   set.seed(1)
   temp_pheno <- matrix(c(-15, -15, 10, 0, 10, 10, -10, 0, 7, 5, 25, 7),
@@ -252,11 +245,8 @@ test_that("calc_sig returns an error when the only confident edges are
                         temp_geno_trans,
                         temp_tree,
                         temp_pheno,
-                        temp_conf,
-                        temp_geno_recon))
+                        temp_conf))
 })
-
-
 
 # test get_hi_conf_tran_indices
 test_that("get_hi_conf_tran_indices returns only high confidence transition
