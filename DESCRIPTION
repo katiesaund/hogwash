@@ -30,3 +30,4 @@ Suggests:
     testthat, knitr, rmarkdown, qpdf
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
+URL: https://github.com/katiesaund/hogwash/wiki
