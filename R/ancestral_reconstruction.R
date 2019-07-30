@@ -27,7 +27,7 @@
 #'   * tip_and_node_recon A vector with the tip values followed by the node
 #'       ancestral reconstruction. Length == Ntip(tr) + Nnode(tr).
 #'
-#'  @noRd
+#' @noRd
 #'
 ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   # Check input ----------------------------------------------------------------

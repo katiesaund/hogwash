@@ -51,7 +51,7 @@ identify_short_edges <- function(tr){
 #'  definition 1. Then the remaining entries correspond to the nodes and is
 #'  either 0 or 1.
 #'
-#'  @noRd
+#' @noRd
 #'
 get_bootstrap_confidence <- function(tr, confidence_threshold){
   # Check input ----------------------------------------------------------------

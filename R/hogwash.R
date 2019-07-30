@@ -50,42 +50,46 @@
 #'  genotypes, ncol = 2.
 #'
 #' @export
+#'
 #' @examples
-#' \strong{Continuous Test for continuous phenotype}
-#' \code{phenotype <- hogwash::growth
+#' \donttest{
+#' # Continuous Test for continuous phenotype
+#' phenotype <- hogwash::growth
 #' genotype <- hogwash::snp_genotype
 #' tree <- hogwash::tree
 #' hogwash(pheno = phenotype,
 #'         geno = genotype,
-#'         tree = tree)}
-#'
-#' \strong{Continuous Test while grouping SNPs into genes}
-#' \code{phenotype <- hogwash::growth
-#' genotype <- hogwash::snp_genotype
-#' tree <- hogwash::tree
-#' key <- hogwash::snp_gene_key
-#' hogwash(pheno = phenotype,
-#'         geno = genotype,
-#'         tree = tree,
-#'         group_genotype_key = key)}
-#'
-#' \strong{Both Synchronous Test & PhyC for discrete phenotype}
-#' \code{phenotype <- hogwash::antibiotic_resistance
-#' genotype <- hogwash::snp_genotype
-#' tree <- hogwash::tree
-#' hogwash(pheno = phenotype,
-#'         geno = genotype,
-#'         tree = tree)}
-#'
-#' \strong{Both Synchronous Test & PhyC while grouping SNPs into genes}
-#' \code{phenotype <- hogwash::antibiotic_resistance
+#'         tree = tree)
+#' }
+#' \donttest{
+#' # Continuous Test while grouping SNPs into genes
+#' phenotype <- hogwash::growth
 #' genotype <- hogwash::snp_genotype
 #' tree <- hogwash::tree
 #' key <- hogwash::snp_gene_key
 #' hogwash(pheno = phenotype,
 #'         geno = genotype,
 #'         tree = tree,
-#'         group_genotype_key = key)}
+#'         group_genotype_key = key)
+#'
+#' # Both Synchronous Test & PhyC for discrete phenotype
+#' phenotype <- hogwash::antibiotic_resistance
+#' genotype <- hogwash::snp_genotype
+#' tree <- hogwash::tree
+#' hogwash(pheno = phenotype,
+#'         geno = genotype,
+#'         tree = tree)
+#'
+#' # Both Synchronous Test & PhyC while grouping SNPs into genes
+#' phenotype <- hogwash::antibiotic_resistance
+#' genotype <- hogwash::snp_genotype
+#' tree <- hogwash::tree
+#' key <- hogwash::snp_gene_key
+#' hogwash(pheno = phenotype,
+#'         geno = genotype,
+#'         tree = tree,
+#'         group_genotype_key = key)
+#' }
 #'
 #' @author Katie Saund
 #'

@@ -334,7 +334,7 @@ discrete_permutation <- function(tr,
 #' @param hi_conf_edge List.
 #' @param index Number. The "i" of the loop this function is run within.
 #'
-#' @returnNumeric Vector. Length = num perm.
+#' @return Numeric Vector. Length = num perm.
 #' @noRd
 count_empirical_both_present <- function(permuted_mat,
                                          pheno_vec,

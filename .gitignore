@@ -8,3 +8,4 @@ doc
 *.gz
 *dummy*.rda
 *.Rcheck
+test/*/*.rda
