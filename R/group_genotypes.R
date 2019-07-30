@@ -526,6 +526,10 @@ group_genotypes <- function(tr,
                    min_rows = ncol(geno),
                    exact_cols = 2,
                    min_cols = 2)
+  check_is_string(uni_genes[1])
+  if (length(uni_genes) > length(unique(lookup[, 2]))) {
+    stop("Too many genotypes in uni_genes")
+  }
 
   # Function -------------------------------------------------------------------
   geno_recon_and_conf_tip_node <-
