@@ -8,6 +8,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 cran-comments.md
+^tests/testthat/*.rda
+^tests/testthat/*.pdf
 tests/testthat/*.rda
 tests/testthat/*.pdf
 inst/wiki_images/*
