@@ -558,8 +558,6 @@ plot_continuous_results <- function(disc_cont,
 
   colnames(trans_dir_edge_mat) <- colnames(geno)
 
-  # TODO Update trans_edge_mat to exclude low confidence  edges, currently it
-  # includes transition edges (all high and some low confidence transitions)
   for (c in 1:ncol(trans_dir_edge_mat)) {
     trans_dir_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
@@ -876,7 +874,6 @@ plot_phyc_results <- function(tr,
   }
 
   p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1
-  # TODO -1 should be NA but it won't work correctly
   p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
   colnames(p_mat) <- "pheno_presence"
   phenotype_annotation <- as.data.frame(p_mat)
@@ -904,7 +901,6 @@ plot_phyc_results <- function(tr,
     snp_in_gene <-
       snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
                   drop = FALSE]
-    # TODO add a test to make sure order doesn't matter in the cbind()
     column_annot <- cbind(significant_loci, log_p_value, snp_in_gene)
   } else {
     column_annot <- cbind(significant_loci, log_p_value)
@@ -919,8 +915,6 @@ plot_phyc_results <- function(tr,
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
                         row.names(column_annot)), ]
 
-  # TODO: make sure this kind of annotation steps gets generalized to more
-  # TODO: locations -- I think I wrote a function like this somewhere else.
   if (length(unique(phenotype_annotation[, 1])) == 3) {
     pheno_presence_col <- c( na = "grey", absence = "white", presence = "red")
   } else if (length(unique(phenotype_annotation[, 1])) == 2) {
@@ -974,8 +968,6 @@ plot_phyc_results <- function(tr,
   # Loop through significant hits:
   pheno_as_list <- list(p_recon_edges)
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
-  # TODO break these plots into more functions b/c lots of redundant code
-  # TODO between recon and transition plots
   for (j in 1:nrow(recon_hit_vals)) {
     if (recon_hit_vals[j, 1] < fdr) {
       graphics::par(mfrow = c(3, 2),
@@ -1006,7 +998,6 @@ plot_phyc_results <- function(tr,
                             "No transition",
                             "Transition")
       # Permutation test
-      # TODO change to loop through sig hits
       max_x <- max(recon_perm_obs_results$permuted_count[[j]],
                    recon_perm_obs_results$observed_overlap[j])
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
@@ -1032,7 +1023,6 @@ plot_phyc_results <- function(tr,
                        lwd = 1,
                        cex = 0.75)
 
-      # TODO should be NA instead of -1 but it won't work correctedly
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
       colnames(p_mat) <- "pheno_presence"
@@ -1215,7 +1205,6 @@ plot_synchronous_results  <- function(tr,
     snp_in_gene <-
       snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
                   drop = FALSE]
-    # TODO add a test to make sure order doesn't matter in cbind()
     column_annot <- cbind(significant_loci, log_p_value, snp_in_gene)
   } else {
     column_annot <- cbind(significant_loci, log_p_value)
@@ -1229,7 +1218,6 @@ plot_synchronous_results  <- function(tr,
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
                        row.names(column_annot)), ]
 
-  # TODO use the annotation function here instead of this redundant code
   if (length(unique(phenotype_annotation[, 1])) == 3) {
     pheno_presence_col <- c("-1" = "grey", "0" = "white", "1" = "red")
   } else if (length(unique(phenotype_annotation[, 1])) == 2) {
@@ -1313,7 +1301,6 @@ plot_synchronous_results  <- function(tr,
                             "No transition",
                             "Transition")
       # Plot permutation test
-      # TODO change to loop through sig hits
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
                    trans_perm_obs_results$observed_overlap[j])
       graphics::hist(trans_perm_obs_results$permuted_count[[j]],
@@ -1326,7 +1313,7 @@ plot_synchronous_results  <- function(tr,
            main = paste0("Geno & pheno transition overlap\npval=",
                          round(trans_hit_vals[j, 1], 4),
                          "\nRed=observed,Grey=permutations",
-                         sep = "")) # TODO add rank pvalue
+                         sep = ""))
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
                        col = "red")
 

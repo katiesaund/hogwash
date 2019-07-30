@@ -59,9 +59,6 @@ count_hits_on_edges <- function(genotype_transition_edges,
                                 phenotype_reconstruction,
                                 high_confidence_edges,
                                 tr){
-  # TODO This approach assumes that the genotype_transition_edges being fed
-  # TODO   into it are all 0 > 1 for phyC. Not sure if there is an
-  # TODO   assumption in place for the overlap test.
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_number(genotype_transition_edges[[1]][1])

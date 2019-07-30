@@ -26,8 +26,6 @@ get_dropped_genotypes <- function(geno, keepers){
   if (ncol(geno) != length(keepers)){
     stop("Keepers must have an entry for each genotype.")
   }
-  # TODO add a stop() here is sum(keepers) == 0. This should stop hogwash from
-  # TODO continuing any further as there is no genotype to test.
 
   # Function -------------------------------------------------------------------
   dropped_genotype_names <- colnames(geno)[!keepers]

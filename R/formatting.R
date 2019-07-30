@@ -87,7 +87,7 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
 
   # Function -------------------------------------------------------------------
   check_if_phenotype_normal(pheno, disc_cont)
-  # TODO ? check_if_convergence_occurs(pheno, tr, disc_cont)
+  # check_if_convergence_occurs(pheno, tr, disc_cont)
   pheno_vector <- convert_matrix_to_vector(pheno)
   check_convergence_possible(pheno_vector, disc_cont)
 

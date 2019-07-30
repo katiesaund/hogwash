@@ -22,13 +22,7 @@
 #' @noRd
 #'
 run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
-  # TODO deal with cases when there isn't enough data
-  #   (aren't at least 1 of least t_index and non_t_index)
-  # TODO -- If i were really fancy -- I would remove these from the genotype and
-  # report that they're bad & continue without breaking out of the algorithm
-  # right now it will cause a stop error which won't be good for lots of things.
-  # Can't seem to recapitulate the error when there are not enough samples to
-  # run the test, but all indices are list of at least one. Hmm.
+  # Check inputs ---------------------------------------------------------------
   if (length(t_index) < 1 | length(non_t_index) < 1) {
     stop("Not enough high confidence transition edges to use for KS test.")
   }
@@ -49,7 +43,7 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
 
   # Function -------------------------------------------------------------------
   p_trans_delta <-
-    calculate_phenotype_change_on_edge(t_index,     phenotype_by_edges)
+    calculate_phenotype_change_on_edge(t_index, phenotype_by_edges)
   p_non_trans_delta <-
     calculate_phenotype_change_on_edge(non_t_index, phenotype_by_edges)
 
@@ -183,10 +177,7 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   }
   # permuted_trans_index_mat is my new, permuted "indices$trans_index" where
   # each row is a new, fake list of transition genotype branches.
-  # TODO BUT CAVEAT: these are just fake/null transitions and some of them are
-  # probably actually touching! If I wanted to be super legit I would recreate
-  # as many hits, calculate new transitions, and then use those in my
-  # permutation test, somehow controlling for variable numbers of transitions.
+
   # Check and return output ----------------------------------------------------
   check_dimensions(permuted_trans_index_mat,
                    exact_rows = perm,
@@ -220,7 +211,7 @@ calculate_empirical_pheno_delta <- function(perm,
                                             hi_conf_edge_nums,
                                             pheno_by_edges){
   # Check input ----------------------------------------------------------------
-  # TODO add check inputs to this function
+
   # Function -------------------------------------------------------------------
   empirical_ks_stat <- rep(NA, perm)
   for (k in 1:perm) {
@@ -289,10 +280,6 @@ calc_sig <- function(mat,
                      pheno_recon_ordered_by_edges,
                      genotype_confidence,
                      genotype_reconstruction){
-  # TODO double check that genotype_reconstruction is not needed in this
-  # TODO   function
-  # TODO If that's true, then remove and propogate the change and test after
-  # TODO   implementation.
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_permutation_num_valid(permutations)
@@ -405,7 +392,6 @@ calc_sig <- function(mat,
 #' @noRd
 #'
 get_sig_hit_and_mult_test_corr <- function(hit_values, fdr){
-  # TODO fix column names?
   # Check inputs ---------------------------------------------------------------
   check_num_between_0_and_1(fdr)
 
