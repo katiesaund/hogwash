@@ -70,8 +70,6 @@ Overview: hogwash reads in one phenotype (either continuous or
  described later on the inputs page.
 }
 \examples{
-
-\dontshow{
 # Continuous Test for continuous phenotype
 phenotype <- hogwash::growth
 genotype <- hogwash::snp_genotype
@@ -79,8 +77,7 @@ tree <- hogwash::tree
 hogwash(pheno = phenotype,
         geno = genotype,
         tree = tree)
-}
-\dontrun{
+\donttest{
 # Continuous Test while grouping SNPs into genes
 phenotype <- hogwash::growth
 genotype <- hogwash::snp_genotype
