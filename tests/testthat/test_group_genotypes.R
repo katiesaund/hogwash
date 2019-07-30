@@ -1,7 +1,7 @@
 context("Group genotypes") #---------------------------------------------------#
-
-# test build_gene_trans_from_snp_trans -----------------------------------------
-test_that("build_gene_trans_from_snp_trans does X given Y", {
+# test build_gene_trans_from_snp_trans
+test_that("build_gene_trans_from_snp_trans works for valid input", {
+  # Set up
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
@@ -47,6 +47,7 @@ test_that("build_gene_trans_from_snp_trans does X given Y", {
                                                   AR$geno_trans,
                                                   snp_gene_key)
 
+  # Test
   expect_true(length(temp_results) == length(unique(snp_gene_key[, 2])))
   expect_equal(temp_results[[1]]$transition, AR$geno_trans[[1]]$transition)
   expect_equal(temp_results[[2]]$transition, AR$geno_trans[[2]]$transition)
@@ -54,14 +55,13 @@ test_that("build_gene_trans_from_snp_trans does X given Y", {
   expect_equal(temp_results[[4]]$transition, AR$geno_trans[[4]]$transition)
   expect_equal(temp_results[[5]]$transition,
                AR$geno_trans[[5]]$transition + AR$geno_trans[[6]]$transition)
-
   expect_equal(length(temp_results[[1]]$transition), ape::Nedge(temp_tree))
   expect_equal(length(temp_results[[1]]$trans_dir), ape::Nedge(temp_tree))
-
 })
 
 # test prepare_genotype --------------------------------------------------------
 test_that("prepare_genotype gives expected genotype for a grouped input", {
+  # Set up
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
@@ -105,9 +105,12 @@ test_that("prepare_genotype gives expected genotype for a grouped input", {
     c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "GENE7", "GENE7")
 
   temp_logical <- TRUE
+  temp_result <- prepare_genotype(temp_logical,
+                                  temp_geno,
+                                  temp_tree,
+                                  temp_lookup)
 
-  temp_result <-
-    prepare_genotype(temp_logical, temp_geno, temp_tree, temp_lookup)
+  # Test
   expect_equal(temp_result$genotype, temp_geno[, c(1, 2, 5, 6, 7, 8)])
   expect_equal(temp_result$gene_snp_lookup, temp_lookup[c(1, 2, 5, 6, 7, 8), ])
   expect_equal(as.numeric(unname(temp_result$snps_per_gene)), c(1, 1, 1, 1, 2))
@@ -115,7 +118,8 @@ test_that("prepare_genotype gives expected genotype for a grouped input", {
                c("GENE1", "GENE2", "GENE5", "GENE6", "GENE7"))
 
 })
-test_that("prepare_genotype gives expected genotype for an not grouped input", {
+test_that("prepare_genotype gives expected genotype for a not grouped input", {
+  # Set up
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
@@ -163,15 +167,16 @@ test_that("prepare_genotype gives expected genotype for an not grouped input", {
                                   temp_tree,
                                   temp_lookup)
 
+  # Test
   expect_null(temp_result$snps_per_gene)
   expect_equal(temp_result$genotype, temp_geno[, c(1, 5, 6)])
   expect_equal(temp_result$no_convergence_genotypes,
                c("SNP2", "SNP3", "SNP4", "SNP7", "SNP8"))
-
 })
 
 # test prepare_ungrouped_genotype ----------------------------------------------
-test_that("prepare_ungrouped_genotype", {
+test_that("prepare_ungrouped_genotype works for valid input", {
+  # Set up
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
@@ -208,6 +213,8 @@ test_that("prepare_ungrouped_genotype", {
     c("SNP1", "SNP2", "SNP3", "SNP4", "SNP5", "SNP6", "SNP7", "SNP8")
 
   temp_result <- prepare_ungrouped_genotype(temp_geno, temp_tree)
+
+  # Test
   expect_null(temp_result$snps_per_gene)
   expect_equal(temp_result$genotype, temp_geno[, c(1, 5, 6)])
   expect_equal(temp_result$no_convergence_genotypes,
@@ -215,7 +222,8 @@ test_that("prepare_ungrouped_genotype", {
 })
 
 # test prepare_grouped_genotype ------------------------------------------------
-test_that("prepare_grouped_genotype", {
+test_that("prepare_grouped_genotype works for valid inputs", {
+  # Set up
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
@@ -260,6 +268,7 @@ test_that("prepare_grouped_genotype", {
 
   temp_result <- prepare_grouped_genotype(temp_geno, temp_lookup)
 
+  # Test
   expect_equal(temp_result$genotype, temp_geno[, c(1, 2, 5, 6, 7, 8)])
   expect_equal(temp_result$gene_snp_lookup, temp_lookup[c(1, 2, 5, 6, 7, 8), ])
   expect_equal(as.numeric(unname(temp_result$snps_per_gene)), c(1, 1, 1, 1, 2))
@@ -268,7 +277,8 @@ test_that("prepare_grouped_genotype", {
 })
 
 # test group_genotypes ---------------------------------------------------------
-test_that("group_genotypes does X given Y", {
+test_that("group_genotypes works for valid inputs", {
+  # Set up
   set.seed(1)
   temp_tree <- ape::rtree(7)
   temp_tree$edge.length <-
@@ -343,6 +353,8 @@ test_that("group_genotypes does X given Y", {
                                   geno_trans_phyc,
                                   geno$gene_snp_lookup,
                                   geno$unique_genes)
+
+  # Test
   expect_equal(length(temp_results$geno_recon_ordered_by_edges),
                ncol(temp_results$genotype))
   expect_identical(row.names(temp_results$genotype), temp_tree$tip.label)
@@ -354,4 +366,45 @@ test_that("group_genotypes does X given Y", {
                ape::Nedge(temp_tree))
   expect_equal(length(temp_results$geno_trans_phyc[[1]]$trans_dir),
                ape::Nedge(temp_tree))
+})
+
+# test build_gene_genotype_from_snps
+test_that("build_gene_genotype_from_snps works for valid inputs", {
+  # Set up
+  temp_geno <- matrix(c(0, 1),
+                      ncol = 4,
+                      nrow = 3)
+  colnames(temp_geno) <- c("a", "b", "d", "h")
+  row.names(temp_geno) <- c("sample1", "sample2", "sample3")
+  temp_key <- matrix(c(letters[1:8],
+                     c(rep("One", 3), rep("Two", 3), rep("Three", 2))),
+                     ncol = 2,
+                     nrow = 8)
+  colnames(temp_key) <- c("snp", "gene")
+  temp_key <- temp_key[temp_key[, 1] %in% colnames(temp_geno),, drop = FALSE]
+  results <- build_gene_genotype_from_snps(temp_geno, temp_key)
+
+  expected_results <- matrix(c(1, 1, 1, 0, 1, 0, 1, 0, 1), nrow = 3, ncol = 3)
+  colnames(expected_results) <- c("One", "Two", "Three")
+  row.names(expected_results) <- c("sample1", "sample2", "sample3")
+
+  # Test
+  expect_identical(results, expected_results)
+})
+
+test_that("build_gene_genotype_from_snps gives error for invalid inputs", {
+  # Set up
+  temp_geno <- matrix(c(0, 1),
+                      ncol = 4,
+                      nrow = 3)
+  colnames(temp_geno) <- c("a", "b", "d", "h")
+  row.names(temp_geno) <- c("sample1", "sample2", "sample3")
+  temp_key <- matrix(c(letters[1:8],
+                       c(rep("One", 3), rep("Two", 3), rep("Three", 2))),
+                     ncol = 2,
+                     nrow = 8)
+  colnames(temp_key) <- c("snp", "gene")
+
+  # Test
+  expect_error(build_gene_genotype_from_snps(temp_geno, temp_key))
 })

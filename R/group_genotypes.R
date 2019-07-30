@@ -278,7 +278,8 @@ build_gene_trans_from_snp_trans <- function(tr,
 #'
 #' @param geno Matrix. Columns are genotypes. Rows are isolates.
 #' @param gene_to_snp_lookup_table Matrix. 2 columns. 1st column are the
-#'  ungrouped genotypes 2nd column are the grouped genotypes.
+#'  ungrouped genotypes 2nd column are the grouped genotypes. The table's 1st
+#'  column must contain only genotypes that are found in the row.names(geno).
 #'
 #' @return samples_by_genes. Matrix.
 #'
@@ -286,6 +287,13 @@ build_gene_trans_from_snp_trans <- function(tr,
 #'
 build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
   # Check input ----------------------------------------------------------------
+  check_class(geno, "matrix")
+  check_class(gene_to_snp_lookup_table, "matrix")
+  if (sum(!gene_to_snp_lookup_table[ , 1] %in% colnames(geno)) > 0) {
+    stop("gene_to_snp_lookup_table must only contain genotypes in geno")
+  }
+  check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
+  check_dimensions(geno, NULL, 1, NULL, 1)
 
   # Function -------------------------------------------------------------------
   unique_genes <- unique(gene_to_snp_lookup_table[, 2])
@@ -348,7 +356,7 @@ prepare_grouped_genotype <- function(geno, lookup){
 
   # we don't want to remove snps that are too rare or too common until snps are
   # grouped into genes, then run on the grouped genes. But we need to remove
-  # SNPs that don't occur for ace to work.
+  # SNPs that don't occur for ape::ace to work.
   genotype <- geno[, colSums(geno) > 0]
   genotype <- genotype[, colSums(genotype) < nrow(genotype)]
 
