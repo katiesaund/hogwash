@@ -2,9 +2,9 @@ citHeader("To cite hogwash in publications use:")
 
 citEntry(entry = "Article",
   title        = "Paper title",
-  author       = personList(as.person("Katie Saund"), 
+  author       = personList(as.person("Katie Saund"),
                     as.person("Other author name"),
-                    as.perons("Other author name")),
+                    as.person("Other author name")),
   journal      = "Journal Name",
   year         = "Num",
   volume       = "Num",

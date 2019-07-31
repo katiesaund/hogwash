@@ -24,9 +24,9 @@ Imports:
     pheatmap,
     phytools,
     stats,
-    utils,
+    utils
 Suggests: 
-    testthat, knitr, rmarkdown, qpdf
+    testthat, knitr, rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 URL: https://github.com/katiesaund/hogwash/wiki

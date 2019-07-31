@@ -10,26 +10,28 @@ hogwash(pheno, geno, tree, file_name = Sys.Date(), dir = ".",
 }
 \arguments{
 \item{pheno}{Matrix. Dimensions: nrow = number of samples, ncol = 1. Either
-continuous or binary (0/1). Row.names() must match tree$tip.label.}
+continuous or binary (0/1). Row.names() must match tree$tip.label. Required
+input.}
 
 \item{geno}{Matrix. Dimensions: nrow = number of samples, ncol = number of
-genotypes. Binary (0/1). Row.names() must match tree$tip.label.}
+genotypes. Binary (0/1). Row.names() must match tree$tip.label. Required
+input.}
 
 \item{tree}{Phylo object. If unrooted, will be rooted using
-phytools::midpoint.root() method.}
+phytools::midpoint.root() method. Required input.}
 
-\item{file_name}{Character. Name of output files.}
+\item{file_name}{Character. Suffix for output files. Default value is the current date: YYYY-MM-DD.}
 
-\item{dir}{Character. Path to output directory.}
+\item{dir}{Character. Path to output directory. Default value is current directory: "."}
 
-\item{perm}{Integer. Number of permutations to run.}
+\item{perm}{Integer. Number of permutations to run. Default value is: 10,000.}
 
-\item{fdr}{Numeric. False discovery rate. Between 0 and 1.}
+\item{fdr}{Numeric. False discovery rate. Between 0 and 1. Default value is: 0.15.}
 
-\item{bootstrap}{Numeric. Confidence threshold for tree bootstrap values.}
+\item{bootstrap}{Numeric. Confidence threshold for tree bootstrap values. Default value is: 0.70.}
 
 \item{group_genotype_key}{Matrix. Dimenions: nrow = number of unique
-genotypes, ncol = 2.}
+genotypes, ncol = 2. Optional input.}
 }
 \description{
 This function runs a bacterial genome-wide association test. It
