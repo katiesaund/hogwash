@@ -6,3 +6,178 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(hogwash)
+```
+
+Bacterial GWAS are the application of the GWAS method, pioneered in humans since the mid-2000s, to bacterial genomes. Bacterial genomes present different pros and cons that human genomes when applying GWAS methods. Bacteria have clonal populations, so it's easy to identify false positives when associating genetic loci with phenotypes therefore it's critical to control for population structure during association testing.
+
+The hogwash package makes it straight forward to test for associations between the presence of genetic viarants and a binary or continuous phenotype. 
+
+This document introduces you to the hogwash methods and shows you how to run the code on your computer. 
+
+# How hogwash works   
+This package reads in one phenotype (either continuous or binary), a matrix of binary genotypes, and a phylogenetic tree. Given these inputs it performs an ancestral reconstruction of that phenotype and each genotype. The ancestral reconstructions are used to perform one of several tests to associate the the genotypes with the phenotype: 
+
+1. Continuous Test
+2. Synchronous Test
+3. PhyC 
+  
+Once a test finishes running it returns (i) p-values for all genotypes tested, (ii) a manhattan plot of those p-values; if any of the genotypes tested were significant associated with the phenotype after FDR correction it also returns (iii) a list of significant hits and (iv) figures of the genotype & phenotype reconstructions on the tree.  
+
+### Grouping 
+A unique feature of hogwash is the ability to organize genotypes into biologically meaningful groups. Testing for an association between an individual SNP and a phenotype is quite stringent, but patterns may emerge when grouping together biologically related genotypes. For example, grouping together all variants (insertions, deletions and SNPs) within a gene or promoter region could allow the user to identify a particular gene as being associated with a phenotype while any individual variant within that gene may not have deep penetrance in the isolates being tested. Grouped genotypes could have increased power to identify convergent evolution because they captures larger trends in functional impact at the group level and reduce the multiple testing correction burden. Use cases for this method could be to group SNPs into genes, kmers or genes into pathways, etc... Each of the three tests can be run on disaggregated data or aggregated data with the inclusion of a grouping key which is described later on the inputs page. 
+
+### A note on nomenclature: 
+#### Talking about phylogenetic trees: 
+Nodes: bifurcation points   
+Tips: termini  
+Edges: the line defined by two adjacent nodes or a tip and the nearest node
+
+#### Convergent evolution vs parallel evolution:
+While convergent evolution and parallel evolution have specific meanings, those definitions are often confused and hard to disentangle. I’ve found that the nuanced differences between convergent and parallel evolution are frequently lost in conversation. For the purposes of this software package, I prefer to call all episodes of independent evolution of a trait "convergence." 
+
+## All tests start with ancestral reconstruction & confidence
+### Ancestral reconstruction
+Given a phylogenetic tree and trait for each tree tip an ancestral reconstruction is created wherein the value of the trait at each internal node is predicted. To learn more about the ancestral reconstruction tool please read the [ape::ace() documentation](https://www.rdocumentation.org/packages/ape/versions/5.3/topics/ace). Ancestral reconstruction for binary characters is performed with maximum likelihood and either an equal rates or all rates different model (the best model is chosen for each reconstruction).  
+  
+Binary phenotype: 
+![ancestral reconstruction](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/ancestral_reconstruction.png)
+
+From the ancestral reconstruction above we infer that antibiotic resistance evolved three separate times: 
+
+1. Ancestor to t1 & t9
+2. Ancestor to t7
+3. Ancestor to t2 & t6 
+  
+### Confidence
+A tree edge is excluded from analysis if it: 
+* has low bootstrap support (default: < 70%),
+* is very long (>10% of total tree edge length),
+* or has low ancestral reconstruction support (maximum likelihood < .875) from either the phenotype or genotype reconstruction. 
+
+## 1. Continuous test (input: continuous phenotype)
+### Does the phenotype change more than expected by chance on genotype transition edges than on genotype non-transition edges?
+
+Genotype transitions are defined as any edge where the parent node and child node are not equal. 
+
+| Genotype edge type | parent node value | child node value |   
+|-|-|-|
+| Transition | wild type (0) | mutant (1) |  
+| Transition | mutant (1) | wild type (0) |  
+| Non-transition | wild type (0) | wild type (0) |  
+| Non-transition | mutant (1) | mutant (1) |  
+
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/both_transition_edges.png)
+
+The absolute value of the phenotype change on each edge is measured. Then the distributions of the delta phenotype on genotype transition edges versus non-transition edges are compared.  
+
+![continuous algorithm](https://github.com/katiesaund/hogwash/blob/master/data/continuous_algorithm_demo.png)
+Left panel: the delta phenotype is noticeably higher on transition edges (purple), suggesting an association between a change in the genotype and a change in the phenotype. Right panel: the two delta phenotype distributions are nearly identical, suggesting the genotype transitions are not associated with phenotype changes.    
+
+The two phenotype distributions are compared using a two-sample Kolmogorov–Smirnov (KS) test. The test's output, the KS test statistic, is recorded. Then a permutation test is performed wherein the classification of each edge as a genotype transition or non-transition edge is randomized. The KS test is repeated on the permuted data. An empirical p-value is calculated based on the observed vs. permuted KS test statistics. 
+
+## 2. Synchronous test (input: binary phenotype)
+### Do genotype transitions occur more often than expected by chance on phenotype transition edges than on phenotype non-transition edges?
+This test is an extension of PhyC (see below), but with the goal of decreasing false positive by requiring more stringent association between the genotype and phenotype. The number of edges on the tree where both a genotype transition and phenotype transition occurs is calculated. Then a permutation test is run where the classification of edges as genotype transition edges are randomized on the tree. The number of edges where the permuted genotype transitions coincide with the phenotype transition is recorded for each permutation, creating a null distribution. An empirical p-value is calculated based on the observed number of edges as compared to the null distribution. 
+
+Transition edges are defined as in (1.) but phenotypes, which are now binary, are also classified in this way:
+
+| Genotype or phenotype edge type | parent node value | child node value |   
+|-|-|-|
+| Transition | wild type (0) | mutant (1) |  
+| Transition | mutant (1) | wild type (0) |  
+| Non-transition | wild type (0) | wild type (0) |  
+| Non-transition | mutant (1) | mutant (1) |  
+
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/both_transition_edges.png)
+
+## 3. PhyC (input: binary phenotype)
+### Does the genotype transition from wild type to mutant more often than expected by chance on edges where the phenotype is present than where the phenotype is absent?  
+This test is my implementation of the PhyC algorithm* as described in [Farhat et al.’s 2013 Nature Genetics paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3887553/). If a genotype mutates more often on edges with the phenotypic trait of interest, there is a positive correlation between the genotype mutation and the phenotype. This approach controls for population structure by requiring the overlap of the phenotype with the genotype transition, rather than the overlap of the phenotype presence with genotype presence. 
+
+The number of edges on the tree where both a genotype mutates (0 -> 1) and the phenotype is present occurs is calculated. Then a permutation test is run where the genotype mutations (0 -> 1) are randomized on the tree. The number of edges where the permuted genotype mutation (0 -> 1) coincides with the phenotype transition is recorded for each permutation, creating a null distribution. An empirical p-value is calculated based on the observed number of edges as compared to the null distribution. 
+
+Edges definitions are as follows: 
+* Genotype: the only genotype edges of interest are edges where a mutation appears. 
+* Phenotype: rather than consider changes in the phenotype, only consider the presence or absence of the phenotype on each edge. 
+
+| Genotype edge type | parent node value | child node value |   
+|-|-|-|
+| Transition | wild type (0) | mutant (1) |  
+| Other | mutant (1) | wild type (0) |  
+| Other | wild type (0) | wild type (0) |  
+| Other | mutant (1) | mutant (1) | 
+
+
+| Phenotype edge type | Phenotype **edge** value |   
+|-|-|
+| Present| mutant (1) |  
+| Absent | wild type (0) |  
+
+*Note: PhyC was originally implemented with Bonferroni multiple test correction, but this implementation uses False Discovery Rate. 
+
+## Comparing the three tests: 
+
+|                  | Phenotype | Genotype | Question|  
+|---------------|----------------|---------------|-------------| 
+| Continuous | Continous. Absolute value of phenotype change on each edge.  | Transition edges: node unequal. Non-transition edges: nodes equal. | Does the phenotype change more than expected on genotype transition edges than on genotype non-transition edges?| 
+| Synchronous | Discrete. Transition edges: nodes unequal. Non-transition edges: nodes equal. | Transition edges: nodes unequal. Non-transition edges: nodes equal. | Do genotype transitions occur more often than expected on phenotype transition edges than on phenotype non-transition edges? |   
+| PhyC | Discrete. Ancestral reconstruction edge value: phenotype is 1 or 0. | Transition edges: parent node == 0 & child node == 1 | Does the genotype transition from wild type (0) to mutant (1) more often than expected by chance on phenotype present (1) edges than phenotype absent (0) edges? |  
+
+## Data
+
+Load data for Continuous Test: 
+```{r}
+growth_phenotype <- hogwash::growth
+snp_genotype <- hogwash::snp_genotype
+tree <- hogwash::tree
+key <- hogwash::snp_gene_key
+
+```
+
+Load phenotype data for the Synchronous Test & PhyC 
+```{r}
+antibiotic_phenotype <- hogwash::antibiotic_resistance
+```
+
+
+## Run hogwash
+
+Run the Continuous Test: 
+```{r}
+hogwash(pheno = growth_phenotype, 
+        geno = snp_genotype,  
+        tree = tree)
+```
+
+
+Run the Continuous Test but group SNPs from the same gene together. 
+```{r}
+hogwash(pheno = growth_phenotype, 
+        geno = snp_genotype,  
+        tree = tree, 
+        group_genotype_key = key)
+```
+
+
+Run the Synchronous Test & PhyC 
+```{r}
+hogwash(pheno = antibiotic_phenotype, 
+        geno = snp_genotype,  
+        tree = tree)
+```
+
+
+Run the Synchronous Test & PhyC but group SNPs from the same gene together. 
+```{r}
+hogwash(pheno = antibiotic_phenotype, 
+        geno = snp_genotype,  
+        tree = tree, 
+        group_genotype_key = key)
+
+```
+
+
