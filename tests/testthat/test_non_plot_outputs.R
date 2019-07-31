@@ -2,7 +2,7 @@ context("Non-plot outputs") #----------------------------------------------#
 
 test_that("save_results_as_r_object error for invalid input", {
   temp_dir <- "."
-  temp_name <- "test"
+  temp_name <- "dummy"
   temp_object <- letters[1:3]
   temp_prefix <- "fake_test"
   temp_group_logical <- FALSE
@@ -15,7 +15,7 @@ test_that("save_results_as_r_object error for invalid input", {
 
 test_that("save_results_as_r_object works valid input", {
   temp_dir <- "."
-  temp_name <- "test"
+  temp_name <- "dummy"
   temp_object <- letters[1:3]
   temp_prefix <- "phyc"
   temp_group_logical <- FALSE
@@ -29,7 +29,7 @@ test_that("save_results_as_r_object works valid input", {
 
 test_that("save_results_as_r_object works valid input", {
   temp_dir <- "."
-  temp_name <- "test"
+  temp_name <- "dummy"
   temp_object <- letters[1:3]
   temp_prefix <- "synchronous"
   temp_group_logical <- FALSE
@@ -43,7 +43,7 @@ test_that("save_results_as_r_object works valid input", {
 
 test_that("save_results_as_r_object works valid input", {
   temp_dir <- "."
-  temp_name <- "test"
+  temp_name <- "dummy"
   temp_object <- letters[1:3]
   temp_prefix <- "continuous"
   temp_group_logical <- FALSE
