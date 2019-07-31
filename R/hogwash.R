@@ -52,6 +52,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # Both Synchronous Test & PhyC for discrete phenotype
 #' phenotype <- hogwash::antibiotic_resistance
 #' genotype <- hogwash::snp_genotype
@@ -59,7 +60,7 @@
 #' hogwash(pheno = phenotype,
 #'         geno = genotype,
 #'         tree = tree)
-#' \donttest{
+#'
 #' # Continuous Test for continuous phenotype
 #' phenotype <- hogwash::growth
 #' genotype <- hogwash::snp_genotype
@@ -67,6 +68,7 @@
 #' hogwash(pheno = phenotype,
 #'         geno = genotype,
 #'         tree = tree)
+#'
 #' # Continuous Test while grouping SNPs into genes
 #' phenotype <- hogwash::growth
 #' genotype <- hogwash::snp_genotype
@@ -98,7 +100,7 @@
 hogwash <- function(pheno,
                     geno,
                     tree,
-                    file_name = paste(Sys.Date(), "_hogwash", sep = ""),
+                    file_name = Sys.Date(),
                     dir = ".",
                     perm = 10000,
                     fdr = 0.15,
