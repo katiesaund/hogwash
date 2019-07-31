@@ -1,5 +1,4 @@
 ^Meta$
-^doc$
 ^README\.Rmd$
 ^NEWS\.md$
 ^\*.jpg$
@@ -12,3 +11,6 @@
 ^inst/wiki_images/*$
 ^.*[.]pdf$
 ^inst$
+..Rcheck
+.gitignore
+.git
