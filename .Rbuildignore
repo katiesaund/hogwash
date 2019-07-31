@@ -11,3 +11,4 @@
 ^.*/testthat/.*[.]rda$
 ^inst/wiki_images/*$
 ^.*[.]pdf$
+^inst$
