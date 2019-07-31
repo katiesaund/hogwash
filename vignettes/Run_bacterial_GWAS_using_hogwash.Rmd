@@ -32,9 +32,14 @@ A unique feature of hogwash is the ability to organize genotypes into biological
 
 ### A note on nomenclature: 
 #### Talking about phylogenetic trees: 
-Nodes: bifurcation points   
-Tips: termini  
-Edges: the line defined by two adjacent nodes or a tip and the nearest node
+
+* Nodes: bifurcation points   
+* Tips: termini  
+* Edges: the line defined by two adjacent nodes or a tip and the nearest node
+
+```{r, echo = FALSE, out.width = "700px"}
+knitr::include_graphics("tree_with_nomenclature_for_wiki.png")
+```
 
 #### Convergent evolution vs parallel evolution:
 While convergent evolution and parallel evolution have specific meanings, those definitions are often confused and hard to disentangle. I’ve found that the nuanced differences between convergent and parallel evolution are frequently lost in conversation. For the purposes of this software package, I prefer to call all episodes of independent evolution of a trait "convergence." 
@@ -44,7 +49,9 @@ While convergent evolution and parallel evolution have specific meanings, those 
 Given a phylogenetic tree and trait for each tree tip an ancestral reconstruction is created wherein the value of the trait at each internal node is predicted. To learn more about the ancestral reconstruction tool please read the [ape::ace() documentation](https://www.rdocumentation.org/packages/ape/versions/5.3/topics/ace). Ancestral reconstruction for binary characters is performed with maximum likelihood and either an equal rates or all rates different model (the best model is chosen for each reconstruction).  
   
 Binary phenotype: 
-![ancestral reconstruction](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/ancestral_reconstruction.png)
+```{r, echo = FALSE, out.width = "700px", }
+knitr::include_graphics("ancestral_reconstruction.png")
+```
 
 From the ancestral reconstruction above we infer that antibiotic resistance evolved three separate times: 
 
@@ -71,11 +78,16 @@ Genotype transitions are defined as any edge where the parent node and child nod
 | Non-transition | wild type (0) | wild type (0) |  
 | Non-transition | mutant (1) | mutant (1) |  
 
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/both_transition_edges.png)
+```{r, echo = FALSE, out.width = "700px", }
+knitr::include_graphics("both_transition_edges.png")
+```
 
 The absolute value of the phenotype change on each edge is measured. Then the distributions of the delta phenotype on genotype transition edges versus non-transition edges are compared.  
 
-![continuous algorithm](https://github.com/katiesaund/hogwash/blob/master/data/continuous_algorithm_demo.png)
+```{r, echo = FALSE, out.width = "700px", }
+knitr::include_graphics("continuous_algorithm_demo.png")
+```
+
 Left panel: the delta phenotype is noticeably higher on transition edges (purple), suggesting an association between a change in the genotype and a change in the phenotype. Right panel: the two delta phenotype distributions are nearly identical, suggesting the genotype transitions are not associated with phenotype changes.    
 
 The two phenotype distributions are compared using a two-sample Kolmogorov–Smirnov (KS) test. The test's output, the KS test statistic, is recorded. Then a permutation test is performed wherein the classification of each edge as a genotype transition or non-transition edge is randomized. The KS test is repeated on the permuted data. An empirical p-value is calculated based on the observed vs. permuted KS test statistics. 
@@ -93,7 +105,10 @@ Transition edges are defined as in (1.) but phenotypes, which are now binary, ar
 | Non-transition | wild type (0) | wild type (0) |  
 | Non-transition | mutant (1) | mutant (1) |  
 
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/both_transition_edges.png)
+
+```{r, echo = FALSE, out.width = "700px", }
+knitr::include_graphics("both_transition_edges.png")
+```
 
 ## 3. PhyC (input: binary phenotype)
 ### Does the genotype transition from wild type to mutant more often than expected by chance on edges where the phenotype is present than where the phenotype is absent?  
@@ -182,7 +197,11 @@ Genotype:
 
 ### Phylogenetic tree
 The phylogenetic tree should be rooted, but if not the tree will be rooted using the midpoint method. The tree must be fully bifurcating. I recommend building your phylogenetic tree with an outgroup, root using the outgroup, and then remove the outgroup prior to running hogwash. 
-![phylogenetic tree](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/tree_for_wiki.jpg)  
+
+```{r, echo = FALSE, out.width = "700px", }
+knitr::include_graphics("tree_with_nomenclature_for_wiki.png")
+```
+
 ## Optional data
 ### Grouping genotypes key
 hogwash allows the user to create ancestral reconstructions for individual genotypes and then condense them into meaningful groups. 
@@ -280,30 +299,48 @@ The pdf file contains all of the plots while the rda file contains all of the st
 ## All three tests: 
 Each test will return a .pdf with at least a manhattan plot of the genetic loci (x-axis) vs. the -ln(p-value) (y-axis). The horizontal red line is the threshold for significance, with significant loci appearing above the line. Only significant loci will be labeled.  
   
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/2019-06-16_fqR_roary_convergence_test.png)
+  
+```{r, echo = FALSE, out.width = "700px", }
+knitr::include_graphics("2019-06-16_fqR_roary_convergence_test.png")
+```
 
 ## Continuous test output plots: for only significant hits
 ### Phenotype
 The ancestral reconstruction of the continuous phenotype. 
-![ancestral reconstruction of continuous phenotype](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/continuous_phenotype_ancestral_reconstruction.png)
+
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("continuous_phenotype_ancestral_reconstruction.png")
+```
+
 
 ### Genotype
 Ancestral reconstruction of the genotype on the tree and the tree with the transition edges identified. 
-![genotype transition tree](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/Genotype_transitions.png)
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("Genotype_transitions.png")
+```
+
 
 ### Change in phenotype on each edge. 
 4 plots to describe the change of phenotype on tree edges.
 
 1. Histogram of phenotype change on all tree edges and only on high confidence edges.  
 2. Histogram of the absolute value in the change of the phenotype on genotype transition edges vs. genotype non-transition edges.  
-![histogram](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/delta_phenotype_by_edge_type.png)
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("delta_phenotype_by_edge_type.png")
+```
+
 3. Histogram of the raw value in the change of the phenotype on genotype transition edges vs. genotype non-transition edges. 
 4. The observed KS test statistic with the null distribution of KS test statistics derived from the permutations.  
-![KS null distribution](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/KS_null_distribution.png)
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("KS_null_distribution.png")
+```
 
 ### 
 In cases where at least two loci were significant a heat map will be created. Each column is a named genotype. Each row corresponds to an edge on the tree. The heat map describes the genotype by edge. 1 (black) = transition edge. 0 (white) = non-transition edge. NA (grey) = low confidence (neither transition nor non-transition edge).  
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/ordered_by_tree_edge.png)
+```{r, echo = FALSE, out.width = "400px", }
+knitr::include_graphics("ordered_by_tree_edge.png")
+```
+
   
 ## Binary phenotype test output plots
 In cases where at least two loci were significant a heat map will be created. Each column is a named genotype. Each row corresponds to an edge on the tree.  
@@ -328,16 +365,27 @@ The heat map describes the genotype by edge:
   * 0 (light green) = not a transition edge  
   * -1 (white) = NA. NA indicates that the edge is low confidence and therefore cannot be characterized as either transition or non-transition edge.  
 
-![heat map summary](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/synchronous_grouped_genotype_summary_heatmap.png)
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("synchronous_grouped_genotype_summary_heatmap.png")
+```
+
 
 For each significant locus three plots are created: 
 
 1. Phenotype transitions  
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/synchronous_phenotype_transitio.png)  
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("synchronous_phenotype_transitio.png")
+```
+
 2. Genotype transitions  
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/synchronous_genotype_transition.png)
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("synchronous_genotype_transition.png")
+```
+
 3. Synchronicity of genotype transition and phenotype transitions with the null distribution generated from the permutations.  
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/synchronous_null_distribution.png)
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("synchronous_null_distribution.png")
+```
 
 ##### PhyC: 
 
@@ -349,11 +397,19 @@ For each significant locus three plots are created:
 For each significant locus three plots are created: 
 
 1. Phenotype ancestral reconstruction  
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/phenotype_binary_reconstruction.png)
-2. Genotype transition   
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/convergence_genotype_reconstruction.png)
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("phenotype_binary_reconstruction.png")
+```
+
+2. Genotype transition  
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("convergence_genotype_reconstruction.png")
+```
+
 3. Convergence of genotype transition (0 &rightarrow; 1) and phenotype presence (1) with the null distribution generated from the permutations.  
-![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/convergence_null_distribution.png)
+```{r, echo = FALSE, out.width = "500px", }
+knitr::include_graphics("convergence_null_distribution.png")
+```
 
 
 # .rda file
