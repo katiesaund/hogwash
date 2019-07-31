@@ -54,6 +54,7 @@ From the ancestral reconstruction above we infer that antibiotic resistance evol
   
 ### Confidence
 A tree edge is excluded from analysis if it: 
+
 * has low bootstrap support (default: < 70%),
 * is very long (>10% of total tree edge length),
 * or has low ancestral reconstruction support (maximum likelihood < .875) from either the phenotype or genotype reconstruction. 
