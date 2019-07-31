@@ -9,7 +9,7 @@ test_that("run_synchronous() doesn't give any errors when given a discrete
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- hogwash::snp_genotype
-  args$output_name            <- "dummy_grouped"
+  args$output_name            <- "dummy"
   args$output_dir             <- "."
   args$perm                   <- 1000
   args$fdr                    <- 0.15
@@ -33,7 +33,7 @@ test_that("run_synchronous() doesn't give any errors when given a discrete
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- hogwash::snp_genotype
-  args$output_name            <- "dummy_grouped"
+  args$output_name            <- "dummy"
   args$output_dir             <- "."
   args$perm                   <- 1000
   args$fdr                    <- 0.15

@@ -11,7 +11,7 @@ test_that("select_test_type doesn't throw error when given valid continuous
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- hogwash::snp_genotype
-  args$output_name            <- "dummy_grouped"
+  args$output_name            <- "dummy"
   args$output_dir             <- "."
   args$perm                   <- 10
   args$fdr                    <- 0.15
@@ -37,7 +37,7 @@ test_that("select_test_type doesn't throw error given valid discrete input", {
   args$tree$node.label[1]     <- 0
   args$tree$node.label        <- as.numeric(args$tree$node.label)
   args$genotype               <- hogwash::snp_genotype
-  args$output_name            <- "dummy_grouped"
+  args$output_name            <- "dummy"
   args$output_dir             <- "."
   args$perm                   <- 10
   args$fdr                    <- 0.15
@@ -48,8 +48,6 @@ test_that("select_test_type doesn't throw error given valid discrete input", {
   # Test
   expect_error(select_test_type(args), NA)
 })
-
-
 
 test_that("select_test_type throws error when given invalid input", {
   # Set up
