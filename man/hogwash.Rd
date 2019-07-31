@@ -4,8 +4,8 @@
 \alias{hogwash}
 \title{hogwash}
 \usage{
-hogwash(pheno, geno, tree, file_name = paste(Sys.Date(), "_hogwash", sep
-  = ""), dir = ".", perm = 10000, fdr = 0.15, bootstrap = 0.7,
+hogwash(pheno, geno, tree, file_name = Sys.Date(), dir = ".",
+  perm = 10000, fdr = 0.15, bootstrap = 0.7,
   group_genotype_key = NULL)
 }
 \arguments{
@@ -70,6 +70,15 @@ Overview: hogwash reads in one phenotype (either continuous or
  described later on the inputs page.
 }
 \examples{
+\donttest{
+# Both Synchronous Test & PhyC for discrete phenotype
+phenotype <- hogwash::antibiotic_resistance
+genotype <- hogwash::snp_genotype
+tree <- hogwash::tree
+hogwash(pheno = phenotype,
+        geno = genotype,
+        tree = tree)
+
 # Continuous Test for continuous phenotype
 phenotype <- hogwash::growth
 genotype <- hogwash::snp_genotype
@@ -77,7 +86,7 @@ tree <- hogwash::tree
 hogwash(pheno = phenotype,
         geno = genotype,
         tree = tree)
-\donttest{
+
 # Continuous Test while grouping SNPs into genes
 phenotype <- hogwash::growth
 genotype <- hogwash::snp_genotype
@@ -87,14 +96,6 @@ hogwash(pheno = phenotype,
         geno = genotype,
         tree = tree,
         group_genotype_key = key)
-
-# Both Synchronous Test & PhyC for discrete phenotype
-phenotype <- hogwash::antibiotic_resistance
-genotype <- hogwash::snp_genotype
-tree <- hogwash::tree
-hogwash(pheno = phenotype,
-        geno = genotype,
-        tree = tree)
 
 # Both Synchronous Test & PhyC while grouping SNPs into genes
 phenotype <- hogwash::antibiotic_resistance

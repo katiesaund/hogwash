@@ -143,41 +143,256 @@ Load phenotype data for the Synchronous Test & PhyC
 antibiotic_phenotype <- hogwash::antibiotic_resistance
 ```
 
+A brief overview of the types of input data for hogwash: 
+## Required data
+### Phenotype
+The required structure of the phenotype data object is a matrix. The rows correspond to samples and should be ordered to match the tips of the phylogenetic tree. There should only be one column, which contains the phenotype data. The matrix should have both row names and column names. The row names must exactly match the tree’s tip labels. The phenotype can either be binary (0/1) or continuous. At this time hogwash **does not** support multiple categorical phenotypes (eg. ‘A’, ‘B’, & ‘C’).
+
+Discrete phenotype:  
+
+|                  | Antibiotic_resistance |   
+|---------------|---------------------------|  
+| sample_1 | 0 |   
+| sample_2 | 0 |   
+| sample_3 | 1 |  
+| sample_4 | 1 |  
+
+Continuous phenotype:  
+
+|                  | Toxin_production |   
+|---------------|-------------------------|  
+| sample_1 | 0.10 |   
+| sample_2 | 1.20 |   
+| sample_3 | 0.05 |  
+| sample_4 | 2.70 |    
+Ideally, continuous phenotype data would be normally distributed. If your data are not normal, please consider transforming them (e.g. log transform) prior to running hogwash. 
+
+### Genotype
+The required structure of the genotype data object is a matrix. The rows correspond to samples and should be ordered to match the tips of the phylogenetic tree. The columns correspond to individual genotypes. The matrix should have both row names and column names. The row names must exactly match the tree’s tip labels. Genotypes can be SNPs (core genome), genes (accessory genome) or other types (indels, pathways, etc...). Genotypes must be coded a binary (0/1).  
+Genotype:  
+
+|                  | SNP_1 | SNP_2 | SNP_3 | SNP_4 | SNP_5 |         
+|---------------|-----------|-----------|-----------|------------|-----------|      
+| sample_1 | 0 | 1 | 1 | 0 | 0 |  
+| sample_2 | 0 | 0 | 0 | 1 | 1 |  
+| sample_3 | 1 | 0 | 0 | 1 | 0 |  
+| sample_4 | 1 | 1 | 1 | 0 | 1 |  
+   
+
+### Phylogenetic tree
+The phylogenetic tree should be rooted, but if not the tree will be rooted using the midpoint method. The tree must be fully bifurcating. I recommend building your phylogenetic tree with an outgroup, root using the outgroup, and then remove the outgroup prior to running hogwash. 
+![phylogenetic tree](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/tree_for_wiki.jpg)  
+## Optional data
+### Grouping genotypes key
+hogwash allows the user to create ancestral reconstructions for individual genotypes and then condense them into meaningful groups. 
+
+Requiring that an individual SNP occur in multiple lineages may be too stringent, but instead if all relevant SNPs from a gene are grouped together the power to identify convergent evolution will be increased because this grouping method could capture larger trends in functional impact at the gene level and a reduce the multiple testing correction burden. Use cases for this method could be to group SNPs into genes or genes into pathways. 
+
+The required structure of the grouping genotypes key data object is a matrix. Each row corresponds to one genotype. The first column must have the names of every genotype included in the genotype matrix. The second column must have a name for a group to which the item in the first column belongs. Row names are not required. The column names are used in output plots and therefore must be included. 
+  
+|  SNP   | GENE     |           
+|----------|--------------|      
+|SNP_1 | GENE_A |    
+|SNP_2 | GENE_A |  
+|SNP_3 | GENE_B |  
+|SNP_4 | GENE_C |   
+|SNP_5 | GENE_A |   
+|SNP_6 | GENE_D |   
+|SNP_7 | GENE_D |   
+  
+### Permutation number  
+The default value is 10,000. Larger values may take prohibitively long to run.  
+  
+### False discovery rate  
+The default value is 0.15.   
+  
+### Bootstrap support value confidence threshold  
+The default value is 0.70 based on the value found in [Farhat et al’s 2013 Nature genetics paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3887553/). However, think carefully about the bootstrap confidence threshold you choose. For example, IQ-TREE is an increasingly popular method by which to create phylogenetic trees. The ultrafast bootstrap (UFBoot) support values are not the same as normal bootstrap support values. [UFBOOT support values are only considered high confidence for >= 0.95.](http://www.iqtree.org/doc/Frequently-Asked-Questions)
+
 
 ## Run hogwash
 
 Run the Continuous Test: 
-```{r}
+```{r, eval=FALSE}
 hogwash(pheno = growth_phenotype, 
         geno = snp_genotype,  
         tree = tree)
 ```
+The results of running the Continuous Test are now saved in two documents: 
+
+* hogwash_continuous_TODAYS_DATE.pdf
+
+* hogwash_continuous_TODAYS_DATE.rda
 
 
 Run the Continuous Test but group SNPs from the same gene together. 
-```{r}
+```{r, eval=FALSE}
 hogwash(pheno = growth_phenotype, 
         geno = snp_genotype,  
         tree = tree, 
         group_genotype_key = key)
 ```
+The results of running the Continuous Test with grouped genotypes are now saved in two documents: 
 
+* hogwash_continuous_grouped_TODAYS_DATE.pdf
+
+* hogwash_continuous_grouped_TODAYS_DATE.rda
 
 Run the Synchronous Test & PhyC 
-```{r}
+```{r, eval=FALSE}
 hogwash(pheno = antibiotic_phenotype, 
         geno = snp_genotype,  
         tree = tree)
 ```
+The results of running the  Synchronous Test & PhyC are now saved in four documents: 
 
+* hogwash_synchronous_TODAYS_DATE.pdf
+
+* hogwash_synchronous_TODAYS_DATE.rda
+
+* hogwash_phyc_TODAYS_DATE.pdf
+
+* hogwash_phyc_TODAYS_DATE.rda
 
 Run the Synchronous Test & PhyC but group SNPs from the same gene together. 
-```{r}
+```{r, eval=FALSE}
 hogwash(pheno = antibiotic_phenotype, 
         geno = snp_genotype,  
         tree = tree, 
         group_genotype_key = key)
 
 ```
+The results of running the  Synchronous Test & PhyC with grouped genotypes are now saved in four documents: 
+* hogwash_synchronous_grouped_TODAYS_DATE.pdf
+
+* hogwash_synchronous_grouped_TODAYS_DATE.rda
+
+* hogwash_phyc_grouped_TODAYS_DATE.pdf
+
+* hogwash_phyc_grouped_TODAYS_DATE.rda
+
+## Interpreting the results
+The pdf file contains all of the plots while the rda file contains all of the statistics, results, and tables. 
+
+# Plots
+
+## All three tests: 
+Each test will return a .pdf with at least a manhattan plot of the genetic loci (x-axis) vs. the -ln(p-value) (y-axis). The horizontal red line is the threshold for significance, with significant loci appearing above the line. Only significant loci will be labeled.  
+  
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/2019-06-16_fqR_roary_convergence_test.png)
+
+## Continuous test output plots: for only significant hits
+### Phenotype
+The ancestral reconstruction of the continuous phenotype. 
+![ancestral reconstruction of continuous phenotype](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/continuous_phenotype_ancestral_reconstruction.png)
+
+### Genotype
+Ancestral reconstruction of the genotype on the tree and the tree with the transition edges identified. 
+![genotype transition tree](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/Genotype_transitions.png)
+
+### Change in phenotype on each edge. 
+4 plots to describe the change of phenotype on tree edges.
+
+1. Histogram of phenotype change on all tree edges and only on high confidence edges.  
+2. Histogram of the absolute value in the change of the phenotype on genotype transition edges vs. genotype non-transition edges.  
+![histogram](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/delta_phenotype_by_edge_type.png)
+3. Histogram of the raw value in the change of the phenotype on genotype transition edges vs. genotype non-transition edges. 
+4. The observed KS test statistic with the null distribution of KS test statistics derived from the permutations.  
+![KS null distribution](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/KS_null_distribution.png)
+
+### 
+In cases where at least two loci were significant a heat map will be created. Each column is a named genotype. Each row corresponds to an edge on the tree. The heat map describes the genotype by edge. 1 (black) = transition edge. 0 (white) = non-transition edge. NA (grey) = low confidence (neither transition nor non-transition edge).  
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/ordered_by_tree_edge.png)
+  
+## Binary phenotype test output plots
+In cases where at least two loci were significant a heat map will be created. Each column is a named genotype. Each row corresponds to an edge on the tree.  
+
+The heat map describes the genotype by edge:  
+
+- 1 (black) = transition edge  
+- 0 (white) = non-transition edge  
+- NA (grey) = low confidence 
+
+### Column annotations:  
+
+- FDR corrected, -ln(p-value) (purple)
+- Locus: whether or not the p-value is significant after multiple test correction. (Not significant in white, significant in blue)
+- Optional: Number of genetic loci included in the group (only appears when genotype is grouped according to a user provided key)
+
+### Row annotations: 
+
+#### Synchronous Test 
+* Phenotype transition  
+  * 1 (dark green) = transition edge  
+  * 0 (light green) = not a transition edge  
+  * -1 (white) = NA. NA indicates that the edge is low confidence and therefore cannot be characterized as either transition or non-transition edge.  
+
+![heat map summary](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/synchronous_grouped_genotype_summary_heatmap.png)
+
+For each significant locus three plots are created: 
+
+1. Phenotype transitions  
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/synchronous_phenotype_transitio.png)  
+2. Genotype transitions  
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/synchronous_genotype_transition.png)
+3. Synchronicity of genotype transition and phenotype transitions with the null distribution generated from the permutations.  
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/synchronous_null_distribution.png)
+
+##### PhyC: 
+
+* Phenotype presence or absence   
+    * 1 (dark green) = present   
+    * 0 (light green) = absent  
+    * -1 (white) = NA. NA indicates that the edge is low confidence and therefore cannot be characterized as either present or absent.  
+
+For each significant locus three plots are created: 
+
+1. Phenotype ancestral reconstruction  
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/phenotype_binary_reconstruction.png)
+2. Genotype transition   
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/convergence_genotype_reconstruction.png)
+3. Convergence of genotype transition (0 &rightarrow; 1) and phenotype presence (1) with the null distribution generated from the permutations.  
+![](https://github.com/katiesaund/hogwash/blob/master/inst/wiki_images/convergence_null_distribution.png)
 
 
+# .rda file
+This rdata file contains multiple types of data objects. 
+## Continuous phenotype output (Continuous Test) 
+- `hogwash_continuous$log` A description of your R environment  
+- `hogwash_continuous$no_convergence_genotypes` A character vector with the names of genotypes excluded from both ancestral reconstruction and testing. These genotypes were excluded because either the genotype was absent in all or all but 1 samples or was present in all or all but 1 sample.  
+- `hogwash_continuous$hit_pvals` The FDR corrected p-value for each genotype tested.   
+- `hogwash_continuous$sig_pvals` The FDR corrected p-value for only genotypes significantly associated with the genotype.  
+- `hogwash_continuous$hi_confidence_transition_edge` A list of numeric vectors. Each vector corresponds to the a tested genotype. The vectors are ordered by tree edges. High confidence genotype transition edges are indicated by 1, low confidence by 0.  
+- `hogwash_continuous$num_hi_conf_transition_edge` Named numeric vector with the total number of high confidence genotype transition edges for the respective genotype.  
+- `hogwash_continuous$dropped_genotypes` A character vector with the names of genotypes removed from testing because they did not have at least two high confidence genotype transition edges.  
+- `hogwash_continuous$genotype_transition_edge` Matrix. Rows correspond to tree edges. Columns correspond to tested genotypes. Encoding: 
+  - 0 == not a transition edge  
+  - 1 == transition edge where parent node is 0 and child node is 1  
+  - -1 == transition edge where parent node is 1 and child node is 0  
+  - NA == low confidence edge     
+- `hogwash_continuous$phenotype_transition_edges` Matrix. Rows correspond to tree edges. Values are the absolute change in the phenotype on that tree edge.  
+- `hogwash_continuous$delta_pheno_table` A list of names matrices. Each tested genotype has a matrix that describes the sum of the absolute value in phenotype change on each of the following types of tree edges: genotype 0 &rightarrow; 1, genotype 1 &rightarrow; 0, and no change in genotype (either 0 &rightarrow; 0 or 1 &rightarrow; 1).  
+Example:  
+ 
+| | sum(\|delta phenotype\|) |
+| - | - |
+|geno_parent_0_child_1  |                 0.88|
+|geno_parent_1_child_0  |                 0.00|
+|geno_no_change |                        80.08|
+
+
+- `hogwash_continuous$delta_pheno_list` A list of named lists. Each sublist corresponds to one tested genotype. The sublist has three numeric vectors: `$geno_parent_0_child_1`, `$geno_parent_1_child_0`, and `hogwash_continuous$geno_no_change.` Each value in the vector the is absolute value of phenotype change for an edge of that category. The edge values are not in any particular order. 
+
+## Binary phenotype output (both Synchronous & PhyC) 
+The prefix will be either hogwash_synchronous or hogwash_phyc, as appropriate. 
+
+- `$log` A description of your R environment  
+- `$no_convergence_genotypes` A character vector with the names of genotypes excluded from both ancestral reconstruction and testing. These genotypes were excluded because either the genotype was absent in all or all but 1 samples or was present in all or all but 1 sample.  
+- `$contingency_table` A list of matrices. Each tested genotype has a corresponding contingency table.  
+  - Synchronous: Relationship between the genotype not/transition and phenotype not/transition on each tree edge.   
+  - Continuous: Relationship between the genotype not/transition and phenotype presence/absence on each tree edge.   
+- `$hit_pvals` The FDR corrected p-value for each genotype tested.   
+- `$sig_pvals` The FDR corrected p-value for only genotypes significantly associated with the genotype.  
+- `$hi_confidence_transition_edge` A list of numeric vectors. Each vector corresponds to the a tested genotype. The vectors are ordered by tree edges. High confidence genotype transition edges are indicated by 1, low confidence by 0.  
+- `$num_hi_conf_transition_edge` Named numeric vector with the total number of high confidence genotype transition edges for the respective genotype.  
+- `$dropped_genotypes` A character vector with the names of genotypes removed from testing because they did not have at least two high confidence genotype transition edges.  
