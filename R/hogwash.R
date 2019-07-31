@@ -36,18 +36,20 @@
 #'  or aggregated data with the inclusion of a grouping key which is
 #'  described later on the inputs page.
 #' @param pheno Matrix. Dimensions: nrow = number of samples, ncol = 1. Either
-#'  continuous or binary (0/1). Row.names() must match tree$tip.label.
+#'  continuous or binary (0/1). Row.names() must match tree$tip.label. Required
+#'  input.
 #' @param geno Matrix. Dimensions: nrow = number of samples, ncol = number of
-#'  genotypes. Binary (0/1). Row.names() must match tree$tip.label.
+#'  genotypes. Binary (0/1). Row.names() must match tree$tip.label. Required
+#'  input.
 #' @param tree Phylo object. If unrooted, will be rooted using
-#'  phytools::midpoint.root() method.
-#' @param file_name Character. Name of output files.
-#' @param dir Character. Path to output directory.
-#' @param perm Integer. Number of permutations to run.
-#' @param fdr Numeric. False discovery rate. Between 0 and 1.
-#' @param bootstrap Numeric. Confidence threshold for tree bootstrap values.
+#'  phytools::midpoint.root() method. Required input.
+#' @param file_name Character. Suffix for output files. Default value is the current date: YYYY-MM-DD.
+#' @param dir Character. Path to output directory. Default value is current directory: "."
+#' @param perm Integer. Number of permutations to run. Default value is: 10,000.
+#' @param fdr Numeric. False discovery rate. Between 0 and 1. Default value is: 0.15.
+#' @param bootstrap Numeric. Confidence threshold for tree bootstrap values. Default value is: 0.70.
 #' @param group_genotype_key Matrix. Dimenions: nrow = number of unique
-#'  genotypes, ncol = 2.
+#'  genotypes, ncol = 2. Optional input.
 #'
 #' @export
 #'
