@@ -53,6 +53,12 @@ save_results_as_r_object <- function(dir, name, object, prefix, group_logical){
   check_if_dir_exists(dir)
   check_is_string(name)
   check_is_string(prefix)
+  if (!exists("object")) {
+    stop("Must be an robject.")
+  }
+  if (is.null(object)) {
+    stop("Must supply an object to save")
+  }
 
   # Function & output ----------------------------------------------------------
   if (group_logical) {
