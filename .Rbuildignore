@@ -8,9 +8,8 @@
 ^\.Rproj\.user$
 ^cran-comments.md$
 ^.*/testthat/.*[.]rda$
-^inst/wiki_images/*$
+^inst/wiki_images$
 ^.*[.]pdf$
-^inst$
 ..Rcheck
 .gitignore
 .git

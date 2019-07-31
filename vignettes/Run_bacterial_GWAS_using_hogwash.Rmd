@@ -4,7 +4,7 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Run bacterial GWAS using hogwash}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  \usepackage[UTF-8]{inputenc}
 ---
 
 ```{r, echo = FALSE, message = FALSE}
