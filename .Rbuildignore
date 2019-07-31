@@ -12,4 +12,3 @@
 ^.*[.]pdf$
 ..Rcheck
 .gitignore
-.git
