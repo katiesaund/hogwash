@@ -13,11 +13,7 @@ Description: This package contains three methods to identify genetic loci
   phenotype and genotype to coincide on edges of the phylogenetic tree. The 
   three methods are the Continuous Test, the Synchronous Test, and PhyC. This 
   package's PhyC method is an implementation of the bacterial GWAS method 
-  originally described in Farhat, M. R., Shapiro, B. J., Kieser, K. J., 
-  Sultana, R., Jacobson, K. R., Victor, T. C., … Murray, M. (2013). Genomic 
-  analysis identifies targets of convergent positive selection in drug-resistant 
-  Mycobacterium tuberculosis. Nature Genetics, 45(10), 1183–1189. 
-  https://doi.org/10.1038/ng.2747. 
+  originally described in Farhat et al. (2013) <doi.org/10.1038/ng.2747>. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
