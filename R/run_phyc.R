@@ -86,6 +86,11 @@ run_phyc <- function(args){
     reorder_tip_and_node_to_edge(AR$pheno_recon_and_conf$tip_and_node_recon,
                                     args$tree)
 
+  # CALCULATE GAMMA -----------------------------------------------------------#
+  gamma <- calculate_phyc_gamma(genotype_transition_edges,
+                                pheno_recon_ordered_by_edges,
+                                hi_conf$high_conf_ordered_by_edges)
+
   # RUN PERMUTATION TEST ------------------------------------------------------#
   disc_recon_results <-
     discrete_calculate_pvals(genotype_transition_edges,
@@ -131,6 +136,7 @@ run_phyc <- function(args){
     hi_conf$num_high_conf_trans_edges
   results_object$dropped_genotypes <-
     hi_conf$dropped_genotypes
+  results_object$gamma <- gamma
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,

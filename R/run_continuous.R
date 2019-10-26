@@ -65,6 +65,11 @@ run_continuous <- function(args){
     geno_recon_ordered_by_edges,
     geno$snps_per_gene)
 
+  # CALCULATE GAMMA -----------------------------------------------------------#
+  gamma <- calculate_synchronous_gamma(hi_conf$genotype_transition,
+                                       AR$pheno_recon_and_conf$recon_edge_mat,
+                                       hi_conf$high_conf_ordered_by_edges)
+
   # RUN PERMUTATION TEST ------------------------------------------------------#
   results_all_transitions <-
     calc_sig(hi_conf$genotype,
@@ -122,6 +127,7 @@ run_continuous <- function(args){
   results_object$delta_pheno_list <- trans_mat_results$delta_pheno_list
   results_object$hit_pvals <- corrected_pvals_all_trans$hit_pvals
   results_object$sig_hits <- all_transitions_sig_hits
+  results_object$gamma <- gamma
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,
