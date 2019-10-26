@@ -66,9 +66,9 @@ run_continuous <- function(args){
     geno$snps_per_gene)
 
   # CALCULATE GAMMA -----------------------------------------------------------#
-  gamma <- calculate_synchronous_gamma(hi_conf$genotype_transition,
-                                       AR$pheno_recon_and_conf$recon_edge_mat,
-                                       hi_conf$high_conf_ordered_by_edges)
+  gamma <- calculate_continuous_gamma(hi_conf$genotype_transition,
+                                      AR$pheno_recon_and_conf$recon_edge_mat,
+                                      hi_conf$high_conf_ordered_by_edges)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   results_all_transitions <-
