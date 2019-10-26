@@ -114,7 +114,7 @@ calculate_continuous_gamma <- function(geno_trans_edge_list,
   gamma_list <- gamma_percent <- rep(0, length(geno_trans_edge_list$transition))
   for (i in 1:length(geno_trans_edge_list)) {
     pheno_large_geno_trans <-
-      sum(pheno_delta > median(pheno_delta) &
+      sum(pheno_delta > stats::median(pheno_delta) &
             geno_trans_edge_list[[i]]$transition == 1 &
             high_conf_edge_list[[i]] == 1)
     gamma_list[[i]] <- pheno_large_geno_trans
