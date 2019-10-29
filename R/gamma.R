@@ -34,7 +34,7 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
     gamma_percent[[i]] <- gamma_list[[i]] / sum(high_conf_edge_list[[i]])
   }
   gamma_avg <- mean(gamma_percent)
-  num_hi_conf_edges <- lapply(high_conf_edge_list, sum) %>% unlist()
+  num_hi_conf_edges <- unlist(lapply(high_conf_edge_list, sum))
 
   results <- list("gamma_avg" = gamma_avg,
                   "gamma_percent" = gamma_percent,
@@ -86,7 +86,7 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
     gamma_percent[[i]] <- gamma_list[[i]] / sum(high_conf_edge_list[[i]])
   }
   gamma_avg <- mean(gamma_percent)
-  num_hi_conf_edges <- lapply(high_conf_edge_list, sum) %>% unlist()
+  num_hi_conf_edges <- unlist(lapply(high_conf_edge_list, sum))
 
   results <- list("gamma_avg" = gamma_avg,
                   "gamma_percent" = gamma_percent,
@@ -147,7 +147,7 @@ calculate_continuous_gamma <- function(geno_trans_edge_list,
     gamma_percent[[i]] <- gamma_list[[i]] / sum(high_conf_edge_list[[i]])
   }
   gamma_avg <- mean(gamma_percent)
-  num_hi_conf_edges <- lapply(high_conf_edge_list, sum) %>% unlist()
+  num_hi_conf_edges <- unlist(lapply(high_conf_edge_list, sum))
 
 
   results <- list("gamma_avg" = gamma_avg,
