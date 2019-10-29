@@ -18,7 +18,13 @@
 calculate_phyc_gamma <- function(geno_trans_edge_list,
                                  pheno_recon_vec,
                                  high_conf_edge_list){
+
+  check_equal(length(geno_trans_edge_list), length(high_conf_edge_list))
+  check_equal(length(geno_trans_edge_list[[1]]), length(high_conf_edge_list[[1]]))
+  check_equal(length(geno_trans_edge_list[[1]]), length(pheno_recon_vec))
+
   gamma_list <- gamma_percent <- rep(0, length(geno_trans_edge_list))
+
   for (i in 1:length(geno_trans_edge_list)) {
     pheno_1_geno_0_to_1 <-
       sum(pheno_recon_vec == 1 &
@@ -28,10 +34,12 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
     gamma_percent[[i]] <- gamma_list[[i]] / sum(high_conf_edge_list[[i]])
   }
   gamma_avg <- mean(gamma_percent)
+  num_hi_conf_edges <- lapply(high_conf_edge_list, sum) %>% unlist()
 
   results <- list("gamma_avg" = gamma_avg,
                   "gamma_percent" = gamma_percent,
-                  "gamma_count" = gamma_list)
+                  "gamma_count" = gamma_list,
+                  "num_hi_conf_edges" = num_hi_conf_edges)
   return(results)
 }
 
@@ -63,20 +71,28 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
 calculate_synchronous_gamma <- function(geno_trans_edge_list,
                                         pheno_trans_vec,
                                         high_conf_edge_list){
+  check_equal(length(geno_trans_edge_list), length(high_conf_edge_list))
+  check_equal(length(geno_trans_edge_list[[1]]), length(high_conf_edge_list[[1]]))
+  check_equal(length(geno_trans_edge_list[[1]]), length(pheno_trans_vec$transition))
+
+
   gamma_list <- gamma_percent <- rep(0, length(geno_trans_edge_list))
   for (i in 1:length(geno_trans_edge_list)) {
-    pheno_1_geno_0_to_1 <-
+    pheno_trans_and_geno_trans <-
       sum(pheno_trans_vec$transition == 1 &
             geno_trans_edge_list[[i]] == 1 &
             high_conf_edge_list[[i]] == 1)
-    gamma_list[[i]] <- pheno_1_geno_0_to_1
+    gamma_list[[i]] <- pheno_trans_and_geno_trans
     gamma_percent[[i]] <- gamma_list[[i]] / sum(high_conf_edge_list[[i]])
   }
   gamma_avg <- mean(gamma_percent)
+  num_hi_conf_edges <- lapply(high_conf_edge_list, sum) %>% unlist()
 
   results <- list("gamma_avg" = gamma_avg,
                   "gamma_percent" = gamma_percent,
-                  "gamma_count" = gamma_list)
+                  "gamma_count" = gamma_list,
+                  "num_hi_conf_edges" = num_hi_conf_edges)
+
   return(results)
 }
 
@@ -106,24 +122,37 @@ calculate_continuous_gamma <- function(geno_trans_edge_list,
                                        pheno_recon_mat,
                                        high_conf_edge_list){
 
+  check_equal(length(geno_trans_edge_list), length(high_conf_edge_list))
+  check_equal(length(geno_trans_edge_list[[1]]$transition),
+              length(high_conf_edge_list[[1]]))
+  check_equal(nrow(pheno_recon_mat), length(high_conf_edge_list[[1]]))
+  check_dimensions(pheno_recon_mat,
+                   exact_rows = length(high_conf_edge_list[[1]]),
+                   min_rows = 1,
+                   exact_cols = 2,
+                   min_cols = 2)
+
   pheno_delta <- rep(0, nrow(pheno_recon_mat))
   for (i in 1:nrow(pheno_recon_mat)) {
     pheno_delta[i] <- calculate_phenotype_change_on_edge(i, pheno_recon_mat)
   }
-
   gamma_list <- gamma_percent <- rep(0, length(geno_trans_edge_list$transition))
   for (i in 1:length(geno_trans_edge_list)) {
     pheno_large_geno_trans <-
       sum(pheno_delta > stats::median(pheno_delta) &
             geno_trans_edge_list[[i]]$transition == 1 &
             high_conf_edge_list[[i]] == 1)
+
     gamma_list[[i]] <- pheno_large_geno_trans
     gamma_percent[[i]] <- gamma_list[[i]] / sum(high_conf_edge_list[[i]])
   }
   gamma_avg <- mean(gamma_percent)
+  num_hi_conf_edges <- lapply(high_conf_edge_list, sum) %>% unlist()
+
 
   results <- list("gamma_avg" = gamma_avg,
                   "gamma_percent" = gamma_percent,
-                  "gamma_count" = gamma_list)
+                  "gamma_count" = gamma_list,
+                  "num_hi_conf_edges" = num_hi_conf_edges)
   return(results)
 }
