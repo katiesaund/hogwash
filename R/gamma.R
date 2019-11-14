@@ -83,10 +83,10 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
 #'    number of genotypes.
 #' @noRd
 #'
-calculate_synchronous_gamma <- function(geno_trans_edge_list,
-                                        pheno_trans_vec,
+calculate_synchronous_gamma <- function(pheno_trans_vec,
                                         high_conf){
   high_conf_edge_list <- high_conf$high_conf_ordered_by_edges
+  geno_trans_edge_list <- high_conf$genotype_transition
   check_equal(length(geno_trans_edge_list), length(high_conf_edge_list))
   check_equal(length(geno_trans_edge_list[[1]]), length(high_conf_edge_list[[1]]))
   check_equal(length(geno_trans_edge_list[[1]]), length(pheno_trans_vec$transition))
