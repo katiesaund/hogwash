@@ -235,6 +235,14 @@ prepare_high_confidence_objects <- function(genotype_transition,
   snps_in_each_gene <-
     snps_in_each_gene[names(snps_in_each_gene) %in% colnames(geno)]
 
+  # Check output ---------------------------------------------------------------
+  if (length(genotype_transition) == 0) {
+    stop("No genotypes to test because all genotypes failed quality control")
+  }
+  if (length(genotype_transition) == 0) {
+    stop("No genotypes to test because all genotypes failed quality control")
+  }
+
   # Return output --------------------------------------------------------------
   results <-
     list("dropped_genotypes" = dropped_genotypes,
