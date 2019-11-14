@@ -89,7 +89,7 @@ run_phyc <- function(args){
   # CALCULATE GAMMA -----------------------------------------------------------#
   gamma <- calculate_phyc_gamma(genotype_transition_edges,
                                 pheno_recon_ordered_by_edges,
-                                hi_conf$high_conf_ordered_by_edges)
+                                hi_conf)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   disc_recon_results <-

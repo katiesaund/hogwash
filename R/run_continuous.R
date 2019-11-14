@@ -68,7 +68,7 @@ run_continuous <- function(args){
   # CALCULATE GAMMA -----------------------------------------------------------#
   gamma <- calculate_continuous_gamma(hi_conf$genotype_transition,
                                       AR$pheno_recon_and_conf$recon_edge_mat,
-                                      hi_conf$high_conf_ordered_by_edges)
+                                      hi_conf)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   results_all_transitions <-

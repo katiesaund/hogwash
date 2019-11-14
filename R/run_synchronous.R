@@ -83,7 +83,7 @@ run_synchronous <- function(args){
   # CALCULATE GAMMA -----------------------------------------------------------#
   gamma <- calculate_synchronous_gamma(genotype_transition_edges,
                                        pheno_trans,
-                                       hi_conf$high_conf_ordered_by_edges)
+                                       hi_conf)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   disc_trans_results <-
