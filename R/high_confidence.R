@@ -239,9 +239,6 @@ prepare_high_confidence_objects <- function(genotype_transition,
   if (length(genotype_transition) == 0) {
     stop("No genotypes to test because all genotypes failed quality control")
   }
-  if (length(genotype_transition) == 0) {
-    stop("No genotypes to test because all genotypes failed quality control")
-  }
 
   # Return output --------------------------------------------------------------
   results <-
