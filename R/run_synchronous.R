@@ -68,6 +68,17 @@ run_synchronous <- function(args){
     geno_recon_ordered_by_edges,
     geno$snps_per_gene)
 
+  print("synch")
+
+  print("hi_conf$genotype_transition")
+  print(hi_conf$genotype_transition)
+
+  print("hi_conf$genotype_transition[[1]]")
+  print(hi_conf$genotype_transition[[1]])
+
+  print("hi_conf$genotype_transition[[1]]$transition")
+  print(hi_conf$genotype_transition[[1]]$transition)
+
   genotype_transition_edges <- rep(list(0), ncol(hi_conf$genotype))
   for (k in 1:ncol(hi_conf$genotype)) {
     genotype_transition_edges[[k]] <-

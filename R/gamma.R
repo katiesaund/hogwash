@@ -148,6 +148,14 @@ calculate_continuous_gamma <- function(geno_trans_edge_list,
                                        pheno_recon_mat,
                                        high_conf){
   high_conf_edge_list <- high_conf$high_conf_ordered_by_edges
+
+  print("continuous")
+  print("geno_trans_edge_list")
+  print(geno_trans_edge_list)
+  print("geno_trans_edge_list[[1]]")
+  print(geno_trans_edge_list[[1]])
+  print("geno_trans_edge_list[[1]]$transition")
+  print(geno_trans_edge_list[[1]]$transition)
   check_equal(length(geno_trans_edge_list), length(high_conf_edge_list))
   check_equal(length(geno_trans_edge_list[[1]]$transition),
               length(high_conf_edge_list[[1]]))
