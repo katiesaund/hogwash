@@ -400,15 +400,15 @@ plot_continuous_results <- function(disc_cont,
 
   sorted_trans_edge_mat <-
     trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[, 1])],
-                         row.names(trans_edge_mat)), ]
+                         row.names(trans_edge_mat)), , drop = FALSE]
   ordered_by_p_val <-
     sorted_trans_edge_mat[, match(
       row.names(log_p_value)[order(log_p_value[, 1])],
-      colnames(sorted_trans_edge_mat))]
+      colnames(sorted_trans_edge_mat)), drop = FALSE]
 
   column_annot_ordered_by_p_val <-
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
-                       row.names(column_annot)), ]
+                       row.names(column_annot)), , drop = FALSE]
   colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
     c("locus", "-ln(p-val)")
 
@@ -493,7 +493,8 @@ plot_continuous_results <- function(disc_cont,
                             j,
                             "No transition",
                             "Transition")
-      hist_abs_delta_pheno_all_edges(p_trans_mat,
+      mat_p_trans_mat <- as.matrix(p_trans_mat)
+      hist_abs_delta_pheno_all_edges(mat_p_trans_mat,
                                      geno_confidence,
                                      tr,
                                      j)
@@ -913,7 +914,7 @@ plot_phyc_results <- function(tr,
                  drop = FALSE]
   column_annot_ordered_by_p_val <-
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
-                        row.names(column_annot)), ]
+                        row.names(column_annot)), drop = FALSE]
 
   if (length(unique(phenotype_annotation[, 1])) == 3) {
     pheno_presence_col <- c( na = "grey", absence = "white", presence = "red")
@@ -934,15 +935,21 @@ plot_phyc_results <- function(tr,
     }
   }
 
-  if (length(unique(column_annot_ordered_by_p_val[, 1])) == 2) {
-    locus_col <- c(not_sig = "white", sig = "blue")
-  } else if (length(unique(column_annot_ordered_by_p_val[, 1])) == 1) {
-    locus_col <- c(sig = "blue")
-    if (unique(column_annot_ordered_by_p_val[, 1]) == "not_sig") {
-      locus_col <- c(not_sig = "white")
-    }
-  }
+  # if (length(unique(column_annot_ordered_by_p_val[, 1])) == 2) {
+  #   locus_col <- c(not_sig = "white", sig = "blue")
+  # } else if (length(unique(column_annot_ordered_by_p_val[, 1])) == 1) {
+  #   locus_col <- c(sig = "blue")
+  #   if (unique(column_annot_ordered_by_p_val[, 1]) == "not_sig") {
+  #     locus_col <- c(not_sig = "white")
+  #   }
+  # }
+
+  locus_col <- c(not_sig = "white", sig = "blue")
+
   ann_colors <- list(locus = locus_col, pheno_presence = pheno_presence_col)
+
+  print("p-values")
+  print(log_p_value)
 
   print("plotting bug fixing")
   print("ann_colors")
