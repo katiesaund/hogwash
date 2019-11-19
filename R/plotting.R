@@ -952,6 +952,11 @@ plot_phyc_results <- function(tr,
   print("phenotype_annotation")
   print(phenotype_annotation)
 
+  print("matrix")
+  print("ordered_by_p_val")
+  print(ordered_by_p_val)
+  print(summary(ordered_by_p_val))
+
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (plotting_logical) {
     colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
