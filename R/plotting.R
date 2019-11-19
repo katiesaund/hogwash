@@ -914,7 +914,7 @@ plot_phyc_results <- function(tr,
                  drop = FALSE]
   column_annot_ordered_by_p_val <-
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
-                        row.names(column_annot)), drop = FALSE]
+                        row.names(column_annot))]
 
   if (length(unique(phenotype_annotation[, 1])) == 3) {
     pheno_presence_col <- c( na = "grey", absence = "white", presence = "red")
