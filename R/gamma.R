@@ -144,8 +144,7 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
 #'    number of genotypes.
 #' @noRd
 #'
-calculate_continuous_gamma <- function(geno_trans_edge_list,
-                                       pheno_recon_mat,
+calculate_continuous_gamma <- function(pheno_recon_mat,
                                        high_conf){
   high_conf_edge_list <- high_conf$high_conf_ordered_by_edges
   geno_trans_edge_list <- high_conf$genotype_transition
