@@ -50,7 +50,7 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
                   "num_hi_conf_edges" = num_hi_conf_edges,
                   "pheno_beta" = pheno_beta,
                   "geno_beta" = geno_beta,
-                  "epilson" = epsilon)
+                  "epsilon" = epsilon)
   return(results)
 }
 
@@ -113,7 +113,7 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
                   "num_hi_conf_edges" = num_hi_conf_edges,
                   "pheno_beta" = pheno_beta,
                   "geno_beta" = geno_beta,
-                  "epilson" = epsilon)
+                  "epsilon" = epsilon)
   return(results)
 }
 
@@ -185,6 +185,6 @@ calculate_continuous_gamma <- function(geno_trans_edge_list,
                   "num_hi_conf_edges" = num_hi_conf_edges,
                   "pheno_beta" = pheno_beta,
                   "geno_beta" = geno_beta,
-                  "epilson" = epsilon)
+                  "epsilon" = epsilon)
   return(results)
 }
