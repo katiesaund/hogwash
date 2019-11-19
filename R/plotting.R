@@ -944,6 +944,14 @@ plot_phyc_results <- function(tr,
   }
   ann_colors <- list(locus = locus_col, pheno_presence = pheno_presence_col)
 
+  print("plotting bug fixing")
+  print("ann_colors")
+  print(ann_colors)
+  print("column_annot_ordered_by_p_val")
+  print(column_annot_ordered_by_p_val)
+  print("phenotype_annotation")
+  print(phenotype_annotation)
+
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (plotting_logical) {
     colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
