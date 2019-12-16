@@ -1,4 +1,4 @@
-#' Calculate gamma within phyC test
+#' Calculate gamma within PhyC test
 #'
 #' @param geno_trans_edge_list A list of genotypes. Length == number of
 #'   genotypes. Length of individual vectors within == Nedge(tree). Individual
