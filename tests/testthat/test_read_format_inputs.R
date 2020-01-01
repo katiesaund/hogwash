@@ -331,3 +331,28 @@ test_that("check_input_format gives error when tree has too few tips", {
                                   temp_bootstrap,
                                   temp_group_genotype_key))
 })
+
+test_that("check_input_format gives error when group_genotype_key doesn't have a row for each variant in the genotype matrix", {
+  temp_pheno <- hogwash::growth
+  temp_tree <- hogwash::tree
+  temp_geno <- hogwash::snp_genotype
+  temp_name <- "temp_name"
+  temp_dir <- "."
+  temp_perm <- 10
+  temp_fdr <- 0.10
+  temp_bootstrap <- 0.875
+  temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_group_genotype_key <- temp_group_genotype_key[1:4, , drop = FALSE]
+
+
+  # Test - NA in group_genotype_key
+  expect_error(check_input_format(temp_pheno,
+                                  temp_tree,
+                                  temp_geno,
+                                  temp_name,
+                                  temp_dir,
+                                  temp_perm,
+                                  temp_fdr,
+                                  temp_bootstrap,
+                                  temp_group_genotype_key))
+})

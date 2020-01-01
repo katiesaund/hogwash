@@ -50,6 +50,9 @@ check_input_format <- function(pheno,
                      exact_cols = 2,
                      min_cols = 2)
     check_for_NA_and_inf(group_genotype_key)
+    if (nrow(group_genotype_key) != ncol(geno)) {
+      stop("If providing a genotype grouping key there must be a 1-to-1 mapping between each variant in the genotype key's first column and the variants in genotype matrix columns.")
+    }
   }
   if (ape::Ntip(tr) < 7) {
     stop("Tree must have at least 7 tips")
