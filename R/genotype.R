@@ -1,10 +1,11 @@
-#' get_dropped_genotypes
+#' Get names of genotypes dropped from analysis
 #'
 #' @description  Given a matrix with both desirable genotypes (keepers) and
 #'  undesirable genotypes and a numeric index of the keepers, get the names of
-#'  the keepers.
+#'  the undesirable genotypes.
 #'
-#' @param geno Matrix. Numeric, binary matrix.
+#' @param geno Matrix. Numeric, binary genotype matrix. Columns = genotypes.
+#'   Rows = samples.
 #' @param keepers Logical vector. Length == length(genotype_transition)  ==
 #'  length(genotype_confidence) == Number of genotypes. True indicates the
 #'  genotype has at least 2 high confidence genotype transition edges. False
@@ -19,12 +20,13 @@
 get_dropped_genotypes <- function(geno, keepers){
   # Check input ----------------------------------------------------------------
   check_if_binary_matrix(geno)
-  if (!is.logical(keepers[1])) {
-    stop("Keepers must contain logicals")
-  }
+  check_class(keepers, "logical")
   check_if_vector(keepers)
-  if (ncol(geno) != length(keepers)){
+  if (ncol(geno) != length(keepers)) {
     stop("Keepers must have an entry for each genotype.")
+  }
+  if (sum(keepers) == 0) {
+    stop("There are no genotypes left to test.")
   }
 
   # Function -------------------------------------------------------------------
@@ -34,7 +36,7 @@ get_dropped_genotypes <- function(geno, keepers){
   return(dropped_genotype_names)
 } # end get_dropped_genotypes()
 
-#' remove_rare_or_common_geno
+#' Remove rare or common genotypes from genotype matrix
 #'
 #' @description This function removes genotypes are either too rare (only occur
 #'  once) or too common (occur everywhere or everywhere but once). This step is
@@ -42,11 +44,14 @@ get_dropped_genotypes <- function(geno, keepers){
 #'  convergence is possible are included for testing.
 #'
 #' @param mat Matrix. Columns correspond to genotypes. Rows correspond to tree
-#'  tips.
-#' @param tr Phylo.
+#'  tips. Binary.
+#' @param tr Phylo. Tree.
 #'
-#' @return mat. Matrix.
-#'
+#' @return A list with the following items:
+#'   \describe{
+#'     \item{mat}{Matrix.}
+#'     \item{dropped_genotype_names}{Character vector.}
+#'   }
 #' @noRd
 #'
 remove_rare_or_common_geno <- function(mat, tr){

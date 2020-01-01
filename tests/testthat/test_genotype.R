@@ -1,4 +1,4 @@
-context("Genotype") #----------------------------------------------#
+# Genotype --------------------------------------------------------------------#
 # test remove_rare_or_common_geno
 test_that("remove_rare_or_common_geno removes columns that have all ones or all
           zeroes, or all but one 1s.", {
@@ -72,11 +72,13 @@ test_that("get_dropped_genotypes works with valid input", {
                         0, 0, 0, 1, 1),
                       ncol = 5,
                       nrow = 5)
+  colnames(temp_geno) <- paste0("ID", 1:ncol(temp_geno))
   temp_keepers <- c(TRUE, TRUE, FALSE, FALSE, FALSE)
-  expect_error(get_dropped_genotypes(temp_geno, temp_keepers), NA)
+  expect_equal(get_dropped_genotypes(temp_geno, temp_keepers),
+               c("ID3", "ID4", "ID5"))
 })
 
-test_that("get_dropped_genotypes gives error with invalid input", {
+test_that("get_dropped_genotypes gives error with invalid keeper object", {
   temp_geno <- matrix(c(0, 1, 1, 0, 0,
                         1, 1, 0, 0, 0,
                         1, 0, 0, 0, 1,
@@ -84,11 +86,12 @@ test_that("get_dropped_genotypes gives error with invalid input", {
                         0, 0, 0, 1, 1),
                       ncol = 5,
                       nrow = 5)
+  colnames(temp_geno) <- paste0("ID", 1:ncol(temp_geno))
   temp_keepers <- "keeper"
   expect_error(get_dropped_genotypes(temp_geno, temp_keepers))
 })
 
-test_that("get_dropped_genotypes gives error with invalid input", {
+test_that("get_dropped_genotypes gives error with too long of a keeper vector", {
   temp_geno <- matrix(c(0, 1, 1, 0, 0,
                         1, 1, 0, 0, 0,
                         1, 0, 0, 0, 1,
@@ -96,6 +99,20 @@ test_that("get_dropped_genotypes gives error with invalid input", {
                         0, 0, 0, 1, 1),
                       ncol = 5,
                       nrow = 5)
+  colnames(temp_geno) <- paste0("ID", 1:ncol(temp_geno))
   temp_keepers <- c(TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE)
+  expect_error(get_dropped_genotypes(temp_geno, temp_keepers))
+})
+
+test_that("get_dropped_genotypes gives error with when all genotypes get dropped", {
+  temp_geno <- matrix(c(0, 1, 1, 0, 0,
+                        1, 1, 0, 0, 0,
+                        1, 0, 0, 0, 1,
+                        0, 0, 1, 1, 0,
+                        0, 0, 0, 1, 1),
+                      ncol = 5,
+                      nrow = 5)
+  colnames(temp_geno) <- paste0("ID", 1:ncol(temp_geno))
+  temp_keepers <- c(FALSE, FALSE, FALSE, FALSE, FALSE)
   expect_error(get_dropped_genotypes(temp_geno, temp_keepers))
 })
