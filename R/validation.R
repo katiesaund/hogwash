@@ -551,7 +551,6 @@ check_anc_rec_compatible <- function(input){
 #' @param cls Character string. Describes a class type, e.g. "matrix", "list",
 #'  "vector", etc...
 #'
-#' @noRd
 check_class <- function(obj, cls){
   # Check inputs -------------------------------------------------------------
   check_is_string(cls)
