@@ -51,6 +51,9 @@ check_input_format <- function(pheno,
                      min_cols = 2)
     check_for_NA_and_inf(group_genotype_key)
   }
+  if (ape::Ntip(tr) < 7) {
+    stop("Tree must have at least 7 tips")
+  }
 
 
   # Function -------------------------------------------------------------------

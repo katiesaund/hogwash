@@ -305,3 +305,29 @@ test_that("check_input_format gives error when group_genotype_key has NA", {
                                   temp_bootstrap,
                                   temp_group_genotype_key))
 })
+
+test_that("check_input_format gives error when tree has too few tips", {
+  temp_tree <- hogwash::tree
+  temp_geno <- hogwash::snp_genotype
+  temp_tree <- ape::drop.tip(temp_tree, c("t2", "t3", "t4", "t5"))
+  temp_pheno <- hogwash::growth
+  temp_pheno <- temp_pheno[row.names(temp_pheno) %in% temp_tree$tip.label, , drop = FALSE]
+  temp_geno <- temp_geno[row.names(temp_geno) %in% temp_tree$tip.label, , drop = FALSE]
+  temp_name <- "temp_name"
+  temp_dir <- "."
+  temp_perm <- 10
+  temp_fdr <- 0.10
+  temp_bootstrap <- 0.875
+  temp_group_genotype_key <- hogwash::snp_gene_key
+
+  # Test - NA in group_genotype_key
+  expect_error(check_input_format(temp_pheno,
+                                  temp_tree,
+                                  temp_geno,
+                                  temp_name,
+                                  temp_dir,
+                                  temp_perm,
+                                  temp_fdr,
+                                  temp_bootstrap,
+                                  temp_group_genotype_key))
+})
