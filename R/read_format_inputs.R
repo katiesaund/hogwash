@@ -1,20 +1,20 @@
-#' check_input_format
+#' Check format of user provided data
 #'
 #' @description Check that all of the inputs into hogwash are in the valid
 #'  format.
-#' @param pheno  Matrix. Phenotype. Phenotype. matrix should have same rows as
+#' @param pheno Matrix. Phenotype matrix row.names should be the same as the
 #'  tr$tip.label and exactly 1 column. Phenotype rownames should be in the same
 #'  order as the tr$tip.label.
 #' @param tr Phylo. Tree.
-#' @param geno Matrix. Genotype. Genotype matrix should have same rows as
-#' tr$tip.label, at least 2 genotypes in the columns. Genotype rownames should
-#'  be in the same order as the tr$tip.label.
-#' @param name Character. Output name.
-#' @param dir  Character. Output path.
-#' @param perm  Number. Times to shuffle the data on the tree to create a null
+#' @param geno Matrix. Genotype matrix should have same rows as tr$tip.label, at
+#'  least 2 genotypes in the columns. Genotype rownames should be in the same
+#'  order as the tr$tip.label.
+#' @param name Character. Output name (prefix).
+#' @param dir Character. Output path.
+#' @param perm Number. Times to shuffle the data on the tree to create a null
 #'  distribution for the permutation test.
 #' @param fdr Number. False discovery rate. Between 0 and 1.
-#' @param bootstrap Numeric. Confidence threshold for tree bootstrap values.
+#' @param bootstrap Number. Confidence threshold for tree bootstrap values.
 #' @param group_genotype_key Either NULL or a matrix. Dimenions: nrow = number
 #'  of unique genotypes, ncol = 2.
 #'
@@ -49,6 +49,7 @@ check_input_format <- function(pheno,
                      min_rows = 1,
                      exact_cols = 2,
                      min_cols = 2)
+    check_for_NA_and_inf(group_genotype_key)
   }
 
 
