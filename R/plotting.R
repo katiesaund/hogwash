@@ -1,4 +1,5 @@
-#' plot_continuous_phenotype
+#' Plot the continuous phenotype as a phylogenetic tree filled in with a color
+#' gradient
 #'
 #' @description Plot the continuous phenotype on tree with the phenotype
 #'  coloring the branches.
@@ -37,7 +38,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
 
 } # end plot_continuous_phenotype()
 
-#' hist_raw_hi_conf_delta_pheno
+#' Draw histogram of the raw phenotype change on each high confidence tree edge
 #'
 #' @description Plot a histogram to show the change in phenotype on each tree
 #'  edge. Plot phenotype change as raw value change (not absolute value).
@@ -112,7 +113,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
        xlim = c(min(raw_trans_delta, raw_non_trans_delta),
                 max(raw_trans_delta, raw_non_trans_delta)),
        ylab = "Count",
-       cex = .8,
+       # cex = .8,
        xlab = "Raw delta phenotype")
 
   graphics::hist(raw_trans_delta,
