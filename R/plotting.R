@@ -90,6 +90,8 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
   }
 
   # Function -------------------------------------------------------------------
+  hist_cex_size <- 1.5
+
   trans_index <-
     c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
   non_trans_index <- c(1:ape::Nedge(tr))[!geno_transition[[index]]$transition]
@@ -103,29 +105,37 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
                                        pheno_recon_ordered_by_edges)
 
   graphics::hist(raw_non_trans_delta,
-       main = paste(
-         "Raw delta phenotype on high confidence edges\n # transition edge= ",
-         length(raw_trans_delta), "\n# non transition edge =",
-         length(raw_non_trans_delta), sep = ""),
+       main = "Raw delta Phenotype",
        breaks = ape::Nedge(tr) / 4,
        col = non_trans_color,
        border = FALSE,
        xlim = c(min(raw_trans_delta, raw_non_trans_delta),
-                max(raw_trans_delta, raw_non_trans_delta)),
+                1.2 * max(raw_trans_delta, raw_non_trans_delta)),
+       ylim = c(0, 0.75 * sum(length(raw_non_trans_delta),
+                              length(raw_trans_delta))),
        ylab = "Count",
-       # cex = .8,
-       xlab = "Raw delta phenotype")
+       xlab = "Raw Delta Phenotype",
+       cex.main = hist_cex_size,
+       cex.lab = hist_cex_size,
+       cex.axis = hist_cex_size)
 
   graphics::hist(raw_trans_delta,
        breaks = ape::Nedge(tr) / 4,
        col = trans_color,
        border = trans_color,
-       add = TRUE,
-       xlim = c(min(raw_trans_delta, raw_non_trans_delta),
-                max(raw_trans_delta, raw_non_trans_delta)))
+       add = TRUE)
+
+  legend("topright",
+         title = "Hi Conf. Edge Type",
+         legend = c("Transition", "Non-transition"),
+         col = c(trans_color, non_trans_color),
+         pch = 15,
+         cex = hist_cex_size,
+         bg = rgb(0, 0, 0, 0.01))
 } # end hist_raw_hi_conf_delta_pheno()
 
-#' hist_abs_hi_conf_delta_pheno
+#' Draw histogram of the absolute value of phenotype change on each high
+#' confidence tree edge
 #'
 #' @description Plot a histogram to show the change in phenotype on each tree
 #'  edge. Plot phenotype change as absolute value change. Exclude low confidence
@@ -161,36 +171,40 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
   }
 
   # Function -------------------------------------------------------------------
+  hist_cex_size <- 1.5
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::hist(all_trans$observed_pheno_non_trans_delta[[index]],
        breaks = ape::Nedge(tr) / 4,
        col = non_trans_color,
        border = FALSE,
        ylab = "Count",
-       xlab = "|Delta phenotype|",
+       xlab = "|Delta Phenotype|",
        xlim = c(0,
-                max(all_trans$observed_pheno_trans_delta[[index]],
-                    all_trans$observed_pheno_non_trans_delta[[index]])),
-       cex = .8,
-       main = paste("|delta phenotype| on only high confidence edges \n #
-                    non-trans edges = ",
-                    length(all_trans$observed_pheno_non_trans_delta[[index]]),
-                    "\n # trans edges = ",
-                    length(all_trans$observed_pheno_trans_delta[[index]]),
-                    sep = ""))
-
+                1.2 * max(all_trans$observed_pheno_trans_delta[[index]],
+                          all_trans$observed_pheno_non_trans_delta[[index]])),
+       main = "|Delta Phenotype|",
+       ylim = c(0, 0.75 * sum(length(all_trans$observed_pheno_trans_delta[[index]]),
+                              length(all_trans$observed_pheno_non_trans_delta[[index]]))),
+       cex.main = hist_cex_size,
+       cex.lab = hist_cex_size,
+       cex.axis = hist_cex_size)
 
   graphics::hist(all_trans$observed_pheno_trans_delta[[index]],
        breaks = ape::Nedge(tr) / 4,
        col = trans_color,
        border = trans_color,
-       add = TRUE,
-       xlim = c(0,
-                max(all_trans$observed_pheno_trans_delta[[index]],
-                    all_trans$observed_pheno_non_trans_delta[[index]])))
+       add = TRUE)
+
+  legend("topright",
+         title = "Hi Conf. Edge Type",
+         legend = c("Transition", "Non-transition"),
+         col = c(trans_color, non_trans_color),
+         pch = 15,
+         cex = hist_cex_size,
+         bg = rgb(0, 0, 0, 0.01))
 } # end hist_abs_hi_conf_delta_pheno()
 
-#' hist_abs_delta_pheno_all_edges
+#' Draw histogram of the absolute value of the phenotype change on each edge
 #'
 #' @description Plot a histogram to show the change in phenotype on each tree
 #'  edge. Plot phenotype change as absolute value change. First, plot all tree
@@ -226,6 +240,7 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
   check_equal(length(geno_confidence[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
+
   edge_num <- length(unlist(p_trans_mat))
   hi_edge_num <-
     length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
@@ -251,6 +266,15 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
        border = FALSE,
        ylab = "Count",
        add = TRUE)
+
+  # TODO Left off here at 7pm on 1/1/2020
+  # legend("topright",
+  #        title = "Edge Type",
+  #        legend = c("Hi Conf.", "Lo Conf."),
+  #        col = c(trans_color, non_trans_color),
+  #        pch = 15,
+  #        cex = hist_cex_size,
+  #        bg = rgb(0, 0, 0, 0.01))
 } # end hist_abs_delta_pheno_all_edges()
 
 #' plot_continuous_results
@@ -465,6 +489,8 @@ plot_continuous_results <- function(disc_cont,
     cellwidth = cell_width_value,
     na_col = "grey")
 
+  transparent_grey <- rgb(0, 0, 0, 0.25)
+  transparent_red <- rgb(1, 0, 0, 0.25)
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] < fdr) {
@@ -476,8 +502,8 @@ plot_continuous_results <- function(disc_cont,
       plot_tr_w_color_edges(tr,
                             geno_reconstruction,
                             geno_confidence,
-                            "grey",
-                            "red",
+                            transparent_grey,
+                            transparent_red,
                             paste0(row.names(pval_all_transition$hit_pvals)[j],
                                    "\n Genotype reconstruction"),
                             "recon",
@@ -487,8 +513,8 @@ plot_continuous_results <- function(disc_cont,
       plot_tr_w_color_edges(tr,
                             geno_transition,
                             geno_confidence,
-                            "grey",
-                            "red",
+                            transparent_grey,
+                            transparent_red,
                             "Genotype transition",
                             "trans",
                             j,
@@ -502,15 +528,15 @@ plot_continuous_results <- function(disc_cont,
       hist_abs_hi_conf_delta_pheno(results_all_trans,
                                    tr,
                                    j,
-                                   "grey",
-                                   "red")
+                                   transparent_grey,
+                                   transparent_red)
       hist_raw_hi_conf_delta_pheno(geno_transition,
                                    geno_confidence,
                                    pheno_recon_ordered_by_edges,
                                    tr,
                                    j,
-                                   "grey",
-                                   "red")
+                                   transparent_grey,
+                                   transparent_red)
 
       graphics::hist(log(results_all_trans$ks_statistics[[j]]),
            breaks = perm / 10,
