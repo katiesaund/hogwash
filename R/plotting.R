@@ -1157,7 +1157,6 @@ plot_synchronous_results  <- function(tr,
     g_trans_mat[geno_confidence[[i]] == 0, i] <- NA
   }
 
-  # TODO -1 should be NA but it won't work correctedly
   p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1
   p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
   colnames(p_mat) <- "Edge Type"
