@@ -2,7 +2,7 @@
 #'
 #' @noRd
 blank_plot <- function(){
-  plot(0,
+  graphics::plot(0,
        type = 'n',
        axes = FALSE,
        ann = FALSE)
@@ -135,13 +135,13 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
        border = trans_color,
        add = TRUE)
 
-  legend("topright",
+  graphics::legend("topright",
          title = "Hi Conf. Geno. Edge Type",
          legend = c("Transition", "Non-transition"),
          col = c(trans_color, non_trans_color),
          pch = 15,
          cex = hist_cex_size,
-         bg = rgb(0, 0, 0, 0.01))
+         bg = grDevices::rgb(0, 0, 0, 0.01))
 } # end hist_raw_hi_conf_delta_pheno()
 
 #' Draw histogram of the absolute value of phenotype change on each high
@@ -206,13 +206,13 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
        border = trans_color,
        add = TRUE)
 
-  legend("topright",
+  graphics::legend("topright",
          title = "Hi Conf. Geno. Edge Type",
          legend = c("Transition", "Non-transition"),
          col = c(trans_color, non_trans_color),
          pch = 15,
          cex = hist_cex_size,
-         bg = rgb(0, 0, 0, 0.01))
+         bg = grDevices::rgb(0, 0, 0, 0.01))
 } # end hist_abs_hi_conf_delta_pheno()
 
 #' Draw histogram of the absolute value of the phenotype change on each edge
@@ -252,8 +252,8 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 
   # Function -------------------------------------------------------------------
   hist_cex_size <- 1
-  transparent_purple <- rgb(1, 0, 1, 0.25)
-  transparent_blue <- rgb(0, 0, 1, 0.25)
+  transparent_purple <- grDevices::rgb(1, 0, 1, 0.25)
+  transparent_blue <- grDevices::rgb(0, 0, 1, 0.25)
 
   edge_num <- length(unlist(p_trans_mat))
   hi_edge_num <-
@@ -282,13 +282,13 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
        ylab = "Count",
        add = TRUE)
 
-  legend("topright",
+  graphics::legend("topright",
          title = "Edge Type",
          legend = c("Hi Confidence", "Any"),
          col = c(transparent_purple, transparent_blue),
          pch = 15,
          cex = hist_cex_size,
-         bg = rgb(0, 0, 0, 0.01))
+         bg = grDevices::rgb(0, 0, 0, 0.01))
 } # end hist_abs_delta_pheno_all_edges()
 
 #' make_manhattan_plot
@@ -353,7 +353,7 @@ make_manhattan_plot <- function(geno_pheno_name,
                    pos = 1,
                    cex = manhattan_cex / 2)
   }
-  legend("topright",
+  graphics::legend("topright",
          bty = "n",
          legend = "Significance Threshold",
          col = "red",
@@ -695,12 +695,12 @@ plot_phyc_results <- function(tr,
                        rank(recon_hit_vals[j, ]),
                        sep = ""))
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
-                       col = rgb(1, 0, 0, 0.25),
+                       col = grDevices::rgb(1, 0, 0, 0.25),
                        lwd = 4)
       graphics::legend("topleft",
                        title = "Co-occurence",
                        legend = c("Null", "Observed"),
-                       col = c( "grey", rgb(1, 0, 0, 0.25)),
+                       col = c( "grey", grDevices::rgb(1, 0, 0, 0.25)),
                        pch = 15,
                        cex = hist_cex_size)
     }
@@ -953,15 +953,15 @@ plot_synchronous_results  <- function(tr,
                          rank(trans_hit_vals[j, ]),
                          sep = ""))
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
-                       col = rgb(1, 0, 0, 0.25),
+                       col = grDevices::rgb(1, 0, 0, 0.25),
                        lwd = 4)
-      legend("topleft",
+      graphics::legend("topleft",
              title = "Co-occurence",
              legend = c("Null", "Observed"),
-             col = c("grey", rgb(1, 0, 0, 0.25)),
+             col = c("grey", grDevices::rgb(1, 0, 0, 0.25)),
              pch = 15,
              cex = hist_cex_size,
-             bg = rgb(0, 0, 0, 0.01))
+             bg = grDevices::rgb(0, 0, 0, 0.01))
     }
   }
   grDevices::dev.off()
@@ -1216,8 +1216,8 @@ plot_continuous_results <- function(disc_cont,
   plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
 
   # Only make the following plots for significant loci
-  transparent_grey <- rgb(0, 0, 0, 0.25)
-  transparent_red <- rgb(1, 0, 0, 0.25)
+  transparent_grey <- grDevices::rgb(0, 0, 0, 0.25)
+  transparent_red <- grDevices::rgb(1, 0, 0, 0.25)
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] < fdr) {
       graphics::par(mfrow = c(3, 2),
@@ -1292,16 +1292,16 @@ plot_continuous_results <- function(disc_cont,
                                   log(results_all_trans$ks_statistics[[j]])), 0))
       graphics::abline(v =
                          log(as.numeric(results_all_trans$observed_ks_stat[j])),
-                       col = rgb(1, 0, 0, 0.25),
+                       col = grDevices::rgb(1, 0, 0, 0.25),
                        lwd = 4)
 
-      legend("topleft",
+      graphics::legend("topleft",
              title = "KS Test Statistics",
              legend = c("Null", "Observed"),
-             col = c("grey", rgb(1, 0, 0, 0.25)),
+             col = c("grey", grDevices::rgb(1, 0, 0, 0.25)),
              pch = 15,
              cex = hist_cex_size,
-             bg = rgb(0, 0, 0, 0.01))
+             bg = grDevices::rgb(0, 0, 0, 0.01))
 
     }
   }
