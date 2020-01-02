@@ -13,7 +13,7 @@ test_that("reorder_tip_and_node_to_edge works for valid inputs", {
   results <- reorder_tip_and_node_to_edge(temp_tip_node, temp_tree)
 
   # Test
-  expect_equal(results, c(0, 1, 1, 0, 1, 0, 1, 1))
+  expect_equal(results, c(1, 0, 0, 1, 0, 1, 1, 1))
 })
 
 test_that("reorder_tip_and_node_to_edge gives errors for invalid inputs", {
@@ -53,7 +53,7 @@ test_that("identify_short_edges returns the only 1s in this test tree", {
 test_that("identify_short_edges returns a zero for the branch made artificially
           long in this test tree", {
   set.seed(1)
-  temp_tree <- ape::rtree(11)
+  temp_tree <- ape::rtree(15)
   tree_with_long_edge <- temp_tree
   tree_with_long_edge$edge.length[9] <-
     .15 * sum(tree_with_long_edge$edge.length)

@@ -18,8 +18,8 @@ test_that("identify_transition_edges returns correct transition vector and
                                             1,
                                             temp_recon$node_anc_rec,
                                             "discrete")
-  expect_equivalent(temp_results$transition, c(1, 1, 0, 0, 0, 1, 0, 1))
-  expect_equivalent(temp_results$trans_dir, c(-1, 1, 0, 0, 0, -1, 0, 1))
+  expect_equivalent(temp_results$transition, c(0, 0, 0, 1, 1, 1, 0, 0))
+  expect_equivalent(temp_results$trans_dir, c(0, 0, 0, -1, -1, 1, 0, 0))
 })
 
 test_that("identify_transition_edges returns correct transition vector and
@@ -42,10 +42,10 @@ test_that("identify_transition_edges returns correct transition vector and
                                                    temp_recon[[i]]$node_anc_rec,
                                                    "discrete")
   }
-  expect_equivalent(temp_results[[1]]$transition, c(1,  1, 0, 0, 0,  1, 0, 1))
-  expect_equivalent(temp_results[[1]]$trans_dir,  c(-1, 1, 0, 0, 0, -1, 0, 1))
-  expect_equivalent(temp_results[[2]]$transition, c(0,  1, 0, 0, 0,  0, 0, 0))
-  expect_equivalent(temp_results[[2]]$trans_dir,  c(0,  1, 0, 0, 0,  0, 0, 0))
+  expect_equivalent(temp_results[[1]]$transition, c(0, 0, 0, 1, 1, 1, 0, 0))
+  expect_equivalent(temp_results[[1]]$trans_dir,  c(0, 0, 0, -1, -1, 1, 0, 0))
+  expect_equivalent(temp_results[[2]]$transition, c(0, 1, 0, 0, 0, 0, 0, 0))
+  expect_equivalent(temp_results[[2]]$trans_dir,  c(0, -1, 0, 0, 0, 0, 0, 0))
 })
 
 
@@ -67,7 +67,7 @@ test_that("identify_transition_edges returns correct transition vector and
                                             temp_recon$node_anc_rec,
                                             "continuous")
   expect_equivalent(temp_results$transition, NA)
-  expect_equivalent(temp_results$trans_dir, c(1, -1,  1, -1,  1, -1, -1, -1))
+  expect_equivalent(temp_results$trans_dir, c(1, -1, -1, 1, -1, -1, -1, -1))
 })
 
 # test keep_two_plus_hi_conf_tran_ed
@@ -159,10 +159,10 @@ test_that("prep_geno_trans_for_phyc returns a $transition vector that
                                                 "continuous")
   temp_results <- prep_geno_trans_for_phyc(temp_geno, temp_AR$geno_trans)
 
-  expect_equal(temp_results[[1]]$transition, c(0, 1, 0, 0, 0, 0, 0, 1))
-  expect_equal(temp_results[[1]]$trans_dir, c(0, 1, 0, 0, 0, 0, 0, 1))
-  expect_equal(temp_results[[2]]$transition, c(0, 1, 0, 0, 0, 0, 0, 0))
-  expect_equal(temp_results[[2]]$trans_dir, c(0, 1, 0, 0, 0, 0, 0, 0))
-  expect_equal(temp_AR$geno_trans[[1]]$transition, c(1, 1, 0, 0, 0, 1, 0, 1))
-  expect_equal(temp_AR$geno_trans[[1]]$trans_dir, c(-1, 1, 0, 0, 0, -1, 0, 1))
+  expect_equal(temp_results[[1]]$transition, c(0, 0, 0, 0, 0, 1, 0, 0))
+  expect_equal(temp_results[[1]]$trans_dir, c(0, 0, 0, 0, 0, 1, 0, 0))
+  expect_equal(temp_results[[2]]$transition, c(0, 0, 0, 0, 0, 0, 0, 0))
+  expect_equal(temp_results[[2]]$trans_dir, c(0, 0, 0, 0, 0, 0, 0, 0))
+  expect_equal(temp_AR$geno_trans[[1]]$transition, c(0, 0, 0, 1, 1, 1, 0, 0))
+  expect_equal(temp_AR$geno_trans[[1]]$trans_dir, c(0, 0, 0, -1, -1, 1, 0, 0))
 })
