@@ -74,6 +74,27 @@ args$group_genotype         <- FALSE
 args$gene_snp_lookup        <- NULL
 run_synchronous(args)
 
+
+# not grouped - no phenotype transitions
+args                        <- NULL
+args$test                   <- FALSE
+args$phenotype              <- hogwash::antibiotic_resistance
+args$phenotype[1, 1] <- 1
+args$phenotype[3:4, 1] <- 0
+args$tree                   <- hogwash::tree
+args$tree$node.label[1]     <- 0
+args$tree$node.label        <- as.numeric(args$tree$node.label)
+args$genotype               <- hogwash::snp_genotype
+args$output_name            <- "dummy_switch_t7"
+args$output_dir             <- "."
+args$perm                   <- 1000
+args$fdr                    <- 0.95
+args$discrete_or_continuous <- "discrete"
+args$bootstrap_cutoff       <- 0.7
+args$group_genotype         <- FALSE
+args$gene_snp_lookup        <- NULL
+run_synchronous(args)
+
 # PhyC ungrouped
 args                        <- NULL
 args$test                   <- FALSE

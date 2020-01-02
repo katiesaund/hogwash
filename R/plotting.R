@@ -1357,30 +1357,33 @@ plot_synchronous_results  <- function(tr,
       cellwidth = cell_width_value)
   }
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
+  p_trans_edges_as_list <- list(p_trans_edges)
+
+   graphics::par(mfrow = c(1, 1),
+                mgp   = c(3, 1, 0),
+                oma   = c(0, 0, 4, 0),
+                mar = c(4, 4, 4, 4),
+                xpd = FALSE)
+  plot_tr_w_color_edges(tr,
+                        p_trans_edges_as_list,
+                        pheno_conf_as_list,
+                        "grey",
+                        "red",
+                        paste0("\n Phenotype"),
+                        "recon",
+                        1,
+                        "No transition",
+                        "Transition")
+
 
   # Loop through significant hits:
   for (j in 1:nrow(trans_hit_vals)) {
     if (trans_hit_vals[j, 1] < fdr) {
-      graphics::par(mfrow = c(3, 2),
+      graphics::par(mfrow = c(2, 2),
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4),
                     xpd = FALSE)
-
-      # Plot phenotype
-      p_trans_edges_as_list <- list(p_trans_edges)
-      plot_tr_w_color_edges(tr,
-                            p_trans_edges_as_list,
-                            pheno_conf_as_list,
-                            "grey",
-                            "red",
-                            paste0("\n Phenotype transitions"),
-                            "recon",
-                            1,
-                            "No transition",
-                            "Transition")
-
-      blank_plot()
 
       # Plot genotype
       plot_tr_w_color_edges(tr,
