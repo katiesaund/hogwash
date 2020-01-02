@@ -346,6 +346,8 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #'  Rownames are genotypes.
 #' @param group_logical Logical. Inidicates whether or not genotypes were
 #'  grouped.
+#'  @param snp_in_gene Either NULL or table of integers where each entry
+#'   corresponds to one genotype.
 #'
 #' @return Plots continuous test resutlts.
 plot_continuous_results <- function(disc_cont,
@@ -365,7 +367,8 @@ plot_continuous_results <- function(disc_cont,
                                     pheno_recon_ordered_by_edges,
                                     tr_and_pheno_hi_conf,
                                     all_trans_sig_hits,
-                                    group_logical){
+                                    group_logical,
+                                    snp_in_gene){
   # Check inputs ---------------------------------------------------------------
   check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
@@ -390,6 +393,11 @@ plot_continuous_results <- function(disc_cont,
                    2)
   check_equal(length(tr_and_pheno_hi_conf), ncol(geno))
   check_class(group_logical, "logical")
+  if (!is.null(snp_in_gene)) {
+    if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
+      stop("snp_in_gene should be a table of integers")
+    }
+  }
 
   # Function -------------------------------------------------------------------
   image_width <- 250
@@ -420,7 +428,17 @@ plot_continuous_results <- function(disc_cont,
                      row.names(all_trans_sig_hits), ] <- "Significant"
 
   log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
-  column_annot <- cbind(significant_loci, log_p_value)
+
+  if (!is.null(snp_in_gene)) {
+    snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
+    colnames(snp_in_gene) <- "Variants in Group"
+    snp_in_gene <-
+      snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
+                  drop = FALSE]
+    column_annot <- cbind(significant_loci, log_p_value, snp_in_gene)
+  } else {
+    column_annot <- cbind(significant_loci, log_p_value)
+  }
 
   row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:ape::Nedge(tr))
 
@@ -1187,7 +1205,7 @@ plot_synchronous_results  <- function(tr,
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
-    colnames(snp_in_gene) <- "# grouped genotypes"
+    colnames(snp_in_gene) <- "Variants in Group"
     snp_in_gene <-
       snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
                   drop = FALSE]
@@ -1216,14 +1234,12 @@ plot_synchronous_results  <- function(tr,
   phenotype_annotation[phenotype_annotation == 0] <- "Non-Transition"
   phenotype_annotation[phenotype_annotation == 1] <- "Phenotype Transition"
 
-  ann_colors <-
-    list(
-      `Locus Significance` = c(`Not Significant` = "white",
-                               Significant = "blue"),
-      `Edge Type` = c(`Low Confidence` = "grey",
-                                      `Non-Transition` = "white",
-                                      `Phenotype Transition` = "red",
-                                      `Genotype Transition` = "black"))
+  ann_colors <-list(`Locus Significance` = c(`Not Significant` = "white",
+                                             Significant = "blue"),
+                    `Edge Type` = c(`Low Confidence` = "grey",
+                                    `Non-Transition` = "white",
+                                    `Phenotype Transition` = "red",
+                                    `Genotype Transition` = "black"))
 
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {

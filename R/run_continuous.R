@@ -93,24 +93,25 @@ run_continuous <- function(args){
   phenotype_vector <-
     prepare_phenotype(args$phenotype, args$discrete_or_continuous, args$tree)
   trans_mat_results <-
-    plot_continuous_results("continuous",
-                            args$tree,
-                            args$fdr,
-                            args$output_dir,
-                            args$output_name,
-                            corrected_pvals_all_trans,
-                            phenotype_vector,
-                            args$perm,
-                            results_all_transitions,
-                            AR$pheno_recon_and_conf$node_anc_rec,
-                            hi_conf$geno_recon_edge,
-                            hi_conf$high_conf_ordered_by_edges,
-                            hi_conf$genotype_transition,
-                            hi_conf$genotype,
-                            AR$pheno_recon_and_conf$recon_edge_mat,
-                            hi_conf$high_conf_ordered_by_edges,
-                            all_transitions_sig_hits,
-                            args$group_genotype)
+    plot_continuous_results(disc_cont = "continuous",
+                            tr = args$tree,
+                            fdr = args$fdr,
+                            dir = args$output_dir,
+                            name = args$output_name,
+                            pval_all_transition = corrected_pvals_all_trans,
+                            pheno_vector = phenotype_vector,
+                            perm = args$perm,
+                            results_all_trans = results_all_transitions,
+                            pheno_anc_rec = AR$pheno_recon_and_conf$node_anc_rec,
+                            geno_reconstruction = hi_conf$geno_recon_edge,
+                            geno_confidence = hi_conf$high_conf_ordered_by_edges,
+                            geno_transition = hi_conf$genotype_transition,
+                            geno = hi_conf$genotype,
+                            pheno_recon_ordered_by_edges = AR$pheno_recon_and_conf$recon_edge_mat,
+                            tr_and_pheno_hi_conf = hi_conf$high_conf_ordered_by_edges,
+                            all_trans_sig_hits = all_transitions_sig_hits,
+                            group_logical = args$group_genotype,
+                            snp_in_gene = geno$snps_per_gene)
   results_object$hi_confidence_transition_edge <-
     hi_conf$hi_confidence_transition_edge
   results_object$num_hi_conf_transition_edge <-
