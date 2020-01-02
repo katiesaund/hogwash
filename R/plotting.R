@@ -1,3 +1,13 @@
+#' Draw a blank plot
+#'
+#' @noRd
+blank_plot <- function(){
+  plot(0,
+       type = 'n',
+       axes = FALSE,
+       ann = FALSE)
+}
+
 #' Plot the continuous phenotype as a phylogenetic tree filled in with a color
 #' gradient
 #'
@@ -183,8 +193,9 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
                 1.2 * max(all_trans$observed_pheno_trans_delta[[index]],
                           all_trans$observed_pheno_non_trans_delta[[index]])),
        main = "|Delta Phenotype|",
-       ylim = c(0, 0.75 * sum(length(all_trans$observed_pheno_trans_delta[[index]]),
-                              length(all_trans$observed_pheno_non_trans_delta[[index]]))),
+       ylim = c(0,
+                0.75 * sum(length(all_trans$observed_pheno_trans_delta[[index]]),
+                           length(all_trans$observed_pheno_non_trans_delta[[index]]))),
        cex.main = hist_cex_size,
        cex.lab = hist_cex_size,
        cex.axis = hist_cex_size)
@@ -279,377 +290,6 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
          cex = hist_cex_size,
          bg = rgb(0, 0, 0, 0.01))
 } # end hist_abs_delta_pheno_all_edges()
-
-#' Plot all results from the Continuous Test
-#'
-#' @details Plot all genotype's -log(p-value) as a manhattan plot. If any hits
-#' are significant after FDR, then plot histrograms & trees for each of these.
-#'
-#' @noRd
-#' @param disc_cont String, should be "continuous."
-#' @param tr Phylo.
-#' @param fdr Number. False discovery rate.
-#' @param dir Character. Output path.
-#' @param name Character. Output name.
-#' @param pval_all_transition List of two data.frames.
-#'  * $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names =
-#'       genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
-#'  * $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are
-#'       significant after FDR correction. Column name =
-#'       "fdr_corrected_pvals[fdr_corrected_pvals < fdr]".
-#'       Row.names = genotypes. Nrow = is variable-- could be between 0 and
-#'       max number of genotypes. It will only have rows if the corrected
-#'       p-value is less than the fdr value.
-#' @param pheno_vector Vector. Length = Ntip(tr).
-#' @param perm Number.
-#' @param results_all_trans List of 8.
-#'  * $pvals. Named numeric vector. Length == number of genotypes. Values
-#'      between 1 and 0. Names are genotype names.
-#'  * $ks_statistics. List of numeric vectors. Length of list == number of
-#'      genotypes. Each vector has length == number of permutations. Values
-#'      between 1 and 0.
-#'  * $observed_pheno_trans_delta. List of numeric vectors. Length of list ==
-#'      number of genotypes. Vectors are of variable length because length is
-#'      the number of transition edges for that particular genotype. Vectors are
-#'      numeric.
-#'  * $observed_pheno_non_trans_delta. List of numeric vectors. Length of list
-#'       == number of genotypes. Vectors are of variable length because length
-#'       is the number of non-transition edges for that particular genotype.
-#'       Vectors are numeric.
-#'  * $trans_median. Numberic. Vector. Length = number of genotypes. Describes
-#'      median delta phenotype on all transition edges.
-#'  * $all_edges_median. Numeric vector. Length = number of genotypes. Describes
-#'      median delta phenotype on all edges.
-#'  * $num_genotypes. Integer. The number of genotypes.
-#'  * $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values
-#'      between 1 and 0.
-#' @param pheno_anc_rec Vector. The values of the ancestral reconstruction of
-#'  the phenotype at each internal node. Length = Nnode(tr).
-#' @param geno_reconstruction List of lists. Binary. Number of lists = number of
-#'   genotypes. Length(each individual list) == Nedge(tree).
-#' @param geno_confidence List. Each entry corresponds to one genotype.
-#'  Length = number of genotypes.
-#' @param geno_transition Object with two lists: $trans_dir and $transition.
-#'  Each list has an entry for each genotype. Each sublist has one value for
-#'  each tree edge.
-#' @param geno Matrix. Columns = genotypes, rows = samples. Binary.
-#' @param pheno_recon_ordered_by_edges Matrix. Dim: nrow = Nedge(tr) x ncol = 2.
-#'  Parent (older) node is 1st column. Child (younger) node is the 2nd column.
-#'  Ancestral reconstruction value of each node.
-#' @param tr_and_pheno_hi_conf List. Length(list) = ncol(mat) == number of
-#'   genotypes. Each entry is a vector with length == Nedge(tr). All entries are
-#'   0 (low confidence) or 1 (high confidence).
-#' @param all_trans_sig_hits Data.frame. 1 column. Colnum names =
-#'  "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are (1)
-#'  significant after multiple test correction and (2) have higher median delta
-#'  phenotype on transition edges than on all edges. Values are between 1 and 0.
-#'  Rownames are genotypes.
-#' @param group_logical Logical. Inidicates whether or not genotypes were
-#'  grouped.
-#'  @param snp_in_gene Either NULL or table of integers where each entry
-#'   corresponds to one genotype.
-#'
-#' @return Plots continuous test results.
-plot_continuous_results <- function(disc_cont,
-                                    tr,
-                                    fdr,
-                                    dir,
-                                    name,
-                                    pval_all_transition,
-                                    pheno_vector,
-                                    perm,
-                                    results_all_trans,
-                                    pheno_anc_rec,
-                                    geno_reconstruction,
-                                    geno_confidence,
-                                    geno_transition,
-                                    geno,
-                                    pheno_recon_ordered_by_edges,
-                                    tr_and_pheno_hi_conf,
-                                    all_trans_sig_hits,
-                                    group_logical,
-                                    snp_in_gene){
-  # Check inputs ---------------------------------------------------------------
-  check_str_is_discrete_or_continuous(disc_cont)
-  check_for_root_and_bootstrap(tr)
-  check_tree_is_valid(tr)
-  check_num_between_0_and_1(fdr)
-  check_if_dir_exists(dir)
-  check_is_string(name)
-  check_class(pval_all_transition$hit_pvals, "data.frame")
-  check_equal(length(pheno_vector), ape::Ntip(tr))
-  check_if_permutation_num_valid(perm)
-  check_equal(length(results_all_trans$ks_statistics), ncol(geno))
-  check_equal(length(pheno_anc_rec), ape::Nnode(tr))
-  check_equal(length(geno_reconstruction), ncol(geno))
-  check_equal(length(geno_reconstruction[[1]]), ape::Nedge(tr))
-  check_equal(length(geno_confidence), ncol(geno))
-  check_equal(length(geno_transition[[1]]$transition), ape::Nedge(tr))
-  check_if_binary_matrix(geno)
-  check_dimensions(pheno_recon_ordered_by_edges,
-                   ape::Nedge(tr),
-                   ape::Nedge(tr),
-                   2,
-                   2)
-  check_equal(length(tr_and_pheno_hi_conf), ncol(geno))
-  check_class(group_logical, "logical")
-  if (!is.null(snp_in_gene)) {
-    if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
-      stop("snp_in_gene should be a table of integers")
-    }
-  }
-
-  # Function -------------------------------------------------------------------
-  image_width <- 250
-  hist_cex_size <- 1
-  trans_edge_mat <- NULL
-  for (i in 1:length(geno_transition)) {
-    trans_edge_mat <- cbind(trans_edge_mat, geno_transition[[i]]$transition)
-  }
-  colnames(trans_edge_mat) <- colnames(geno)
-
-  for (c in 1:ncol(trans_edge_mat)) {
-    trans_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
-  }
-
-  ph_trans <-
-    abs(pheno_recon_ordered_by_edges[, 1] - pheno_recon_ordered_by_edges[, 2])
-
-  p_trans_mat <- matrix(ph_trans, nrow = length(ph_trans), ncol = 1)
-  colnames(p_trans_mat) <- "|Delta Phenotype|"
-  p_trans_mat <- as.data.frame(round(p_trans_mat, 2))
-
-  significant_loci <-
-    data.frame("Locus Significance" = rep("Not Significant",
-                                          ncol(trans_edge_mat)),
-                                 stringsAsFactors = FALSE)
-  row.names(significant_loci) <- colnames(trans_edge_mat)
-  significant_loci[row.names(significant_loci) %in%
-                     row.names(all_trans_sig_hits), ] <- "Significant"
-
-  log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
-
-  if (!is.null(snp_in_gene)) {
-    snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
-    colnames(snp_in_gene) <- "Variants in Group"
-    snp_in_gene <-
-      snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
-                  drop = FALSE]
-    column_annot <- cbind(significant_loci, log_p_value, snp_in_gene)
-  } else {
-    column_annot <- cbind(significant_loci, log_p_value)
-  }
-
-  row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:ape::Nedge(tr))
-
-  ann_colors <- list(
-    `Locus Significance` = c(`Not Significant` = "white", Significant = "blue"),
-    `Genotype Edge` = c(`Low Confidence` = "grey", `Non-Transition` = "white", `Transition` = "black") # TEMP TRYING TO FIX LEGEND
-  )
-
-  sorted_trans_edge_mat <-
-    trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[, 1])],
-                         row.names(trans_edge_mat)), , drop = FALSE]
-  ordered_by_p_val <-
-    sorted_trans_edge_mat[, match(
-      row.names(log_p_value)[order(log_p_value[, 1])],
-      colnames(sorted_trans_edge_mat)), drop = FALSE]
-
-  column_annot_ordered_by_p_val <-
-    column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
-                       row.names(column_annot)), , drop = FALSE]
-
-  if (ncol(column_annot_ordered_by_p_val) == 2) {
-    colnames(column_annot_ordered_by_p_val) <-
-      c("Locus Significance", "-ln(FDR Corrected P-value)")
-  } else {
-    colnames(column_annot_ordered_by_p_val) <-
-      c("Locus Significance", "-ln(FDR Corrected P-value)", "Variants in Group")
-  }
-
-  # Create dummy column annotation so that a good heatmap legend prints
-  column_annot_ordered_by_p_val <-
-    cbind(rep("Non-Transition", nrow(column_annot_ordered_by_p_val)),
-          column_annot_ordered_by_p_val)
-  colnames(column_annot_ordered_by_p_val)[1] <- "Genotype Edge"
-
-  if (group_logical) {
-    fname <- paste0(dir, "/hogwash_continuous_grouped_", name, ".pdf")
-  } else {
-    fname <- paste0(dir, "/hogwash_continuous_", name, ".pdf")
-  }
-
-  grDevices::pdf(fname, width = 8.5, height = 11)
-  graphics::par(mfrow = c(1, 1), mar = c(5, 5, 5, 5))
-  make_manhattan_plot(name,
-                      pval_all_transition$hit_pvals,
-                      fdr,
-                      "continuous")
-
-  cell_width_value <- image_width / ncol(ordered_by_p_val)
-
-  colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
-
-  pheatmap::pheatmap(
-    ordered_by_p_val,
-    main = "Continuous Test: Convergence by Tree Edge",
-    cluster_cols = TRUE,
-    na_col = "grey",
-    cluster_rows = FALSE,
-    legend = FALSE,
-    show_rownames = FALSE,
-    color = c("white", "black"),
-    annotation_col = column_annot_ordered_by_p_val,
-    annotation_row = p_trans_mat,
-    annotation_colors = ann_colors,
-    show_colnames = TRUE,
-    fontsize = 8,
-    cellwidth = cell_width_value)
-
-  graphics::par(mfrow = c(1, 1),
-                mgp = c(3, 1, 0),
-                oma = c(0, 0, 4, 0),
-                mar = c(4, 4, 4, 4),
-                xpd = FALSE)
-  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
-
-
-  transparent_grey <- rgb(0, 0, 0, 0.25)
-  transparent_red <- rgb(1, 0, 0, 0.25)
-  # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
-  for (j in 1:nrow(pval_all_transition$hit_pvals)) {
-    if (pval_all_transition$hit_pvals[j, 1] < fdr) {
-      graphics::par(mfrow = c(3, 2),
-                    mgp   = c(3, 1, 0),
-                    oma   = c(0, 0, 4, 0),
-                    mar = c(4, 4, 4, 4),
-                    xpd = FALSE)
-      plot_tr_w_color_edges(tr,
-                            geno_reconstruction,
-                            geno_confidence,
-                            "grey",
-                            "red",
-                            paste0(row.names(pval_all_transition$hit_pvals)[j],
-                                   "\n Genotype reconstruction"),
-                            "recon",
-                            j,
-                            "Wild type",
-                            "Variant")
-      plot_tr_w_color_edges(tr,
-                            geno_transition,
-                            geno_confidence,
-                            "grey",
-                            "red",
-                            "Genotype transition",
-                            "trans",
-                            j,
-                            "No transition",
-                            "Transition")
-      mat_p_trans_mat <- as.matrix(p_trans_mat)
-      hist_abs_delta_pheno_all_edges(mat_p_trans_mat,
-                                     geno_confidence,
-                                     tr,
-                                     j)
-      hist_abs_hi_conf_delta_pheno(results_all_trans,
-                                   tr,
-                                   j,
-                                   transparent_grey,
-                                   transparent_red)
-      hist_raw_hi_conf_delta_pheno(geno_transition,
-                                   geno_confidence,
-                                   pheno_recon_ordered_by_edges,
-                                   tr,
-                                   j,
-                                   transparent_grey,
-                                   transparent_red)
-
-      graphics::hist(log(results_all_trans$ks_statistics[[j]]),
-           breaks = perm / 10,
-           col = "grey",
-           border = FALSE,
-           main =
-             paste("KS Test Statistic Null Distribution\n-ln(FDR Corrected P-value) = ",
-                   formatC(-log(pval_all_transition$hit_pvals[j, 1]),format = "e", digits = 1),
-                   " P-value rank = ",
-                   rank(pval_all_transition$hit_pvals)[j],
-                   sep = ""),
-           cex.main = hist_cex_size,
-           cex.lab = hist_cex_size,
-           cex.axis = hist_cex_size,
-           ylab = "Count",
-           xlab = "ln(KS Test Statistic)",
-           ylim = c(0, 0.6 * length(results_all_trans$ks_statistics[[j]])),
-           xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])),
-                        log(results_all_trans$ks_statistics[[j]])), 0))
-      graphics::abline(v =
-                         log(as.numeric(results_all_trans$observed_ks_stat[j])),
-                       col = rgb(1, 0, 0, 0.25),
-                       lwd = 4)
-
-      legend("topleft",
-             title = "KS Test Statistics",
-             legend = c("Null", "Observed"),
-             col = c("grey", rgb(1, 0, 0, 0.25)),
-             pch = 15,
-             cex = hist_cex_size,
-             bg = rgb(0, 0, 0, 0.01))
-
-    }
-  }
-
-  grDevices::dev.off()
-
-  trans_dir_edge_mat <- NULL
-  for (i in 1:length(geno_transition)) {
-    trans_dir_edge_mat <- cbind(trans_dir_edge_mat,
-                                geno_transition[[i]]$trans_dir)
-  }
-
-  colnames(trans_dir_edge_mat) <- colnames(geno)
-
-  for (c in 1:ncol(trans_dir_edge_mat)) {
-    trans_dir_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
-  }
-
-  all_tables <- all_lists <- rep(list(NULL), ncol(trans_dir_edge_mat))
-  delta_pheno_table <- matrix(0, nrow = 3, ncol = 1)
-  row.names(delta_pheno_table) <- c("geno_parent_0_child_1",
-                                    "geno_parent_1_child_0",
-                                    "geno_no_change")
-  colnames(delta_pheno_table) <- c("sum(|delta_phenotype|)")
-  for (i in 1:ncol(trans_dir_edge_mat)) {
-    temp_table <- delta_pheno_table
-    temp_table[1, 1] <-
-      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == 1),  1], na.rm = TRUE)
-    temp_table[2, 1] <-
-      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == -1), 1], na.rm = TRUE)
-    temp_table[3, 1] <-
-      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == 0),  1], na.rm = TRUE)
-    all_tables[[i]] <- temp_table
-  }
-  names(all_tables) <- colnames(geno)
-  delta_pheno_table <- all_tables
-  delta_pheno_list <- rep(list(0), 3)
-  names(delta_pheno_list) <- c("geno_parent_0_child_1",
-                               "geno_parent_1_child_0",
-                               "geno_no_change")
-  for (i in 1:ncol(trans_dir_edge_mat)) {
-    temp_list <- delta_pheno_list
-    temp_list[[1]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == 1),  1]
-    temp_list[[2]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == -1), 1]
-    temp_list[[3]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == 0),  1]
-    all_lists[[i]] <- temp_list
-    names(all_lists)[i] <- colnames(trans_dir_edge_mat)[i]
-  }
-  delta_pheno_list <- all_lists
-
-  # Return output --------------------------------------------------------------
-  results <- list("trans_dir_edge_mat" = trans_dir_edge_mat,
-                  "p_trans_mat" = p_trans_mat,
-                  "delta_pheno_table" = delta_pheno_table,
-                  "delta_pheno_list" = delta_pheno_list )
-  return(results)
-} # end plot_continuous_results()
 
 #' make_manhattan_plot
 #'
@@ -806,7 +446,7 @@ plot_tr_w_color_edges <- function(tr,
                    cex = tree_legend_cex)
 } # end plot_tr_w_color_edges()
 
-#' Plot PhyC results
+#' Plot all PhyC results
 #'
 #' @noRd
 #' @param tr Phylo.
@@ -882,19 +522,24 @@ plot_phyc_results <- function(tr,
   check_str_is_test_name(prefix)
 
   # Function -------------------------------------------------------------------
+
+  # Set default values
   image_width <- 250
   hist_cex_size <- 1
+
+  # File name
   if (grouped_logical) {
     fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
   } else {
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
 
+  # Manhattan Plot
   grDevices::pdf(fname, width = 8.5, height = 11)
-
   graphics::par(mfrow = c(1, 1), mar = c(5, 5, 5, 5))
   make_manhattan_plot(name, recon_hit_vals, fdr, prefix)
 
+  # Prep heatmap
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
 
   for (i in 1:length(g_trans_edges)) {
@@ -967,7 +612,9 @@ plot_phyc_results <- function(tr,
   phenotype_annotation[phenotype_annotation == 1] <- "Phenotype Presence"
 
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
+  # End heatmap prep
 
+  # Plot tree edges vs genotype non/transitions
   if (plotting_logical) {
     colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
 
@@ -988,15 +635,13 @@ plot_phyc_results <- function(tr,
       cellwidth = cell_width_value)
   }
 
-
+  # Plot Phenotype Presence/Absence on Tree
   pheno_as_list <- list(p_recon_edges)
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
-
   graphics::par(mfrow = c(1, 1),
                 mgp = c(3, 1, 0),
                 oma = c(0, 0, 4, 0),
                 mar = c(4, 4, 4, 4))
-  # Phenotype
   plot_tr_w_color_edges(tr,
                         pheno_as_list,
                         pheno_conf_as_list,
@@ -1015,7 +660,7 @@ plot_phyc_results <- function(tr,
                     mgp = c(3, 1, 0),
                     oma = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4))
-      # Genotype
+      # Plot Genotype Transitions on Tree
       plot_tr_w_color_edges(tr,
                             g_trans_edges,
                             geno_confidence,
@@ -1027,9 +672,10 @@ plot_phyc_results <- function(tr,
                             j,
                             "No transition",
                             "Transition")
-      blank_plot()
 
-      # Permutation test
+      blank_plot() # Blank plot to maintain correct plot location
+
+      # Plot Null Distribution Histogram
       max_x <- 1.2 * max(recon_perm_obs_results$permuted_count[[j]],
                    recon_perm_obs_results$observed_overlap[j])
       max_y <- 0.85 * length(recon_perm_obs_results$permuted_count[[j]])
@@ -1061,6 +707,7 @@ plot_phyc_results <- function(tr,
   }
 
   grDevices::dev.off()
+  # End of plot
 } # end plot_phyc_results()
 
 #' plot_synchronous_results
@@ -1137,19 +784,25 @@ plot_synchronous_results  <- function(tr,
   check_class(grouped_logical, "logical")
 
   # Function -------------------------------------------------------------------
+  # Set default values
   image_width <- 250
   hist_cex_size <- 1
+
+  # File name
   if (grouped_logical) {
     fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
   } else {
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
+
+  # Start Plotting
   grDevices::pdf(fname, width = 8.5, height = 11)
 
+  # Manhattan Plot
   graphics::par(mfrow = c(1, 1), mar = c(5, 5, 5, 5))
   make_manhattan_plot(name, trans_hit_vals, fdr, prefix)
 
-  # heatmaps
+  # Prep Heatmap
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
 
   for (i in 1:length(g_trans_edges)) {
@@ -1220,8 +873,9 @@ plot_synchronous_results  <- function(tr,
   if (can_be_plotted) {
     cell_width_value <- image_width / ncol(ordered_by_p_val)
     colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
+    # End Heatmap Prep
 
-    # Transition loci summary heat maps
+    # Plot Heatmap with Genotype and Phenotype Transitions Per Tree Edge
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
       legend = FALSE,
@@ -1238,10 +892,11 @@ plot_synchronous_results  <- function(tr,
       show_colnames = TRUE,
       cellwidth = cell_width_value)
   }
+
+  # Plot Phenotype Transitions on Tree
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
   p_trans_edges_as_list <- list(p_trans_edges)
-
-   graphics::par(mfrow = c(1, 1),
+  graphics::par(mfrow = c(1, 1),
                 mgp   = c(3, 1, 0),
                 oma   = c(0, 0, 4, 0),
                 mar = c(4, 4, 4, 4),
@@ -1257,7 +912,6 @@ plot_synchronous_results  <- function(tr,
                         "No transition",
                         "Transition")
 
-
   # Loop through significant hits:
   for (j in 1:nrow(trans_hit_vals)) {
     if (trans_hit_vals[j, 1] < fdr) {
@@ -1267,7 +921,7 @@ plot_synchronous_results  <- function(tr,
                     mar = c(4, 4, 4, 4),
                     xpd = FALSE)
 
-      # Plot genotype
+      # Plot Genotype Reconstruction on Tree
       plot_tr_w_color_edges(tr,
                             g_trans_edges,
                             geno_confidence,
@@ -1280,9 +934,9 @@ plot_synchronous_results  <- function(tr,
                             "No transition",
                             "Transition")
 
-      blank_plot()
+      blank_plot() # Blank plot maintains correct layout
 
-      # Plot permutation test
+      # Plot Null Distribution Histogram
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
                    trans_perm_obs_results$observed_overlap[j])
       graphics::hist(trans_perm_obs_results$permuted_count[[j]],
@@ -1311,13 +965,399 @@ plot_synchronous_results  <- function(tr,
     }
   }
   grDevices::dev.off()
+  # End of Plotting
 } # end plot_synchronous_results()
 
+#' Plot all results from the Continuous Test
+#'
+#' @details (1) Plot all genotype's -ln(FDR corrected P-value) on a Manhattan
+#'   plot. (2) Plot a heatmap with genotypes in the columns and tree edges in
+#'   the rows.|Delta Phenotype| plotted as a row annotation. P-value,
+#'   user-defined  significance, and number of variants in group (if grouped)
+#'   plotted as column annotations. (3) Plot the continuous phenotype. (4) If
+#'   any hits are significant after FDR correction, then plot histograms & trees
+#'   for each of the significant loci.
+#'
+#' @noRd
+#' @param disc_cont String, should be "continuous."
+#' @param tr Phylo.
+#' @param fdr Number. False discovery rate.
+#' @param dir Character. Output path.
+#' @param name Character. Output name.
+#' @param pval_all_transition List of two data.frames.
+#'  * $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names =
+#'       genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
+#'  * $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are
+#'       significant after FDR correction. Column name =
+#'       "fdr_corrected_pvals[fdr_corrected_pvals < fdr]".
+#'       Row.names = genotypes. Nrow = is variable-- could be between 0 and
+#'       max number of genotypes. It will only have rows if the corrected
+#'       p-value is less than the fdr value.
+#' @param pheno_vector Vector. Length = Ntip(tr).
+#' @param perm Number.
+#' @param results_all_trans List of 8.
+#'  * $pvals. Named numeric vector. Length == number of genotypes. Values
+#'      between 1 and 0. Names are genotype names.
+#'  * $ks_statistics. List of numeric vectors. Length of list == number of
+#'      genotypes. Each vector has length == number of permutations. Values
+#'      between 1 and 0.
+#'  * $observed_pheno_trans_delta. List of numeric vectors. Length of list ==
+#'      number of genotypes. Vectors are of variable length because length is
+#'      the number of transition edges for that particular genotype. Vectors are
+#'      numeric.
+#'  * $observed_pheno_non_trans_delta. List of numeric vectors. Length of list
+#'       == number of genotypes. Vectors are of variable length because length
+#'       is the number of non-transition edges for that particular genotype.
+#'       Vectors are numeric.
+#'  * $trans_median. Numberic. Vector. Length = number of genotypes. Describes
+#'      median delta phenotype on all transition edges.
+#'  * $all_edges_median. Numeric vector. Length = number of genotypes. Describes
+#'      median delta phenotype on all edges.
+#'  * $num_genotypes. Integer. The number of genotypes.
+#'  * $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values
+#'      between 1 and 0.
+#' @param pheno_anc_rec Vector. The values of the ancestral reconstruction of
+#'  the phenotype at each internal node. Length = Nnode(tr).
+#' @param geno_reconstruction List of lists. Binary. Number of lists = number of
+#'   genotypes. Length(each individual list) == Nedge(tree).
+#' @param geno_confidence List. Each entry corresponds to one genotype.
+#'  Length = number of genotypes.
+#' @param geno_transition Object with two lists: $trans_dir and $transition.
+#'  Each list has an entry for each genotype. Each sublist has one value for
+#'  each tree edge.
+#' @param geno Matrix. Columns = genotypes, rows = samples. Binary.
+#' @param pheno_recon_ordered_by_edges Matrix. Dim: nrow = Nedge(tr) x ncol = 2.
+#'  Parent (older) node is 1st column. Child (younger) node is the 2nd column.
+#'  Ancestral reconstruction value of each node.
+#' @param tr_and_pheno_hi_conf List. Length(list) = ncol(mat) == number of
+#'   genotypes. Each entry is a vector with length == Nedge(tr). All entries are
+#'   0 (low confidence) or 1 (high confidence).
+#' @param all_trans_sig_hits Data.frame. 1 column. Colnum names =
+#'  "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are (1)
+#'  significant after multiple test correction and (2) have higher median delta
+#'  phenotype on transition edges than on all edges. Values are between 1 and 0.
+#'  Rownames are genotypes.
+#' @param group_logical Logical. Inidicates whether or not genotypes were
+#'  grouped.
+#'  @param snp_in_gene Either NULL or table of integers where each entry
+#'   corresponds to one genotype.
+#'
+#' @return Plots continuous test results.
+plot_continuous_results <- function(disc_cont,
+                                    tr,
+                                    fdr,
+                                    dir,
+                                    name,
+                                    pval_all_transition,
+                                    pheno_vector,
+                                    perm,
+                                    results_all_trans,
+                                    pheno_anc_rec,
+                                    geno_reconstruction,
+                                    geno_confidence,
+                                    geno_transition,
+                                    geno,
+                                    pheno_recon_ordered_by_edges,
+                                    tr_and_pheno_hi_conf,
+                                    all_trans_sig_hits,
+                                    group_logical,
+                                    snp_in_gene){
+  # Check inputs ---------------------------------------------------------------
+  check_str_is_discrete_or_continuous(disc_cont)
+  check_for_root_and_bootstrap(tr)
+  check_tree_is_valid(tr)
+  check_num_between_0_and_1(fdr)
+  check_if_dir_exists(dir)
+  check_is_string(name)
+  check_class(pval_all_transition$hit_pvals, "data.frame")
+  check_equal(length(pheno_vector), ape::Ntip(tr))
+  check_if_permutation_num_valid(perm)
+  check_equal(length(results_all_trans$ks_statistics), ncol(geno))
+  check_equal(length(pheno_anc_rec), ape::Nnode(tr))
+  check_equal(length(geno_reconstruction), ncol(geno))
+  check_equal(length(geno_reconstruction[[1]]), ape::Nedge(tr))
+  check_equal(length(geno_confidence), ncol(geno))
+  check_equal(length(geno_transition[[1]]$transition), ape::Nedge(tr))
+  check_if_binary_matrix(geno)
+  check_dimensions(pheno_recon_ordered_by_edges,
+                   ape::Nedge(tr),
+                   ape::Nedge(tr),
+                   2,
+                   2)
+  check_equal(length(tr_and_pheno_hi_conf), ncol(geno))
+  check_class(group_logical, "logical")
+  if (!is.null(snp_in_gene)) {
+    if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
+      stop("snp_in_gene should be a table of integers")
+    }
+  }
 
-#' Draw a blank plot
-blank_plot <- function(){
-  plot(0,
-       type = 'n',
-       axes = FALSE,
-       ann = FALSE)
-}
+  # Function -------------------------------------------------------------------
+
+  # Set up variables
+  image_width <- 250
+  hist_cex_size <- 1
+  trans_edge_mat <- NULL
+
+  # Prep to plot heatmap
+  for (i in 1:length(geno_transition)) {
+    trans_edge_mat <- cbind(trans_edge_mat, geno_transition[[i]]$transition)
+  }
+  colnames(trans_edge_mat) <- colnames(geno)
+
+  for (c in 1:ncol(trans_edge_mat)) {
+    trans_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
+  }
+
+  ph_trans <-
+    abs(pheno_recon_ordered_by_edges[, 1] - pheno_recon_ordered_by_edges[, 2])
+
+  p_trans_mat <- matrix(ph_trans, nrow = length(ph_trans), ncol = 1)
+  colnames(p_trans_mat) <- "|Delta Phenotype|"
+  p_trans_mat <- as.data.frame(round(p_trans_mat, 2))
+
+  significant_loci <-
+    data.frame("Locus Significance" = rep("Not Significant",
+                                          ncol(trans_edge_mat)),
+               stringsAsFactors = FALSE)
+  row.names(significant_loci) <- colnames(trans_edge_mat)
+  significant_loci[row.names(significant_loci) %in%
+                     row.names(all_trans_sig_hits), ] <- "Significant"
+
+  log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
+
+  if (!is.null(snp_in_gene)) {
+    snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
+    colnames(snp_in_gene) <- "Variants in Group"
+    snp_in_gene <-
+      snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
+                  drop = FALSE]
+    column_annot <- cbind(significant_loci, log_p_value, snp_in_gene)
+  } else {
+    column_annot <- cbind(significant_loci, log_p_value)
+  }
+
+  row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:ape::Nedge(tr))
+
+  ann_colors <- list(
+    `Locus Significance` = c(`Not Significant` = "white", Significant = "blue"),
+    `Genotype Edge` = c(`Low Confidence` = "grey", `Non-Transition` = "white", `Transition` = "black") # TEMP TRYING TO FIX LEGEND
+  )
+
+  sorted_trans_edge_mat <-
+    trans_edge_mat[match(row.names(p_trans_mat)[order(p_trans_mat[, 1])],
+                         row.names(trans_edge_mat)), , drop = FALSE]
+  ordered_by_p_val <-
+    sorted_trans_edge_mat[, match(
+      row.names(log_p_value)[order(log_p_value[, 1])],
+      colnames(sorted_trans_edge_mat)), drop = FALSE]
+
+  column_annot_ordered_by_p_val <-
+    column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
+                       row.names(column_annot)), , drop = FALSE]
+
+  if (ncol(column_annot_ordered_by_p_val) == 2) {
+    colnames(column_annot_ordered_by_p_val) <-
+      c("Locus Significance", "-ln(FDR Corrected P-value)")
+  } else {
+    colnames(column_annot_ordered_by_p_val) <-
+      c("Locus Significance", "-ln(FDR Corrected P-value)", "Variants in Group")
+  }
+
+  # Create dummy column annotation so that a good heatmap legend prints
+  column_annot_ordered_by_p_val <-
+    cbind(rep("Non-Transition", nrow(column_annot_ordered_by_p_val)),
+          column_annot_ordered_by_p_val)
+  colnames(column_annot_ordered_by_p_val)[1] <- "Genotype Edge"
+  cell_width_value <- image_width / ncol(ordered_by_p_val)
+  colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
+  # End of heatmap prep
+
+  # File name
+  if (group_logical) {
+    fname <- paste0(dir, "/hogwash_continuous_grouped_", name, ".pdf")
+  } else {
+    fname <- paste0(dir, "/hogwash_continuous_", name, ".pdf")
+  }
+
+  # Start plotting
+  grDevices::pdf(fname, width = 8.5, height = 11)
+  graphics::par(mfrow = c(1, 1), mar = c(5, 5, 5, 5))
+
+  # Manhattan Plot
+  make_manhattan_plot(name,
+                      pval_all_transition$hit_pvals,
+                      fdr,
+                      "continuous")
+
+  # Plot Genotype vs Tree Edge Heatmap
+  pheatmap::pheatmap(
+    ordered_by_p_val,
+    main = "Continuous Test: Convergence by Tree Edge",
+    cluster_cols = TRUE,
+    na_col = "grey",
+    cluster_rows = FALSE,
+    legend = FALSE,
+    show_rownames = FALSE,
+    color = c("white", "black"),
+    annotation_col = column_annot_ordered_by_p_val,
+    annotation_row = p_trans_mat,
+    annotation_colors = ann_colors,
+    show_colnames = TRUE,
+    fontsize = 8,
+    cellwidth = cell_width_value)
+
+  # Plot Continuous Phenotype on Tree
+  graphics::par(mfrow = c(1, 1),
+                mgp = c(3, 1, 0),
+                oma = c(0, 0, 4, 0),
+                mar = c(4, 4, 4, 4),
+                xpd = FALSE)
+  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
+
+  # Only make the following plots for significant loci
+  transparent_grey <- rgb(0, 0, 0, 0.25)
+  transparent_red <- rgb(1, 0, 0, 0.25)
+  for (j in 1:nrow(pval_all_transition$hit_pvals)) {
+    if (pval_all_transition$hit_pvals[j, 1] < fdr) {
+      graphics::par(mfrow = c(3, 2),
+                    mgp   = c(3, 1, 0),
+                    oma   = c(0, 0, 4, 0),
+                    mar = c(4, 4, 4, 4),
+                    xpd = FALSE)
+      # Plot Genotype Reconstruction on the Tree
+      plot_tr_w_color_edges(tr,
+                            geno_reconstruction,
+                            geno_confidence,
+                            "grey",
+                            "red",
+                            paste0(row.names(pval_all_transition$hit_pvals)[j],
+                                   "\n Genotype reconstruction"),
+                            "recon",
+                            j,
+                            "Wild type",
+                            "Variant")
+      # Plot Genotype Transitions on the Tree
+      plot_tr_w_color_edges(tr,
+                            geno_transition,
+                            geno_confidence,
+                            "grey",
+                            "red",
+                            "Genotype transition",
+                            "trans",
+                            j,
+                            "No transition",
+                            "Transition")
+      # Histogram of the |delta phenotype| by edge, colored by all edges vs high
+      #   conf. edges
+      mat_p_trans_mat <- as.matrix(p_trans_mat)
+      hist_abs_delta_pheno_all_edges(mat_p_trans_mat,
+                                     geno_confidence,
+                                     tr,
+                                     j)
+      # Histogram of the |delta phenotype| for only high conf. edges, colored by
+      #   genotype non-transition vs transition edges
+      hist_abs_hi_conf_delta_pheno(results_all_trans,
+                                   tr,
+                                   j,
+                                   transparent_grey,
+                                   transparent_red)
+      # Histogram of the raw delta phenotype for only high conf. edges, colored
+      #   by genotype non-transition vs transition edges
+      hist_raw_hi_conf_delta_pheno(geno_transition,
+                                   geno_confidence,
+                                   pheno_recon_ordered_by_edges,
+                                   tr,
+                                   j,
+                                   transparent_grey,
+                                   transparent_red)
+      # Plot Null Distribution of KS Test Statistics
+      graphics::hist(log(results_all_trans$ks_statistics[[j]]),
+                     breaks = perm / 10,
+                     col = "grey",
+                     border = FALSE,
+                     main =
+                       paste("KS Test Statistic Null Distribution\n-ln(FDR Corrected P-value) = ",
+                             formatC(-log(pval_all_transition$hit_pvals[j, 1]),format = "e", digits = 1),
+                             " P-value rank = ",
+                             rank(pval_all_transition$hit_pvals)[j],
+                             sep = ""),
+                     cex.main = hist_cex_size,
+                     cex.lab = hist_cex_size,
+                     cex.axis = hist_cex_size,
+                     ylab = "Count",
+                     xlab = "ln(KS Test Statistic)",
+                     ylim = c(0, 0.6 * length(results_all_trans$ks_statistics[[j]])),
+                     xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])),
+                                  log(results_all_trans$ks_statistics[[j]])), 0))
+      graphics::abline(v =
+                         log(as.numeric(results_all_trans$observed_ks_stat[j])),
+                       col = rgb(1, 0, 0, 0.25),
+                       lwd = 4)
+
+      legend("topleft",
+             title = "KS Test Statistics",
+             legend = c("Null", "Observed"),
+             col = c("grey", rgb(1, 0, 0, 0.25)),
+             pch = 15,
+             cex = hist_cex_size,
+             bg = rgb(0, 0, 0, 0.01))
+
+    }
+  }
+
+  grDevices::dev.off()
+  # End Plotting
+
+  # Prep output data
+  trans_dir_edge_mat <- NULL
+  for (i in 1:length(geno_transition)) {
+    trans_dir_edge_mat <- cbind(trans_dir_edge_mat,
+                                geno_transition[[i]]$trans_dir)
+  }
+
+  colnames(trans_dir_edge_mat) <- colnames(geno)
+
+  for (c in 1:ncol(trans_dir_edge_mat)) {
+    trans_dir_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
+  }
+
+  all_tables <- all_lists <- rep(list(NULL), ncol(trans_dir_edge_mat))
+  delta_pheno_table <- matrix(0, nrow = 3, ncol = 1)
+  row.names(delta_pheno_table) <- c("geno_parent_0_child_1",
+                                    "geno_parent_1_child_0",
+                                    "geno_no_change")
+  colnames(delta_pheno_table) <- c("sum(|delta_phenotype|)")
+  for (i in 1:ncol(trans_dir_edge_mat)) {
+    temp_table <- delta_pheno_table
+    temp_table[1, 1] <-
+      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == 1),  1], na.rm = TRUE)
+    temp_table[2, 1] <-
+      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == -1), 1], na.rm = TRUE)
+    temp_table[3, 1] <-
+      sum(p_trans_mat[which(trans_dir_edge_mat[, i] == 0),  1], na.rm = TRUE)
+    all_tables[[i]] <- temp_table
+  }
+  names(all_tables) <- colnames(geno)
+  delta_pheno_table <- all_tables
+  delta_pheno_list <- rep(list(0), 3)
+  names(delta_pheno_list) <- c("geno_parent_0_child_1",
+                               "geno_parent_1_child_0",
+                               "geno_no_change")
+  for (i in 1:ncol(trans_dir_edge_mat)) {
+    temp_list <- delta_pheno_list
+    temp_list[[1]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == 1),  1]
+    temp_list[[2]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == -1), 1]
+    temp_list[[3]] <- p_trans_mat[which(trans_dir_edge_mat[, i] == 0),  1]
+    all_lists[[i]] <- temp_list
+    names(all_lists)[i] <- colnames(trans_dir_edge_mat)[i]
+  }
+  delta_pheno_list <- all_lists
+
+  # Return output --------------------------------------------------------------
+  results <- list("trans_dir_edge_mat" = trans_dir_edge_mat,
+                  "p_trans_mat" = p_trans_mat,
+                  "delta_pheno_table" = delta_pheno_table,
+                  "delta_pheno_list" = delta_pheno_list )
+  return(results)
+} # end plot_continuous_results()
