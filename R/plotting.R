@@ -548,7 +548,7 @@ plot_continuous_results <- function(disc_cont,
            col = "grey",
            border = FALSE,
            main =
-             paste("Null Distribution of KS Test Statistics \n-ln(FDR corrected P-value) = ",
+             paste("KS Test Statistic Null Distribution\n-ln(FDR corrected P-value) = ",
                    formatC(-log(pval_all_transition$hit_pvals[j, 1]),format = "e", digits = 1),
                    " P-value rank = ",
                    rank(pval_all_transition$hit_pvals)[j],
@@ -563,13 +563,13 @@ plot_continuous_results <- function(disc_cont,
                         log(results_all_trans$ks_statistics[[j]])), 0))
       graphics::abline(v =
                          log(as.numeric(results_all_trans$observed_ks_stat[j])),
-                       col = "red",
+                       col = rgb(1, 0, 0, 0.25),
                        lwd = 4)
 
       legend("topleft",
              title = "KS Test Statistics",
              legend = c("Null", "Observed"),
-             col = c("grey", "red"),
+             col = c("grey", rgb(1, 0, 0, 0.25)),
              pch = 15,
              cex = hist_cex_size,
              bg = rgb(0, 0, 0, 0.01))
@@ -823,7 +823,7 @@ make_ann_colors <- function(geno_matrix){
   return(ann_colors)
 }
 
-#' plot_phyc_results
+#' Plot PhyC results
 #'
 #' @description Plot PhyC results.
 #'
@@ -902,6 +902,7 @@ plot_phyc_results <- function(tr,
 
   # Function -------------------------------------------------------------------
   image_width <- 250
+  hist_cex_size <- 1.3
   if (grouped_logical) {
     fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
   } else {
@@ -981,15 +982,6 @@ plot_phyc_results <- function(tr,
     }
   }
 
-  # if (length(unique(column_annot_ordered_by_p_val[, 1])) == 2) {
-  #   locus_col <- c(not_sig = "white", sig = "blue")
-  # } else if (length(unique(column_annot_ordered_by_p_val[, 1])) == 1) {
-  #   locus_col <- c(sig = "blue")
-  #   if (unique(column_annot_ordered_by_p_val[, 1]) == "not_sig") {
-  #     locus_col <- c(not_sig = "white")
-  #   }
-  # }
-
   locus_col <- c(not_sig = "white", sig = "blue")
 
   ann_colors <- list(locus = locus_col, pheno_presence = pheno_presence_col)
@@ -1046,11 +1038,13 @@ plot_phyc_results <- function(tr,
                             pheno_conf_as_list,
                             "grey",
                             "red",
-                            paste0("\n Phenotype reconstruction"),
+                            paste0("\n Phenotype Reconstruction"),
                             "recon",
                             1,
                             "Wild type",
                             "Variant")
+      blank_plot()
+
       # Genotype
       plot_tr_w_color_edges(tr,
                             g_trans_edges,
@@ -1058,36 +1052,41 @@ plot_phyc_results <- function(tr,
                             "grey",
                             "red",
                             paste0(row.names(recon_hit_vals)[j],
-                                   "\nGenotype transition"),
+                                   "\nGenotype Transitions"),
                             "recon",
                             j,
                             "No transition",
                             "Transition")
+      blank_plot()
+
       # Permutation test
-      max_x <- max(recon_perm_obs_results$permuted_count[[j]],
+      max_x <- 1.2 * max(recon_perm_obs_results$permuted_count[[j]],
                    recon_perm_obs_results$observed_overlap[j])
+      max_y <- 0.85 * length(recon_perm_obs_results$permuted_count[[j]])
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
                      breaks = num_perm / 10,
                      xlim = c(0, max_x),
+                     ylim = c(0, max_y),
                      col = "grey",
                      border = FALSE,
                      ylab = "Count",
                      xlab =
-                       "Edges with genotype transition & phenotype presence",
+                       "Genotype Transition & Phenotype Presence Co-occurrence",
                      main = paste0(
-                       "Genotype transition & phenotype presence\npval=",
-                       round(recon_hit_vals[j, 1], 4),
+                       "Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
+                       formatC(-log(recon_hit_vals[j, 1]), format = "e", digits = 1),
+                       " P-value rank = ",
+                       rank(recon_hit_vals[j, ]),
                        sep = ""))
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
-                       col = "red")
-      graphics::legend("topright",
-                       bty = "n",
-                       legend = c("Observed", "Null distribution"),
-                       col = c("red", "grey"),
-                       lty = 1,
-                       ncol = 1,
-                       lwd = 1,
-                       cex = 0.75)
+                       col = rgb(1, 0, 0, 0.25),
+                       lwd = 4)
+      graphics::legend("topleft",
+                       title = "Co-occurence",
+                       legend = c("Null", "Observed"),
+                       col = c( "grey", rgb(1, 0, 0, 0.25)),
+                       pch = 15,
+                       cex = hist_cex_size)
 
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
@@ -1386,17 +1385,16 @@ plot_synchronous_results  <- function(tr,
            border = FALSE,
            ylab = "Count",
            xlab = "Genotype & Phenotype Transition Edge Co-occurrence",
-           main = paste0("Transition Edge Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
+           main = paste0("Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
                          formatC(-log(trans_hit_vals[j, 1]), format = "e", digits = 1),
                          " P-value rank = ",
                          rank(trans_hit_vals[j, ]),
                          sep = ""))
-
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
                        col = rgb(1, 0, 0, 0.25),
                        lwd = 4)
       legend("topleft",
-             title = "Edge Type",
+             title = "Co-occurence",
              legend = c("Null", "Observed"),
              col = c("grey", rgb(1, 0, 0, 0.25)),
              pch = 15,
