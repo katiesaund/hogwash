@@ -85,7 +85,7 @@ args$genotype               <- hogwash::snp_genotype
 args$output_name            <- "dummy"
 args$output_dir             <- "."
 args$perm                   <- 1000
-args$fdr                    <- 0.15
+args$fdr                    <- 0.95
 args$discrete_or_continuous <- "discrete"
 args$bootstrap_cutoff       <- 0.7
 args$group_genotype         <- FALSE
@@ -103,7 +103,7 @@ args$genotype               <- hogwash::snp_genotype
 args$output_name            <- "dummy"
 args$output_dir             <- "."
 args$perm                   <- 1000
-args$fdr                    <- 0.15
+args$fdr                    <- 0.95
 args$discrete_or_continuous <- "discrete"
 args$bootstrap_cutoff       <- 0.7
 args$group_genotype         <- TRUE

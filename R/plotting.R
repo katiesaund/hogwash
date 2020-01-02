@@ -448,7 +448,7 @@ plot_continuous_results <- function(disc_cont,
   }
 
   grDevices::pdf(fname, width = 16, height = 20)
-
+  graphics::par(mfrow = c(1, 1), mar = c(10, 10, 10, 10))
   make_manhattan_plot(name,
                       pval_all_transition$hit_pvals,
                       fdr,
@@ -670,6 +670,7 @@ make_manhattan_plot <- function(geno_pheno_name,
 
   # Function -------------------------------------------------------------------
   # Create negative log p-values with arbitrary locus numbers
+  manhattan_cex <- 2
   neg_log_p_value <- data.frame(-log(pval_hits))
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
   colnames(neg_log_p_with_num)[1] <- "locus"
@@ -677,14 +678,17 @@ make_manhattan_plot <- function(geno_pheno_name,
   ymax <- max(-log(0.01), neg_log_p_with_num[, 2, drop = TRUE])
   with(neg_log_p_with_num,
        graphics::plot(x = neg_log_p_with_num[, 1],
-            y = neg_log_p_with_num[, 2, drop = TRUE],
+            y = jitter(neg_log_p_with_num[, 2, drop = TRUE]),
             type = "p",
+            cex.main = manhattan_cex,
+            cex.lab = manhattan_cex,
+            cex.axis = manhattan_cex,
             main = paste(test_name, geno_pheno_name, sep = " "),
             col = grDevices::rgb(0, 0, 0, 0.3),
             pch = 19,
-            xlab = "Genetic locus",
+            xlab = "Genetic loci",
             ylim = c(0, ymax),
-            ylab = "-ln(p-val)" ))
+            ylab = "-ln(P-value)" ))
 
   graphics::abline(h = -log(fdr),
                    col = "red")
@@ -693,8 +697,14 @@ make_manhattan_plot <- function(geno_pheno_name,
                    y = sig_temp[, 2],
                    labels = row.names(sig_temp),
                    pos = 1,
-                   cex = 0.7)
+                   cex = 1)
   }
+  legend("topright",
+         bty = "n",
+         legend = "Significance Threshold",
+         col = "red",
+         pch = "-",
+         cex = manhattan_cex)
 } #end make_manhattan_plot()
 
 #' plot_tr_w_color_edges
@@ -911,7 +921,7 @@ plot_phyc_results <- function(tr,
 
   grDevices::pdf(fname, width = 16, height = 20)
 
-  graphics::par(mfrow = c(1, 1))
+  graphics::par(mfrow = c(1, 1), mar = c(10, 10, 10, 10))
   make_manhattan_plot(name, recon_hit_vals, fdr, prefix)
 
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
@@ -1231,7 +1241,7 @@ plot_synchronous_results  <- function(tr,
   }
   grDevices::pdf(fname, width = 16, height = 20)
 
-  graphics::par(mfrow = c(1, 1))
+  graphics::par(mfrow = c(1, 1), mar = c(10, 10, 10, 10))
   make_manhattan_plot(name, trans_hit_vals, fdr, prefix)
 
   # heatmaps
