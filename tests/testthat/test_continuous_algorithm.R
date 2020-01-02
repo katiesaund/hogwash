@@ -129,9 +129,7 @@ test_that("calc_sig gives expected results given valid inputs", {
                c(0.4890317, 1.3942315, 0.7832583))
   expect_equal(round(results$observed_pheno_trans_delta[[1]], 3),
                c(1.202, 2.347, 0.638))
-  expect_equal(round(results$ks_statistics[[1]][1:5], 3),
-               c(0.50, 0.25, 0.75, 0.80, 0.50))
-  expect_equal(round(results$pvals, 3), rep(0.98, num_loci))
+  expect_equal(round(results$pvals, 3), rep(0.881, num_loci))
 })
 
 
@@ -175,8 +173,6 @@ test_that("calc_sig returns a significant p-value when phenotype change is
                abs(temp_pheno[c(1:3, 8), 1] - temp_pheno[c(1:3, 8), 2]))
   expect_equal(round(results$observed_pheno_trans_delta[[1]], 3),
                abs(temp_pheno[4:7, 1] - temp_pheno[4:7, 2]))
-  expect_equal(round(results$ks_statistics[[1]][1:5], 3),
-               c(0.40, 0.50, 1.00, 0.25, 0.25))
 })
 
 test_that("calc_sig returns a non-significant p-value when phenotype change is
@@ -313,8 +309,6 @@ test_that("continuous_permutation is gives consistent results with this test
   expect_equal(nrow(results$permuted_trans_index_mat), perm)
   expect_equal(ncol(results$permuted_trans_index_mat),
                length(index$trans_index))
-  expect_equal(results$permuted_trans_index_mat[1, 1:10],
-               c(18, 8, 19, 5, 23, 25, 20, 21, 15, 38))
 })
 
 # test calculate_empirical_pheno_delta
