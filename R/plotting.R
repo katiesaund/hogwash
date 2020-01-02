@@ -349,7 +349,7 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 #'  @param snp_in_gene Either NULL or table of integers where each entry
 #'   corresponds to one genotype.
 #'
-#' @return Plots continuous test resutlts.
+#' @return Plots continuous test results.
 plot_continuous_results <- function(disc_cont,
                                     tr,
                                     fdr,
@@ -443,7 +443,8 @@ plot_continuous_results <- function(disc_cont,
   row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:ape::Nedge(tr))
 
   ann_colors <- list(
-    `Locus Significance` = c(`Not Significant` = "white", Significant = "blue")
+    `Locus Significance` = c(`Not Significant` = "white", Significant = "blue"),
+    `Genotype Edge` = c(`Low Confidence` = "grey", `Non-Transition` = "white", `Transition` = "black") # TEMP TRYING TO FIX LEGEND
   )
 
   sorted_trans_edge_mat <-
@@ -459,12 +460,18 @@ plot_continuous_results <- function(disc_cont,
                        row.names(column_annot)), , drop = FALSE]
 
   if (ncol(column_annot_ordered_by_p_val) == 2) {
-    colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
+    colnames(column_annot_ordered_by_p_val) <-
       c("Locus Significance", "-ln(FDR Corrected P-value)")
   } else {
-    colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
+    colnames(column_annot_ordered_by_p_val) <-
       c("Locus Significance", "-ln(FDR Corrected P-value)", "Variants in Group")
   }
+
+  # Create dummy column annotation so that a good heatmap legend prints
+  column_annot_ordered_by_p_val <-
+    cbind(rep("Non-Transition", nrow(column_annot_ordered_by_p_val)),
+          column_annot_ordered_by_p_val)
+  colnames(column_annot_ordered_by_p_val)[1] <- "Genotype Edge"
 
   if (group_logical) {
     fname <- paste0(dir, "/hogwash_continuous_grouped_", name, ".pdf")
@@ -489,6 +496,7 @@ plot_continuous_results <- function(disc_cont,
     cluster_cols = TRUE,
     na_col = "grey",
     cluster_rows = FALSE,
+    legend = FALSE,
     show_rownames = FALSE,
     color = c("white", "black"),
     annotation_col = column_annot_ordered_by_p_val,
@@ -1078,7 +1086,7 @@ plot_phyc_results <- function(tr,
                      main = paste0(
                        "Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
                        formatC(-log(recon_hit_vals[j, 1]), format = "e", digits = 1),
-                       " P-value rank = ",
+                       "\nP-value rank = ",
                        rank(recon_hit_vals[j, ]),
                        sep = ""))
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
@@ -1329,7 +1337,7 @@ plot_synchronous_results  <- function(tr,
            xlab = "Genotype & Phenotype Transition Edge Co-occurrence",
            main = paste0("Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
                          formatC(-log(trans_hit_vals[j, 1]), format = "e", digits = 1),
-                         " P-value rank = ",
+                         "\nP-value rank = ",
                          rank(trans_hit_vals[j, ]),
                          sep = ""))
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
