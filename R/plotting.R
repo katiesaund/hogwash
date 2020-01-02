@@ -1097,61 +1097,6 @@ plot_phyc_results <- function(tr,
                        col = c( "grey", rgb(1, 0, 0, 0.25)),
                        pch = 15,
                        cex = hist_cex_size)
-
-      p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1
-      p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
-      colnames(p_mat) <- "`Phenotype Presence/Absence`"
-      phenotype_annotation <- as.data.frame(p_mat)
-      row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
-      temp_g_trans_edges <- g_trans_edges[[j]]
-      temp_g_trans_edges[geno_confidence[[j]] == 0] <- NA
-      g_mat <- as.matrix(temp_g_trans_edges)
-      row.names(g_mat) <- c(1:nrow(g_mat))
-      colnames(g_mat) <- "genotype_transition"
-      temp_g_mat <- cbind(g_mat, phenotype_annotation)
-      g_mat <- temp_g_mat[order(temp_g_mat[, 2],
-                                temp_g_mat[, 1],
-                                na.last = FALSE,
-                                decreasing = FALSE),
-                          1,
-                          drop = FALSE]
-      plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
-
-      if (plotting_logical) {
-        ann_colors <- make_ann_colors(g_mat)
-
-        if (!is.null(snp_in_gene)) {
-          num_snps <- snp_in_gene[row.names(recon_hit_vals)[j], , drop = FALSE]
-          row.names(num_snps) <- "genotype_transition"
-          colnames(num_snps) <- "# grouped genotypes"
-          ann_colors <-
-            c(ann_colors, list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
-        } else {
-          num_snps <- NULL
-        }
-
-        cell_width_value <- image_width / ncol(g_mat)
-        colnames(g_mat) <- substr(colnames(g_mat), 1, 20)
-
-        pheatmap::pheatmap(
-          mat = g_mat,
-          main = paste0(row.names(recon_hit_vals)[j],
-                        "\n Tree edges clustered by edge type\n
-                        Genotype transition edge\n& phenotype present edge"),
-          cluster_cols = TRUE,
-          cluster_rows = FALSE,
-          na_col = "grey",
-          show_rownames = FALSE,
-          color = c("white", "red"),
-          annotation_row = phenotype_annotation,
-          annotation_col = num_snps,
-          annotation_legend = TRUE,
-          annotation_colors = ann_colors,
-          show_colnames = TRUE,
-          legend = TRUE,
-          fontsize = 8,
-          cellwidth = cell_width_value)
-      }
     }
   }
 
