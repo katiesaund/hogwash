@@ -664,6 +664,7 @@ make_manhattan_plot <- function(geno_pheno_name,
             main = paste(test_name, geno_pheno_name, sep = " "),
             col = grDevices::rgb(0, 0, 0, 0.3),
             pch = 19,
+            xaxt = 'n',
             xlab = "Genetic loci",
             ylim = c(0, ymax),
             ylab = "-ln(FDR Corrected P-value)"))
