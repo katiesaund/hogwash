@@ -1185,7 +1185,7 @@ plot_synchronous_results  <- function(tr,
   # TODO -1 should be NA but it won't work correctedly
   p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1
   p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
-  colnames(p_mat) <- "Phenotype Transitions/Non"
+  colnames(p_mat) <- "Transitions/Non-Transitions"
   phenotype_annotation <- as.data.frame(p_mat)
   row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
 
@@ -1233,15 +1233,16 @@ plot_synchronous_results  <- function(tr,
 
   phenotype_annotation[phenotype_annotation == -1] <- "Low Confidence"
   phenotype_annotation[phenotype_annotation == 0] <- "Non-Transition"
-  phenotype_annotation[phenotype_annotation == 1] <- "Transition"
+  phenotype_annotation[phenotype_annotation == 1] <- "Phenotype Transition"
 
   ann_colors <-
     list(
       `Locus Significance` = c(`Not Significant` = "white",
                                Significant = "blue"),
-      `Phenotype Transitions/Non` = c(`Low Confidence` = "grey",
+      `Transitions/Non-Transitions` = c(`Low Confidence` = "grey",
                                       `Non-Transition` = "white",
-                                      Transition = "red"))
+                                      `Phenotype Transition` = "red",
+                                      `Genotype Transition` = "black"))
 
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {
@@ -1251,6 +1252,7 @@ plot_synchronous_results  <- function(tr,
     # Transition loci summary heat maps
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
+      legend = FALSE,
       main = paste0("Edges:\nGenotype transitions with phenotype transitions"),
       cluster_cols = TRUE,
       na_col = "grey",
