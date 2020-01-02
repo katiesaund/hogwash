@@ -403,7 +403,7 @@ plot_continuous_results <- function(disc_cont,
   for (c in 1:ncol(trans_edge_mat)) {
     trans_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
   }
-  # end update trans_edge_mat
+
   ph_trans <-
     abs(pheno_recon_ordered_by_edges[, 1] - pheno_recon_ordered_by_edges[, 2])
 
@@ -411,19 +411,21 @@ plot_continuous_results <- function(disc_cont,
   colnames(p_trans_mat) <- "delta_pheno"
   p_trans_mat <- as.data.frame(round(p_trans_mat, 2))
 
-  significant_loci <- data.frame("locus" = rep("not_sig", ncol(trans_edge_mat)),
+  significant_loci <-
+    data.frame("Locus Significance" = rep("Not Significant",
+                                          ncol(trans_edge_mat)),
                                  stringsAsFactors = FALSE)
   row.names(significant_loci) <- colnames(trans_edge_mat)
   significant_loci[row.names(significant_loci) %in%
-                     row.names(all_trans_sig_hits), ] <- "sig"
+                     row.names(all_trans_sig_hits), ] <- "Significant"
 
   log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
   column_annot <- cbind(significant_loci, log_p_value)
 
   row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:ape::Nedge(tr))
-  # end heatmap prep
+
   ann_colors <- list(
-    locus = c(not_sig = "white", sig = "blue")
+    `Locus Significance` = c(`Not Significant` = "white", Significant = "blue")
   )
 
   sorted_trans_edge_mat <-
@@ -438,7 +440,7 @@ plot_continuous_results <- function(disc_cont,
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
                        row.names(column_annot)), , drop = FALSE]
   colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
-    c("locus", "-ln(p-val)")
+    c("Locus Significance", "-ln(p-val)")
 
   if (group_logical) {
     fname <- paste0(dir, "/hogwash_continuous_grouped_", name, ".pdf")
@@ -452,21 +454,17 @@ plot_continuous_results <- function(disc_cont,
                       pval_all_transition$hit_pvals,
                       fdr,
                       "continuous")
-  # cell_width_value <- 1.5
-  # if (ncol(ordered_by_p_val) < 50) {
-  #   cell_width_value <- 10
-  # }
-  cell_width_value <- image_width / ncol(ordered_by_p_val)
 
+  cell_width_value <- image_width / ncol(ordered_by_p_val)
 
   colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
 
   pheatmap::pheatmap(
     ordered_by_p_val,
-    main          = paste0("Edges:\n hi conf trans vs delta pheno"),
-    cluster_cols  = FALSE,
+    main = paste0("Edges:\n hi conf trans vs delta pheno"),
+    cluster_cols = FALSE,
     na_col = "grey",
-    cluster_rows  = FALSE,
+    cluster_rows = FALSE,
     show_rownames = FALSE,
     color = c("white", "black"),
     annotation_col = column_annot_ordered_by_p_val,
@@ -475,6 +473,13 @@ plot_continuous_results <- function(disc_cont,
     show_colnames = TRUE,
     fontsize = 8,
     cellwidth = cell_width_value)
+
+  print("continuous plotting bug fixing")
+  print("ann_colors")
+  print(ann_colors)
+
+  print("column_annot_ordered_by_p_val")
+  print(column_annot_ordered_by_p_val)
 
   transparent_grey <- rgb(0, 0, 0, 0.25)
   transparent_red <- rgb(1, 0, 0, 0.25)
@@ -640,7 +645,7 @@ make_manhattan_plot <- function(geno_pheno_name,
   manhattan_cex <- 2
   neg_log_p_value <- data.frame(-log(pval_hits))
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
-  colnames(neg_log_p_with_num)[1] <- "locus"
+  colnames(neg_log_p_with_num)[1] <- "Locus Significance"
   sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[, 2] > -log(fdr))
   ymax <- max(-log(0.01), neg_log_p_with_num[, 2, drop = TRUE])
   with(neg_log_p_with_num,
@@ -914,11 +919,12 @@ plot_phyc_results <- function(tr,
 
   cell_width_value <- image_width / ncol(g_trans_mat)
 
-  significant_loci <- data.frame("locus" = rep("not_sig", ncol(g_trans_mat)),
+  significant_loci <-
+    data.frame("Locus Significance" = rep("Not Significant", ncol(g_trans_mat)),
                                  stringsAsFactors = FALSE)
   row.names(significant_loci) <- row.names(recon_hit_vals)
   log_p_value <- data.frame(-log(recon_hit_vals))
-  significant_loci[log_p_value > -log(fdr)] <- "sig"
+  significant_loci[log_p_value > -log(fdr)] <- "Significant"
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
@@ -938,7 +944,17 @@ plot_phyc_results <- function(tr,
                  drop = FALSE]
   column_annot_ordered_by_p_val <-
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
-                        row.names(column_annot))]
+                        row.names(column_annot)), , drop = FALSE]
+
+  if (ncol(column_annot_ordered_by_p_val) == 2) {
+    colnames(column_annot_ordered_by_p_val) <- c("Locus Significance",
+                                                 "fdr_corrected_pvals")
+  } else {
+    colnames(column_annot_ordered_by_p_val) <- c("Locus Significance",
+                                                 "fdr_corrected_pvals",
+                                                 "SNPs in gene")
+  }
+
 
   if (length(unique(phenotype_annotation[, 1])) == 3) {
     pheno_presence_col <- c( na = "grey", absence = "white", presence = "red")
@@ -959,14 +975,17 @@ plot_phyc_results <- function(tr,
     }
   }
 
-  locus_col <- c(not_sig = "white", sig = "blue")
+  # locus_col <- c(`Not Significant` = "white", Significant = "blue")
 
-  ann_colors <- list(locus = locus_col, pheno_presence = pheno_presence_col)
+  ann_colors <-
+    list(`Locus Significance` = c(`Not Significant` = "white",
+                                  Significant = "blue"),
+         pheno_presence = pheno_presence_col)
 
   print("p-values")
   print(log_p_value)
 
-  print("plotting bug fixing")
+  print("PHYC plotting bug fixing")
   print("ann_colors")
   print(ann_colors)
   print("column_annot_ordered_by_p_val")
@@ -1235,11 +1254,11 @@ plot_synchronous_results  <- function(tr,
   colnames(g_trans_mat) <- row.names(trans_hit_vals)
 
   significant_loci <-
-    data.frame("locus" = rep("not_sig", ncol(g_trans_mat)),
+    data.frame("Locus Significance" = rep("Not Significant", ncol(g_trans_mat)),
                stringsAsFactors = FALSE)
   row.names(significant_loci) <- row.names(trans_hit_vals)
   log_p_value <- data.frame(-log(trans_hit_vals))
-  significant_loci[log_p_value > -log(fdr)] <- "sig"
+  significant_loci[log_p_value > -log(fdr)] <- "Significant"
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
@@ -1280,15 +1299,15 @@ plot_synchronous_results  <- function(tr,
   }
 
   if (length(unique(column_annot_ordered_by_p_val[, 1])) == 2) {
-    locus_col <- c(not_sig = "white", sig = "blue")
+    locus_col <- c(`Not Significant` = "white", Significant = "blue")
   } else if (length(unique(column_annot_ordered_by_p_val[, 1])) == 1) {
-    locus_col <- c(sig = "blue")
-    if (unique(column_annot_ordered_by_p_val[, 1]) == "not_sig") {
-      locus_col <- c(not_sig = "white")
+    locus_col <- c(Significant = "blue")
+    if (unique(column_annot_ordered_by_p_val[, 1]) == "Not Significant") {
+      locus_col <- c(`Not Significant` = "white")
     }
   }
 
-  ann_colors <- list(locus = locus_col, pheno_presence = pheno_presence_col)
+  ann_colors <- list(`Locus Significance` = locus_col, pheno_presence = pheno_presence_col)
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {
     cell_width_value <- image_width / ncol(ordered_by_p_val)
