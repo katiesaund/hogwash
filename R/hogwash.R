@@ -2,7 +2,7 @@
 #'
 #' @description This function runs a bacterial genome-wide association test. It
 #'   runs either the Continuous Test (when given continuous phenotype data) or
-#'   both the Synchronous Test and PhyC (when given binary phenotype data).
+#'   both the Synchronous Test and PhyC Test (when given binary phenotype data).
 #'
 #' @details Overview: hogwash reads in one phenotype (either continuous or
 #'  binary), a matrix of binary genotypes, and a phylogenetic tree. Given these
@@ -12,7 +12,7 @@
 #'  \enumerate{
 #'   \item Continuous Test
 #'   \item Synchronous Test
-#'   \item PhyC (Farhat et al.)
+#'   \item PhyC Test (Farhat et al.)
 #' }
 #'  Once a test finishes running it returns (i) p-values for all genotypes
 #'  tested, (ii) a manhattan plot of those p-values; if any of the genotypes
