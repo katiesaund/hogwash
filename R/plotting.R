@@ -90,7 +90,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
   }
 
   # Function -------------------------------------------------------------------
-  hist_cex_size <- 1.5
+  hist_cex_size <- 1.3
 
   trans_index <-
     c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
@@ -105,7 +105,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
                                        pheno_recon_ordered_by_edges)
 
   graphics::hist(raw_non_trans_delta,
-       main = "Raw delta Phenotype",
+       main = "Raw Delta Phenotype",
        breaks = ape::Nedge(tr) / 4,
        col = non_trans_color,
        border = FALSE,
@@ -126,7 +126,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
        add = TRUE)
 
   legend("topright",
-         title = "Hi Conf. Edge Type",
+         title = "Hi Conf. Geno. Edge Type",
          legend = c("Transition", "Non-transition"),
          col = c(trans_color, non_trans_color),
          pch = 15,
@@ -171,7 +171,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
   }
 
   # Function -------------------------------------------------------------------
-  hist_cex_size <- 1.5
+  hist_cex_size <- 1.3
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::hist(all_trans$observed_pheno_non_trans_delta[[index]],
        breaks = ape::Nedge(tr) / 4,
@@ -196,7 +196,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
        add = TRUE)
 
   legend("topright",
-         title = "Hi Conf. Edge Type",
+         title = "Hi Conf. Geno. Edge Type",
          legend = c("Transition", "Non-transition"),
          col = c(trans_color, non_trans_color),
          pch = 15,
@@ -240,41 +240,44 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
   check_equal(length(geno_confidence[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
+  hist_cex_size <- 1.3
+  transparent_purple <- rgb(1, 0, 1, 0.25)
+  transparent_blue <- rgb(0, 0, 1, 0.25)
 
   edge_num <- length(unlist(p_trans_mat))
   hi_edge_num <-
     length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
-  title <- paste("|delta phenotype| on all edges \n Light Green: all edges = ",
-                 edge_num, "\n Grey: high confidence edges = ",
-                 hi_edge_num,
-                 sep = "")
   delta_phenotype_on_all_edges <- as.numeric(unlist(p_trans_mat))
   graphics::hist(delta_phenotype_on_all_edges,
        breaks = ape::Nedge(tr) / 4,
-       col = grDevices::rgb(0, 0.5, 0, 0.25),
+       col = transparent_blue,
        border = FALSE,
        ylab = "Count",
-       xlab = "Delta phenotype",
-       main = title)
+       xlab = "|Delta Phenotype|",
+       main = "|Delta Phenotype|",
+       cex.main = hist_cex_size,
+       cex.lab = hist_cex_size,
+       cex.axis = hist_cex_size,
+       xlim = c(0, 1.2 * max(delta_phenotype_on_all_edges)),
+       ylim = c(0, 0.75 * (length(delta_phenotype_on_all_edges))))
 
   delta_pheno_on_hi_conf_edges <-
     as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
   graphics::hist(delta_pheno_on_hi_conf_edges,
   # plot phenotype transition only high confidence edges for this genotype
        breaks = ape::Nedge(tr) / 4,
-       col = grDevices::rgb(0, 0, 0, 0.25),
+       col = transparent_purple,
        border = FALSE,
        ylab = "Count",
        add = TRUE)
 
-  # TODO Left off here at 7pm on 1/1/2020
-  # legend("topright",
-  #        title = "Edge Type",
-  #        legend = c("Hi Conf.", "Lo Conf."),
-  #        col = c(trans_color, non_trans_color),
-  #        pch = 15,
-  #        cex = hist_cex_size,
-  #        bg = rgb(0, 0, 0, 0.01))
+  legend("topright",
+         title = "Edge Type",
+         legend = c("Hi Confidence", "Any"),
+         col = c(transparent_purple, transparent_blue),
+         pch = 15,
+         cex = hist_cex_size,
+         bg = rgb(0, 0, 0, 0.01))
 } # end hist_abs_delta_pheno_all_edges()
 
 #' plot_continuous_results
