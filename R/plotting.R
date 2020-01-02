@@ -910,7 +910,7 @@ plot_phyc_results <- function(tr,
 
   p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1
   p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
-  colnames(p_mat) <- "Phenotype Presence/Absence"
+  colnames(p_mat) <- "Edge Type"
   phenotype_annotation <- as.data.frame(p_mat)
   row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
 
@@ -963,36 +963,16 @@ plot_phyc_results <- function(tr,
   ann_colors <-
     list(`Locus Significance` = c(`Not Significant` = "white",
                                   Significant = "blue"),
-         `Phenotype Presence/Absence` = c(`Low Confidence` = "grey",
-                                          Absence = "white",
-                                          Presence = "red"))
-
-  print("p-values")
-  print(log_p_value)
-
-  print("PHYC plotting bug fixing")
-  print("ann_colors")
-  print(ann_colors)
-  print("column_annot_ordered_by_p_val")
-  print(column_annot_ordered_by_p_val)
+         `Edge Type` = c(`Low Confidence` = "grey",
+                                          `Phenotype Absence or Genotype Non-Transition` = "white",
+                                          `Phenotype Presence` = "red",
+                                          `Genotype Transition` = "black"))
 
   phenotype_annotation[phenotype_annotation == -1] <- "Low Confidence"
-  phenotype_annotation[phenotype_annotation == 0] <- "Absence"
-  phenotype_annotation[phenotype_annotation == 1] <- "Presence"
-
-  print("phenotype_annotation")
-  print(phenotype_annotation)
-
-  print("matrix")
-  print("ordered_by_p_val")
-  print(ordered_by_p_val)
+  phenotype_annotation[phenotype_annotation == 0] <- "Phenotype Absence or Genotype Non-Transition"
+  phenotype_annotation[phenotype_annotation == 1] <- "Phenotype Presence"
 
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
-
-  print("grouped_logical")
-  print(grouped_logical)
-  print("plotting_logical")
-  print(plotting_logical)
 
   if (plotting_logical) {
     colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
@@ -1001,6 +981,7 @@ plot_phyc_results <- function(tr,
       ordered_by_p_val,
       main = "PhyC Convergence Summary",
       cluster_cols  = TRUE,
+      legend = FALSE,
       na_col = "grey",
       cluster_rows  = FALSE,
       show_rownames = FALSE,
@@ -1185,7 +1166,7 @@ plot_synchronous_results  <- function(tr,
   # TODO -1 should be NA but it won't work correctedly
   p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1
   p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
-  colnames(p_mat) <- "Transitions/Non-Transitions"
+  colnames(p_mat) <- "Edge Type"
   phenotype_annotation <- as.data.frame(p_mat)
   row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
 
@@ -1239,7 +1220,7 @@ plot_synchronous_results  <- function(tr,
     list(
       `Locus Significance` = c(`Not Significant` = "white",
                                Significant = "blue"),
-      `Transitions/Non-Transitions` = c(`Low Confidence` = "grey",
+      `Edge Type` = c(`Low Confidence` = "grey",
                                       `Non-Transition` = "white",
                                       `Phenotype Transition` = "red",
                                       `Genotype Transition` = "black"))
