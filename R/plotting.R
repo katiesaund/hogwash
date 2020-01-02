@@ -507,8 +507,8 @@ plot_continuous_results <- function(disc_cont,
       plot_tr_w_color_edges(tr,
                             geno_reconstruction,
                             geno_confidence,
-                            transparent_grey,
-                            transparent_red,
+                            "grey",
+                            "red",
                             paste0(row.names(pval_all_transition$hit_pvals)[j],
                                    "\n Genotype reconstruction"),
                             "recon",
@@ -518,8 +518,8 @@ plot_continuous_results <- function(disc_cont,
       plot_tr_w_color_edges(tr,
                             geno_transition,
                             geno_confidence,
-                            transparent_grey,
-                            transparent_red,
+                            "grey",
+                            "red",
                             "Genotype transition",
                             "trans",
                             j,
@@ -548,9 +548,9 @@ plot_continuous_results <- function(disc_cont,
            col = "grey",
            border = FALSE,
            main =
-             paste("Null distribution of KS test statistics \nP-value = ",
-                   round(pval_all_transition$hit_pvals[j, 1], 10),
-                   "\nP-value rank = ",
+             paste("Null Distribution of KS Test Statistics \n-ln(FDR corrected P-value) = ",
+                   formatC(-log(pval_all_transition$hit_pvals[j, 1]),format = "e", digits = 1),
+                   " P-value rank = ",
                    rank(pval_all_transition$hit_pvals)[j],
                    sep = ""),
            cex.main = hist_cex_size,
@@ -563,7 +563,7 @@ plot_continuous_results <- function(disc_cont,
                         log(results_all_trans$ks_statistics[[j]])), 0))
       graphics::abline(v =
                          log(as.numeric(results_all_trans$observed_ks_stat[j])),
-                       col = "red")
+                       col = "red", lwd = 4)
 
       legend("topleft",
              title = "KS Test Statistics",
@@ -573,22 +573,22 @@ plot_continuous_results <- function(disc_cont,
              cex = hist_cex_size,
              bg = rgb(0, 0, 0, 0.01))
 
-      colnames(sorted_trans_edge_mat) <-
-        substr(colnames(sorted_trans_edge_mat), 1, 20)
-
-      pheatmap::pheatmap(
-        sorted_trans_edge_mat[, j, drop = FALSE],
-        main = paste0(row.names(pval_all_transition$hit_pvals)[j],
-                      "\n Tree edges: hi conf trans vs delta pheno"),
-        cluster_cols = FALSE,
-        cluster_rows = FALSE,
-        na_col = "grey",
-        show_rownames = FALSE,
-        color = c("white", "black"),
-        annotation_row = p_trans_mat,
-        show_colnames = TRUE,
-        fontsize = 8,
-        cellwidth = 20)
+      # colnames(sorted_trans_edge_mat) <-
+      #   substr(colnames(sorted_trans_edge_mat), 1, 20)
+      #
+      # pheatmap::pheatmap(
+      #   sorted_trans_edge_mat[, j, drop = FALSE],
+      #   main = paste0(row.names(pval_all_transition$hit_pvals)[j],
+      #                 "\n Tree edges: hi conf trans vs delta pheno"),
+      #   cluster_cols = FALSE,
+      #   cluster_rows = FALSE,
+      #   na_col = "grey",
+      #   show_rownames = FALSE,
+      #   color = c("white", "black"),
+      #   annotation_row = p_trans_mat,
+      #   show_colnames = TRUE,
+      #   fontsize = 8,
+      #   cellwidth = 20)
     }
   }
 
@@ -746,6 +746,7 @@ plot_tr_w_color_edges <- function(tr,
   check_is_string(title)
 
   # Function -------------------------------------------------------------------
+  tree_legend_cex <- 1.3
   edge_color_baseline <- "black"
   edge_color <- rep(edge_color_baseline, ape::Nedge(tr))
   if (trans_or_recon == "recon") {
@@ -764,7 +765,8 @@ plot_tr_w_color_edges <- function(tr,
                  main = title,
                  use.edge.length = FALSE,
                  label.offset = 0.25,
-                 adj = 0)
+                 adj = 0,
+                 cex = tree_legend_cex)
   graphics::legend("topleft",
                    bty = "n",
                    legend = c(legend_baseline,
@@ -776,7 +778,7 @@ plot_tr_w_color_edges <- function(tr,
                    lty = 1,
                    ncol = 1,
                    lwd = 1,
-                   cex = 0.5)
+                   cex = tree_legend_cex)
 } # end plot_tr_w_color_edges()
 
 #' make_ann_colors
@@ -1240,7 +1242,7 @@ plot_synchronous_results  <- function(tr,
     g_trans_mat[geno_confidence[[i]] == 0, i] <- NA
   }
 
-  # TOD -1 should be NA but it won't work correctedly
+  # TODO -1 should be NA but it won't work correctedly
   p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1
   p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
   colnames(p_mat) <- "pheno_transitions"
