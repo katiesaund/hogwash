@@ -806,47 +806,6 @@ plot_tr_w_color_edges <- function(tr,
                    cex = tree_legend_cex)
 } # end plot_tr_w_color_edges()
 
-#' make_ann_colors
-#'
-#' @description Create object to annotate columns in the significant hit
-#'  results.
-#'
-#' @noRd
-#' @param geno_matrix Genotype matrix to plot in heatmap.
-#'
-#' @return Annotation color object for heatmap.
-make_ann_colors <- function(geno_matrix){
-  # Check input ----------------------------------------------------------------
-  check_dimensions(geno_matrix, min_rows = 1, min_cols = 1)
-
-  # Function -------------------------------------------------------------------
-  ones <- sum(geno_matrix == 1, na.rm = TRUE) > 0
-  zeros <- sum(geno_matrix == 0, na.rm = TRUE) > 0
-  nas <- sum(is.na(geno_matrix)) > 0
-
-  if (ones + zeros + nas == 3) {
-    ann_colors <- list(`Phenotype Presence/Absence` = c(na = "grey",
-                                         absent = "white",
-                                         present = "red"))
-  } else if (ones == 1 && zeros == 1 && nas == 0) {
-    ann_colors <- list(`Phenotype Presence/Absence` = c(absent = "white", present = "red"))
-  } else if (ones == 1 && zeros == 0 && nas == 1) {
-    ann_colors <- list(`Phenotype Presence/Absence` = c(na = "grey", present = "red"))
-  } else if (ones == 0 && zeros == 1 && nas == 1) {
-    ann_colors <- list(`Phenotype Presence/Absence` = c(na = "grey", absent = "white"))
-  } else if (ones == 0 && zeros == 0 && nas == 1) {
-    ann_colors <- list(`Phenotype Presence/Absence` = c(na = "grey"))
-  } else if (ones == 0 && zeros == 1 && nas == 0) {
-    ann_colors <- list(`Phenotype Presence/Absence` = c(absent = "white"))
-  } else if (ones == 1 && zeros == 0 && nas == 0) {
-    ann_colors <- list(`Phenotype Presence/Absence` = c(present = "red"))
-  } else {
-    stop("No ones, zeroes, or NAs present in g_mat")
-  }
-  # Return output --------------------------------------------------------------
-  return(ann_colors)
-}
-
 #' Plot PhyC results
 #'
 #' @noRd
