@@ -394,6 +394,7 @@ plot_continuous_results <- function(disc_cont,
   check_class(group_logical, "logical")
 
   # Function -------------------------------------------------------------------
+  hist_cex_size <- 1.3
   trans_edge_mat <- NULL
   for (i in 1:length(geno_transition)) {
     trans_edge_mat <- cbind(trans_edge_mat, geno_transition[[i]]$transition)
@@ -500,7 +501,8 @@ plot_continuous_results <- function(disc_cont,
       graphics::par(mfrow = c(3, 3),
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
-                    mar = c(4, 4, 4, 4))
+                    mar = c(4, 4, 4, 4),
+                    xpd = FALSE)
       plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
       plot_tr_w_color_edges(tr,
                             geno_reconstruction,
@@ -546,19 +548,30 @@ plot_continuous_results <- function(disc_cont,
            col = "grey",
            border = FALSE,
            main =
-             paste("Null distribution of KS statistic for all transitions.\n
-                   Red = Observed KS statistic.\n p-value = ",
+             paste("Null distribution of KS test statistics \nP-value = ",
                    round(pval_all_transition$hit_pvals[j, 1], 10),
-                   "\np-value rank = ",
+                   "\nP-value rank = ",
                    rank(pval_all_transition$hit_pvals)[j],
                    sep = ""),
+           cex.main = hist_cex_size,
+           cex.lab = hist_cex_size,
+           cex.axis = hist_cex_size,
            ylab = "Count",
-           xlab = "ln(KS statistic)",
+           xlab = "ln(KS Test Statistic)",
+           ylim = c(0, 0.6 * length(results_all_trans$ks_statistics[[j]])),
            xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])),
                         log(results_all_trans$ks_statistics[[j]])), 0))
       graphics::abline(v =
                          log(as.numeric(results_all_trans$observed_ks_stat[j])),
                        col = "red")
+
+      legend("topleft",
+             title = "KS Test Statistics",
+             legend = c("Null", "Observed"),
+             col = c("grey", "red"),
+             pch = 15,
+             cex = hist_cex_size,
+             bg = rgb(0, 0, 0, 0.01))
 
       colnames(sorted_trans_edge_mat) <-
         substr(colnames(sorted_trans_edge_mat), 1, 20)
