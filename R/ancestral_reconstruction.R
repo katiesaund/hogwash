@@ -172,7 +172,7 @@ continuous_get_recon_confidence <- function(recon_vector){
 
 #' convert_to_edge_mat
 #'
-#' @description Convert the reconstruction to be in the same format at
+#' @description Convert the reconstruction to be in the same format as
 #'   tree$edge, where each row is an edge. This format will make it much easier
 #'   to calculate the phenotype change on each edge for continuous phenotypes.
 #'

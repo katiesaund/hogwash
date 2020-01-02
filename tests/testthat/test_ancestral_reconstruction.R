@@ -1,6 +1,6 @@
-context("Ancestral reconstruction") #------------------------------------------#
+# Ancestral reconstruction ----------------------------------------------------#
 
-# test ancestral_reconstruction_by_ML ------------------------------------------
+# ancestral_reconstruction_by_ML -----------------------------------------------
 test_that("ancestral_reconstruction_by_ML with discrete input works", {
   # Set up
   set.seed(1)
@@ -93,7 +93,7 @@ test_that("ancestral_reconstruction_by_ML with discrete input works.", {
   expect_equivalent(dummy_pheno$node_anc_rec,
                     c(1, 1, 1, 1))
   expect_equivalent(dummy_pheno$tip_and_node_rec_conf,
-                    c(1, 1, 1, 1, 1, 1, 1, 1, 0))
+                    c(1, 1, 1, 1, 1, 1, 1, 1, 1))
   expect_equivalent(dummy_pheno$recon_edge_mat[, 1, drop = TRUE],
                     c(1, 1, 1, 1, 1, 1, 1, 1))
   expect_equivalent(dummy_pheno$recon_edge_mat[, 2, drop = TRUE],
@@ -103,11 +103,11 @@ test_that("ancestral_reconstruction_by_ML with discrete input works.", {
   expect_equivalent(dummy_geno$node_anc_rec,
                     c(0, 0, 0, 1))
   expect_equivalent(dummy_geno$tip_and_node_rec_conf,
-                    c(1, 1, 1, 1, 1, 1, 1, 1, 0))
+                    c(1, 1, 1, 1, 1, 0, 0, 0, 0))
   expect_equivalent(dummy_geno$recon_edge_mat[, 1, drop = TRUE],
-                    c(0, 0, 0, 0, 0, 0, 1, 1))
+                    c(0, 0, 0, 0, 0, 1, 1, 0))
   expect_equivalent(dummy_geno$recon_edge_mat[, 2, drop = TRUE],
-                    c(0, 0, 0, 0, 0, 1, 1, 1))
+                    c(0, 0, 0, 0, 1, 0, 1, 1))
 })
 
 
@@ -217,8 +217,8 @@ test_that("convert_to_edge_mat works for valid input", {
 
   # Set up
   test_vector <- rep(1:9)
-  expected_parent_nodes <- c(6, 7, 7, 6, 8, 8, 9, 9)
-  expected_child_nodes <- c(7, 1, 2, 8, 3, 9, 4, 5)
+  expected_parent_nodes <- c(6, 6, 7, 8, 8, 9, 9, 7)
+  expected_child_nodes <- c(1, 7, 8, 2, 9, 3, 4, 5)
   expected_output <- cbind(expected_parent_nodes, expected_child_nodes)
   results <- convert_to_edge_mat(temp_tree, test_vector)
   expect_equal(unname(expected_output), results)

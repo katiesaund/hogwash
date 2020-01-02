@@ -806,3 +806,8 @@ test_that("plot_tr_w_color_edges works for valid inputs on trans", {
                                      temp_legend_other),
                NA)
 })
+
+# blank_plot
+test_that("blank_plot gives no errors", {
+  expect_error(blank_plot(), NA)
+})
