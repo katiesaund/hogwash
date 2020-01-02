@@ -960,32 +960,12 @@ plot_phyc_results <- function(tr,
                                                  "Variants in Group")
   }
 
-
-  if (length(unique(phenotype_annotation[, 1])) == 3) {
-    pheno_presence_col <-
-      c( `Low Confidence` = "grey", Absence = "white", Presence = "red")
-  } else if (length(unique(phenotype_annotation[, 1])) == 2) {
-    if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 0)) == 2) {
-      pheno_presence_col <- c(`Low Confidence` = "grey", Absence = "white")
-    } else if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 1)) == 2) {
-      pheno_presence_col <- c( `Low Confidence` = "grey", Presence = "red")
-    } else if (sum(unique(phenotype_annotation[, 1]) %in% c(1, 0)) == 2) {
-      pheno_presence_col <- c(Absence = "white", Presence = "red")
-    }
-  } else if (length(unique(phenotype_annotation[, 1])) == 1) {
-    pheno_presence_col <- c(Presence = "red")
-    if (unique(phenotype_annotation[, 1]) == -1) {
-      pheno_presence_col <- c(`Low Confidence` = "grey")
-    } else if (unique(phenotype_annotation[, 1]) == 0) {
-      pheno_presence_col <- c(Absence = "white")
-    }
-  }
-
   ann_colors <-
     list(`Locus Significance` = c(`Not Significant` = "white",
                                   Significant = "blue"),
-         `Phenotype Presence/Absence` = pheno_presence_col)
-
+         `Phenotype Presence/Absence` = c(`Low Confidence` = "grey",
+                                          Absence = "white",
+                                          Presence = "red"))
 
   print("p-values")
   print(log_p_value)
@@ -1251,40 +1231,18 @@ plot_synchronous_results  <- function(tr,
                                                  "Variants in Group")
   }
 
-  if (length(unique(phenotype_annotation[, 1])) == 3) {
-    pheno_presence_col <- c(`Low Confidence` = "grey", `Non-Transition` = "white", Transition = "red")
-  } else if (length(unique(phenotype_annotation[, 1])) == 2) {
-    if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 0)) == 2) {
-      pheno_presence_col <- c(`Low Confidence` = "grey", `Non-Transition` = "white")
-    } else if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 1)) == 2) {
-      pheno_presence_col <- c(`Low Confidence` = "grey", Transition = "red")
-    } else if (sum(unique(phenotype_annotation[, 1]) %in% c(1, 0)) == 2) {
-      pheno_presence_col <- c(`Non-Transition` = "white", Transition = "red")
-    }
-  } else if (length(unique(phenotype_annotation[, 1])) == 1) {
-    pheno_presence_col <- c(Transition = "red")
-    if (unique(phenotype_annotation[, 1]) == -1) {
-      pheno_presence_col <- c(`Low Confidence` = "grey")
-    } else if (unique(phenotype_annotation[, 1]) == 0) {
-      pheno_presence_col <- c(`Non-Transition` = "white")
-    }
-  }
-
-  if (length(unique(column_annot_ordered_by_p_val[, 1])) == 2) {
-    locus_col <- c(`Not Significant` = "white", Significant = "blue")
-  } else if (length(unique(column_annot_ordered_by_p_val[, 1])) == 1) {
-    locus_col <- c(Significant = "blue")
-    if (unique(column_annot_ordered_by_p_val[, 1]) == "Not Significant") {
-      locus_col <- c(`Not Significant` = "white")
-    }
-  }
-
   phenotype_annotation[phenotype_annotation == -1] <- "Low Confidence"
   phenotype_annotation[phenotype_annotation == 0] <- "Non-Transition"
   phenotype_annotation[phenotype_annotation == 1] <- "Transition"
 
-  ann_colors <- list(`Locus Significance` = locus_col,
-                     `Phenotype Transitions/Non` = pheno_presence_col)
+  ann_colors <-
+    list(
+      `Locus Significance` = c(`Not Significant` = "white",
+                               Significant = "blue"),
+      `Phenotype Transitions/Non` = c(`Low Confidence` = "grey",
+                                      `Non-Transition` = "white",
+                                      Transition = "red"))
+
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {
     cell_width_value <- image_width / ncol(ordered_by_p_val)
