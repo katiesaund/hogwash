@@ -280,12 +280,10 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
          bg = rgb(0, 0, 0, 0.01))
 } # end hist_abs_delta_pheno_all_edges()
 
-#' plot_continuous_results
-#'
-#' @description Plot continuous phenotype results.
+#' Plot all results from the Continuous Test
 #'
 #' @details Plot all genotype's -log(p-value) as a manhattan plot. If any hits
-#' are significant after FDR, then plot heatmaps & trees for each of these.
+#' are significant after FDR, then plot histrograms & trees for each of these.
 #'
 #' @noRd
 #' @param disc_cont String, should be "continuous."
@@ -394,6 +392,7 @@ plot_continuous_results <- function(disc_cont,
   check_class(group_logical, "logical")
 
   # Function -------------------------------------------------------------------
+  image_width <- 250
   hist_cex_size <- 1.3
   trans_edge_mat <- NULL
   for (i in 1:length(geno_transition)) {
@@ -453,10 +452,12 @@ plot_continuous_results <- function(disc_cont,
                       pval_all_transition$hit_pvals,
                       fdr,
                       "continuous")
-  cell_width_value <- 1.5
-  if (ncol(ordered_by_p_val) < 50) {
-    cell_width_value <- 10
-  }
+  # cell_width_value <- 1.5
+  # if (ncol(ordered_by_p_val) < 50) {
+  #   cell_width_value <- 10
+  # }
+  cell_width_value <- image_width / ncol(ordered_by_p_val)
+
 
   colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
 
@@ -474,24 +475,6 @@ plot_continuous_results <- function(disc_cont,
     show_colnames = TRUE,
     fontsize = 8,
     cellwidth = cell_width_value)
-
-  colnames(sorted_trans_edge_mat) <-
-    substr(colnames(sorted_trans_edge_mat), 1, 20)
-
-  pheatmap::pheatmap(
-    sorted_trans_edge_mat,
-    main          = paste0("Edges:\n hi conf trans vs delta pheno"),
-    cluster_cols  = TRUE,
-    cluster_rows  = FALSE,
-    show_rownames = FALSE,
-    color = c("white", "black"),
-    annotation_col = column_annot,
-    annotation_row = p_trans_mat,
-    annotation_colors = ann_colors,
-    show_colnames = TRUE,
-    fontsize = 8,
-    cellwidth = cell_width_value,
-    na_col = "grey")
 
   transparent_grey <- rgb(0, 0, 0, 0.25)
   transparent_red <- rgb(1, 0, 0, 0.25)
@@ -574,22 +557,6 @@ plot_continuous_results <- function(disc_cont,
              cex = hist_cex_size,
              bg = rgb(0, 0, 0, 0.01))
 
-      # colnames(sorted_trans_edge_mat) <-
-      #   substr(colnames(sorted_trans_edge_mat), 1, 20)
-      #
-      # pheatmap::pheatmap(
-      #   sorted_trans_edge_mat[, j, drop = FALSE],
-      #   main = paste0(row.names(pval_all_transition$hit_pvals)[j],
-      #                 "\n Tree edges: hi conf trans vs delta pheno"),
-      #   cluster_cols = FALSE,
-      #   cluster_rows = FALSE,
-      #   na_col = "grey",
-      #   show_rownames = FALSE,
-      #   color = c("white", "black"),
-      #   annotation_row = p_trans_mat,
-      #   show_colnames = TRUE,
-      #   fontsize = 8,
-      #   cellwidth = 20)
     }
   }
 
