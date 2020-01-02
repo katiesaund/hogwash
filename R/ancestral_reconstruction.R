@@ -60,7 +60,7 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
     tip_and_node_anc_rec_conf <-
       continuous_get_recon_confidence(tip_and_node_recon)
 
-  } else if (disc_cont == "discrete") {
+  } else {
     # This is always the choice for genotypes and discrete phenotypes
     # RECONSTRUCTION
     discrete_results <-
@@ -206,13 +206,14 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
   return(reconstruction_as_edge_mat)
 } # end convert_to_edge_mat()
 
-#' discrete_ancestral_reconstruction
+#' Perform ancestral reconstruction of discrete data
 #'
 #' @description Perform ancestral state reconstruction using ape::ace() function
 #'   on discrete phenotype or genotype. The best model to describe the
 #'   probabilities of state changes is decided by the subfunction:
-#'   pick_recon_model(), which chooses either 'ARD', all rates different, or
-#'   'ER', equal rates.
+#'   build_better_reconstruction(), which chooses either 'ARD', all rates
+#'    different, or ER', equal rates and returns the better of the two
+#'    reconstructions.
 #'
 #' @param tr Phylo.
 #' @param mat Matrix. Genotype or discrete phenotype matrix.
@@ -254,14 +255,8 @@ discrete_ancestral_reconstruction <- function(tr,
 
   # Function -------------------------------------------------------------------
   set.seed(1)
-  recon_model <- pick_recon_model(mat, tr, disc_cont, num, recon_method)
-  set.seed(1)
-  reconstruction <- ape::ace(mat[, num, drop = TRUE],
-                        tr,
-                        model = recon_model,
-                        type = disc_cont,
-                        method = recon_method,
-                        marginal = FALSE)
+  reconstruction <-
+    build_better_reconstruction(mat, tr, disc_cont, num, recon_method)
 
   # Extract the mostly likely character state using which.max
   ML_anc_rec <-
@@ -322,12 +317,14 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
   return(tip_and_node_anc_rec_conf)
 } # end discrete_get_recon_confidence()
 
-#' pick_recon_model
+#' Reconstruct discrete data and return reconstruction built with the better
+#' model
 #'
 #' @description Given a discrete genotype or phenotype, build an ancestral
 #'   reconstruction using an equal rates model ("ER") and then repeat with an
 #'   all rates different model ("ARD"). Choose the best model based on p-value
-#'   from likelihood ratio test and difference in AIC.
+#'   from likelihood ratio test and difference in AIC. Return the better
+#'   reconstruction.
 #'
 #' @param mat Matrix. Genotype or phenotype binary matrix. (Only discrete
 #'   phenotype). Dim: genotype: ncol = ntip(tree) x nrow = number of genotypes.
@@ -337,13 +334,11 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
 #' @param num Number. Column index for matrix.
 #' @param recon_method String. Either "ML", "REML", "pic", or "GLS".
 #'
-#' @return best_model: Character string. Either 'ER' or 'ARD'. These two options
-#'   are strings indicating a model choice to be used downstream in the
-#'   ape::ace function.
+#' @return Reconstruction of class `ace` from `ape`.
 #'
 #' @noRd
 #'
-pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
+build_better_reconstruction <- function(mat, tr, disc_cont, num, recon_method){
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
   check_if_binary_matrix(mat)
@@ -414,9 +409,15 @@ pick_recon_model <- function(mat, tr, disc_cont, num, recon_method){
     }
   }
 
+  # Given best model, return best ancestral reconstruction
+  best_reconstruction <- ERreconstruction
+  if (best_model == "ARD") {
+    best_reconstruction <- ARDreconstruction
+  }
+
   # Return output --------------------------------------------------------------
-  return(best_model)
-} # end pick_recon_model()
+  return(best_reconstruction)
+} # end build_better_reconstruction()
 
 #' prepare_ancestral_reconstructions
 #'

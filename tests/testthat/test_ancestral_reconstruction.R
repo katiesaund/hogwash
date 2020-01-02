@@ -364,8 +364,8 @@ test_that("discrete_ancestral_reconstruction throws error given bogus inputs", {
 
 })
 
-# test pick_recon_model --------------------------------------------------------
-test_that("pick_recon_model gives an error given invalid input", {
+# test build_better_reconstruction ---------------------------------------------
+test_that("build_better_reconstruction gives an error given invalid input", {
   # Set up
   num_col <- 9
   tree <- ape::rtree(num_col, rooted = TRUE)
@@ -377,14 +377,14 @@ test_that("pick_recon_model gives an error given invalid input", {
   reconstruction_method <- "ML"
 
   # Test
-  expect_error(pick_recon_model(test_mat,
-                                tree,
-                                discrete_or_continuous,
-                                index,
-                                reconstruction_method))
+  expect_error(build_better_reconstruction(test_mat,
+                                           tree,
+                                           discrete_or_continuous,
+                                           index,
+                                           reconstruction_method))
 })
 
-test_that("pick_recon_model works given valid input", {
+test_that("build_better_reconstruction works given valid input", {
   # Set up
   num_col <- 9
   tree <- ape::rtree(num_col, rooted = TRUE)
@@ -398,15 +398,15 @@ test_that("pick_recon_model works given valid input", {
   reconstruction_method <- "ML"
 
   # Test
-  expect_error(pick_recon_model(test_mat,
-                                tree,
-                                discrete_or_continuous,
-                                index,
-                                reconstruction_method),
+  expect_error(build_better_reconstruction(test_mat,
+                                           tree,
+                                           discrete_or_continuous,
+                                           index,
+                                           reconstruction_method),
                NA)
 })
 
-test_that("pick_recon_model gives an error given invalid input", {
+test_that("build_better_reconstruction gives an error given invalid input", {
   # Set up
   num_col <- 9
   tree <- ape::rtree(num_col, rooted = TRUE)
@@ -418,14 +418,14 @@ test_that("pick_recon_model gives an error given invalid input", {
   reconstruction_method <- "ML"
 
   # Test
-  expect_error(pick_recon_model(test_mat,
-                                tree,
-                                discrete_or_continuous,
-                                index,
-                                reconstruction_method))
+  expect_error(build_better_reconstruction(test_mat,
+                                           tree,
+                                           discrete_or_continuous,
+                                           index,
+                                           reconstruction_method))
 })
 
-test_that("pick_recon_model gives an error given invalid input", {
+test_that("build_better_reconstruction gives an error given invalid input", {
   # Set up
   num_col <- 9
   tree <- ape::rtree(num_col, rooted = TRUE)
@@ -437,15 +437,15 @@ test_that("pick_recon_model gives an error given invalid input", {
   reconstruction_method <- "ML"
 
   # Test
-  expect_error(pick_recon_model(test_mat,
-                                tree,
-                                discrete_or_continuous,
-                                index,
-                                reconstruction_method))
+  expect_error(build_better_reconstruction(test_mat,
+                                           tree,
+                                           discrete_or_continuous,
+                                           index,
+                                           reconstruction_method))
 })
 
 
-test_that("pick_recon_model gives an error for invalid input", {
+test_that("build_better_reconstruction gives an error for invalid input", {
   # Set up
   num_col <- 9
   tree <- ape::rtree(num_col, rooted = TRUE)
@@ -459,14 +459,14 @@ test_that("pick_recon_model gives an error for invalid input", {
   reconstruction_method <- "fake_method"
 
   # Test
-  expect_error(pick_recon_model(test_mat,
-                                tree,
-                                discrete_or_continuous,
-                                index,
-                                reconstruction_method))
+  expect_error(build_better_reconstruction(test_mat,
+                                           tree,
+                                           discrete_or_continuous,
+                                           index,
+                                           reconstruction_method))
 })
 
-test_that("pick_recon_model gives an error when it given a bad index", {
+test_that("build_better_reconstruction gives an error when it given a bad index", {
   # Set up
   num_col <- 9
   tree <- ape::rtree(num_col, rooted = TRUE)
@@ -480,14 +480,14 @@ test_that("pick_recon_model gives an error when it given a bad index", {
   reconstruction_method <- "ML"
 
   # Test
-  expect_error(pick_recon_model(test_mat,
-                                tree,
-                                discrete_or_continuous,
-                                index,
-                                reconstruction_method))
+  expect_error(build_better_reconstruction(test_mat,
+                                           tree,
+                                           discrete_or_continuous,
+                                           index,
+                                           reconstruction_method))
 })
 
-test_that("pick_recon_model gives an error with invalid input", {
+test_that("build_better_reconstruction gives an error with invalid input", {
   # Set up
   num_col <- 9
   tree <- ape::rtree(num_col, rooted = TRUE)
@@ -499,13 +499,14 @@ test_that("pick_recon_model gives an error with invalid input", {
   reconstruction_method <- "ML"
 
   # Test
-  expect_error(pick_recon_model(test_mat, tree,
-                                discrete_or_continuous,
-                                index,
-                                reconstruction_method))
+  expect_error(build_better_reconstruction(test_mat,
+                                           tree,
+                                           discrete_or_continuous,
+                                           index,
+                                           reconstruction_method))
 })
 
-test_that("pick_recon_model returns 'ER' for this test data", {
+test_that("build_better_reconstruction returns 'ER' for this test data", {
   # Set up
   num_col <- 9
   set.seed(1)
@@ -518,17 +519,16 @@ test_that("pick_recon_model returns 'ER' for this test data", {
   discrete_or_continuous <- "discrete"
   index <- 1
   reconstruction_method <- "ML"
-
+  reconstruction <- build_better_reconstruction(test_mat,
+                                                tree,
+                                                discrete_or_continuous,
+                                                index,
+                                                reconstruction_method)
   # Test
-  expect_identical(pick_recon_model(test_mat,
-                                    tree,
-                                    discrete_or_continuous,
-                                    index,
-                                    reconstruction_method),
-                   "ER")
+  expect_identical(reconstruction$call$model, "ER")
 })
 
-test_that("pick_recon_model returns 'ARD' for this test particular data", {
+test_that("build_better_reconstruction returns 'ARD' for this test particular data", {
   # Set up
   num_col <- 100
   set.seed(1)
@@ -541,14 +541,13 @@ test_that("pick_recon_model returns 'ARD' for this test particular data", {
   discrete_or_continuous <- "discrete"
   index <- 1
   reconstruction_method <- "ML"
-
+  reconstruction <- build_better_reconstruction(test_mat,
+                                                tree,
+                                                discrete_or_continuous,
+                                                index,
+                                                reconstruction_method)
   # Test
-  expect_identical(pick_recon_model(test_mat,
-                                    tree,
-                                    discrete_or_continuous,
-                                    index,
-                                    reconstruction_method),
-                   "ARD")
+  expect_identical(reconstruction$call$model, "ARD")
 })
 
 # test prepare_ancestral_reconstructions ---------------------------------------
