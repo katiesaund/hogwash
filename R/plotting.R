@@ -814,8 +814,6 @@ make_ann_colors <- function(geno_matrix){
 
 #' Plot PhyC results
 #'
-#' @description Plot PhyC results.
-#'
 #' @noRd
 #' @param tr Phylo.
 #' @param dir Directory where to save plots.
@@ -964,21 +962,21 @@ plot_phyc_results <- function(tr,
 
 
   if (length(unique(phenotype_annotation[, 1])) == 3) {
-    pheno_presence_col <- c( na = "grey", absence = "white", presence = "red")
+    pheno_presence_col <- c( `Low Confidence` = "grey", Absence = "white", Presence = "red")
   } else if (length(unique(phenotype_annotation[, 1])) == 2) {
     if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 0)) == 2) {
-      pheno_presence_col <- c(na = "grey", absence = "white")
+      pheno_presence_col <- c(`Low Confidence` = "grey", Absence = "white")
     } else if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 1)) == 2) {
-      pheno_presence_col <- c( na = "grey", presence = "red")
+      pheno_presence_col <- c( `Low Confidence` = "grey", Presence = "red")
     } else if (sum(unique(phenotype_annotation[, 1]) %in% c(1, 0)) == 2) {
-      pheno_presence_col <- c(absence = "white", presence = "red")
+      pheno_presence_col <- c(Absence = "white", Presence = "red")
     }
   } else if (length(unique(phenotype_annotation[, 1])) == 1) {
-    pheno_presence_col <- c(presence = "red")
+    pheno_presence_col <- c(Presence = "red")
     if (unique(phenotype_annotation[, 1]) == -1) {
-      pheno_presence_col <- c(na = "grey")
+      pheno_presence_col <- c(`Low Confidence` = "grey")
     } else if (unique(phenotype_annotation[, 1]) == 0) {
-      pheno_presence_col <- c(absence = "white")
+      pheno_presence_col <- c(Absence = "white")
     }
   }
 
@@ -986,6 +984,7 @@ plot_phyc_results <- function(tr,
     list(`Locus Significance` = c(`Not Significant` = "white",
                                   Significant = "blue"),
          `Phenotype Presence/Absence` = pheno_presence_col)
+
 
   print("p-values")
   print(log_p_value)
@@ -995,15 +994,25 @@ plot_phyc_results <- function(tr,
   print(ann_colors)
   print("column_annot_ordered_by_p_val")
   print(column_annot_ordered_by_p_val)
+
+  phenotype_annotation[phenotype_annotation == -1] <- "Low Confidence"
+  phenotype_annotation[phenotype_annotation == 0] <- "Absence"
+  phenotype_annotation[phenotype_annotation == 1] <- "Presence"
+
   print("phenotype_annotation")
   print(phenotype_annotation)
 
   print("matrix")
   print("ordered_by_p_val")
   print(ordered_by_p_val)
-  print(summary(ordered_by_p_val))
 
   plotting_logical <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
+
+  print("grouped_logical")
+  print(grouped_logical)
+  print("plotting_logical")
+  print(plotting_logical)
+
   if (plotting_logical) {
     colnames(ordered_by_p_val) <- substr(colnames(ordered_by_p_val), 1, 20)
 
