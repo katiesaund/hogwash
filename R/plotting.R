@@ -928,7 +928,7 @@ plot_phyc_results <- function(tr,
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
-    colnames(snp_in_gene) <- "SNPs in gene"
+    colnames(snp_in_gene) <- "Variants in Group"
     snp_in_gene <-
       snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
                   drop = FALSE]
@@ -952,7 +952,7 @@ plot_phyc_results <- function(tr,
   } else {
     colnames(column_annot_ordered_by_p_val) <- c("Locus Significance",
                                                  "fdr_corrected_pvals",
-                                                 "SNPs in gene")
+                                                 "Variants in Group")
   }
 
 
@@ -1284,7 +1284,7 @@ plot_synchronous_results  <- function(tr,
   } else {
     colnames(column_annot_ordered_by_p_val) <- c("Locus Significance",
                                                  "fdr_corrected_pvals",
-                                                 "SNPs in gene")
+                                                 "Variants in Group")
   }
 
   if (length(unique(phenotype_annotation[, 1])) == 3) {
