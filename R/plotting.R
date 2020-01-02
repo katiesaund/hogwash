@@ -1033,28 +1033,33 @@ plot_phyc_results <- function(tr,
       cellwidth = cell_width_value)
   }
 
-  # Loop through significant hits:
+
   pheno_as_list <- list(p_recon_edges)
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
+
+  graphics::par(mfrow = c(1, 1),
+                mgp = c(3, 1, 0),
+                oma = c(0, 0, 4, 0),
+                mar = c(4, 4, 4, 4))
+  # Phenotype
+  plot_tr_w_color_edges(tr,
+                        pheno_as_list,
+                        pheno_conf_as_list,
+                        "grey",
+                        "red",
+                        paste0("\n Phenotype Reconstruction"),
+                        "recon",
+                        1,
+                        "Wild type",
+                        "Variant")
+
+  # Loop through significant hits:
   for (j in 1:nrow(recon_hit_vals)) {
     if (recon_hit_vals[j, 1] < fdr) {
-      graphics::par(mfrow = c(3, 2),
+      graphics::par(mfrow = c(2, 2),
                     mgp = c(3, 1, 0),
                     oma = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4))
-      # Phenotype
-      plot_tr_w_color_edges(tr,
-                            pheno_as_list,
-                            pheno_conf_as_list,
-                            "grey",
-                            "red",
-                            paste0("\n Phenotype Reconstruction"),
-                            "recon",
-                            1,
-                            "Wild type",
-                            "Variant")
-      blank_plot()
-
       # Genotype
       plot_tr_w_color_edges(tr,
                             g_trans_edges,
