@@ -563,7 +563,8 @@ plot_continuous_results <- function(disc_cont,
                         log(results_all_trans$ks_statistics[[j]])), 0))
       graphics::abline(v =
                          log(as.numeric(results_all_trans$observed_ks_stat[j])),
-                       col = "red", lwd = 4)
+                       col = "red",
+                       lwd = 4)
 
       legend("topleft",
              title = "KS Test Statistics",
@@ -907,7 +908,7 @@ plot_phyc_results <- function(tr,
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
 
-  grDevices::pdf(fname)
+  grDevices::pdf(fname, width = 16, height = 20)
 
   graphics::par(mfrow = c(1, 1))
   make_manhattan_plot(name, recon_hit_vals, fdr, prefix)
@@ -1223,13 +1224,13 @@ plot_synchronous_results  <- function(tr,
 
   # Function -------------------------------------------------------------------
   image_width <- 250
+  hist_cex_size <- 1.3
   if (grouped_logical) {
     fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
   } else {
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
-
-  grDevices::pdf(fname)
+  grDevices::pdf(fname, width = 16, height = 20)
 
   graphics::par(mfrow = c(1, 1))
   make_manhattan_plot(name, trans_hit_vals, fdr, prefix)
@@ -1334,13 +1335,16 @@ plot_synchronous_results  <- function(tr,
       cellwidth = cell_width_value)
   }
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
+
   # Loop through significant hits:
   for (j in 1:nrow(trans_hit_vals)) {
     if (trans_hit_vals[j, 1] < fdr) {
       graphics::par(mfrow = c(3, 2),
-                    mgp = c(3, 1, 0),
-                    oma = c(0, 0, 4, 0),
-                    mar = c(4, 4, 4, 4))
+                    mgp   = c(3, 1, 0),
+                    oma   = c(0, 0, 4, 0),
+                    mar = c(4, 4, 4, 4),
+                    xpd = FALSE)
+
       # Plot phenotype
       p_trans_edges_as_list <- list(p_trans_edges)
       plot_tr_w_color_edges(tr,
@@ -1353,6 +1357,9 @@ plot_synchronous_results  <- function(tr,
                             1,
                             "No transition",
                             "Transition")
+
+      blank_plot()
+
       # Plot genotype
       plot_tr_w_color_edges(tr,
                             g_trans_edges,
@@ -1365,26 +1372,40 @@ plot_synchronous_results  <- function(tr,
                             j,
                             "No transition",
                             "Transition")
+
+      blank_plot()
+
       # Plot permutation test
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
                    trans_perm_obs_results$observed_overlap[j])
       graphics::hist(trans_perm_obs_results$permuted_count[[j]],
            breaks = num_perm / 10,
            xlim = c(0, max_x),
+           ylim = c(0, .85 * length(trans_perm_obs_results$permuted_count[[j]])),
            col = "grey",
            border = FALSE,
            ylab = "Count",
-           xlab = "# edges where genotype-phenotype transitions co-occur",
-           main = paste0("Geno & pheno transition overlap\npval=",
-                         round(trans_hit_vals[j, 1], 4),
-                         "\nRed=observed,Grey=permutations",
+           xlab = "Genotype & Phenotype Transition Edge Co-occurrence",
+           main = paste0("Transition Edge Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
+                         formatC(-log(trans_hit_vals[j, 1]), format = "e", digits = 1),
+                         " P-value rank = ",
+                         rank(trans_hit_vals[j, ]),
                          sep = ""))
+
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
-                       col = "red")
+                       col = rgb(1, 0, 0, 0.25),
+                       lwd = 4)
+      legend("topleft",
+             title = "Edge Type",
+             legend = c("Null", "Observed"),
+             col = c("grey", rgb(1, 0, 0, 0.25)),
+             pch = 15,
+             cex = hist_cex_size,
+             bg = rgb(0, 0, 0, 0.01))
 
       # edge heatmap - heatmap is tree edges, annotation is phenotype edges
       graphics::par(mfrow = c(1, 1))
-      # TOD -1 should be NA but it won't work correctedly
+      # TODO -1 should be NA but it won't work correctedly
       p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1
       p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
       colnames(p_mat) <- "pheno_transition"
@@ -1444,3 +1465,12 @@ plot_synchronous_results  <- function(tr,
   }
   grDevices::dev.off()
 } # end plot_synchronous_results()
+
+
+#' Draw a blank plot
+blank_plot <- function(){
+  plot(0,
+       type = 'n',
+       axes = FALSE,
+       ann = FALSE)
+}
