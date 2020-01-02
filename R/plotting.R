@@ -408,7 +408,7 @@ plot_continuous_results <- function(disc_cont,
     abs(pheno_recon_ordered_by_edges[, 1] - pheno_recon_ordered_by_edges[, 2])
 
   p_trans_mat <- matrix(ph_trans, nrow = length(ph_trans), ncol = 1)
-  colnames(p_trans_mat) <- "delta_pheno"
+  colnames(p_trans_mat) <- "|Delta Phenotype|"
   p_trans_mat <- as.data.frame(round(p_trans_mat, 2))
 
   significant_loci <-
@@ -790,21 +790,21 @@ make_ann_colors <- function(geno_matrix){
   nas <- sum(is.na(geno_matrix)) > 0
 
   if (ones + zeros + nas == 3) {
-    ann_colors <- list(pheno_presence = c(na = "grey",
+    ann_colors <- list(`Phenotype Presence/Absence` = c(na = "grey",
                                          absent = "white",
                                          present = "red"))
   } else if (ones == 1 && zeros == 1 && nas == 0) {
-    ann_colors <- list(pheno_presence = c(absent = "white", present = "red"))
+    ann_colors <- list(`Phenotype Presence/Absence` = c(absent = "white", present = "red"))
   } else if (ones == 1 && zeros == 0 && nas == 1) {
-    ann_colors <- list(pheno_presence = c(na = "grey", present = "red"))
+    ann_colors <- list(`Phenotype Presence/Absence` = c(na = "grey", present = "red"))
   } else if (ones == 0 && zeros == 1 && nas == 1) {
-    ann_colors <- list(pheno_presence = c(na = "grey", absent = "white"))
+    ann_colors <- list(`Phenotype Presence/Absence` = c(na = "grey", absent = "white"))
   } else if (ones == 0 && zeros == 0 && nas == 1) {
-    ann_colors <- list(pheno_presence = c(na = "grey"))
+    ann_colors <- list(`Phenotype Presence/Absence` = c(na = "grey"))
   } else if (ones == 0 && zeros == 1 && nas == 0) {
-    ann_colors <- list(pheno_presence = c(absent = "white"))
+    ann_colors <- list(`Phenotype Presence/Absence` = c(absent = "white"))
   } else if (ones == 1 && zeros == 0 && nas == 0) {
-    ann_colors <- list(pheno_presence = c(present = "red"))
+    ann_colors <- list(`Phenotype Presence/Absence` = c(present = "red"))
   } else {
     stop("No ones, zeroes, or NAs present in g_mat")
   }
@@ -912,7 +912,7 @@ plot_phyc_results <- function(tr,
 
   p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1
   p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
-  colnames(p_mat) <- "pheno_presence"
+  colnames(p_mat) <- "Phenotype Presence/Absence"
   phenotype_annotation <- as.data.frame(p_mat)
   row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
 
@@ -982,12 +982,10 @@ plot_phyc_results <- function(tr,
     }
   }
 
-  # locus_col <- c(`Not Significant` = "white", Significant = "blue")
-
   ann_colors <-
     list(`Locus Significance` = c(`Not Significant` = "white",
                                   Significant = "blue"),
-         pheno_presence = pheno_presence_col)
+         `Phenotype Presence/Absence` = pheno_presence_col)
 
   print("p-values")
   print(log_p_value)
@@ -1011,8 +1009,7 @@ plot_phyc_results <- function(tr,
 
     pheatmap::pheatmap(
       ordered_by_p_val,
-      main = paste0(
-        "Edges:\nGenotype transition with phenotype presence/absence"),
+      main = "PhyC Convergence Summary",
       cluster_cols  = FALSE,
       na_col = "grey",
       cluster_rows  = FALSE,
@@ -1093,7 +1090,7 @@ plot_phyc_results <- function(tr,
 
       p_recon_edges[tr_and_pheno_hi_conf == 0] <- -1
       p_mat <- matrix(p_recon_edges, nrow = length(p_recon_edges), ncol = 1)
-      colnames(p_mat) <- "pheno_presence"
+      colnames(p_mat) <- "`Phenotype Presence/Absence`"
       phenotype_annotation <- as.data.frame(p_mat)
       row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
       temp_g_trans_edges <- g_trans_edges[[j]]
@@ -1248,7 +1245,7 @@ plot_synchronous_results  <- function(tr,
   # TODO -1 should be NA but it won't work correctedly
   p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1
   p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
-  colnames(p_mat) <- "pheno_transitions"
+  colnames(p_mat) <- "Phenotype Transitions/Non"
   phenotype_annotation <- as.data.frame(p_mat)
   row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
 
@@ -1322,7 +1319,8 @@ plot_synchronous_results  <- function(tr,
     }
   }
 
-  ann_colors <- list(`Locus Significance` = locus_col, pheno_presence = pheno_presence_col)
+  ann_colors <- list(`Locus Significance` = locus_col,
+                     `Phenotype Presence/Absence` = pheno_presence_col)
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {
     cell_width_value <- image_width / ncol(ordered_by_p_val)
