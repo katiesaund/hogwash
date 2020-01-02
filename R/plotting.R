@@ -1020,7 +1020,7 @@ plot_phyc_results <- function(tr,
     pheatmap::pheatmap(
       ordered_by_p_val,
       main = "PhyC Convergence Summary",
-      cluster_cols  = FALSE,
+      cluster_cols  = TRUE,
       na_col = "grey",
       cluster_rows  = FALSE,
       show_rownames = FALSE,
