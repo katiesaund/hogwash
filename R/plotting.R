@@ -90,7 +90,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
   }
 
   # Function -------------------------------------------------------------------
-  hist_cex_size <- 1.3
+  hist_cex_size <- 1
 
   trans_index <-
     c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
@@ -171,7 +171,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
   }
 
   # Function -------------------------------------------------------------------
-  hist_cex_size <- 1.3
+  hist_cex_size <- 1
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::hist(all_trans$observed_pheno_non_trans_delta[[index]],
        breaks = ape::Nedge(tr) / 4,
@@ -240,7 +240,7 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
   check_equal(length(geno_confidence[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
-  hist_cex_size <- 1.3
+  hist_cex_size <- 1
   transparent_purple <- rgb(1, 0, 1, 0.25)
   transparent_blue <- rgb(0, 0, 1, 0.25)
 
@@ -393,7 +393,7 @@ plot_continuous_results <- function(disc_cont,
 
   # Function -------------------------------------------------------------------
   image_width <- 250
-  hist_cex_size <- 1.3
+  hist_cex_size <- 1
   trans_edge_mat <- NULL
   for (i in 1:length(geno_transition)) {
     trans_edge_mat <- cbind(trans_edge_mat, geno_transition[[i]]$transition)
@@ -454,8 +454,8 @@ plot_continuous_results <- function(disc_cont,
     fname <- paste0(dir, "/hogwash_continuous_", name, ".pdf")
   }
 
-  grDevices::pdf(fname, width = 16, height = 20)
-  graphics::par(mfrow = c(1, 1), mar = c(10, 10, 10, 10))
+  grDevices::pdf(fname, width = 8.5, height = 11)
+  graphics::par(mfrow = c(1, 1), mar = c(5, 5, 5, 5))
   make_manhattan_plot(name,
                       pval_all_transition$hit_pvals,
                       fdr,
@@ -480,24 +480,24 @@ plot_continuous_results <- function(disc_cont,
     fontsize = 8,
     cellwidth = cell_width_value)
 
-  print("continuous plotting bug fixing")
-  print("ann_colors")
-  print(ann_colors)
+  graphics::par(mfrow = c(1, 1),
+                mgp = c(3, 1, 0),
+                oma = c(0, 0, 4, 0),
+                mar = c(4, 4, 4, 4),
+                xpd = FALSE)
+  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
 
-  print("column_annot_ordered_by_p_val")
-  print(column_annot_ordered_by_p_val)
 
   transparent_grey <- rgb(0, 0, 0, 0.25)
   transparent_red <- rgb(1, 0, 0, 0.25)
   # ONLY MAKE THE FOLLOWING PLOTS FOR SIGNIFICANT LOCI
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] < fdr) {
-      graphics::par(mfrow = c(3, 3),
+      graphics::par(mfrow = c(3, 2),
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4),
                     xpd = FALSE)
-      plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
       plot_tr_w_color_edges(tr,
                             geno_reconstruction,
                             geno_confidence,
@@ -648,7 +648,7 @@ make_manhattan_plot <- function(geno_pheno_name,
 
   # Function -------------------------------------------------------------------
   # Create negative log p-values with arbitrary locus numbers
-  manhattan_cex <- 2
+  manhattan_cex <- 1
   neg_log_p_value <- data.frame(-log(pval_hits))
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
   colnames(neg_log_p_with_num)[1] <- "Locus Significance"
@@ -676,7 +676,7 @@ make_manhattan_plot <- function(geno_pheno_name,
                    y = sig_temp[, 2],
                    labels = row.names(sig_temp),
                    pos = 1,
-                   cex = 1)
+                   cex = manhattan_cex / 2)
   }
   legend("topright",
          bty = "n",
@@ -736,7 +736,7 @@ plot_tr_w_color_edges <- function(tr,
   check_is_string(title)
 
   # Function -------------------------------------------------------------------
-  tree_legend_cex <- 1.3
+  tree_legend_cex <- 0.5
   edge_color_baseline <- "black"
   edge_color <- rep(edge_color_baseline, ape::Nedge(tr))
   if (trans_or_recon == "recon") {
@@ -889,16 +889,16 @@ plot_phyc_results <- function(tr,
 
   # Function -------------------------------------------------------------------
   image_width <- 250
-  hist_cex_size <- 1.3
+  hist_cex_size <- 1
   if (grouped_logical) {
     fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
   } else {
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
 
-  grDevices::pdf(fname, width = 16, height = 20)
+  grDevices::pdf(fname, width = 8.5, height = 11)
 
-  graphics::par(mfrow = c(1, 1), mar = c(10, 10, 10, 10))
+  graphics::par(mfrow = c(1, 1), mar = c(5, 5, 5, 5))
   make_manhattan_plot(name, recon_hit_vals, fdr, prefix)
 
   g_trans_mat <- matrix(0, nrow = ape::Nedge(tr), ncol = length(g_trans_edges))
@@ -1183,15 +1183,15 @@ plot_synchronous_results  <- function(tr,
 
   # Function -------------------------------------------------------------------
   image_width <- 250
-  hist_cex_size <- 1.3
+  hist_cex_size <- 1
   if (grouped_logical) {
     fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
   } else {
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
-  grDevices::pdf(fname, width = 16, height = 20)
+  grDevices::pdf(fname, width = 8.5, height = 11)
 
-  graphics::par(mfrow = c(1, 1), mar = c(10, 10, 10, 10))
+  graphics::par(mfrow = c(1, 1), mar = c(5, 5, 5, 5))
   make_manhattan_plot(name, trans_hit_vals, fdr, prefix)
 
   # heatmaps
