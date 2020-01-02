@@ -468,7 +468,7 @@ plot_continuous_results <- function(disc_cont,
   pheatmap::pheatmap(
     ordered_by_p_val,
     main = paste0("Edges:\n hi conf trans vs delta pheno"),
-    cluster_cols = FALSE,
+    cluster_cols = TRUE,
     na_col = "grey",
     cluster_rows = FALSE,
     show_rownames = FALSE,
@@ -1138,7 +1138,7 @@ plot_phyc_results <- function(tr,
           main = paste0(row.names(recon_hit_vals)[j],
                         "\n Tree edges clustered by edge type\n
                         Genotype transition edge\n& phenotype present edge"),
-          cluster_cols = FALSE,
+          cluster_cols = TRUE,
           cluster_rows = FALSE,
           na_col = "grey",
           show_rownames = FALSE,
@@ -1344,7 +1344,7 @@ plot_synchronous_results  <- function(tr,
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
       main = paste0("Edges:\nGenotype transitions with phenotype transitions"),
-      cluster_cols  = FALSE,
+      cluster_cols = TRUE,
       na_col = "grey",
       cluster_rows  = FALSE,
       show_rownames = FALSE,
@@ -1423,65 +1423,6 @@ plot_synchronous_results  <- function(tr,
              pch = 15,
              cex = hist_cex_size,
              bg = rgb(0, 0, 0, 0.01))
-
-      # edge heatmap - heatmap is tree edges, annotation is phenotype edges
-      graphics::par(mfrow = c(1, 1))
-      # TODO -1 should be NA but it won't work correctedly
-      p_trans_edges[tr_and_pheno_hi_conf == 0] <- -1
-      p_mat <- matrix(p_trans_edges, nrow = length(p_trans_edges), ncol = 1)
-      colnames(p_mat) <- "pheno_transition"
-      phenotype_annotation <- as.data.frame(p_mat)
-      row.names(phenotype_annotation) <- 1:nrow(phenotype_annotation)
-
-      temp_g_trans_edges <- g_trans_edges[[j]]
-      temp_g_trans_edges[geno_confidence[[j]] == 0] <- NA
-      g_mat <- as.matrix(temp_g_trans_edges)
-      row.names(g_mat) <- c(1:nrow(g_mat))
-      colnames(g_mat) <- "genotype_transition"
-      temp_g_mat <- cbind(g_mat, phenotype_annotation)
-      g_mat <- temp_g_mat[order(temp_g_mat[, 2],
-                                temp_g_mat[, 1],
-                                na.last = FALSE,
-                                decreasing = FALSE),
-                          1,
-                          drop = FALSE]
-
-      ann_colors <- list(pheno_transition = c(na = "grey",
-                                             no_transition = "white",
-                                             transition = "red"))
-      plotting_logical <- check_if_g_mat_can_be_plotted(g_mat)
-
-      if (plotting_logical) {
-        ann_colors <- make_ann_colors(g_mat)
-        if (!is.null(snp_in_gene)) {
-          num_snps <- snp_in_gene[row.names(trans_hit_vals)[j], , drop = FALSE]
-          row.names(num_snps) <- "genotype_transition"
-          colnames(num_snps) <- "# grouped genotypes"
-          ann_colors <- c(ann_colors,
-                          list(SNPs_in_gene = c(num_snps_in_gene = "blue")))
-        }
-        cell_width_value <- image_width / ncol(g_mat)
-
-        colnames(g_mat) <- substr(colnames(g_mat), 1, 20) # Limit size of name
-
-        pheatmap::pheatmap(
-          g_mat,
-          main = paste0(row.names(trans_hit_vals)[j],
-                        "\nTree edges: genotype & phenotype transitions"),
-          cluster_cols = FALSE,
-          cluster_rows = FALSE,
-          na_col = "grey",
-          show_rownames = FALSE,
-          color = c("white", "red"),
-          annotation_row = phenotype_annotation,
-          annotation_col = num_snps,
-          annotation_colors = ann_colors,
-          annotation_legend = TRUE,
-          show_colnames = TRUE,
-          legend = FALSE,
-          fontsize = 8,
-          cellwidth = cell_width_value)
-      }
     }
   }
   grDevices::dev.off()
