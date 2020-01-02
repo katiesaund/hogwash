@@ -439,8 +439,14 @@ plot_continuous_results <- function(disc_cont,
   column_annot_ordered_by_p_val <-
     column_annot[match(row.names(log_p_value)[order(log_p_value[, 1])],
                        row.names(column_annot)), , drop = FALSE]
-  colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
-    c("Locus Significance", "-ln(p-val)")
+
+  if (ncol(column_annot_ordered_by_p_val) == 2) {
+    colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
+      c("Locus Significance", "-ln(FDR Corrected P-value)")
+  } else {
+    colnames(column_annot) <- colnames(column_annot_ordered_by_p_val) <-
+      c("Locus Significance", "-ln(FDR Corrected P-value)", "Variants in Group")
+  }
 
   if (group_logical) {
     fname <- paste0(dir, "/hogwash_continuous_grouped_", name, ".pdf")
@@ -536,7 +542,7 @@ plot_continuous_results <- function(disc_cont,
            col = "grey",
            border = FALSE,
            main =
-             paste("KS Test Statistic Null Distribution\n-ln(FDR corrected P-value) = ",
+             paste("KS Test Statistic Null Distribution\n-ln(FDR Corrected P-value) = ",
                    formatC(-log(pval_all_transition$hit_pvals[j, 1]),format = "e", digits = 1),
                    " P-value rank = ",
                    rank(pval_all_transition$hit_pvals)[j],
@@ -660,7 +666,7 @@ make_manhattan_plot <- function(geno_pheno_name,
             pch = 19,
             xlab = "Genetic loci",
             ylim = c(0, ymax),
-            ylab = "-ln(P-value)" ))
+            ylab = "-ln(FDR Corrected P-value)"))
 
   graphics::abline(h = -log(fdr),
                    col = "red")
@@ -948,10 +954,10 @@ plot_phyc_results <- function(tr,
 
   if (ncol(column_annot_ordered_by_p_val) == 2) {
     colnames(column_annot_ordered_by_p_val) <- c("Locus Significance",
-                                                 "fdr_corrected_pvals")
+                                                 "-ln(FDR Corrected P-value)")
   } else {
     colnames(column_annot_ordered_by_p_val) <- c("Locus Significance",
-                                                 "fdr_corrected_pvals",
+                                                 "-ln(FDR Corrected P-value)",
                                                  "Variants in Group")
   }
 
@@ -1280,10 +1286,10 @@ plot_synchronous_results  <- function(tr,
                        row.names(column_annot)), , drop = FALSE]
   if (ncol(column_annot_ordered_by_p_val) == 2) {
     colnames(column_annot_ordered_by_p_val) <- c("Locus Significance",
-                                                 "fdr_corrected_pvals")
+                                                 "-ln(FDR Corrected P-value)")
   } else {
     colnames(column_annot_ordered_by_p_val) <- c("Locus Significance",
-                                                 "fdr_corrected_pvals",
+                                                 "-ln(FDR Corrected P-value)",
                                                  "Variants in Group")
   }
 
