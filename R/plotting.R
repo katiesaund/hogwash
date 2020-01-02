@@ -485,7 +485,7 @@ plot_continuous_results <- function(disc_cont,
 
   pheatmap::pheatmap(
     ordered_by_p_val,
-    main = paste0("Edges:\n hi conf trans vs delta pheno"),
+    main = "Continuous Test: Convergence by Tree Edge",
     cluster_cols = TRUE,
     na_col = "grey",
     cluster_rows = FALSE,
@@ -665,7 +665,16 @@ make_manhattan_plot <- function(geno_pheno_name,
   check_str_is_test_name(test_name)
 
   # Function -------------------------------------------------------------------
-  # Create negative log p-values with arbitrary locus numbers
+
+  # Make test names prettier
+  if (test_name == "continuous") {
+    test_name <- "Continuous Test:"
+  } else if (test_name == "synchronous") {
+    test_name <- "Synchronous Test:"
+  }  else {
+    test_name <- "PhyC Test:"
+  }
+
   manhattan_cex <- 1
   neg_log_p_value <- data.frame(-log(pval_hits))
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
@@ -997,7 +1006,7 @@ plot_phyc_results <- function(tr,
 
     pheatmap::pheatmap(
       ordered_by_p_val,
-      main = "PhyC Convergence Summary",
+      main = "PhyC Test: Convergence by Tree Edge",
       cluster_cols  = TRUE,
       legend = FALSE,
       na_col = "grey",
@@ -1250,7 +1259,7 @@ plot_synchronous_results  <- function(tr,
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
       legend = FALSE,
-      main = paste0("Edges:\nGenotype transitions with phenotype transitions"),
+      main = paste0("Synchronous Test: Convergence by Tree Edge"),
       cluster_cols = TRUE,
       na_col = "grey",
       cluster_rows  = FALSE,
