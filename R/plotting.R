@@ -962,7 +962,8 @@ plot_phyc_results <- function(tr,
 
 
   if (length(unique(phenotype_annotation[, 1])) == 3) {
-    pheno_presence_col <- c( `Low Confidence` = "grey", Absence = "white", Presence = "red")
+    pheno_presence_col <-
+      c( `Low Confidence` = "grey", Absence = "white", Presence = "red")
   } else if (length(unique(phenotype_annotation[, 1])) == 2) {
     if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 0)) == 2) {
       pheno_presence_col <- c(`Low Confidence` = "grey", Absence = "white")
@@ -1301,21 +1302,21 @@ plot_synchronous_results  <- function(tr,
   }
 
   if (length(unique(phenotype_annotation[, 1])) == 3) {
-    pheno_presence_col <- c("-1" = "grey", "0" = "white", "1" = "red")
+    pheno_presence_col <- c(`Low Confidence` = "grey", `Non-Transition` = "white", Transition = "red")
   } else if (length(unique(phenotype_annotation[, 1])) == 2) {
     if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 0)) == 2) {
-      pheno_presence_col <- c("-1" = "grey", "0" = "white")
+      pheno_presence_col <- c(`Low Confidence` = "grey", `Non-Transition` = "white")
     } else if (sum(unique(phenotype_annotation[, 1]) %in% c(-1, 1)) == 2) {
-      pheno_presence_col <- c("-1" = "grey", "1" = "red")
+      pheno_presence_col <- c(`Low Confidence` = "grey", Transition = "red")
     } else if (sum(unique(phenotype_annotation[, 1]) %in% c(1, 0)) == 2) {
-      pheno_presence_col <- c("0" = "white", "1" = "red")
+      pheno_presence_col <- c(`Non-Transition` = "white", Transition = "red")
     }
   } else if (length(unique(phenotype_annotation[, 1])) == 1) {
-    pheno_presence_col <- c("1" = "red")
+    pheno_presence_col <- c(Transition = "red")
     if (unique(phenotype_annotation[, 1]) == -1) {
-      pheno_presence_col <- c("-1" = "grey")
+      pheno_presence_col <- c(`Low Confidence` = "grey")
     } else if (unique(phenotype_annotation[, 1]) == 0) {
-      pheno_presence_col <- c("0" = "white")
+      pheno_presence_col <- c(`Non-Transition` = "white")
     }
   }
 
@@ -1328,8 +1329,12 @@ plot_synchronous_results  <- function(tr,
     }
   }
 
+  phenotype_annotation[phenotype_annotation == -1] <- "Low Confidence"
+  phenotype_annotation[phenotype_annotation == 0] <- "Non-Transition"
+  phenotype_annotation[phenotype_annotation == 1] <- "Transition"
+
   ann_colors <- list(`Locus Significance` = locus_col,
-                     `Phenotype Presence/Absence` = pheno_presence_col)
+                     `Phenotype Transitions/Non` = pheno_presence_col)
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {
     cell_width_value <- image_width / ncol(ordered_by_p_val)
