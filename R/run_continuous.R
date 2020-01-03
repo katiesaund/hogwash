@@ -24,11 +24,11 @@ run_continuous <- function(args){
                                           args$phenotype,
                                           genotype,
                                           args$discrete_or_continuous)
-  # Include all transition edges (WT -> mutant and mutant -> WT). For
+  # Include all transition edges (WT -> mutant and mutant -> WT) for both
   #  synchronous and continuous tests.
   geno_trans_synchronous <- AR$geno_trans
 
-  # Keep only WT -> mutant transitions.
+  # Keep only WT -> mutant transitions for PhyC test
   geno_trans_phyc <- prep_geno_trans_for_phyc(genotype, geno_trans_synchronous)
   if (args$group_genotype) {
     grouped_geno <- group_genotypes(args$tree,
