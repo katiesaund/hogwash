@@ -143,8 +143,8 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
 #' @param geno_transition List of named vectors. Length == number of ungrouped
 #'   genotypes. $transition. Length = Nedge(tr). Values or 0 or 1.
 #'   $trans_dir. Length = Nedge(tr). Values -1, 0, or 1.
-#' @param gene_to_snp_lookup_table Matrix. Ncol = 2. Nrow = number of ungrouped
-#'   genotypes.
+#' @param gene_to_snp_lookup_table Matrix. Ncol = 2. Nrow = number of unique
+#'   ungrouped genotype - grouped genotype pairings.
 #'
 #' @return List of two objects. $transition and $trans_dir.
 #'
@@ -171,6 +171,13 @@ build_gene_trans_from_snp_trans <- function(tr,
                    min_cols = 1)
 
   # Function -------------------------------------------------------------------
+  unique_genes <- unique(gene_to_snp_lookup_table[, 2])
+
+  # Create two matrices:
+  # (1) transition_edges_by_snp_mat (Transitions)
+  # (2) trans_dir_edges_by_snp_mat (Transition Direction)
+  # Where the matrices have one row for each tree edge and 1 column for each
+  #   ungrouped genotype.
   transition_edges_by_snp_mat <-
     trans_dir_edges_by_snp_mat <-
     matrix(0, nrow = ape::Nedge(tr), ncol = ncol(geno))
@@ -187,14 +194,9 @@ build_gene_trans_from_snp_trans <- function(tr,
     colnames(trans_dir_edges_by_snp_mat) <-
     colnames(geno)
 
-  trans_ed_by_snp_mat_w_id <-
-    rbind(transition_edges_by_snp_mat,
-          unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
-  trans_dir_ed_by_snp_mat_w_id <-
-    rbind(trans_dir_edges_by_snp_mat,
-          unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
-
-  unique_genes <- unique(gene_to_snp_lookup_table[, 2])
+  # Create two gene matrices from the snp matrices:
+  # (1) gene_trans_mat_built_from_snp (Transitions)
+  # (2) gene_trans_dir_mat_blt_frm_snp (Transition Direction)
   gene_trans_mat_built_from_snp <-
     gene_trans_dir_mat_blt_frm_snp <-
     matrix(0,
@@ -203,19 +205,17 @@ build_gene_trans_from_snp_trans <- function(tr,
 
   for (j in 1:length(unique_genes)) {
     temp_mat <-
-      trans_ed_by_snp_mat_w_id[1:(
-        nrow(trans_ed_by_snp_mat_w_id) - 1),
-        trans_ed_by_snp_mat_w_id[nrow(
-          trans_ed_by_snp_mat_w_id), ] == unique_genes[j], drop = FALSE]
+      transition_edges_by_snp_mat[,
+                                 colnames(transition_edges_by_snp_mat) %in% gene_to_snp_lookup_table[ , 1][gene_to_snp_lookup_table[, 2] == unique_genes[j]],
+                                 drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
     gene_trans_mat_built_from_snp[, j] <- temp_column
 
     temp_dir_mat <-
-      trans_dir_ed_by_snp_mat_w_id[1:(
-        nrow(trans_dir_ed_by_snp_mat_w_id) - 1),
-        trans_dir_ed_by_snp_mat_w_id[nrow(
-          trans_dir_ed_by_snp_mat_w_id), ] == unique_genes[j], drop = FALSE]
+      trans_dir_edges_by_snp_mat[,
+                                  colnames(trans_dir_edges_by_snp_mat) %in% gene_to_snp_lookup_table[ , 1][gene_to_snp_lookup_table[, 2] == unique_genes[j]],
+                                  drop = FALSE]
     class(temp_dir_mat) <- "numeric"
     temp_dir_column <- rowSums(temp_dir_mat)
     gene_trans_dir_mat_blt_frm_snp[, j] <- temp_dir_column
@@ -285,23 +285,14 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 
   # Function -------------------------------------------------------------------
   unique_genes <- unique(gene_to_snp_lookup_table[, 2])
-  # TODO CHANGE nrow = nrow(geno) to length(unique(row.names(geno)))
   samples_by_genes <- matrix(0, nrow = nrow(geno), ncol = length(unique_genes))
   colnames(samples_by_genes) <- unique_genes
   row.names(samples_by_genes) <- row.names(geno)
 
-  snp_geno_with_gene_id <-
-    rbind(geno, unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
-  if (nrow(snp_geno_with_gene_id) != (nrow(geno) + 1)) {
-    stop("rbind didn't work")
-  }
-
   for (j in 1:length(unique_genes)) {
     temp_mat <-
-      snp_geno_with_gene_id[1:(
-        nrow(snp_geno_with_gene_id) - 1),
-        snp_geno_with_gene_id[nrow(
-          snp_geno_with_gene_id), ] == unique_genes[j], drop = FALSE]
+      geno[, colnames(geno) %in% gene_to_snp_lookup_table[ , 1][gene_to_snp_lookup_table[, 2] == unique_genes[j]],
+           drop = FALSE]
     class(temp_mat) <- "numeric"
     temp_column <- rowSums(temp_mat)
     samples_by_genes[, j] <- temp_column
@@ -546,6 +537,8 @@ group_genotypes <- function(tr,
 
   # make new geno (just at the tips, from the snps)
   geno <- build_gene_genotype_from_snps(geno, lookup)
+  print("geno")
+  print(geno)
   simplified_genotype <- remove_rare_or_common_geno(geno, tr)
   geno <- simplified_genotype$mat
   genes_to_keep_in_consideration <-
