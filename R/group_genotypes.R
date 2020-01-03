@@ -523,22 +523,15 @@ group_genotypes <- function(tr,
                                            geno,
                                            geno_reconstruction_and_conf,
                                            lookup)
-  print("geno_recon_and_conf_tip_node")
-  print(geno_recon_and_conf_tip_node)
 
   genotype_transition_sync <-
     build_gene_trans_from_snp_trans(tr, geno, genotype_transition_sync, lookup)
-
-  print("geno_recon_and_conf_tip_node")
-  print(geno_recon_and_conf_tip_node)
 
   genotype_transition_phyc <-
     build_gene_trans_from_snp_trans(tr, geno, genotype_transition_phyc, lookup)
 
   # make new geno (just at the tips, from the snps)
   geno <- build_gene_genotype_from_snps(geno, lookup)
-  print("geno")
-  print(geno)
   simplified_genotype <- remove_rare_or_common_geno(geno, tr)
   geno <- simplified_genotype$mat
   genes_to_keep_in_consideration <-
