@@ -50,8 +50,6 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
     colnames(tip_nodes_by_snp_mat_confi) <-
     colnames(geno)
 
-  check_equal(nrow(gene_to_snp_lookup_table), ncol(tip_nodes_by_snp_mat_recon))
-
   recon_times_confi <- tip_nodes_by_snp_mat_recon * tip_nodes_by_snp_mat_confi
   tip_nod_by_mat_recon_w_gene_id <-
     rbind(tip_nodes_by_snp_mat_recon,
@@ -169,7 +167,6 @@ build_gene_trans_from_snp_trans <- function(tr,
   check_dimensions(geno,
                    exact_rows = ape::Ntip(tr),
                    min_rows = 1,
-                   exact_cols =  nrow(gene_to_snp_lookup_table),
                    min_cols = 1)
   check_if_binary_matrix(geno)
   check_equal(length(geno_transition), ncol(geno))
@@ -177,7 +174,6 @@ build_gene_trans_from_snp_trans <- function(tr,
   check_equal(length(geno_transition[[1]]$trans_dir), ape::Nedge(tr))
   check_if_binary_vector_numeric(geno_transition[[1]]$transition)
   check_dimensions(gene_to_snp_lookup_table,
-                   exact_rows = ncol(geno),
                    min_rows = 1,
                    exact_cols = 2,
                    min_cols = 1)
@@ -522,8 +518,7 @@ group_genotypes <- function(tr,
   check_equal(length(genotype_transition_phyc), ncol(geno))
   check_equal(length(genotype_transition_phyc[[1]]$transition), ape::Nedge(tr))
   check_dimensions(lookup,
-                   exact_rows = ncol(geno),
-                   min_rows = ncol(geno),
+                   min_rows = 2,
                    exact_cols = 2,
                    min_cols = 2)
   check_is_string(uni_genes[1])
