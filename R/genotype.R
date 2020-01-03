@@ -62,8 +62,7 @@ remove_rare_or_common_geno <- function(mat, tr){
   # Function -------------------------------------------------------------------
   geno_to_drop <- rep(FALSE, ncol(mat))
   geno_to_drop[colSums(mat) <= 1] <- TRUE
-  geno_to_drop[colSums(mat) == (ape::Ntip(tr) - 1)] <- TRUE
-  geno_to_drop[colSums(mat) == ape::Ntip(tr)] <- TRUE
+  geno_to_drop[colSums(mat) >= (ape::Ntip(tr) - 1)] <- TRUE
   dropped_genotype_names <- colnames(mat)[geno_to_drop]
   mat <- mat[, !geno_to_drop, drop = FALSE]
 
