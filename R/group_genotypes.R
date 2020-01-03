@@ -328,7 +328,7 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 #'
 #' @param geno Matrix. Binary. Nrow = Ntip(tr). Ncol = number of original
 #'  genotypes.
-#' @param lookup Matrix. Ncol = 2. Nrow = number of genotypes.
+#' @param lookup Matrix. Ncol = 2. Nrow = genotypes with group assignments.
 #'
 #' @return List of four objects:
 #'  * $snp_per_gene. Named table. Names are genotypes. Values are number of
@@ -365,7 +365,15 @@ prepare_grouped_genotype <- function(geno, lookup){
   unique_genes <- unique(gene_snp_lookup[, 2])
   snps_per_gene <- table(gene_snp_lookup[, 2])
 
+  genotype <-
+    genotype[, colnames(genotype) %in% gene_snp_lookup[, 1], drop = FALSE]
   # Check and return output ----------------------------------------------------
+  if (ncol(genotype) < 2) {
+    stop("There are fewer than 2 genotypes that have variable presence/absence and are named in the grouping key")
+  }
+  if (nrow(gene_snp_lookup) < 2) {
+    stop("There are fewer than 2 genotypes that are named in the grouping key and found in the genotype matrix")
+  }
   results <- list("snps_per_gene" = snps_per_gene,
                   "unique_genes" = unique_genes,
                   "gene_snp_lookup" = gene_snp_lookup,
@@ -434,9 +442,7 @@ prepare_ungrouped_genotype <- function(geno, tr){
 #' @noRd
 prepare_genotype <- function(group_logical, geno, tr, lookup){
   # Check input ----------------------------------------------------------------
-  if (!is.logical(group_logical)) {
-    stop("Input must be either TRUE or FALSE")
-  }
+  check_class(group_logical, "logical")
   check_for_root_and_bootstrap(tr)
   if (!is.null(lookup)) {
     check_dimensions(lookup, exact_cols = 2, min_cols = 2, min_rows = 1)
