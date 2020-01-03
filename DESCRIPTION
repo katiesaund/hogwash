@@ -1,6 +1,6 @@
 Package: hogwash
 Type: Package
-Title: Genome-Wide Association Studies for Bacteria
+Title: hogwash: Genome-Wide Association Studies for Bacteria
 Version: 0.1.0
 Author: Katie Saund <katiephd@umich.edu>
 Maintainer: Katie Saund <katiephd@umich.edu>

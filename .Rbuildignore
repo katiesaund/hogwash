@@ -1,5 +1,6 @@
 ^doc$
 ^Meta$
+README.md
 ^README\.Rmd$
 ^NEWS\.md$
 ^\*.jpg$
