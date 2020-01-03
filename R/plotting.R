@@ -309,7 +309,7 @@ make_manhattan_plot <- function(geno_pheno_name,
                                 test_name){
   # Check inputs ---------------------------------------------------------------
   check_is_string(geno_pheno_name)
-  check_num_between_0_and_1(fdr)
+  check_is_number(fdr)
   check_str_is_test_name(test_name)
 
   # Function -------------------------------------------------------------------
@@ -325,6 +325,7 @@ make_manhattan_plot <- function(geno_pheno_name,
 
   manhattan_cex <- 1
   neg_log_p_value <- data.frame(pval_hits)
+  check_is_number(neg_log_p_value[1, 1])
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
   colnames(neg_log_p_with_num)[1] <- "Locus Significance"
   sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[, 2] > fdr)
@@ -496,7 +497,7 @@ plot_phyc_results <- function(tr,
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
   check_is_string(name)
-  check_num_between_0_and_1(fdr)
+  check_is_number(fdr)
   check_if_permutation_num_valid(num_perm)
   if (ncol(recon_hit_vals) != 1 |
       nrow(recon_hit_vals) != length(geno_confidence)) {
@@ -763,7 +764,7 @@ plot_synchronous_results  <- function(tr,
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
   check_is_string(name)
-  check_num_between_0_and_1(fdr)
+  check_is_number(fdr)
   check_if_permutation_num_valid(num_perm)
   if (ncol(trans_hit_vals) != 1 |
       nrow(trans_hit_vals) != length(geno_confidence)) {
@@ -1074,7 +1075,7 @@ plot_continuous_results <- function(disc_cont,
   check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
-  check_num_between_0_and_1(fdr)
+  check_is_number(fdr)
   check_if_dir_exists(dir)
   check_is_string(name)
   check_class(pval_all_transition$hit_pvals, "data.frame")
