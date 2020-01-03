@@ -653,9 +653,13 @@ plot_phyc_results <- function(tr,
                         "Wild type",
                         "Variant")
 
+  # Prep data to report p-value rank
+  rank_mat <- recon_hit_vals
+  rank_mat[rank_mat == 0] <- NA
+
   # Loop through significant hits:
   for (j in 1:nrow(recon_hit_vals)) {
-    if (recon_hit_vals[j, 1] < fdr) {
+    if (recon_hit_vals[j, 1] > fdr) {
       graphics::par(mfrow = c(2, 2),
                     mgp = c(3, 1, 0),
                     oma = c(0, 0, 4, 0),
@@ -692,7 +696,7 @@ plot_phyc_results <- function(tr,
                        "Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
                        formatC(recon_hit_vals[j, 1], format = "e", digits = 1),
                        "\nP-value rank = ",
-                       rank(recon_hit_vals)[j],
+                       rank(1 / rank_mat, na.last = TRUE)[j],
                        sep = ""))
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
                        col = grDevices::rgb(1, 0, 0, 0.25),
@@ -912,9 +916,13 @@ plot_synchronous_results  <- function(tr,
                         "No transition",
                         "Transition")
 
+  # Prep data to report p-value rank
+  rank_mat <- trans_hit_vals
+  rank_mat[rank_mat == 0] <- NA
+
   # Loop through significant hits:
   for (j in 1:nrow(trans_hit_vals)) {
-    if (trans_hit_vals[j, 1] < fdr) {
+    if (trans_hit_vals[j, 1] > fdr) {
       graphics::par(mfrow = c(2, 2),
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
@@ -950,7 +958,7 @@ plot_synchronous_results  <- function(tr,
            main = paste0("Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
                          formatC(trans_hit_vals[j, 1], format = "e", digits = 1),
                          "\nP-value rank = ",
-                         rank(trans_hit_vals)[j],
+                         rank(1 / rank_mat, na.last = TRUE)[j],
                          sep = ""))
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
                        col = grDevices::rgb(1, 0, 0, 0.25),
@@ -1223,10 +1231,13 @@ plot_continuous_results <- function(disc_cont,
   plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
 
   # Only make the following plots for significant loci
+  # Prep data to report p-value rank
+  rank_mat <- pval_all_transition$hit_pvals
+  rank_mat[rank_mat == 0] <- NA
   transparent_grey <- grDevices::rgb(0, 0, 0, 0.25)
   transparent_red <- grDevices::rgb(1, 0, 0, 0.25)
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
-    if (pval_all_transition$hit_pvals[j, 1] < fdr) {
+    if (pval_all_transition$hit_pvals[j, 1] > fdr) {
       graphics::par(mfrow = c(3, 2),
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
@@ -1287,7 +1298,7 @@ plot_continuous_results <- function(disc_cont,
                        paste("KS Test Statistic Null Distribution\n-ln(FDR Corrected P-value) = ",
                              formatC(pval_all_transition$hit_pvals[j, 1],format = "e", digits = 1),
                              " P-value rank = ",
-                             rank(pval_all_transition$hit_pvals)[j],
+                             rank(1 / rank_mat, na.last = TRUE)[j],
                              sep = ""),
                      cex.main = hist_cex_size,
                      cex.lab = hist_cex_size,
