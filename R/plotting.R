@@ -324,10 +324,10 @@ make_manhattan_plot <- function(geno_pheno_name,
   }
 
   manhattan_cex <- 1
-  neg_log_p_value <- data.frame(-log(pval_hits))
+  neg_log_p_value <- data.frame(pval_hits)
   neg_log_p_with_num <- cbind(1:nrow(neg_log_p_value), neg_log_p_value)
   colnames(neg_log_p_with_num)[1] <- "Locus Significance"
-  sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[, 2] > -log(fdr))
+  sig_temp <- subset(neg_log_p_with_num, neg_log_p_with_num[, 2] > fdr)
   ymax <- max(-log(0.01), neg_log_p_with_num[, 2, drop = TRUE])
   with(neg_log_p_with_num,
        graphics::plot(x = neg_log_p_with_num[, 1],
@@ -344,7 +344,7 @@ make_manhattan_plot <- function(geno_pheno_name,
             ylim = c(0, ymax),
             ylab = "-ln(FDR Corrected P-value)"))
 
-  graphics::abline(h = -log(fdr),
+  graphics::abline(h = fdr,
                    col = "red")
   if (nrow(sig_temp) > 0) {
     graphics::text(x = sig_temp[, 1],
@@ -567,8 +567,8 @@ plot_phyc_results <- function(tr,
     data.frame("Locus Significance" = rep("Not Significant", ncol(g_trans_mat)),
                                  stringsAsFactors = FALSE)
   row.names(significant_loci) <- row.names(recon_hit_vals)
-  log_p_value <- data.frame(-log(recon_hit_vals))
-  significant_loci[log_p_value > -log(fdr)] <- "Significant"
+  log_p_value <- data.frame(recon_hit_vals)
+  significant_loci[log_p_value > fdr] <- "Significant"
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
@@ -690,7 +690,7 @@ plot_phyc_results <- function(tr,
                        "Genotype Transition & Phenotype Presence Co-occurrence",
                      main = paste0(
                        "Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
-                       formatC(-log(recon_hit_vals[j, 1]), format = "e", digits = 1),
+                       formatC(recon_hit_vals[j, 1], format = "e", digits = 1),
                        "\nP-value rank = ",
                        rank(recon_hit_vals[j, ]),
                        sep = ""))
@@ -828,8 +828,8 @@ plot_synchronous_results  <- function(tr,
     data.frame("Locus Significance" = rep("Not Significant", ncol(g_trans_mat)),
                stringsAsFactors = FALSE)
   row.names(significant_loci) <- row.names(trans_hit_vals)
-  log_p_value <- data.frame(-log(trans_hit_vals))
-  significant_loci[log_p_value > -log(fdr)] <- "Significant"
+  log_p_value <- data.frame(trans_hit_vals)
+  significant_loci[log_p_value > fdr] <- "Significant"
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
@@ -948,7 +948,7 @@ plot_synchronous_results  <- function(tr,
            ylab = "Count",
            xlab = "Genotype & Phenotype Transition Edge Co-occurrence",
            main = paste0("Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
-                         formatC(-log(trans_hit_vals[j, 1]), format = "e", digits = 1),
+                         formatC(trans_hit_vals[j, 1], format = "e", digits = 1),
                          "\nP-value rank = ",
                          rank(trans_hit_vals[j, ]),
                          sep = ""))
@@ -1122,9 +1122,14 @@ plot_continuous_results <- function(disc_cont,
                stringsAsFactors = FALSE)
   row.names(significant_loci) <- colnames(trans_edge_mat)
   significant_loci[row.names(significant_loci) %in%
-                     row.names(all_trans_sig_hits), ] <- "Significant"
+                     row.names(all_trans_sig_hits), ] <- "Significant & Large |Delta Phenotype|"
 
-  log_p_value <- data.frame(-log(pval_all_transition$hit_pvals))
+  signif_but_wrong_direction <-
+    row.names(pval_all_transition$hit_pvals)[pval_all_transition$hit_pvals[ , 1] > fdr][!row.names(pval_all_transition$hit_pvals) %in% row.names(all_trans_sig_hits)]
+
+  significant_loci[row.names(significant_loci) %in% signif_but_wrong_direction, ] <- "Significant & Small |Delta Phenotype|"
+
+  log_p_value <- data.frame(pval_all_transition$hit_pvals)
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
@@ -1140,7 +1145,9 @@ plot_continuous_results <- function(disc_cont,
   row.names(p_trans_mat) <- row.names(trans_edge_mat) <- c(1:ape::Nedge(tr))
 
   ann_colors <- list(
-    `Locus Significance` = c(`Not Significant` = "white", Significant = "blue"),
+    `Locus Significance` = c(`Not Significant` = "white",
+                             `Significant & Small |Delta Phenotype|` = "light blue",
+                             `Significant & Large |Delta Phenotype|` = "blue"),
     `Genotype Edge` = c(`Low Confidence` = "grey", `Non-Transition` = "white", `Transition` = "black") # TEMP TRYING TO FIX LEGEND
   )
 
@@ -1278,7 +1285,7 @@ plot_continuous_results <- function(disc_cont,
                      border = FALSE,
                      main =
                        paste("KS Test Statistic Null Distribution\n-ln(FDR Corrected P-value) = ",
-                             formatC(-log(pval_all_transition$hit_pvals[j, 1]),format = "e", digits = 1),
+                             formatC(pval_all_transition$hit_pvals[j, 1],format = "e", digits = 1),
                              " P-value rank = ",
                              rank(pval_all_transition$hit_pvals)[j],
                              sep = ""),

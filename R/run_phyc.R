@@ -104,13 +104,15 @@ run_phyc <- function(args){
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_recon <-
     get_sig_hit_and_mult_test_corr(disc_recon_results$hit_pvals, args$fdr)
+  corrected_pvals_recon$hit_pvals <- -log(corrected_pvals_recon$hit_pvals)
+  corrected_pvals_recon$sig_pvals <- -log(corrected_pvals_recon$sig_pvals)
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
   plot_phyc_results(
     tr = args$tree,
     dir = args$output_dir,
     name = args$output_name,
-    fdr = args$fdr,
+    fdr = -log(args$fdr),
     num_perm = args$perm,
     recon_hit_vals = corrected_pvals_recon$hit_pvals,
     p_recon_edges = pheno_recon_ordered_by_edges,

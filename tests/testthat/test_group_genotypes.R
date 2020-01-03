@@ -408,3 +408,5 @@ test_that("build_gene_genotype_from_snps gives error for invalid inputs", {
   # Test
   expect_error(build_gene_genotype_from_snps(temp_geno, temp_key))
 })
+
+

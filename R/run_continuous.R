@@ -89,13 +89,17 @@ run_continuous <- function(args){
                                               corrected_pvals_all_trans,
                                               args$fdr)
 
+  corrected_pvals_all_trans$hit_pvals <- -log(corrected_pvals_all_trans$hit_pvals)
+  corrected_pvals_all_trans$sig_pvals <- -log(corrected_pvals_all_trans$sig_pvals)
+  all_transitions_sig_hits <- -log(all_transitions_sig_hits)
+
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
   phenotype_vector <-
     prepare_phenotype(args$phenotype, args$discrete_or_continuous, args$tree)
   trans_mat_results <-
     plot_continuous_results(disc_cont = "continuous",
                             tr = args$tree,
-                            fdr = args$fdr,
+                            fdr = -log(args$fdr),
                             dir = args$output_dir,
                             name = args$output_name,
                             pval_all_transition = corrected_pvals_all_trans,

@@ -98,13 +98,15 @@ run_synchronous <- function(args){
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_trans <-
     get_sig_hit_and_mult_test_corr(disc_trans_results$hit_pvals, args$fdr)
+  corrected_pvals_trans$hit_pvals <- -log(corrected_pvals_trans$hit_pvals)
+  corrected_pvals_trans$sig_pvals <- -log(corrected_pvals_trans$sig_pvals)
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
   plot_synchronous_results(
     tr = args$tree,
     dir = args$output_dir,
     name = args$output_name,
-    fdr = args$fdr,
+    fdr = -log(args$fdr),
     num_perm = args$perm,
     trans_hit_vals = corrected_pvals_trans$hit_pvals,
     trans_perm_obs_results = disc_trans_results,
