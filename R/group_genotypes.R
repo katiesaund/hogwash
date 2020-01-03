@@ -6,8 +6,8 @@
 #'   $tip_and_node_rec_conf. Length of both objects is number of genotypes.
 #'   Length of vectors within each object is number of tips + number of nodes
 #'   in the tree. Both objects are binary (1/0).
-#' @param gene_to_snp_lookup_table Matrix. Two columns. 1st column is the less
-#'  condensed grouping, 2nd column is the condensed groups.
+#' @param lookup Matrix. Two columns. 1st column are the names
+#'  of the genotypes to be grouped. 2nd column contains the appropriate groups.
 #'
 #' @return List of two objects:
 #'   * tip_node_recon. List of the genotypes built into groups. Length = number
@@ -20,17 +20,24 @@
 build_gene_anc_recon_and_conf_from_snp <- function(tr,
                                                    geno,
                                                    g_recon_and_conf,
-                                                   gene_to_snp_lookup_table){
+                                                   lookup){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_binary_matrix(geno)
   check_dimensions(geno, ape::Ntip(tr), 2, NULL, 2)
   check_equal(length(g_recon_and_conf), ncol(geno))
-  check_dimensions(gene_to_snp_lookup_table, NULL, 1, 2, 2)
+  check_dimensions(lookup, NULL, 1, 2, 2)
   check_if_binary_vector_numeric(g_recon_and_conf[[1]]$tip_and_node_recon)
   check_if_binary_vector_numeric(g_recon_and_conf[[1]]$tip_and_node_rec_conf)
 
   # Function -------------------------------------------------------------------
+  unique_genes <- unique(lookup[, 2])
+
+  # Create two matrices:
+  # (1) tip_nodes_by_snp_mat_recon
+  # (2) tip_nodes_by_snp_mat_confi
+  # Where the rows are tips then nodes, names 1:sum(Ntip + Nnode)
+  # Where the columns are the genotype names (SNPs not genes yet)
   tip_nodes_by_snp_mat_recon <-
     tip_nodes_by_snp_mat_confi <-
     matrix(0, nrow = (ape::Nnode(tr) + ape::Ntip(tr)), ncol = ncol(geno))
@@ -50,21 +57,14 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
     colnames(tip_nodes_by_snp_mat_confi) <-
     colnames(geno)
 
+  # Create a thrid matrix called recon_times_confi
+  # This matrix records reconstruction times confidence values
   recon_times_confi <- tip_nodes_by_snp_mat_recon * tip_nodes_by_snp_mat_confi
-  tip_nod_by_mat_recon_w_gene_id <-
-    rbind(tip_nodes_by_snp_mat_recon,
-          unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
-  tip_node_by_snp_mat_conf_w_id <-
-    rbind(tip_nodes_by_snp_mat_confi,
-          unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
-  recon_times_confi_with_gene_id <-
-    rbind(recon_times_confi,
-          unlist(gene_to_snp_lookup_table[, 2, drop = TRUE]))
 
-  check_equal(nrow(tip_nod_by_mat_recon_w_gene_id),
-              (nrow(tip_nodes_by_snp_mat_recon) + 1))
-  unique_genes <- unique(gene_to_snp_lookup_table[, 2])
-
+  # Build the three gene matrices from the SNP matrices
+  # (1) Gene reconstruction (gene_mat_built_from_snps)
+  # (2) Gene present and confident (gene_presence_confidence)
+  # (3) Gene absent and confidence (gene_absence_confidence)
   gene_mat_built_from_snps <-
     gene_presence_confidence <-
     gene_absence_confidence <-
@@ -73,25 +73,20 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
            ncol = length(unique_genes))
 
   for (j in 1:length(unique_genes)) {
-    # Matrix of just the SNPs found in gene "j"
+    # Generate temporary matrices- subset to just the SNPs found in gene "j"
     temp_mat <-
-      tip_nod_by_mat_recon_w_gene_id[1:(
-        nrow(tip_nod_by_mat_recon_w_gene_id) - 1),
-        tip_nod_by_mat_recon_w_gene_id[nrow(
-          tip_nod_by_mat_recon_w_gene_id), ] == unique_genes[j],
-        drop = FALSE]
-    temp_recon_times_confi <-
-      recon_times_confi_with_gene_id[1:(
-        nrow(recon_times_confi_with_gene_id) - 1),
-        recon_times_confi_with_gene_id[nrow(
-          recon_times_confi_with_gene_id), ] == unique_genes[j],
-        drop = FALSE]
+      tip_nodes_by_snp_mat_recon[,
+                                 colnames(tip_nodes_by_snp_mat_recon) %in% lookup[ , 1][lookup[, 2] == unique_genes[j]],
+                                 drop = FALSE]
+
     temp_conf <-
-      tip_node_by_snp_mat_conf_w_id[1:(
-        nrow(tip_node_by_snp_mat_conf_w_id) - 1),
-        tip_node_by_snp_mat_conf_w_id[nrow(
-          tip_node_by_snp_mat_conf_w_id), ] == unique_genes[j],
-        drop = FALSE]
+      tip_nodes_by_snp_mat_confi[,
+                                 colnames(tip_nodes_by_snp_mat_confi) %in% lookup[ , 1][lookup[, 2] == unique_genes[j]],
+                                 drop = FALSE]
+    temp_recon_times_confi <-
+      recon_times_confi[,
+                        colnames(recon_times_confi) %in% lookup[ , 1][lookup[, 2] == unique_genes[j]],
+                        drop = FALSE]
     class(temp_mat) <-
       class(temp_recon_times_confi) <-
       class(temp_conf) <-
@@ -107,10 +102,7 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
 
   gene_mat_built_from_snps <- gene_mat_built_from_snps > 0
   gene_presence_confidence <- gene_presence_confidence > 0
-  class(gene_mat_built_from_snps) <-
-    class(gene_presence_confidence) <-
-    "numeric"
-
+  class(gene_mat_built_from_snps) <- class(gene_presence_confidence) <- "numeric"
   gene_all_confidence <- gene_presence_confidence + gene_absence_confidence
 
   colnames(gene_mat_built_from_snps) <-
@@ -293,6 +285,7 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 
   # Function -------------------------------------------------------------------
   unique_genes <- unique(gene_to_snp_lookup_table[, 2])
+  # TODO CHANGE nrow = nrow(geno) to length(unique(row.names(geno)))
   samples_by_genes <- matrix(0, nrow = nrow(geno), ncol = length(unique_genes))
   colnames(samples_by_genes) <- unique_genes
   row.names(samples_by_genes) <- row.names(geno)
@@ -483,7 +476,8 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
 #'  genotypes.
 #'  * $transition. Length == Nedge(tr).
 #'  * $trans_dir. Length == Nedge(tr).
-#' @param lookup Matrix. Characters. Nrow = number of genotypes.
+#' @param lookup Matrix. Characters. Nrow = number of unique genotype-group
+#'  pairings.
 #' @param uni_genes Character vector. Equivalent to unique(lookup[,2]).
 #'
 #' @return List of 6 objects.
@@ -538,8 +532,15 @@ group_genotypes <- function(tr,
                                            geno,
                                            geno_reconstruction_and_conf,
                                            lookup)
+  print("geno_recon_and_conf_tip_node")
+  print(geno_recon_and_conf_tip_node)
+
   genotype_transition_sync <-
     build_gene_trans_from_snp_trans(tr, geno, genotype_transition_sync, lookup)
+
+  print("geno_recon_and_conf_tip_node")
+  print(geno_recon_and_conf_tip_node)
+
   genotype_transition_phyc <-
     build_gene_trans_from_snp_trans(tr, geno, genotype_transition_phyc, lookup)
 
