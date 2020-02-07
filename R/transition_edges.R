@@ -10,30 +10,33 @@
 # The first colum is the older node and the second column is the younger node.
 
 
-#' identify_transition_edges
+#' Identify transition edges on a tree
 #'
 #' @description Given a reconstruction identify which edges on tree are
-#'  transitions. A transition edge is one in which the parent node and child
-#'  node differ.
+#'   transitions. A transition edge is one in which the parent node and child
+#'   node differ.
 #'
 #' @param tr Phylo.
 #' @param mat Matrix. Phenotype (either continuous or binary) or a binary
 #'   genotype. Dim: nrow = Ntrip(tr) x ncol = {1 if phenotype or number of
 #'   genotypes}.
-#' @param num Integer. Index of current genotype (column number in genotype matrix).
+#' @param num Integer. Index of current genotype (column number in genotype
+#'   matrix).
 #' @param node_recon Numeric vector. Either pheno_recon_and_conf$node_anc_rec or
-#'  geno_recon_and_conf[[k]]$node_anc_rec. Length = Nnode(tr). Ancestral
-#'  reconstruction value for each node.
+#'   geno_recon_and_conf[[k]]$node_anc_rec. Length = Nnode(tr). Ancestral
+#'   reconstruction value for each node.
 #' @param disc_cont Character string. Either "discrete" or "continuous".
 #'
 #' @return List.
-#'  * $transition: Continuous: NA, because this is meaningless for continuous data
-#'    as all edges will be transitions. Discrete: Numeric vector of 0 or 1. 0
-#'    indicates parent and child node are identical. 1 indicates parent and
-#'    child node differ.
-#'  * $trans_dir: Numeric Vector. Continuous and discrete: gives the direction
-#'    of the transition. When parent < child or parent_0_child_1 value is +1.
-#'    When parent > child or parent_1_child_0 value is -1.
+#'   \describe{
+#'    \item{transition}{Continuous: NA, because this is meaningless for
+#'    continuous data as all edges will be transitions. Discrete: Numeric vector
+#'    of 0 or 1. 0 indicates parent and child node are identical. 1 indicates
+#'    parent and child node differ.}
+#'    \item{trans_dir}{Numeric Vector. Continuous and discrete: gives the
+#'    direction of the transition. When parent < child or parent_0_child_1 value
+#'    is +1. When parent > child or parent_1_child_0 value is -1.}
+#'   }
 #' @noRd
 identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
   # Check input ----------------------------------------------------------------
@@ -87,21 +90,22 @@ identify_transition_edges <- function(tr, mat, num, node_recon, disc_cont){
   # Check and return output ----------------------------------------------------
   results <- list("transition" = transition, "trans_dir" = transition_direction)
   return(results)
-} # end identify_transition_edges()
+}
 
-#' keep_two_plus_hi_conf_tran_ed
+#' Keep only genotypes with two or more high confidence transition edges
 #'
 #' @description Since we're looking for convergence of transitions we need a
-#'  second quality control step where we remove genotypes that have only 1
-#'  transition-edge or where the transition edges are identical!
+#'   second quality control step where we remove genotypes that have only 1
+#'   transition-edge or where the transition edges are identical!
 #'
 #' @param genotype_transition List of multiple vectors ($transition and
-#'  $trans_dir). Length(list) = number of genotypes. Length(vector) = Nedge(tr).
+#'   $trans_dir). Length(list) = number of genotypes. Length(vector) =
+#'   Nedge(tr).
 #' @param genotype_confidence List of vectors. Length(list) = number of
-#'  genotypes. Length(vector) = Nedge(tr). Binary.
+#'   genotypes. Length(vector) = Nedge(tr). Binary.
 #'
-#' @return at_least_two_hi_conf_trans_ed Logical vector.
-#'  Length == length(genotype_transition) == length(genotype_confidence).
+#' @return at_least_two_hi_conf_trans_ed Logical vector. Length ==
+#'   length(genotype_transition) == length(genotype_confidence).
 #' @noRd
 keep_two_plus_hi_conf_tran_ed <- function(genotype_transition,
                                           genotype_confidence){
@@ -124,52 +128,60 @@ keep_two_plus_hi_conf_tran_ed <- function(genotype_transition,
 
   # Check and return output ----------------------------------------------------
   return(at_least_two_hi_conf_trans_ed)
-} # end keep_two_plus_hi_conf_tran_ed()
+}
 
-#' keep_hits_with_more_change_on_trans_edges
+#' Keep only significant hits with more change on transition edges than
+#' non-transition edges
 #'
 #' @description  Of all of the significant hits, keep only those where the
-#'  median(delta phenotype) on transition edges is > median(delta phenotype) on
-#'  all edges. Do this so that we're only selecting for genotypes that are
-#'  plausibly have large effect on phenotype, rather than miniscule effects on
-#'  phenotype. Essentially, we're enforcing a one tailed test instead of using
-#'  the results of a two-tailed test.
+#'   median(delta phenotype) on transition edges is > median(delta phenotype) on
+#'   all edges. Do this so that we're only selecting for genotypes that are
+#'   plausibly have large effect on phenotype, rather than miniscule effects on
+#'   phenotype. Essentially, we're enforcing a one tailed test instead of using
+#'   the results of a two-tailed test.
 #'
 #' @param results List of 8.
-#' * $pvals. Named numeric vector. Length == number of genotypes. Values between
-#'   1 and 0. Names are genotype names.
-#' * $ks_statistics. List of numeric vectors. Length of list == number of
-#'   genotypes. Each vector has length == number of permutations. Values
-#'   between 1 and 0.
-#' * $observed_pheno_trans_delta. List of numeric vectors. Length of list ==
-#'   number of genotypes. Vectors are of variable length because length is the
-#'   number of transition edges for that particular genotype. Vectors are
-#'   numeric.
-#' * $observed_pheno_non_trans_delta. List of numeric vectors. Length of list
-#'   == number of genotypes. Vectors are of variable length because length is
-#'   the number of non-transition edges for that particular genotype. Vectors
-#'   are numeric.
-#' * $trans_median. Numberic. Vector. Length = number of genotypes. Describes
-#'   median delta phenotype on all transition edges.
-#' * $all_edges_median. Numeric vector. Length = number of genotypes. Describes
-#'   median delta phenotype on all edges.
-#' * $num_genotypes. Integer. The number of genotypes.
-#' * $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values
-#'   between 1 and 0.
+#'   \describe{
+#'    \item{pvals.}{Named numeric vector. Length == number of genotypes. Values
+#'    between 1 and 0. Names are genotype names.}
+#'    \item{ks_statistics.}{List of numeric vectors. Length of list == number of
+#'    genotypes. Each vector has length == number of permutations. Values
+#'    between 1 and 0.}
+#'    \item{observed_pheno_trans_delta.}{List of numeric vectors. Length of
+#'    list == number of genotypes. Vectors are of variable length because
+#'    length is the number of transition edges for that particular genotype.
+#'    Vectors are numeric.}
+#'    \item{observed_pheno_non_trans_delta.}{List of numeric vectors. Length of
+#'    list == number of genotypes. Vectors are of variable length because length
+#'    is the number of non-transition edges for that particular genotype.
+#'    Vectors are numeric.}
+#'    \item{trans_median.}{Numberic. Vector. Length = number of genotypes.
+#'    Describes median delta phenotype on all transition edges.}
+#'    \item{all_edges_median.}{Numeric vector. Length = number of genotypes.
+#'    Describes median delta phenotype on all edges.}
+#'    \item{num_genotypes.}{Integer. The number of genotypes.}
+#'    \item{observed_ks_stat.}{Numeric Vector. Length = number of genotypes.
+#'    Values between 1 and 0.}
+#'   }
 #' @param pvals List of 2.
-#'  * $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names =
-#'    genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
-#'  * $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are
+#'   \describe{
+#'    \item{hit_pvals.}{Dataframe. 1 column. Nrow = number of genotypes.
+#'    Row.names = genotypes. Column name = "fdr_corrected_pvals". Values between
+#'    1 and 0.}
+#'    \item{sig_pvals.}{Dataframe. 1 column. Nrow = number of genotypes that are
 #'    significant after FDR correction. Column name =
 #'    "fdr_corrected_pvals[fdr_corrected_pvals < fdr]". Row.names = genotypes.
 #'    Nrow = is variable-- could be between 0 and max number of genotypes. It
-#'     will only have rows if the corrected p-value is less than the fdr value.
-#' @param fdr Number. False discovery rate (significance threshold). Between 0 and 1.
+#'    will only have rows if the corrected p-value is less than the fdr value.}
+#'   }
+#' @param fdr Number. False discovery rate (significance threshold). Between 0
+#'   and 1.
 #'
 #' @return  hits. Data.frame. 1 column. Colnum names = "fdr_corrected_pvals".
-#'  Nrow = variable. Number of genotypes that are (1) significant after multiple
-#'  test correction and (2) have higher median delta phenotype on transition
-#'  edges than on all edges. Values are between 1 and 0. Rownames are genotypes.
+#'   Nrow = variable. Number of genotypes that are (1) significant after
+#'   multiple test correction and (2) have higher median delta phenotype on
+#'   transition edges than on all edges. Values are between 1 and 0. Rownames
+#'   are genotypes.
 #' @noRd
 keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
   # Check inputs ---------------------------------------------------------------
@@ -188,22 +200,24 @@ keep_hits_with_more_change_on_trans_edges <- function(results, pvals, fdr){
 
   # Check and return output ----------------------------------------------------
   return(hits)
-} # end keep_hits_with_more_change_on_trans_edges()
+}
 
-#' prep_geno_trans_for_phyc
+#' Prepare genotype transition object for PhyC Test
 #'
 #' @description Discrete testing requires two different definitions of genotype
-#'  transition, one for PhyC and one for Synchronous Test. This function
-#'  converts geno_trans$transition from the object created for synchronous test
-#'  to the version required for the PhyC test.
+#'   transition, one for PhyC and one for Synchronous Test. This function
+#'   converts geno_trans$transition from the object created for synchronous test
+#'   to the version required for the PhyC test.
 #'
-#'  @details For PhyC prepare genotype transition as below: keep only WT ->
+#' @details For PhyC prepare genotype transition as below: keep only WT ->
 #'   mutant transitions (0 -> 1)
 #'
 #' @param geno Matrix. Nrow = Ntip(Tree). Ncol = number of genotypes. Binary.
-#' @param genotype_transition List of lists. Each sublist has two vectors.
-#'  * $transition. Length  == Nedge(tree). 0/1
-#'  * $trans_dir. -1/0/1. Length == Nedge(tree).
+#' @param genotype_transition List of lists. Each sublist has two vectors:
+#'   \describe{
+#'     \item{transition}{Length == Nedge(tree). 0/1}
+#'     \item{trans_dir}{-1/0/1. Length == Nedge(tree).}
+#'   }
 #'
 #' @return genotype_transition. List with $transition and $trans_dir.
 #' @noRd
@@ -227,4 +241,4 @@ prep_geno_trans_for_phyc <- function(geno, genotype_transition){
 
   # Return output --------------------------------------------------------------
   return(genotype_transition)
-} # end prep_geno_trans_for_phyc()
+}
