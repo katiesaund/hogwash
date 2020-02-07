@@ -1,4 +1,4 @@
-#' run_ks_test
+#' Run KS Test
 #'
 #' @description Run a Kolmogorov-Smirnov test on the continuous phenotype. The
 #'   phenotype is divided into two groups: transition edges and non-transition
@@ -12,15 +12,16 @@
 #'   node. 2nd column is daughter node.
 #'
 #' @return A list of 4 elements:
-#'   * $pval. Numeric. KS Test p-value.
-#'   * $statistic. Numeric. KS Test statistic.
-#'   * $pheno_trans_delta. Numeric vector. The value of the delta of the
-#'       phenotype on transition edges.
-#'   * $pheno_non_trans_delta. Numeric vector. The value of the delta of the
-#'       phenotype on all non-transition edges.
+#'   \describe{
+#'     \item{pval.}{Numeric. KS Test p-value.}
+#'     \item{statistic.}{Numeric. KS Test statistic.}
+#'     \item{pheno_trans_delta.}{Numeric vector. The value of the delta of the
+#'     phenotype on transition edges.}
+#'     \item{pheno_non_trans_delta.}{Numeric vector. The value of the delta of
+#'     the phenotype on all non-transition edges.}
+#'   }
 #'
 #' @noRd
-#'
 run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   # Check inputs ---------------------------------------------------------------
   if (length(t_index) < 1 | length(non_t_index) < 1) {
@@ -61,9 +62,9 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
                   "pheno_trans_delta"     = p_trans_delta,
                   "pheno_non_trans_delta" = p_non_trans_delta)
   return(results)
-} # end run_ks_test()
+}
 
-#' get_hi_conf_tran_indices
+#' Get the indices of high and low confidence transition edges
 #'
 #' @description Returns a list of the indices of each high confidence transition
 #'   tree edge and a list of the indicies that are low confidence,
@@ -80,11 +81,13 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
 #' @param tr Phylo.
 #'
 #' @return results. List of 2.
-#'  * trans_index: Vector of numbers. Each number corresponds to an edge that is
-#'      both a transition and high confidence.
-#'  * non_trans_index: hi_conf_non_trans_index. Vector of numbers. Each number
-#'      corresponds to an edge that is both a not a transition and high
-#'      confidence.
+#'   \describe{
+#'     \item{trans_index}{Vector of numbers. Each number corresponds to an edge
+#'     that is both a transition and high confidence.}
+#'     \item{non_trans_index}{hi_conf_non_trans_index. Vector of numbers. Each
+#'     number corresponds to an edge that is both a not a transition and high
+#'     confidence.}
+#'   }
 #' @noRd
 #'
 get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
@@ -113,19 +116,21 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
   # Return output --------------------------------------------------------------
   return(list("trans_index" = hi_conf_trans_index,
               "non_trans_index" = hi_conf_non_trans_index))
-} # end get_hi_conf_tran_indices()
+}
 
-#' continuous_permutation
+#' Perform permutation for continuous data
 #'
 #' @description Perform permutation of which genotype edges are considered high
 #'   confidence transitions.
 #'
 #' @param index_obj List of 2.
-#'  * trans_index: Vector of numbers. Each number corresponds to an edge that is
-#'      both a transition and high confidence.
-#'  * non_trans_index: hi_conf_non_trans_index. Vector of numbers. Each number
-#'      corresponds to an edge that is both a not a transition and high
-#'      confidence.
+#'   \describe{
+#'     \item{trans_index}{Vector of numbers. Each number corresponds to an edge
+#'     that is both a transition and high confidence.}
+#'     \item{non_trans_index}{hi_conf_non_trans_index. Vector of numbers. Each
+#'     number corresponds to an edge that is both a not a transition and high
+#'     confidence.}
+#'   }
 #' @param tr Phylo.
 #' @param geno_conf Length(list) = ncol(mat) == number of genotypes. Each entry
 #'   is a vector with length == Nedge(tr). All entries are 0 (low confidence) or
@@ -134,13 +139,14 @@ get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
 #' @param num_i Integer. The i from the loop this function is set within.
 #'
 #' @return List of 2:
-#'   * $hi_conf_edges. List of edge numbers. Corresponds to edges in tree with
-#'       high confidence.
-#'   * $permuted_trans_index_mat. Matrix. Nrow = number of permutations. Ncol =
-#'       Number of transition edges. Each entry is an edge number.
+#'   \describe{
+#'     \item{hi_conf_edges}{List of edge numbers. Corresponds to edges in tree
+#'     with high confidence.}
+#'     \item{permuted_trans_index_mat}{Matrix. Nrow = number of permutations.
+#'     Ncol = Number of transition edges. Each entry is an edge number.}
+#'   }
 #'
 #' @noRd
-#'
 continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -186,9 +192,9 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
                    min_cols = 1)
   return(list("hi_conf_edges" = hi_conf_edges,
               "permuted_trans_index_mat" = permuted_trans_index_mat))
-} # end continuous_permutation()
+}
 
-#' calculate_empirical_pheno_delta
+#' Calculate empirical delta phenotype
 #'
 #' @description Return Kolmogorov-Smirnov test statistic on the permuted
 #'   (empirical) phenotype deltas per tree edge.
@@ -205,7 +211,6 @@ continuous_permutation <- function(index_obj, tr, geno_conf, perm, num_i){
 #' @return empirical_ks_stat
 #'
 #' @noRd
-#'
 calculate_empirical_pheno_delta <- function(perm,
                                             permuted_trans_mat,
                                             hi_conf_edge_nums,
@@ -235,9 +240,9 @@ calculate_empirical_pheno_delta <- function(perm,
   }
   # Check and return output ----------------------------------------------------
   return(empirical_ks_stat)
-} # end calculate_empirical_pheno_delta()
+}
 
-#' calc_sig
+#' Calculate significance for continuous data
 #'
 #' @description Run Kolmogorov-Smirnov test to find out if the phenotype change
 #'   on transition edges is significantly different from phenotype change on
@@ -245,7 +250,7 @@ calculate_empirical_pheno_delta <- function(perm,
 #'   statistics of the permuted values as compared to the observed (real) value.
 #'
 #' @param mat Matrix. Nrow(mat) == number of samples. Each column is a variant.
-#'  Matrix is binary.
+#'   Matrix is binary.
 #' @param permutations Integer. Number of times to run the permutation test.
 #' @param genotype_transition_list List of lists.
 #'   Length(genotype_transition_list) == num genotypes. For each genotype there
@@ -259,27 +264,29 @@ calculate_empirical_pheno_delta <- function(perm,
 #'   genotypes. Each entry is a vector with length == Nedge(tr). All entries are
 #'   0 (low confidence) or 1 (high confidence).
 #'
-#' @return List of 8.
-#'  * $pvals. Named numeric vector. Length == number of genotypes. Values
-#'      between 1 and 0. Names are genotype names.
-#'  * $ks_statistics. List of numeric vectors. Length of list == number of
-#'      genotypes. Each vector has length == number of permutations. Values
-#'      between 1 and 0.
-#'  * $observed_pheno_trans_delta. List of numeric vectors. Length of list ==
-#'      number of genotypes. Vectors are of variable length because length is
-#'      the number of transition edges for that particular genotype. Vectors are
-#'      numeric.
-#'  * $observed_pheno_non_trans_delta. List of numeric vectors. Length of list
-#'       == number of genotypes. Vectors are of variable length because length
-#'       is the number of non-transition edges for that particular genotype.
-#'       Vectors are numeric.
-#'  * $trans_median. Numberic. Vector. Length = number of genotypes. Describes
-#'      median delta phenotype on all transition edges.
-#'  * $all_edges_median. Numeric vector. Length = number of genotypes. Describes
-#'      median delta phenotype on all edges.
-#'  * $num_genotypes. Integer. The number of genotypes.
-#'  * $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values
-#'      between 1 and 0.
+#' @return List of 8:
+#'   \describe{
+#'     \item{pvals}{Named numeric vector. Length == number of genotypes. Values
+#'     between 1 and 0. Names are genotype names.}
+#'     \item{ks_statistics.}{List of numeric vectors. Length of list == number
+#'     of genotypes. Each vector has length == number of permutations. Values
+#'     between 1 and 0.}
+#'     \item{observed_pheno_trans_delta}{List of numeric vectors. Length of
+#'     list == number of genotypes. Vectors are of variable length because
+#'     length is the number of transition edges for that particular genotype.
+#'     Vectors are numeric.}
+#'     \item{observed_pheno_non_trans_delta}{List of numeric vectors. Length of
+#'     list == number of genotypes. Vectors are of variable length because
+#'     length is the number of non-transition edges for that particular
+#'     genotype. Vectors are numeric.}
+#'     \item{trans_median}{Numberic. Vector. Length = number of genotypes.
+#'     Describes median delta phenotype on all transition edges.}
+#'     \item{all_edges_median}{Numeric vector. Length = number of genotypes.
+#'     Describes median delta phenotype on all edges.}
+#'     \item{num_genotypes}{Integer. The number of genotypes.}
+#'     \item{observed_ks_stat.}{Numeric Vector. Length = number of genotypes.
+#'     Values between 1 and 0.}
+#'   }
 #'
 #' @noRd
 calc_sig <- function(mat,
@@ -373,12 +380,12 @@ calc_sig <- function(mat,
   return(results)
 } # end calc_sig()
 
-#' get_sig_hit_and_mult_test_corr
+#' Identify the significant loci and apply mulitiple test correction
 #'
 #' @description Given p-values that have not yet been corrected for multiple
-#' testing, apply a false discovery rate. Using FDR instead of FWER/bonferroni
-#' because these approaches tend to suffer from low power. FDR control increases
-#' power while bounding error.
+#'   testing, apply a false discovery rate. Using FDR instead of FWER/bonferroni
+#'   because these approaches tend to suffer from low power. FDR control
+#'   increases power while bounding error.
 #'
 #' @details Note, implementation of FDR is different from the choice of
 #'   bonferroni in the phyC paper.
@@ -389,17 +396,19 @@ calc_sig <- function(mat,
 #' @param fdr Numeric. False discovery rate (typically ~10% for discovery work).
 #'   Between 0 and 1.
 #'
-#' @return pvals. List of two data.frames.
-#'   * $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names =
-#'       genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
-#'   * $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are
-#'       significant after FDR correction. Column name =
-#'       "fdr_corrected_pvals[fdr_corrected_pvals < fdr]".
-#'       Row.names = genotypes. Nrow = is variable-- could be between 0 and
-#'        max number of genotypes. It will only have rows if the corrected
-#'        p-value is less than the fdr value.
-#' @noRd
+#' @return pvals. List of two data.frames:
+#'   \describe{
+#'     \item{hit_pvals}{Dataframe. 1 column. Nrow = number of genotypes.
+#'     Row.names = genotypes. Column name = "fdr_corrected_pvals". Values
+#'     between 1 and 0.}
+#'     \item{sig_pvals}{Dataframe. 1 column. Nrow = number of genotypes that
+#'     are significant after FDR correction. Column name =
+#'     "fdr_corrected_pvals[fdr_corrected_pvals < fdr]". Row.names = genotypes.
+#'     Nrow = is variable-- could be between 0 and max number of genotypes. It
+#'     will only have rows if the corrected p-value is less than the fdr value.}
+#'   }
 #'
+#' @noRd
 get_sig_hit_and_mult_test_corr <- function(hit_values, fdr){
   # Check inputs ---------------------------------------------------------------
   check_num_between_0_and_1(fdr)
@@ -419,4 +428,4 @@ get_sig_hit_and_mult_test_corr <- function(hit_values, fdr){
   results <- list("hit_pvals" = fdr_corrected_pvals,
                   "sig_pvals" = sig_pvals)
   return(results)
-} # end get_sig_hit_and_mult_test_corr()
+}
