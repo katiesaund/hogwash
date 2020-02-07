@@ -1,7 +1,7 @@
-#' ancestral_reconstruction_by_ML
+#' Calculate ancestral reconstruciton with maximum likelihood approach
 #'
 #' @description Compute ancestral reconstruction from a continuous phenotype or
-#' discrete genotype or phenotype.
+#'   discrete genotype or phenotype.
 #'
 #' @details Note on the marginal setting in the function ape::ace(). Marginal =
 #'   FALSE means that the marginal is in fact calculated. Do not set marginal to
@@ -11,24 +11,25 @@
 #' @param tr Phylo. Rooted phylogenetic tree.
 #' @param mat Matrix. Either the phenotype matrix or the genotype matrix. Dim:
 #'   nrow = Ntip(tr) x ncol = {1 if phenotype or number of genotypes}.
-#' @param num Numeric. Indicating the row of the matrix from which the
-#'   ancestral reconstruction is to be built.
+#' @param num Numeric. Indicating the row of the matrix from which the ancestral
+#'   reconstruction is to be built.
 #' @param disc_cont Character. Either "discrete" or "continuous."
 #'
-#' @return results a list with multiple outputs:
-#'   * node_anc_rec Vector. Ancestral reconstruction for each node. Length =
-#'       Nnode(tr).
-#'   * tip_and_node_rec_conf A vector with a 1 for each tip with the node
-#'       ancestral reconstruction confidence appended. Length = Nnode(tr) +
-#'       Ntip(tr).
-#'   * recon_edge_mat Matrix. Ancestral reconstruction configured into the edge
-#'        matrix. Dim: nrow = Nedge(tr) x ncol = 2. 1st column == parent node.
-#'        2nd column == child node.
-#'   * tip_and_node_recon A vector with the tip values followed by the node
-#'       ancestral reconstruction. Length == Ntip(tr) + Nnode(tr).
+#' @return Returns a list with multiple elements:
+#'   \describe{
+#'     \item{node_anc_rec}{Vector. Ancestral reconstruction for each node.
+#'     Length = Nnode(tr).}
+#'      \item{tip_and_node_rec_conf}{A vector with a 1 for each tip with the
+#'      node ancestral reconstruction confidence appended. Length = Nnode(tr) +
+#'      Ntip(tr).}
+#'     \item{recon_edge_mat}{Matrix. Ancestral reconstruction configured into
+#'     the edge matrix. Dim: nrow = Nedge(tr) x ncol = 2. 1st column == parent
+#'     node. 2nd column == child node.}
+#'     \item{tip_and_node_recon}{A vector with the tip values followed by the
+#'     node ancestral reconstruction. Length == Ntip(tr) + Nnode(tr).}
+#'   }
 #'
 #' @noRd
-#'
 ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   # Check input ----------------------------------------------------------------
   check_is_string(disc_cont)
@@ -46,7 +47,6 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
                                     # reconstruction per node .875/.125 = 7.
 
   if (disc_cont == "continuous") {
-    # This is only for a continuous phenotype
     # RECONSTRUCTION
     cont_results <- continuous_ancestral_reconstruction(tr,
                                                         mat,
@@ -82,9 +82,9 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
                   "recon_edge_mat" = reconstruction_as_edge_mat,
                   "tip_and_node_recon" = tip_and_node_recon)
   return(results)
-} # end ancestral_reconstruction_by_ML()
+}
 
-#' continuous_ancestral_reconstruction
+#' Perform ancestral reconstruction for continuous data
 #'
 #' @description Perform ancestral state reconstruction using ape::ace() function
 #'   on continuous phenotype.
@@ -95,13 +95,15 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
 #' @param disc_cont Character string. Must be "continuous."
 #' @param recon_method Character string. Either "ML", "REML", "pic", or "GLS."
 #'
-#' @return List of two outputs:
-#'  * ML_anc_rec. Reconstruction values for each node.
-#'  * tip_and_node_recon. Vector. Phenotype values for each tip followed by the
-#'      ancestral reconstruction at each node. Length = Ntip(tr) + Nnode(tr).
+#' @return List of two elements:
+#'   \describe{
+#'     \item{ML_anc_rec}{Reconstruction values for each node.}
+#'     \item{tip_and_node_recon}{Vector. Phenotype values for each tip followed
+#'     by the ancestral reconstruction at each node. Length = Ntip(tr) +
+#'     Nnode(tr).}
+#'   }
 #'
 #' @noRd
-#'
 continuous_ancestral_reconstruction <- function(tr,
                                                 mat,
                                                 num,
@@ -140,7 +142,7 @@ continuous_ancestral_reconstruction <- function(tr,
               "tip_and_node_recon" = tip_and_node_recon))
 } # end continuous_ancestral_reconstruction()
 
-#' continuous_get_recon_confidence
+#' Create a confidence vector for the continuous trait reconstruction
 #'
 #' @description Given a vector of a continuous trait reconstruction, generate a
 #'   dummy confidence vector. Ancestral reconstruction for continuous values
@@ -155,7 +157,6 @@ continuous_ancestral_reconstruction <- function(tr,
 #'   confidence. Length == Ntip(tr) + Nnode(tr). Tips folowed by nodes.
 #'
 #' @noRd
-#'
 continuous_get_recon_confidence <- function(recon_vector){
   # Check input ----------------------------------------------------------------
   if (!is.vector(recon_vector)) {
@@ -168,9 +169,9 @@ continuous_get_recon_confidence <- function(recon_vector){
 
   # Return output --------------------------------------------------------------
   return(tip_and_node_anc_rec_conf)
-} # end continuous_get_recon_confidence()
+}
 
-#' convert_to_edge_mat
+#' Convert a vector to an edge matrix
 #'
 #' @description Convert the reconstruction to be in the same format as
 #'   tree$edge, where each row is an edge. This format will make it much easier
@@ -204,16 +205,16 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
 
   # Return output --------------------------------------------------------------
   return(reconstruction_as_edge_mat)
-} # end convert_to_edge_mat()
+}
 
 #' Perform ancestral reconstruction of discrete data
 #'
 #' @description Perform ancestral state reconstruction using ape::ace() function
 #'   on discrete phenotype or genotype. The best model to describe the
 #'   probabilities of state changes is decided by the subfunction:
-#'   build_better_reconstruction(), which chooses either 'ARD', all rates
-#'    different, or ER', equal rates and returns the better of the two
-#'    reconstructions.
+#'   build_better_reconstruction(), which chooses either "'"ARD", all rates
+#'   different, or "ER", equal rates and returns the better of the two
+#'   reconstructions.
 #'
 #' @param tr Phylo.
 #' @param mat Matrix. Genotype or discrete phenotype matrix.
@@ -221,19 +222,25 @@ convert_to_edge_mat <- function(tr, tip_and_node_reconstruction){
 #' @param disc_cont Character. Should always be "discrete."
 #' @param recon_method Character string. Either "ML", "REML", "pic", or "GLS."
 #'
-#' @return List with multiple outputs:
-#'   * ML_anc_rec: Vector. Reconstruction (numeric) at node values only. Length
-#'       = Nnode(tr).
-#'   * tip_and_node_recon: A vector with the tip values followed by the node
-#'       ancestral reconstruction. Length = Nnode(tr) + Ntip(tr).
-#'   * reconstruction: Ape::ace() object. Contains multiple pieces of
+#' @return List with multiple elements:
+#'   \describe{
+#'     \item{ML_anc_rec}{Vector. Reconstruction (numeric) at node values only.
+#'     Length = Nnode(tr).}
+#'     \item{tip_and_node_recon}{A vector with the tip values followed by the
+#'     node ancestral reconstruction. Length = Nnode(tr) + Ntip(tr).}
+#'     \item{reconstruction}{Ape::ace() object. Contains multiple pieces of
 #'       information. Class = "ace." Type = "list".
-#'       $loglik. Number. Log likelihood of the ancestral reconstruction.
-#'       $rates. Number.
-#'       $se. Number. Standard error.
-#'       $index.matrix. Matrix.
-#'       $lik.anc. Matrix. Likelihood for each state at each tree node.
-#'       $call. Record of the ace() call. Class = "call."
+#'       \describe{
+#'         \item{loglik}{Number. Log likelihood of the ancestral
+#'         reconstruction.}
+#'         \item{rates}{Number.}
+#'         \item{se}{Number. Standard error.}
+#'         \item{index.matrix}{Matrix.}
+#'         \item{lik.anc}{Matrix. Likelihood for each state at each tree node}
+#'         \item{call}{Record of the `ace()` call. Class = "call."}
+#'       }
+#'     }
+#'   }
 #'
 #' @noRd
 discrete_ancestral_reconstruction <- function(tr,
@@ -271,9 +278,9 @@ discrete_ancestral_reconstruction <- function(tr,
   return(list("tip_and_node_recon" = tip_and_node_recon,
               "ML_anc_rec" = ML_anc_rec,
               "reconstruction" = reconstruction))
-} # end discrete_ancestral_reconstruction()
+}
 
-#' discrete_get_recon_confidence
+#' Identify high confidence ancestral reconstruction nodes
 #'
 #' @description Given the ancestral reconstruction identify which nodes are high
 #'   confidence based on the maximum likelihood of the reconstruction and the
@@ -283,19 +290,21 @@ discrete_ancestral_reconstruction <- function(tr,
 #'
 #' @param recon Ape::ace() object. Contains multiple pieces of information.
 #'   Class = "ace." Type = "list." Ancestral reconstruction.
-#'   * $loglik. Number. Log likelihood of the ancestral reconstruction.
-#'   * $rates. Number.
-#'   * $se. Number. Standard error.
-#'   * $index.matrix. Matrix.
-#'   * $lik.anc. Matrix. Likelihood for each state at each tree node.
-#'   * $call. Record of the ace() call. Class = "call."
+#'   \describe{
+#'     \item{loglik}{Number. Log likelihood of the ancestral
+#'     reconstruction.}
+#'     \item{rates}{Number.}
+#'     \item{se}{Number. Standard error.}
+#'     \item{index.matrix}{Matrix.}
+#'     \item{lik.anc}{Matrix. Likelihood for each state at each tree node}
+#'     \item{call}{Record of the `ace()` call. Class = "call."}
+#'   }
 #' @param tr Phylo.
 #' @param ML_cutoff Number between 0 and 1. If the maximum likelihood of the
 #'   reconstruction is above this number it's considered a high confidence
 #'   reconstruction, otherwise it's a low confidence reconstruction.
 #'
 #' @noRd
-#'
 discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -315,7 +324,7 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
 
   # Return output --------------------------------------------------------------
   return(tip_and_node_anc_rec_conf)
-} # end discrete_get_recon_confidence()
+}
 
 #' Reconstruct discrete data and return reconstruction built with the better
 #' model
@@ -337,7 +346,6 @@ discrete_get_recon_confidence <- function(recon, tr, ML_cutoff){
 #' @return Reconstruction of class `ace` from `ape`.
 #'
 #' @noRd
-#'
 build_better_reconstruction <- function(mat, tr, disc_cont, num, recon_method){
   # Check input ----------------------------------------------------------------
   check_tree_is_valid(tr)
@@ -417,7 +425,7 @@ build_better_reconstruction <- function(mat, tr, disc_cont, num, recon_method){
 
   # Return output --------------------------------------------------------------
   return(best_reconstruction)
-} # end build_better_reconstruction()
+}
 
 #' prepare_ancestral_reconstructions
 #'
@@ -434,38 +442,49 @@ build_better_reconstruction <- function(mat, tr, disc_cont, num, recon_method){
 #' @param disc_cont Character string. Either "discrete" or "continuous."
 #'
 #' @return List of lists:
-#'  * pheno_recon_and_conf: List of multiple objects.
-#'  * pheno_recon_and_conf$node_anc_rec: The values of the ancestral
-#'      reconstruction of the phenotype at each internal node. Length =
-#'      Nnode(tr).
-#'  * pheno_recon_and_conf$tip_and_node_rec_conf: A binary numeric vector. Each
-#'      entry corresponds to a tip or node in the tree. 1 indicates high
-#'      confidence in the ancestral reconstruction of the phenotype, while 0
-#'      incidates low confidence. Length = Ntip(tr) + Nnode(tr). Ordered by tips
-#'      then by nodes.
-#'  * pheno_recon_and_conf$recon_edge_mat: Matrix. Dim: nrow = Nedge(tr) x
-#'      ncol = 2. Parent (older) node is 1st column. Child (younger) node is the
-#'      2nd column. Ancestral reconstruction value of each node.
-#'  * pheno_recon_and_conf$tip_and_node_recon: Numeric vector. Observed value at
-#'      each tip followed ancestral reconstruction value at each tree node.
-#'      Length = Ntip(tr) + Nnode(tr).
-#'  * geno_recon_and_conf: List of lists. 1 list per genotype in the genotype
+#'   \describe{
+#'     \item{pheno_recon_and_conf}{List of multiple objects.
+#'       \describe{
+#'         \item{node_anc_rec}{The values of the ancestral reconstruction of the
+#'          phenotype at each internal node. Length = Nnode(tr).}
+#'         \item{tip_and_node_rec_conf}{A binary numeric vector. Each entry
+#'         corresponds to a tip or node in the tree. 1 indicates high confidence
+#'         in the ancestral reconstruction of the phenotype, while 0 incidates
+#'         low confidence. Length = Ntip(tr) + Nnode(tr). Ordered by tips then
+#'         by nodes.}
+#'         \item{recon_edge_mat}{Matrix. Dim: nrow = Nedge(tr) x ncol = 2.
+#'         Parent (older) node is 1st column. Child (younger) node is the 2nd
+#'         column. Ancestral reconstruction value of each node.}
+#'         \item{tip_and_node_recon}{Numeric vector. Observed value at each tip
+#'         followed ancestral reconstruction value at each tree node. Length =
+#'         Ntip(tr) + Nnode(tr).}
+#'       }
+#'     }
+#'     \item{geno_recon_and_conf}{List of lists. 1 list per genotype in the genotype
 #'      matrix. Each sublist has the same four objects as pheno_recon_and_conf
 #'      above: $node_anc_rec, $tip_and_node_rec_conf, $recon_edge_mat, and
 #'      $tip_and_node_recon.
-#'  * geno_trans: List of vectors. One list entry for each genotype. Each list
-#'      entry has two vectors.
-#'  * geno_trans$transition: Length = Nedge(tr). Binary, numeric vector. 0
-#'      indicates no transition (parent and child node equal). 1 indicates a
-#'      transition across the edge (parent node != child node).
-#'  * geno_trans$trans_dir: Length = Nedge(tr). Numeric vector. Values should be
-#'       -1, 0, or 1. -1 0 indicate no transition and therefore no direction of
-#'       the transition. 1 indicates the parent is less than the child (discrete
-#'       case: parent == 0 & child == 1). 0 indicates the parent is greater than
-#'       the child (discrete case: parent == 1 & child == 0).
+#'        \describe{
+#'          \item{geno_trans}{List of vectors. One list entry for each genotype.
+#'          Each list entry has two vectors.
+#'            \describe{
+#'              \item{transition}{Length = Nedge(tr). Binary, numeric vector. 0
+#'              indicates no transition (parent and child node equal). 1
+#'              indicates a transition across the edge (parent node != child
+#'              node).}
+#'              \item{trans_dir}{Length = Nedge(tr). Numeric vector. Values
+#'              should be -1, 0, or 1. -1 0 indicate no transition and therefore
+#'              no direction of the transition. 1 indicates the parent is less
+#'              than the child (discrete case: parent == 0 & child == 1). 0
+#'              indicates the parent is greater thanthe child (discrete case:
+#'              parent == 1 & child == 0).}
+#'            }
+#'          }
+#'        }
+#'     }
+#'   }
 #'
 #' @noRd
-#'
 prepare_ancestral_reconstructions <- function(tr, pheno, geno, disc_cont){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -503,4 +522,4 @@ prepare_ancestral_reconstructions <- function(tr, pheno, geno, disc_cont){
                   "geno_recon_and_conf" = geno_recon_and_conf,
                   "geno_trans" = geno_trans)
   return(results)
-} # end prepare_ancestral_reconstructions
+}
