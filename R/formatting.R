@@ -1,16 +1,15 @@
-#' format_tree
+#' Format phylogenetic tree
 #'
-#' @description For a phylogenetic tree convert all bootstrap support values
-#'   to numeric (from character). Typically, a tree's root doesn't have a value
-#'   but this adds a zero to that location (if necessary) because functions
-#'   later in hogwash require that all nodes have numeric values.
+#' @description For a phylogenetic tree convert all bootstrap support values to
+#'   numeric (from character). Typically, a tree's root doesn't have a value but
+#'   this adds a zero to that location (if necessary) because functions later in
+#'   hogwash require that all nodes have numeric values.
 #'
 #' @param tr Phylo.
 #'
 #' @return tr. Phylo.
 #'
 #' @noRd
-#'
 format_tree <- function(tr){
   # Check input ----------------------------------------------------------------
   check_class(tr, "phylo")
@@ -35,19 +34,18 @@ format_tree <- function(tr){
   check_for_root_and_bootstrap(tr)
   check_tree_is_valid(tr)
   return(tr)
-} # end format_tree()
+}
 
-#' convert_matrix_to_vector
+#' Convert matrix to a vector
 #'
 #' @description Convert a single column matrix into a vector, retain row names
-#'  as names of vector.
+#'   as names of vector.
 #'
 #' @param mat Matrix. Matrix should have only 1 column.
 #'
 #' @return vec. Named vector.
 #'
 #' @noRd
-#'
 convert_matrix_to_vector <- function(mat){
   # Check input ----------------------------------------------------------------
   check_dimensions(mat, NULL, 1, 1, 1)
@@ -59,13 +57,13 @@ convert_matrix_to_vector <- function(mat){
   # Check and return output ----------------------------------------------------
   check_if_vector(vec)
   return(vec)
-} # end convert_matrix_to_vector()
+}
 
-#' prepare_phenotype
+#' Convert phenotype matrix to vector
 #'
 #' @description Prepare phenotype for downstream analyses. Convert phenotype
-#'  matrix to phenotype vector. Check if the continuous phenotype is normally
-#'  distributed.
+#'   matrix to phenotype vector. Check if the continuous phenotype is normally
+#'   distributed.
 #'
 #' @param pheno Matrix with 1 column.
 #' @param disc_cont String. Either "discrete" or "continuous."
@@ -74,7 +72,6 @@ convert_matrix_to_vector <- function(mat){
 #' @return pheno_vector. Vector. Length = Ntip(tr).
 #'
 #' @noRd
-#'
 prepare_phenotype <- function(pheno, disc_cont, tr){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -93,4 +90,4 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   # Check and return output ----------------------------------------------------
   check_equal(length(pheno_vector), ape::Ntip(tr))
   return(pheno_vector)
-} # end prepare_phenotype()
+}
