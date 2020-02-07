@@ -1,19 +1,18 @@
-#' save_continuous
+#' Save Continuous Test results
 #'
 #' @description Save the results of the Continuous Test in an rdata object
-#'  called hogwash_continuous.
+#'   called hogwash_continuous.
 #' @param hogwash_continuous List of objects.
 #' @param file_name Character.
 #'
 #' @noRd
 save_continuous <- function(hogwash_continuous, file_name){
   save(hogwash_continuous, file = file_name)
-} # end save_continuous()
-
-#' save_synchronous
+}
+#' Save Synchronous Test results
 #'
 #' @description Save the results of the Synchronous Test in an rdata object
-#'  called hogwash_synchronous
+#'   called hogwash_synchronous
 #'
 #' @param hogwash_synchronous List of objects.
 #' @param file_name Character.
@@ -21,9 +20,9 @@ save_continuous <- function(hogwash_continuous, file_name){
 #' @noRd
 save_synchronous <- function(hogwash_synchronous, file_name){
   save(hogwash_synchronous, file = file_name)
-} # end save_synchronous()
+}
 
-#' save_phyc
+#' Save PhyC Test results
 #'
 #' @description Save the results of the PhyC Test in an rdata object
 #'  called hogwash_synchronous
@@ -34,9 +33,9 @@ save_synchronous <- function(hogwash_synchronous, file_name){
 #' @noRd
 save_phyc <- function(hogwash_phyc, file_name){
   save(hogwash_phyc, file = file_name)
-} # end save_phyc()
+}
 
-#' save_results_as_r_object
+#' Save results in .rda
 #'
 #' @description Save all of the non-plot outputs in a .rda file.
 #'
@@ -76,4 +75,4 @@ save_results_as_r_object <- function(dir, name, object, prefix, group_logical){
   } else {
     stop("test name incorrect")
   }
-} # end save_results_as_r_object()
+}
