@@ -1,13 +1,10 @@
-#' run_continuous
-#'
-#' @description Run Continuous algorithm.
+#' Run Continuous algorithm.
 #'
 #' @param args Object with all of the inputs necessary to run gwas.
 #'
 #' @return Saves two files: a pdf with plots of results and a .rda with log and
 #'    all relevant results.
 #' @noRd
-#'
 run_continuous <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
@@ -137,4 +134,4 @@ run_continuous <- function(args){
                            results_object,
                            "continuous",
                            args$group_genotype)
-} # end run_continuous()
+}

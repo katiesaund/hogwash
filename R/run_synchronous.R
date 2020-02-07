@@ -1,11 +1,9 @@
-#' run_synchronous
-#'
-#' @description Run Synchronous algorithm.
+#' Run Synchronous algorithm.
 #'
 #' @param args Object with all of the inputs necessary to run gwas.
 #'
 #' @return Saves two files: a pdf with plots of results and a .rda with log and
-#'    all relevant results.
+#'   all relevant results.
 #' @noRd
 run_synchronous <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
@@ -136,4 +134,4 @@ run_synchronous <- function(args){
                            results_object,
                            "synchronous",
                            args$group_genotype)
-} # end run_synchronous()
+}

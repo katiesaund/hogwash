@@ -1,13 +1,11 @@
-#' run_phyc
-#'
-#' @description Run PhyC algorithm.
+#' Run PhyC algorithm.
 #'
 #' @param args Object with all of the inputs necessary to run gwas.
 #'
 #' @noRd
 #'
 #' @return Saves two files: a pdf with plots of results and a .rda with log and
-#'    all relevant results.
+#'   all relevant results.
 run_phyc <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
@@ -144,4 +142,4 @@ run_phyc <- function(args){
                            results_object,
                            "phyc",
                            args$group_genotype)
-} # end run_phyc()
+}
