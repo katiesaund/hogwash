@@ -1,4 +1,4 @@
-#' calculate_permutation_based_p_value
+#' Calculate P-value
 #'
 #' @description Given all of the empirical statistics derived from permutations,
 #'   count how many of the empirical/permuted test statistics are greater than
@@ -30,15 +30,15 @@ calculate_permutation_based_p_value <- function(empirical_statistic,
   # Check and return output ----------------------------------------------------
   check_num_between_0_and_1(pval)
   return(pval)
-} # end calculate_permutation_based_p_value()
+}
 
-#' count_hits_on_edges
+#' Count the phenotype and genotype edge overlaps
 #'
 #' @description For each genotype, return a count of the number of edges for
 #'   which the genotype is a transition and the phenotype is present (when using
 #'   reconstruction)/phenotype is a transition (when using transition). Also,
 #'   return a count of the number of edges for which the just the genotype is a
-#'    transition (phenotype is either a 0 reconstruction or not a transition).
+#'   transition (phenotype is either a 0 reconstruction or not a transition).
 #'
 #' @param genotype_transition_edges List of numeric vectors. Each vector
 #'   corresponds with one genotype from the geno_mat. The numbers in each vector
@@ -52,8 +52,11 @@ calculate_permutation_based_p_value <- function(empirical_statistic,
 #' @param tr Phylo.
 #'
 #' @return List of two lists:
-#'  * both_present. Length = number of genotypes.
-#'  * only_geno_present. Length = number of genotypes.
+#'   \describe{
+#'     \item{both_present}{Length = number of genotypes.}
+#'     \item{only_geno_present}{Length = number of genotypes.}
+#'   }
+#'
 #' @noRd
 count_hits_on_edges <- function(genotype_transition_edges,
                                 phenotype_reconstruction,
@@ -85,12 +88,12 @@ count_hits_on_edges <- function(genotype_transition_edges,
   hit_counts <- list("both_present" = both_present,
                      "only_geno_present" = only_geno_present)
   return(hit_counts)
-} #end count_hits_on_edges()
+}
 
-#' discrete_calculate_pvals
+#' Run GWAS and calculate P-value for a discrete trait
 #'
-#' @description discrete_calculate_pvals is the "meat" of the phyC algorithm.
-#'   It returns the empirical p-value for each observed genotype.
+#' @description discrete_calculate_pvals is the "meat" of the phyC algorithm. It
+#'   returns the empirical p-value for each observed genotype.
 #'
 #' @details Algorithm overview:
 #'   * Subset tree edges to those with high confidence (as determined by
@@ -108,8 +111,8 @@ count_hits_on_edges <- function(genotype_transition_edges,
 #'   * Calculate empirical p-values.
 #'
 #' @param genotype_transition_edges List of vectors.
-#'   Length(genotype_transition_list) == number of genotypes.
-#'   Length(each vector) == Nedge(tr). Each of these are either 0, 1.
+#'   Length(genotype_transition_list) == number of genotypes. Length(each
+#'   vector) == Nedge(tr). Each of these are either 0, 1.
 #' @param phenotype_reconstruction Vector. Length() == Nedge(tr). Phenotype
 #'   reconstruction could instead by phenotype transition vector.
 #' @param tr Phylo. Rooted phylogenetic tree.
@@ -122,16 +125,18 @@ count_hits_on_edges <- function(genotype_transition_edges,
 #'   either 0 (low confidence) or 1 (high confidence).
 #'
 #' @return List of three objects:
-#'  * hit_pvals. Vector. Length is the number of genotypes. Unadjusted p-value
-#'      for each genotype.
-#'  * permuted_count. List. Each entry corresponds to one genotype. Records the
-#'      number of times there is an overlap between the phenotype (either
-#'      transition or reconstruction) and the genotype transition for the
-#'      permuted data.
-#'  * observed_overlap. List. Each entry corresponds to one genotype. Records
-#'      the number of times there is an overlap between the phenotype (either
-#'      transition or reconstruction) and the genotype transition for the
-#'      real/observed data.
+#'   \describe{
+#'     \item{hit_pvals.}{Vector. Length is the number of genotypes. Unadjusted
+#'     p-value for each genotype.}
+#'     \item{permuted_count.}{List. Each entry corresponds to one genotype.
+#'     Records the number of times there is an overlap between the phenotype
+#'     (either transition or reconstruction) and the genotype transition for the
+#'     permuted data.}
+#'     \item{observed_overlap.}{List. Each entry corresponds to one genotype.
+#'     Records the number of times there is an overlap between the phenotype
+#'     (either transition or reconstruction) and the genotype transition for the
+#'     real/observed data.}
+#'   }
 #'
 #' @noRd
 discrete_calculate_pvals <- function(genotype_transition_edges,
@@ -216,13 +221,13 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
                                      high_confidence_edges,
                                      i)
 
-# Note on nomeclature from the phyC paper supplement page 7:
-# X -> G on R is the same as sum(empirical_both_present >= both_present[i])
-# X -> G on S is the same
-# as sum(empirical_only_geno_present <= only_geno_present[i])
-# Note: sum(empirical_both_present >= both_present[i]) always
-# equals sum(empirical_only_geno_present <= only_geno_present[i])
-# so we only need to include one in the p-value calculation.
+    # Note on nomeclature from the phyC paper supplement page 7:
+    # X -> G on R is the same as sum(empirical_both_present >= both_present[i])
+    # X -> G on S is the same
+    # as sum(empirical_only_geno_present <= only_geno_present[i])
+    # Note: sum(empirical_both_present >= both_present[i]) always
+    # equals sum(empirical_only_geno_present <= only_geno_present[i])
+    # so we only need to include one in the p-value calculation.
 
       pval <- calculate_permutation_based_p_value(empirical_both_present,
                                                   both_present[i],
@@ -238,30 +243,30 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
                   "permuted_count" = record_redistrib_both_present,
                   "observed_overlap" = both_present)
   return(results)
-} # end discrete_calculate_pvals()
+}
 
-#' discrete_permutation
+#' Perform permutation for discrete data
 #'
 #' @description Perform a permutation of the edges selected to be genotype
-#'  transition edges. permuted_geno_trans_mat is a matrix where each row
-#'  corresponds to a permuted set of edges and each column corresponds to one
-#'  high confidence edge. To get the edges selected in a permutation, take that
-#'  row from permuted_geno_trans_mat. We could use this format only for later
-#'  analyses, but a more convenient format is to convert to redistributed_hits.
-#'  Redistributed_hits is a matrix with nrow = number of perms (same as
-#'  permuted_geno_trans_mat, but each row now corresponds to a genotype)
+#'   transition edges. permuted_geno_trans_mat is a matrix where each row
+#'   corresponds to a permuted set of edges and each column corresponds to one
+#'   high confidence edge. To get the edges selected in a permutation, take that
+#'   row from permuted_geno_trans_mat. We could use this format only for later
+#'   analyses, but a more convenient format is to convert to redistributed_hits.
+#'   Redistributed_hits is a matrix with nrow = number of perms (same as
+#'   permuted_geno_trans_mat, but each row now corresponds to a genotype)
 #'
 #' @param tr Phylo.
 #' @param num_perm Integer. Number of permutations.
 #' @param number_edges_with_geno_trans Numeric vector. Maximum value should be
-#'  the number of edges in the tree.
-#' @param number_hi_conf_edges Numeric vector. Maximum value should be
-#'  the number of edges in the tree.
+#'   the number of edges in the tree.
+#' @param number_hi_conf_edges Numeric vector. Maximum value should be the
+#'   number of edges in the tree.
 #' @param number_edges Nedge(tr).
 #' @param high_conf_edges Numeric vector of edges that high confidence. Maximum
-#'  value should be the number of edges in the tree.
-#' @param index Integer. "i" from loop. Max value is number of genotypes.
-#'  Min value == 1.
+#'   value should be the number of edges in the tree.
+#' @param index Integer. "i" from loop. Max value is number of genotypes. Min
+#'   value == 1.
 #'
 #' @return redistributed_hits. Matrix. Nrow == num_perm. Ncol == Nedge(tr).
 #' @noRd
@@ -320,16 +325,16 @@ discrete_permutation <- function(tr,
                    exact_cols = ape::Nedge(tr),
                    min_cols = ape::Nedge(tr))
   return(redistributed_hits)
-} # end discrete_permutation()
+}
 
-#' count_empirical_both_present
+#' Count the number of edges where phenotype and genotype overlap
 #'
 #' @description Find number of edges on the tree where the permuted genotype is
-#' a transition AND the phenotype is also a transition (or a phenotype is
-#' present in the reconstruction; it depends on the type of test being run).
+#'   a transition AND the phenotype is also a transition (or a phenotype is
+#'   present in the reconstruction; it depends on the type of test being run).
 #'
 #' @param permuted_mat Matrix. Nrow = number of permutations. Ncol = number of
-#'  tr edges. Either 0 or 1.
+#'   tr edges. Either 0 or 1.
 #' @param pheno_vec Numeric vector.
 #' @param hi_conf_edge List.
 #' @param index Number. The "i" of the loop this function is run within.
@@ -354,16 +359,17 @@ count_empirical_both_present <- function(permuted_mat,
   # Check and return output ----------------------------------------------------
   check_equal(nrow(permuted_mat), length(result))
   return(result)
-} # end count_empirical_both_present()
+}
 
-#' count_empirical_only_geno_present
+#' Count edges with genotype but not phenotype
 #'
 #' @description Find number of edges on the tree where the permuted genotype is
-#'  a transition but the phenotype is not (either a transition phenotype edge or
-#'  phenotype reconstruction present; it depends on the type of test being run).
+#'   a transition but the phenotype is not (either a transition phenotype edge
+#'   or phenotype reconstruction present; it depends on the type of test being
+#'   run).
 #'
 #' @param permuted_mat Matrix. Nrow = number of permutations. Ncol = number of
-#'  edges. Either 0 or 1.
+#'   edges. Either 0 or 1.
 #' @param emp_both_present Numeric vector.
 #'
 #' @return Numeric vector. Length = num perm.
@@ -380,4 +386,4 @@ count_empirical_only_geno_present <- function(permuted_mat, emp_both_present){
   # Check & return output ------------------------------------------------------
   check_equal(nrow(permuted_mat), length(result))
   return(result)
-} # end count_empirical_only_geno_present()
+}
