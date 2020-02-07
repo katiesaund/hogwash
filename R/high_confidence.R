@@ -1,14 +1,13 @@
-#' discretize_conf_with_cutoff
+#' Discritize confidence values given a cutoff
 #'
 #' @description Given a vector with values that describe confidence, binarize
-#'  the vector a accoriding to a cutoff value.
+#'   the vector a accoriding to a cutoff value.
 #' @param confidence_vector Numeric vector.
 #' @param threshold Number.
 #'
 #' @return Confidence vector. Binary vector.
 #'
 #' @noRd
-#'
 discretize_conf_with_cutoff <- function(confidence_vector, threshold){
   # Check inputs ---------------------------------------------------------------
   check_is_number(threshold)
@@ -24,29 +23,26 @@ discretize_conf_with_cutoff <- function(confidence_vector, threshold){
   # Check and return output ----------------------------------------------------
   check_if_binary_vector(confidence_vector)
   return(confidence_vector)
-} # end discretize_conf_with_cutoff()
+}
 
-
-#' report_num_high_confidence_trans_edge
+#' Report the number of high confidence transition edges
 #'
 #' @description Given a genotype for which you have: a list of vectors that
-#'  stores if there is a genotype transition or not for each edge
-#'  (genotype_transition), a list of vectors that stores if that edge is high
-#'  confidence or not (high_conf_edges), and a character vector of the genotype
-#'  names -- create an object that stores the number of high confidence
-#'  transition edges per genotype.
+#'   stores if there is a genotype transition or not for each edge
+#'   (genotype_transition), a list of vectors that stores if that edge is high
+#'   confidence or not (high_conf_edges), and a character vector of the genotype
+#'   names -- create an object that stores the number of high confidence
+#'   transition edges per genotype.
 #'
 #' @param genotype_transition List of numeric vectors. Number of lists == number
-#'  of genotypes. Length of vector == Nedge(tr).
+#'   of genotypes. Length of vector == Nedge(tr).
 #' @param high_conf_edges Binary vector. List of numeric vectors. Number of
 #'   lists == number of genotypes. Length of vector == Nedge(tr).
 #' @param geno_names Character vector. Length == ncol(genotype_matrix).
 #'
-#' @return num_high_conf_trans_edges. Numeric vector. Count of number
-#'   of high confidence transitions per genotype. Vector is named with genotype
-#'   names.
+#' @return num_high_conf_trans_edges. Numeric vector. Count of number of high
+#'   confidence transitions per genotype. Vector is named with genotype names.
 #' @noRd
-#'
 report_num_high_confidence_trans_edge <- function(genotype_transition,
                                                   high_conf_edges,
                                                   geno_names){
@@ -73,24 +69,23 @@ report_num_high_confidence_trans_edge <- function(genotype_transition,
 
   # Return output --------------------------------------------------------------
   return(num_high_conf_trans_edges)
-} # end report_num_high_confidence_trans_edge
+}
 
-#' assign_high_confidence_to_transition_edges
+#' Identify high confidence transition edges
 #'
 #' @description Identify all edges for which the edge is high confidence and a
-#'  transition edge.
+#'   transition edge.
 #'
 #' @param tr Phylo.
 #' @param all_confidence_by_edge List of vectors. Each vector is binary.
-#'  Length(list) == number of genomes.
+#'   Length(list) == number of genomes.
 #' @param geno_trans_by_edge List of vectors. Each vector is binary.
-#'  Length(list) == number of genomes.
+#'   Length(list) == number of genomes.
 #' @param geno Matrix. Binary.
 #'
 #' @return edge_confident_and_trans_edge. List of vector. Each vector is binary.
-#'  Length(list) == number of genomes.
+#'   Length(list) == number of genomes.
 #' @noRd
-#'
 assign_high_confidence_to_transition_edges <- function(tr,
                                                        all_confidence_by_edge,
                                                        geno_trans_by_edge,
@@ -114,49 +109,50 @@ assign_high_confidence_to_transition_edges <- function(tr,
 
   # Return output --------------------------------------------------------------
   return(edge_confident_and_trans_edge)
-} # end assign_high_confidence_to_transition_edges()
+}
 
-
-#' prepare_high_confidence_objects
+#' Prepare all high confidence objects
 #'
 #' @description Identify high confidence edges (considering: tree bootstrap
-#'  values, phenotype reconstruction, tree edge lengths, and ancestral
-#'  reconstruction of genotype).
+#'   values, phenotype reconstruction, tree edge lengths, and ancestral
+#'   reconstruction of genotype).
 #'
 #' @param genotype_transition List of lists. Number of lists = number of
-#'  genotypes. Each list is made of a $transition and $trans_dir list.
-#'  Length(transition) == Length(trans_dir) == Nedge(tree)
+#'   genotypes. Each list is made of a $transition and $trans_dir list.
+#'   Length(transition) == Length(trans_dir) == Nedge(tree)
 #' @param tr Phylo.
 #' @param pheno_tip_node_recon_conf List of confidence values. Binary.
-#'  Length(list) == Ntip() + Nedge()
+#'   Length(list) == Ntip() + Nedge()
 #' @param boot_threshold Numeric. Between 0 and 1.
 #' @param geno Matrix. Binary. Nrow = Ntip(tree). Ncol = Number of genotypes.
 #' @param geno_conf_edge List of lists. Binary. Number of lists = number of
-#'  genotypes. Length(each individual list) == Nedge(Tree)
+#'   genotypes. Length(each individual list) == Nedge(Tree)
 #' @param geno_recon_edge List of lists. Binary. Number of lists = number of
-#'  genotypes. Length(each individual list) == Nedge(Tree)
+#'   genotypes. Length(each individual list) == Nedge(Tree)
 #' @param snps_in_each_gene Either Null or named table where names are genotypes
-#'  and the values are number of not-yet-grouped-genotypes that go into the
-#'  grouped genotype.
+#'   and the values are number of not-yet-grouped-genotypes that go into the
+#'   grouped genotype.
 #'
-#' @return List of objects.
-#'  * dropped_genotypes Character vector. Names of the genotypes not being kept.
-#'  * hi_confidence_transition_edge. List.
-#'  * genotype. Matrix.
-#'  * snps_per_gene. Either Null or named table where names are genotypes and
-#'       the Values are number of not-yet-grouped-genotypes that go into the
-#'       grouped genotype.
-#'  * genotype_transition Object with two lists: $trans_dir and $transition.
-#'  * geno_recon_edge. List of lists. Binary. Number of lists = number of
-#'      genotypes. Length(each individual list) == Nedge(tree).
-#'  * high_conf_ordered_by_edges. List.
-#'  * num_high_conf_trans_edges. Numeric vector. Count of number of
-#'      high confidence transitions per genotype. Vector is named with genotype
-#'      names.
-#'  * tr_and_pheno_hi_conf. Vector. Binary. Length = Nedge(tree).
-#'
+#' @return List of objects:
+#'   \describe{
+#'     \item{dropped_genotypes}{Character vector. Names of the genotypes not
+#'     being kept.}
+#'     \item{hi_confidence_transition_edge.}{List}
+#'     \item{genotype.}{Matrix}
+#'     \item{snps_per_gene.}{Either Null or named table where names are
+#'     genotypes and the Values are number of not-yet-grouped-genotypes that go
+#'     into the grouped genotype.}
+#'     \item{genotype_transition}{Object with two lists: $trans_dir and
+#'     $transition.}
+#'     \item{geno_recon_edge.}{List of lists. Binary. Number of lists = number
+#'     of genotypes. Length(each individual list) == Nedge(tree).}
+#'     \item{high_conf_ordered_by_edges.}{List.}
+#'     \item{num_high_conf_trans_edges.}{Numeric vector. Count of number of high
+#'     confidence transitions per genotype. Vector is named with genotype
+#'     names.}
+#'     \item{tr_and_pheno_hi_conf.}{Vector. Binary. Length = Nedge(tree)}
+#'   }
 #' @noRd
-#'
 prepare_high_confidence_objects <- function(genotype_transition,
                                             tr,
                                             pheno_tip_node_recon_conf,
@@ -252,4 +248,4 @@ prepare_high_confidence_objects <- function(genotype_transition,
           "num_high_conf_trans_edges" = geno_trans_by_edge,
           "tr_and_pheno_hi_conf" = high_confidence_edges)
   return(results)
-} # end prepare_high_confidence_objects()
+}
