@@ -5,20 +5,24 @@
 #'   vectors are binary.
 #' @param pheno_recon_vec A binary vector with length == Nedge(tree).
 #' @param high_conf
-#'  $tr_and_pheno_hi_conf A vector of high confidence edges. Only takes into
-#'    acount the tree edge lengths, bootstrap values, and phenotype ancestral
-#'    reconstruction ML values. Binary vector.
-#'  $high_conf_ordered_by_edges A list of high confidence edges. Length of list
-#'  == number of genotypes. Length of individual vectors within == Nedge(tree).
-#'  Individual vectors are binary.
+#'   \describe{
+#'    \item{tr_and_pheno_hi_conf}{A vector of high confidence edges. Only takes
+#'    into acount the tree edge lengths, bootstrap values, and phenotype
+#'    ancestral reconstruction ML values. Binary vector.}
+#'     \item{high_conf_ordered_by_edges}{A list of high confidence edges. Length
+#'     of list == number of genotypes. Length of individual vectors within ==
+#'     Nedge(tree). Individual vectors are binary.}
+#'   }
 #' @return results. List of three objects:
-#'   $gamma_avg Numeric. Average gamma value of all genotypes. A single value.
-#'   $gamma_percent Numeric vector. Gamma value for each genotype. Length ==
-#'     number of genotypes.
-#'  $gamma_count Numeric vector. Raw gamma value for each genotype. Length ==
-#'    number of genotypes.
+#'   \describe{
+#'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
+#'     value.}
+#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
+#'     Length == number of genotypes.}
+#'    \item{gamma_count}{Numeric vector. Raw gamma value for each genotype.
+#'    Length == number of genotypes.}
+#'   }
 #' @noRd
-#'
 calculate_phyc_gamma <- function(geno_trans_edge_list,
                                  pheno_recon_vec,
                                  high_conf){
@@ -65,24 +69,28 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
 #'   genotypes. Length of individual vectors within == Nedge(tree). Individual
 #'   vectors are binary.
 #' @param pheno_recon_vec A list of lists. Each sublist has two names vectors.
-#'   Individual vectors are binary with length == Nedge(tree). Named vectors
-#'   are $transition and $trans_dir.
+#'   Individual vectors are binary with length == Nedge(tree). Named vectors are
+#'   $transition and $trans_dir.
 #' @param high_conf
-#'  $tr_and_pheno_hi_conf A vector of high confidence edges. Only takes into
-#'    acount the tree edge lengths, bootstrap values, and phenotype ancestral
-#'    reconstruction ML values. Binary vector.
-#'  $high_conf_ordered_by_edges A list of high confidence edges. Length of list
-#'  == number of genotypes. Length of individual vectors within == Nedge(tree).
-#'  Individual vectors are binary.
+#'   \describe{
+#'    \item{tr_and_pheno_hi_conf}{A vector of high confidence edges. Only takes
+#'    into acount the tree edge lengths, bootstrap values, and phenotype
+#'    ancestral reconstruction ML values. Binary vector.}
+#'     \item{high_conf_ordered_by_edges}{A list of high confidence edges. Length
+#'     of list == number of genotypes. Length of individual vectors within ==
+#'     Nedge(tree). Individual vectors are binary.}
+#'   }
 #'
 #' @return results. List of three objects:
-#'   $gamma_avg Numeric. Average gamma value of all genotypes. A single value.
-#'   $gamma_percent Numeric vector. Gamma value for each genotype. Length ==
-#'     number of genotypes.
-#'  $gamma_count Numeric vector. Raw gamma value for each genotype. Length ==
-#'    number of genotypes.
+#'   \describe{
+#'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
+#'     value.}
+#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
+#'     Length == number of genotypes.}
+#'     \item{gamma_count}{Numeric vector. Raw gamma value for each genotype.
+#'     Length == number of genotypes.}
+#'   }
 #' @noRd
-#'
 calculate_synchronous_gamma <- function(geno_trans_edge_list,
                                         pheno_trans_vec,
                                         high_conf){
@@ -129,21 +137,24 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
 #'   Length(each sublist) == Nedge(tree). Binary.
 #' @param pheno_recon_mat Matrix. Structured like tree$edge. Numeric.
 #' @param high_conf
-#'  $tr_and_pheno_hi_conf A vector of high confidence edges. Only takes into
-#'    acount the tree edge lengths, bootstrap values, and phenotype ancestral
-#'    reconstruction ML values. Binary vector.
-#'  $high_conf_ordered_by_edges A list of high confidence edges. Length of list
-#'  == number of genotypes. Length of individual vectors within == Nedge(tree).
-#'  Individual vectors are binary.
-#'
+#'   \describe{
+#'    \item{tr_and_pheno_hi_conf}{A vector of high confidence edges. Only takes
+#'    into acount the tree edge lengths, bootstrap values, and phenotype
+#'    ancestral reconstruction ML values. Binary vector.}
+#'    \item{high_conf_ordered_by_edges}{A list of high confidence edges. Length
+#'    of list == number of genotypes. Length of individual vectors within ==
+#'    Nedge(tree). Individual vectors are binary.}
+#'   }
 #' @return results. List of three objects:
-#'   $gamma_avg Numeric. Average gamma value of all genotypes. A single value.
-#'   $gamma_percent Numeric vector. Gamma value for each genotype. Length ==
-#'     number of genotypes.
-#'  $gamma_count Numeric vector. Raw gamma value for each genotype. Length ==
-#'    number of genotypes.
+#'   \describe{
+#'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
+#'     value.}
+#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
+#'     Length == number of genotypes.}
+#'     \item{gamma_count}{Numeric vector. Raw gamma value for each genotype.
+#'     Length == number of genotypes.}
+#'   }
 #' @noRd
-#'
 calculate_continuous_gamma <- function(pheno_recon_mat,
                                        high_conf){
   high_conf_edge_list <- high_conf$high_conf_ordered_by_edges
