@@ -1,12 +1,12 @@
-#' identify_short_edges
+#' Identify tree edges that are too short
 #'
 #' @description Removes any edges that make up a 10% or more of the total tr
-#'  length.
+#'   length.
 #' @param tr  Phylo.
 #'
 #' @return short_edges. Binary vector. Length = Nedge(tr). Each entry
-#'  corresponds to an edge. 0 == long edge (low confidence in reconstruction
-#'  value). 1 == short edge (high confidence in reconstruction value).
+#'   corresponds to an edge. 0 == long edge (low confidence in reconstruction
+#'   value). 1 == short edge (high confidence in reconstruction value).
 #' @noRd
 identify_short_edges <- function(tr){
   # Check input ----------------------------------------------------------------
@@ -28,16 +28,17 @@ identify_short_edges <- function(tr){
   check_if_binary_vector(short_edges)
   check_equal(length(short_edges), ape::Nedge(tr))
   return(short_edges)
-} # end identify_short_edges()
+}
 
-#' get_bootstrap_confidence
+#' Get bootstrap confidence at each node
 #'
 #' @description Extracts the bootstrap confidence stored in the node.labels of
-#'  the tree, convertns them to a fraction between 0 and 1, and then classifies
-#'  each node as high or low confidence based on the input confidence threshold.
+#'   the tree, convertns them to a fraction between 0 and 1, and then classifies
+#'   each node as high or low confidence based on the input confidence
+#'   threshold.
 #'
 #' @details This method requires that the bootstrap values be assigned to node
-#'  labels. It makes an assumption that the bootstrap values are stored as
+#'   labels. It makes an assumption that the bootstrap values are stored as
 #'   numbers between 1 and 100, that need to then be converted to from this
 #'   percentage to a fraction. A better input would be Bayesian posterior
 #'   probabilities than ML derived bootstrap values...but most of what we're
@@ -47,12 +48,11 @@ identify_short_edges <- function(tr){
 #' @param confidence_threshold Numeric. Between 0 and 1.
 #'
 #' @return tree_tip_and_node_confidence. Binary vector. Length = Ntip(tr) +
-#'  Nnode(tr). The first section is the tip confidence, which is always, by
-#'  definition 1. Then the remaining entries correspond to the nodes and is
-#'  either 0 or 1.
+#'   Nnode(tr). The first section is the tip confidence, which is always, by
+#'   definition 1. Then the remaining entries correspond to the nodes and is
+#'   either 0 or 1.
 #'
 #' @noRd
-#'
 get_bootstrap_confidence <- function(tr, confidence_threshold){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -77,18 +77,18 @@ get_bootstrap_confidence <- function(tr, confidence_threshold){
   check_equal(length(tree_tip_and_node_confidence),
               sum(ape::Ntip(tr) + ape::Nnode(tr)))
   return(tree_tip_and_node_confidence)
-} # end get_bootstrap_confidence()
+}
 
-#' reorder_tip_and_node_to_edge
+#' Reorder a vector into an edge vector
 #'
 #' @description Reorder a vector organzied by tips then nodes into a vector
-#'  organized by tree edges.
+#'   organized by tree edges.
 #'
-#'  @details This function grabs the value of each child from every node and
-#'   stores them in the order of the tree's edge matrix. This effectively
-#'   drops the value of the tree's root because the root is never a child and
-#'   therefore not in the child column of the edge matrix. Each node/tip that
-#'   is not the root is a child exactly once.
+#' @details This function grabs the value of each child from every node and
+#'   stores them in the order of the tree's edge matrix. This effectively drops
+#'   the value of the tree's root because the root is never a child and
+#'   therefore not in the child column of the edge matrix. Each node/tip that is
+#'   not the root is a child exactly once.
 #'
 #' @param tips_and_node_vector Numeric vector. Length = Ntip(tr) + Nnode(tr).
 #' @param tr Phylo.
@@ -110,4 +110,4 @@ reorder_tip_and_node_to_edge <- function(tips_and_node_vector, tr){
 
   # Return output --------------------------------------------------------------
   return(ordered_by_edges)
-}# end reorder_tip_and_node_to_edge()
+}
