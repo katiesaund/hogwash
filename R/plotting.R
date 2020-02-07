@@ -12,15 +12,15 @@ blank_plot <- function(){
 #' gradient
 #'
 #' @description Plot the continuous phenotype on tree with the phenotype
-#'  coloring the branches.
+#'   coloring the branches.
 #'
 #' @param tr Phylo
-#' @param pheno_vector Vector. Length = Ntip(tr).
-#'  Names(pheno_vector) == tr$tip.label.
+#' @param pheno_vector Vector. Length = Ntip(tr). Names(pheno_vector) ==
+#'   tr$tip.label.
 #' @param pheno_anc_rec Vector. Length = Nnode(tr).
 #'
 #' @return A tree plot where the tree edges are filled in with colors
-#'  corresponding to the phenotypic trait values.
+#'   corresponding to the phenotypic trait values.
 #'
 #' @noRd
 plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
@@ -46,21 +46,21 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
        ftype = "off",
        offset = 1.7)
 
-} # end plot_continuous_phenotype()
+}
 
 #' Draw histogram of the raw phenotype change on each high confidence tree edge
 #'
 #' @description Plot a histogram to show the change in phenotype on each tree
-#'  edge. Plot phenotype change as raw value change (not absolute value).
-#'  Exclude low confidence tree edges.
+#'   edge. Plot phenotype change as raw value change (not absolute value).
+#'   Exclude low confidence tree edges.
 #'
 #' @noRd
 #' @param geno_transition List of list of 2 vectors: $transition and $trans_dir.
 #'   Each list corresponds to 1 genotype. In $transition vector each entry
 #'   corresponds to 1 tree edge.
 #' @param geno_confidence List of vectors. Each list corresponds to 1 genotype.
-#'   Each vector entry corresponds to 1 tree edge. 1 == high confidence edge.
-#'   0 == low confidence edge.
+#'   Each vector entry corresponds to 1 tree edge. 1 == high confidence edge. 0
+#'   == low confidence edge.
 #' @param pheno_recon_ordered_by_edges Matrix. Dimensions: Nedge x 2 matrix.
 #'   Entries are the phenotype value at the node, where row is the edge, 1st
 #'   column is the parent node and 2nd column is the child node.
@@ -142,19 +142,19 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
          pch = 15,
          cex = hist_cex_size,
          bg = grDevices::rgb(0, 0, 0, 0.01))
-} # end hist_raw_hi_conf_delta_pheno()
+}
 
 #' Draw histogram of the absolute value of phenotype change on each high
 #' confidence tree edge
 #'
 #' @description Plot a histogram to show the change in phenotype on each tree
-#'  edge. Plot phenotype change as absolute value change. Exclude low confidence
-#'  tree edges.
+#'   edge. Plot phenotype change as absolute value change. Exclude low
+#'   confidence tree edges.
 #'
 #' @noRd
 #' @param all_trans List of 2 lists. $observed_pheno_non_trans_delta and
-#'  $observed_pheno_trans_delta. Position in each corresponds to one genotype.
-#'  Contains informatino about amount of phenotype change.
+#'   $observed_pheno_trans_delta. Position in each corresponds to one genotype.
+#'   Contains informatino about amount of phenotype change.
 #' @param tr Phylo.
 #' @param index Integer. Indexes which genotype is being plotted.
 #' @param non_trans_color Character. Color of non-transition histogram bars.
@@ -213,21 +213,21 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
          pch = 15,
          cex = hist_cex_size,
          bg = grDevices::rgb(0, 0, 0, 0.01))
-} # end hist_abs_hi_conf_delta_pheno()
+}
 
 #' Draw histogram of the absolute value of the phenotype change on each edge
 #'
 #' @description Plot a histogram to show the change in phenotype on each tree
-#'  edge. Plot phenotype change as absolute value change. First, plot all tree
-#'  edge values then overlay only the high confidence edges.
+#'   edge. Plot phenotype change as absolute value change. First, plot all tree
+#'   edge values then overlay only the high confidence edges.
 #'
 #' @noRd
 #' @param p_trans_mat Numeric matrix. Dim: ncol == 1, nrow == Nedge(tree).
-#'  Values are the absolute value in the change of the phenotype on that edge.
+#'   Values are the absolute value in the change of the phenotype on that edge.
 #'   Each row corresponds to one tree edge.
 #' @param geno_confidence List of vectors. Each list corresponds to 1 genotype.
-#'   Each vector entry corresponds to 1 tree edge. 1 == high confidence edge.
-#'   0 == low confidence edge.
+#'   Each vector entry corresponds to 1 tree edge. 1 == high confidence edge. 0
+#'   == low confidence edge.
 #' @param tr Phylo.
 #' @param index Integer. Indexes which genotype is being plotted.
 #'
@@ -289,20 +289,20 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
          pch = 15,
          cex = hist_cex_size,
          bg = grDevices::rgb(0, 0, 0, 0.01))
-} # end hist_abs_delta_pheno_all_edges()
+}
 
-#' make_manhattan_plot
+#' Draw Manhattan Plot
 #'
-#' @description Create a manhattan plot of GWAS hit p-values.
+#' @description Create a Manhattan plot of GWAS hit p-values.
 #'
 #' @noRd
 #' @param geno_pheno_name Character. Will be printed in title of manhattan plot.
 #' @param pval_hits Vector. P-values for all loci.
 #' @param fdr Number. False discorvery rate.
 #' @param test_name Character. Either "continuous", "synchronous", or "phyc".
-#'  Will be printed in title of manhattan plot.
+#'   Will be printed in title of Manhattan plot.
 #'
-#' @return A manhattan plot of all of the hit values.
+#' @return A Manhattan plot of all of the hit values.
 make_manhattan_plot <- function(geno_pheno_name,
                                 pval_hits,
                                 fdr,
@@ -360,11 +360,9 @@ make_manhattan_plot <- function(geno_pheno_name,
          col = "red",
          pch = "-",
          cex = manhattan_cex)
-} #end make_manhattan_plot()
+}
 
-#' plot_tr_w_color_edges
-#'
-#' Plot a phylogenetic tree with certain edges highlighted.
+#' Plot tree with specific edges colored
 #'
 #' @noRd
 #' @param tr Phylo.
@@ -379,7 +377,6 @@ make_manhattan_plot <- function(geno_pheno_name,
 #' @param legend_highlighted Character. Legend name for highlighted lines.
 #'
 #' @return Plot of a tree with certain edges colored.
-#'
 plot_tr_w_color_edges <- function(tr,
                                   edges_to_highlight,
                                   geno_confidence,
@@ -445,7 +442,7 @@ plot_tr_w_color_edges <- function(tr,
                    ncol = 1,
                    lwd = 1,
                    cex = tree_legend_cex)
-} # end plot_tr_w_color_edges()
+}
 
 #' Plot all PhyC results
 #'
@@ -459,13 +456,13 @@ plot_tr_w_color_edges <- function(tr,
 #'   Corrected p-values for each genotype tested.
 #' @param p_recon_edges Vector. Length = Nedge(tree). Reconstruction of
 #'   phenotype.
-#' @param recon_perm_obs_results List of many results.
-#'   $hit_pvals. Character. P-val for each genotype. Length = number of tested
-#'   genotypes. $permuted_count. List of vectors. 1 vector for each tested
-#'   genotype. Length of each vector = number of permuations. $observed_overlap.
-#'   Integer vector. Length = number of tested genotypes.
-#' @param tr_and_pheno_hi_conf Vector of logicals. TRUE = high confidence.
-#'   FALSE = low confidence. Length = Nedge(tree).
+#' @param recon_perm_obs_results List of many results. $hit_pvals. Character.
+#'   P-val for each genotype. Length = number of tested genotypes.
+#'   $permuted_count. List of vectors. 1 vector for each tested genotype. Length
+#'   of each vector = number of permuations. $observed_overlap. Integer vector.
+#'   Length = number of tested genotypes.
+#' @param tr_and_pheno_hi_conf Vector of logicals. TRUE = high confidence. FALSE
+#'   = low confidence. Length = Nedge(tree).
 #' @param geno_confidence List of vectors. Length of individual vector =
 #'   Nedge(tree). Genotype high confidence edges. Either 1 (high confidence) or
 #'   0 (low confidence).
@@ -712,12 +709,9 @@ plot_phyc_results <- function(tr,
   }
 
   grDevices::dev.off()
-  # End of plot
-} # end plot_phyc_results()
+}
 
-#' plot_synchronous_results
-#'
-#' @description Plot the synchronous test results.
+#' Plot Synchronous Test results
 #'
 #' @noRd
 #' @param tr Phylo.
@@ -867,12 +861,12 @@ plot_synchronous_results  <- function(tr,
   phenotype_annotation[phenotype_annotation == 0] <- "Non-Transition"
   phenotype_annotation[phenotype_annotation == 1] <- "Phenotype Transition"
 
-  ann_colors <-list(`Locus Significance` = c(`Not Significant` = "white",
-                                             Significant = "blue"),
-                    `Edge Type` = c(`Low Confidence` = "grey",
-                                    `Non-Transition` = "white",
-                                    `Phenotype Transition` = "red",
-                                    `Genotype Transition` = "black"))
+  ann_colors <- list(`Locus Significance` = c(`Not Significant` = "white",
+                                              Significant = "blue"),
+                     `Edge Type` = c(`Low Confidence` = "grey",
+                                     `Non-Transition` = "white",
+                                     `Phenotype Transition` = "red",
+                                     `Genotype Transition` = "black"))
 
   can_be_plotted <- check_if_g_mat_can_be_plotted(ordered_by_p_val)
   if (can_be_plotted) {
@@ -974,8 +968,7 @@ plot_synchronous_results  <- function(tr,
     }
   }
   grDevices::dev.off()
-  # End of Plotting
-} # end plot_synchronous_results()
+}
 
 #' Plot all results from the Continuous Test
 #'
@@ -994,61 +987,65 @@ plot_synchronous_results  <- function(tr,
 #' @param dir Character. Output path.
 #' @param name Character. Output name.
 #' @param pval_all_transition List of two data.frames.
-#'  * $hit_pvals. Dataframe. 1 column. Nrow = number of genotypes. Row.names =
-#'       genotypes. Column name = "fdr_corrected_pvals". Values between 1 and 0.
-#'  * $sig_pvals. Dataframe. 1 column. Nrow = number of genotypes that are
-#'       significant after FDR correction. Column name =
-#'       "fdr_corrected_pvals[fdr_corrected_pvals < fdr]".
-#'       Row.names = genotypes. Nrow = is variable-- could be between 0 and
-#'       max number of genotypes. It will only have rows if the corrected
-#'       p-value is less than the fdr value.
+#'   \describe{
+#'     \item{hit_pvals}{Dataframe. 1 column. Nrow = number of genotypes.
+#'     Row.names = genotypes. Column name = "fdr_corrected_pvals". Values
+#'     between 1 and 0.}
+#'     \item{sig_pvals}{Dataframe. 1 column. Nrow = number of genotypes that are
+#'     significant after FDR correction. Column name =
+#'     "fdr_corrected_pvals[fdr_corrected_pvals < fdr]". Row.names = genotypes.
+#'     Nrow = is variable-- could be between 0 and max number of genotypes. It
+#'     will only have rows if the corrected p-value is less than the fdr value.}
+#'   }
 #' @param pheno_vector Vector. Length = Ntip(tr).
 #' @param perm Number.
 #' @param results_all_trans List of 8.
-#'  * $pvals. Named numeric vector. Length == number of genotypes. Values
-#'      between 1 and 0. Names are genotype names.
-#'  * $ks_statistics. List of numeric vectors. Length of list == number of
-#'      genotypes. Each vector has length == number of permutations. Values
-#'      between 1 and 0.
-#'  * $observed_pheno_trans_delta. List of numeric vectors. Length of list ==
-#'      number of genotypes. Vectors are of variable length because length is
-#'      the number of transition edges for that particular genotype. Vectors are
-#'      numeric.
-#'  * $observed_pheno_non_trans_delta. List of numeric vectors. Length of list
-#'       == number of genotypes. Vectors are of variable length because length
-#'       is the number of non-transition edges for that particular genotype.
-#'       Vectors are numeric.
-#'  * $trans_median. Numberic. Vector. Length = number of genotypes. Describes
-#'      median delta phenotype on all transition edges.
-#'  * $all_edges_median. Numeric vector. Length = number of genotypes. Describes
-#'      median delta phenotype on all edges.
-#'  * $num_genotypes. Integer. The number of genotypes.
-#'  * $observed_ks_stat. Numeric Vector. Length = number of genotypes. Values
-#'      between 1 and 0.
+#'   \describe{
+#'     \item{pvals}{Named numeric vector. Length == number of genotypes. Values
+#'     between 1 and 0. Names are genotype names.}
+#'     \item{ks_statistics}{List of numeric vectors. Length of list == number
+#'     of genotypes. Each vector has length == number of permutations. Values
+#'     between 1 and 0.}
+#'     \item{observed_pheno_trans_delta}{List of numeric vectors. Length of list
+#'     == number of genotypes. Vectors are of variable length because length is
+#'     the number of transition edges for that particular genotype. Vectors are
+#'     numeric.}
+#'     \item{observed_pheno_non_trans_delta}{List of numeric vectors. Length of
+#'     list == number of genotypes. Vectors are of variable length because
+#'     length is the number of non-transition edges for that particular
+#'     genotype. Vectors are numeric.}
+#'     \item{trans_median}{Numberic. Vector. Length = number of genotypes.
+#'     Describes median delta phenotype on all transition edges.}
+#'     \item{all_edges_median}{Numeric vector. Length = number of genotypes.
+#'     Describes median delta phenotype on all edges.}
+#'     \item{num_genotypes}{Integer. The number of genotypes.}
+#'     \item{observed_ks_stat.}{Numeric Vector. Length = number of genotypes.
+#'     Values between 1 and 0.}
+#'   }
 #' @param pheno_anc_rec Vector. The values of the ancestral reconstruction of
-#'  the phenotype at each internal node. Length = Nnode(tr).
+#'   the phenotype at each internal node. Length = Nnode(tr).
 #' @param geno_reconstruction List of lists. Binary. Number of lists = number of
 #'   genotypes. Length(each individual list) == Nedge(tree).
-#' @param geno_confidence List. Each entry corresponds to one genotype.
-#'  Length = number of genotypes.
+#' @param geno_confidence List. Each entry corresponds to one genotype. Length =
+#'   number of genotypes.
 #' @param geno_transition Object with two lists: $trans_dir and $transition.
-#'  Each list has an entry for each genotype. Each sublist has one value for
-#'  each tree edge.
+#'   Each list has an entry for each genotype. Each sublist has one value for
+#'   each tree edge.
 #' @param geno Matrix. Columns = genotypes, rows = samples. Binary.
 #' @param pheno_recon_ordered_by_edges Matrix. Dim: nrow = Nedge(tr) x ncol = 2.
-#'  Parent (older) node is 1st column. Child (younger) node is the 2nd column.
-#'  Ancestral reconstruction value of each node.
+#'   Parent (older) node is 1st column. Child (younger) node is the 2nd column.
+#'   Ancestral reconstruction value of each node.
 #' @param tr_and_pheno_hi_conf List. Length(list) = ncol(mat) == number of
 #'   genotypes. Each entry is a vector with length == Nedge(tr). All entries are
 #'   0 (low confidence) or 1 (high confidence).
 #' @param all_trans_sig_hits Data.frame. 1 column. Colnum names =
-#'  "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are (1)
-#'  significant after multiple test correction and (2) have higher median delta
-#'  phenotype on transition edges than on all edges. Values are between 1 and 0.
-#'  Rownames are genotypes.
+#'   "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are (1)
+#'   significant after multiple test correction and (2) have higher median delta
+#'   phenotype on transition edges than on all edges. Values are between 1 and
+#'   0. Rownames are genotypes.
 #' @param group_logical Logical. Inidicates whether or not genotypes were
-#'  grouped.
-#'  @param snp_in_gene Either NULL or table of integers where each entry
+#'   grouped.
+#' @param snp_in_gene Either NULL or table of integers where each entry
 #'   corresponds to one genotype.
 #'
 #' @return Plots continuous test results.
@@ -1157,7 +1154,7 @@ plot_continuous_results <- function(disc_cont,
     `Locus Significance` = c(`Not Significant` = "white",
                              `Significant & Small |Delta Phenotype|` = "light blue",
                              `Significant & Large |Delta Phenotype|` = "blue"),
-    `Genotype Edge` = c(`Low Confidence` = "grey", `Non-Transition` = "white", `Transition` = "black") # TEMP TRYING TO FIX LEGEND
+    `Genotype Edge` = c(`Low Confidence` = "grey", `Non-Transition` = "white", `Transition` = "black")
   )
 
   sorted_trans_edge_mat <-
@@ -1379,4 +1376,4 @@ plot_continuous_results <- function(disc_cont,
                   "delta_pheno_table" = delta_pheno_table,
                   "delta_pheno_list" = delta_pheno_list )
   return(results)
-} # end plot_continuous_results()
+}
