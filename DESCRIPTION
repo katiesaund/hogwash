@@ -4,16 +4,16 @@ Title: hogwash: Genome-Wide Association Studies for Bacteria
 Version: 0.1.0
 Author: Katie Saund <katiephd@umich.edu>
 Maintainer: Katie Saund <katiephd@umich.edu>
-Description: This package contains three methods to identify genetic loci 
-  associated with either a binary (two methods) or continuous phenotype (one 
-  method) while controlling for the clonal nature of the bacterial population. A
-  feature of this package is the ability to group together related genotypes to
-  increase the power to detect a relationship between the genotype and the 
-  phenotype of interest. The three methods all depend on convergence in both the 
-  phenotype and genotype to coincide on edges of the phylogenetic tree. The 
-  three methods are the Continuous Test, the Synchronous Test, and PhyC. This 
-  package's PhyC method is an implementation of the bacterial GWAS method 
-  originally described in Farhat et al. (2013) <doi.org/10.1038/ng.2747>. 
+Description: Three methods to identify genetic loci associated with either a 
+  binary (two methods) or continuous phenotype (one method) while controlling 
+  for the clonal nature of the bacterial population. A feature of this package 
+  is the ability to group together related genotypes to increase the power to 
+  detect a relationship between the genotype and the phenotype of interest. The
+  three methods all depend on convergence in both the phenotype and genotype to 
+  coincide on edges of the phylogenetic tree. The three methods are the 
+  Continuous Test, the Synchronous Test, and PhyC. This package's PhyC method is
+  an implementation of the bacterial GWAS method originally described in Farhat 
+  et al. (2013) <doi.org/10.1038/ng.2747>. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -24,7 +24,8 @@ Imports:
     pheatmap,
     phytools,
     stats,
-    utils
+    utils,
+    methods
 Suggests: 
     testthat, knitr, rmarkdown
 VignetteBuilder: knitr
