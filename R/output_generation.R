@@ -1,10 +1,10 @@
-#' create_contingency_table
+#' Create contingency table of genotype-phenotype overlap
 #'
-#' @description This function generates a contingency table for the genotype
-#'  and phenotype. Each entry in the table correpsonds to a tree edge. For
-#'  synchronous it counts the number of tree edges that are +/- genotype
-#'  transitions and +/- phenotype transitions. For phyc it counts the number of
-#'  tree edges that are +/- genotype transitions and +/- phenotype presence.
+#' @description This function generates a contingency table for the genotype and
+#'   phenotype. Each entry in the table correpsonds to a tree edge. For
+#'   synchronous it counts the number of tree edges that are +/- genotype
+#'   transitions and +/- phenotype transitions. For phyc it counts the number of
+#'   tree edges that are +/- genotype transitions and +/- phenotype presence.
 #'
 #' @param genotype_by_edges List.
 #' @param phenotype_by_edges Numeric vector.
@@ -14,7 +14,6 @@
 #' @return all_tables. List of matrices.
 #'
 #' @noRd
-#'
 create_contingency_table <- function(genotype_by_edges,
                                      phenotype_by_edges,
                                      geno,
@@ -54,4 +53,4 @@ create_contingency_table <- function(genotype_by_edges,
 
   # Return output --------------------------------------------------------------
   return(all_tables)
-} # end create_contigency_table()
+}

@@ -1,4 +1,4 @@
-#' assign_pheno_type
+#' Determine if phenotype is discrete or continuous
 #'
 #' @description Determine if the matrix is discrete or continuous.
 #'
@@ -7,7 +7,6 @@
 #' @return type. Character. Either "discrete" or "continuous".
 #'
 #' @noRd
-#'
 assign_pheno_type <- function(mat){
   # Check input ----------------------------------------------------------------
   check_dimensions(mat, NULL, 1, 1, 1)
@@ -25,21 +24,20 @@ assign_pheno_type <- function(mat){
   check_is_string(type)
   check_str_is_discrete_or_continuous(type)
   return(type)
-} # end assign_pheno_type()
+}
 
-#' calculate_phenotype_change_on_edge
+#' Calculate phenotype change per tree edge
 #'
 #' @description Quantify absoluate value of phenotype change on each tree edge.
 #'
 #' @param edge_list Numeric vector. Each number is the index of the tree edge to
-#'  be used
+#'   be used
 #' @param phenotype_by_edges Mat. Dimensions: Nedge x 2 matrix. Entries are the
 #'   phenotype value at the node, where row is the edge, 1st column is the
 #'   parent node and 2nd column is the child node.
 #'
 #' @return Numeric vector.   Length = length(edge_list).
 #' @noRd
-#'
 calculate_phenotype_change_on_edge <- function(edge_list, phenotype_by_edges){
   # Check input ----------------------------------------------------------------
   if (max(edge_list) > nrow(phenotype_by_edges)) {
@@ -69,17 +67,17 @@ calculate_phenotype_change_on_edge <- function(edge_list, phenotype_by_edges){
   }
 
   return(delta)
-} # end calculate_phenotype_change_on_edge()
+}
 
-#' calc_raw_diff
+#' Calculate the phenotype difference on each tree edge
 #'
 #' @description Subtract child node phenotype value from parent node phenotype
-#'  value. Identical to calculate_phenotype_change_on_edge EXCEPT that
-#'  calculating the raw difference rather than the absolute value of the
-#'  difference.
+#'   value. Identical to calculate_phenotype_change_on_edge EXCEPT that
+#'   calculating the raw difference rather than the absolute value of the
+#'   difference.
 #'
 #' @param edge_list Numeric vector. Each number is the index of the tree edge to
-#'  be used.
+#'   be used.
 #' @param phenotype_by_edges Mat. Dimensions: Nedge x 2 matrix. Entries are the
 #'   phenotype value at the node, where row is the edge, 1st column is the
 #'   parent node and 2nd column is the child node.
@@ -110,14 +108,15 @@ calc_raw_diff <- function(edge_list, phenotype_by_edges){
 
   # Return output --------------------------------------------------------------
   return(delta)
-} # end calc_raw_diff()
+}
 
-#' check_if_phenotype_normal
+#' Check if the phenotype is normally distributed
 #'
 #' @description Given a continuous phenotype, check if the phenotype follows a
-#' normal distribution. The Brownian Motional model of ancestral reconstruction,
-#' which this library uses, assumes a normal distribution of the phenotype. If
-#' it doesn't print a statement, but continue with hogwash().
+#'   normal distribution. The Brownian Motional model of ancestral
+#'   reconstruction, which this library uses, assumes a normal distribution of
+#'   the phenotype. If it doesn't print a statement, but continue with
+#'   hogwash().
 #'
 #' @param pheno Matrix. A one column numeric matrix.
 #' @param continuous_or_discrete String. Either 'continuous' or 'discrete.'
@@ -145,4 +144,4 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
       print(msg)
     }
   }
-} # end check_if_phenotype_normal
+}
