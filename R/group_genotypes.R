@@ -1,22 +1,27 @@
-#' build_gene_anc_recon_and_conf_from_snp
+#' Build grouped ancestral reconstruction and confidence
 #'
 #' @param tr Phylo.
 #' @param geno Matrix. Binary. Genotypes in columns, isolates in rows.
-#' @param g_recon_and_conf List of 2 objects: $tip_and_node_recon and
-#'   $tip_and_node_rec_conf. Length of both objects is number of genotypes.
-#'   Length of vectors within each object is number of tips + number of nodes
-#'   in the tree. Both objects are binary (1/0).
+#' @param g_recon_and_conf List of 2 objects:
+#'   \describe{
+#'     \item{tip_and_node_recon}{Length == number of genotypes. Length of
+#'     vectors within each object is number of tips + number of nodes in the
+#'     tree. Both objects are binary (1/0).}
+#'     \item{tip_and_node_rec_conf}{Length == number of genotypes.Length of
+#'     vectors within each object is number of tips + number of nodes in the
+#'     tree. Both objects are binary (1/0).}
+#'   }
 #' @param lookup Matrix. Two columns. 1st column are the names
 #'  of the genotypes to be grouped. 2nd column contains the appropriate groups.
 #'
 #' @return List of two objects:
-#'   * tip_node_recon. List of the genotypes built into groups. Length = number
-#'        of unique grouped genotypes.
-#'   * tip_node_conf. List of genotype confidences built into groups. Length =
-#'       number of unique grouped genotypes.
-#'
+#'   \describe{
+#'     \item{tip_node_recon}{List of the genotypes built into groups. Length =
+#'     number of unique grouped genotypes.}
+#'     \item{tip_node_conf}{List of genotype confidences built into groups.
+#'     Length = number of unique grouped genotypes.}
+#'   }
 #' @noRd
-#'
 build_gene_anc_recon_and_conf_from_snp <- function(tr,
                                                    geno,
                                                    g_recon_and_conf,
@@ -129,27 +134,28 @@ build_gene_anc_recon_and_conf_from_snp <- function(tr,
   # Return output --------------------------------------------------------------
   return(list("tip_node_recon" = gene_list_built_from_snps,
               "tip_node_conf" = gene_conf_list_built_from_snps ))
-} # end build_gene_anc_recon_from_snp()
+}
 
-#' build_gene_trans_from_snp_trans
+#' Build grouped transition information
 #'
 #' @description Calculate which edges of the tree are transitions for the
-#'  grouped genotype from transition information of the ungrouped genotype. The
-#'  function title reflects one such type of grouping: snps into genes.
+#'   grouped genotype from transition information of the ungrouped genotype. The
+#'   function title reflects one such type of grouping: snps into genes.
 #'
 #' @param tr Phylo.
 #' @param geno Matrix. Nrow = Ntip(tr). Ncol = Number of ungrouped genotypes.
 #'   Binary.
 #' @param geno_transition List of named vectors. Length == number of ungrouped
-#'   genotypes. $transition. Length = Nedge(tr). Values or 0 or 1.
-#'   $trans_dir. Length = Nedge(tr). Values -1, 0, or 1.
+#'   genotypes. $transition. Length = Nedge(tr). Values or 0 or 1. $trans_dir.
+#'   Length = Nedge(tr). Values -1, 0, or 1.
 #' @param gene_to_snp_lookup_table Matrix. Ncol = 2. Nrow = number of unique
 #'   ungrouped genotype - grouped genotype pairings.
 #'
-#' @return List of two objects. $transition and $trans_dir.
+#' @return List of two objects:
+#'   * transition
+#'   * trans_dir
 #'
 #' @noRd
-#'
 build_gene_trans_from_snp_trans <- function(tr,
                                             geno,
                                             geno_transition,
@@ -256,23 +262,21 @@ build_gene_trans_from_snp_trans <- function(tr,
   }
   # Return output --------------------------------------------------------------
   return(temp_results)
-} # end build_gene_trans_from_snp_trans()
+}
 
-
-#' build_gene_genotype_from_snps
+#' Build grouped genotype
 #'
 #' @description Build presence/absence of the grouped genotypes (e.g. gene) from
-#'  the presence/absence of the ungrouped genotypes (e.g. snps).
+#'   the presence/absence of the ungrouped genotypes (e.g. snps).
 #'
 #' @param geno Matrix. Columns are genotypes. Rows are isolates.
 #' @param gene_to_snp_lookup_table Matrix. 2 columns. 1st column are the
-#'  ungrouped genotypes 2nd column are the grouped genotypes. The table's 1st
-#'  column must contain only genotypes that are found in the row.names(geno).
+#'   ungrouped genotypes 2nd column are the grouped genotypes. The table's 1st
+#'   column must contain only genotypes that are found in the row.names(geno).
 #'
 #' @return samples_by_genes. Matrix.
 #'
 #' @noRd
-#'
 build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
   # Check input ----------------------------------------------------------------
   check_class(geno, "matrix")
@@ -302,27 +306,28 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
   class(samples_by_genes) <- "numeric"
   # Return output --------------------------------------------------------------
   return(samples_by_genes)
-} # end build_gene_genotype_from_snps()
+}
 
-#' prepare_grouped_genotype
+#' Remove rare and common genotypes from grouped genotypes
 #'
 #' @description Remove genotypes that are too common (omnipresent) or rare
-#'  (completely absent) for ancestral reconstruction to work from both the
-#'  genotype and the lookup key.
+#'   (completely absent) for ancestral reconstruction to work from both the
+#'   genotype and the lookup key.
 #'
 #' @param geno Matrix. Binary. Nrow = Ntip(tr). Ncol = number of original
-#'  genotypes.
+#'   genotypes.
 #' @param lookup Matrix. Ncol = 2. Nrow = genotypes with group assignments.
 #'
 #' @return List of four objects:
-#'  * $snp_per_gene. Named table. Names are genotypes. Values are number of
-#'      not-yet-grouped-genotypes that go into the grouped genotype.
-#'  * $unique_genes. Character vector. Vector of genotype names.
-#'  * $gene_snp_lookup. Character matrix. Ncol = 2. Nrow = number of genotypes
-#'      that are neither omni-present or completely absent.
-#'  * $genotype. Matrix.
+#'   \describe{
+#'     \item{snp_per_gene.}{Named table. Names are genotypes. Values are number
+#'     of not-yet-grouped-genotypes that go into the grouped genotype.}
+#'     \item{unique_genes.}{Character vector. Vector of genotype names.}
+#'     \item{gene_snp_lookup.}{Character matrix. Ncol = 2. Nrow = number of
+#'     genotypes that are neither omni-present or completely absent.}
+#'     \item{genotype.}{Matrix.}
+#'   }
 #' @noRd
-#'
 prepare_grouped_genotype <- function(geno, lookup){
   # Check input ----------------------------------------------------------------
   check_dimensions(lookup, min_rows = 1, exact_cols = 2, min_cols = 2)
@@ -363,23 +368,25 @@ prepare_grouped_genotype <- function(geno, lookup){
                   "gene_snp_lookup" = gene_snp_lookup,
                   "genotype" = genotype)
   return(results)
-} # end prepare_grouped_genotype()
+}
 
-#' prepare_ungrouped_genotype
+#' Remove common and rare ungrouped genotypes
 #'
 #' @description Remove genotypes that are too common or rare for ancestral
-#'  reconstruction to work. Given that this genotype is not grouped return NULL
-#'  for the variable snps_per_gene. Keep track of which genotypes got removed in
-#'  no_convergence_genotypes.
+#'   reconstruction to work. Given that this genotype is not grouped return NULL
+#'   for the variable snps_per_gene. Keep track of which genotypes got removed
+#'   in no_convergence_genotypes.
 #'
 #' @param geno Matrix. Binary. Ncol = number of genotypes. Nrow = Ntip(tr).
 #' @param tr Phylo.
 #'
 #' @return List of three objects:
-#'  * $snp_per_gene. Object of NULL.
-#'  * $genotype. Matrix.
-#'  * $convergene_not_possible_genotypes. Character vector. Vector of genotype
-#'       names.
+#'   \describe{
+#'     \item{snp_per_gene}{NULL.}
+#'     \item{genotype}{Matrix.}
+#'     \item{convergene_not_possible_genotypes}{Character vector. Vector of
+#'     genotype names.}
+#'   }
 #' @noRd
 prepare_ungrouped_genotype <- function(geno, tr){
   # Check input ----------------------------------------------------------------
@@ -397,12 +404,12 @@ prepare_ungrouped_genotype <- function(geno, tr){
          "genotype" = simple_geno$mat,
          "no_convergence_genotypes" = simple_geno$dropped_genotype_names)
   return(results)
-} # end prepare_ungrouped_genotype()
+}
 
-#' prepare_genotype
+#' Prepare genotype, paying attention to (not) grouping
 #'
 #' @description Funnel the genotype to be prepared for downstream use. The
-#'  preparation depends on if the genotype is going to be grouped or not.
+#'   preparation depends on if the genotype is going to be grouped or not.
 #' @param group_logical Logical.
 #' @param geno Genotype matrix. Binary. Nrow = Ntip(tr). Ncol = number of
 #'   ungrouped genotypes.
@@ -410,19 +417,24 @@ prepare_ungrouped_genotype <- function(geno, tr){
 #' @param lookup Either NULL or a Matrix. Ncol = 2.
 #'
 #' @return  prepped_geno. List of multiple objects. Content depends on value of
-#'  group_logical. For grouped genotypes output includes:
-#'  * $snp_per_gene. Named table. Names are genotypes. Values are number of
-#'      not-yet-grouped-genotypes that go into the grouped genotype.
-#'  * $unique_genes. Character vector. Vector of genotype names.
-#'  * $gene_snp_lookup. Character matrix. Ncol = 2. Nrow = number of genotypes
-#'      that are neither omni-present or completely absent.
-#'  * $genotype. Matrix.
+#'   group_logical. For grouped genotypes output includes:
+#'   \describe{
+#'     \item{snp_per_gene}{Named table. Names are genotypes. Values are number
+#'     of not-yet-grouped-genotypes that go into the grouped genotype.}
+#'     \item{unique_genes}{Character vector. Vector of genotype names.}
+#'     \item{gene_snp_lookup}{Character matrix. Ncol = 2. Nrow = number of
+#'     genotypes that are neither omni-present or completely absent.}
+#'     \item{genotype}{Matrix.}
 #'
-#'  For not grouped genotypes output includes:
-#'  * $snp_per_gene. Object of NULL.
-#'  * $genotype. Matrix.
-#'  * $convergene_not_possible_genotypes. Character vector. Vector of genotype
-#'      names.
+#'   }
+#'   For not grouped genotypes output includes:
+#'   \describe{
+#'     \item{snp_per_gene}{NULL}
+#'     \item{genotype}{Matrix}
+#'     \item{convergene_not_possible_genotypes}{Character vector. Vector of
+#'     genotype names.}
+#'
+#'   }
 #' @noRd
 prepare_genotype <- function(group_logical, geno, tr, lookup){
   # Check input ----------------------------------------------------------------
@@ -440,47 +452,56 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
     prepped_geno <- prepare_ungrouped_genotype(geno, tr)
   }
   return(prepped_geno)
-} # end prepare_genotype()
+}
 
-#' group_genotypes
+#' Group genotypes
 #'
 #' @description Group genotypes into larger groups. Examples: SNPs into genes or
-#'  genes into pathways.
+#'   genes into pathways.
 #'
 #' @param tr Phylo.
 #' @param geno Binary matrix. Nrow = Ntip(tr). Ncol = Number of genotypes.
-#' @param geno_recon_and_conf List of Lists of four objects.
-#'   Length of list == number of genotypes.
-#'   * $node_anc_rec. Reconstructed values correspond to each ancestral node.
-#'   * $tip_and_node_recon. Reconstructed values corresponding to tips and
-#'       nodes.
-#'   * $tip_and_node_rec_conf. Ancestral reconstruction confidence values
-#'       corresponding to tips and nodes.
-#'   * $recon_edge_mat. Ancestral reconstruction structured as a matrix with
-#'       each row correspoding to a tree edge. 1st column is parent node. 2nd
-#'       column is child node.
+#' @param geno_recon_and_conf List of Lists of four objects. Length of list ==
+#'   number of genotypes.
+#'   \describe{
+#'     \item{node_anc_rec.}{Reconstructed values correspond to each ancestral
+#'     node.}
+#'     \item{tip_and_node_recon.}{Reconstructed values corresponding to tips and
+#'     nodes.}
+#'     \item{tip_and_node_rec_conf.}{Ancestral reconstruction confidence values
+#'     corresponding to tips and nodes.}
+#'     \item{recon_edge_mat.}{Ancestral reconstruction structured as a matrix
+#'     with each row correspoding to a tree edge. 1st column is parent node. 2nd
+#'     column is child node.}
+#'   }
 #' @param genotype_transition_sync List of lists. Length of list = number of
 #'   genotypes.
-#'   * $transition. Length == Nedge(tr).
-#'   * $trans_dir. Length == Nedge(tr).
+#'   \describe{
+#'     \item{transition}{Length == Nedge(tr).}
+#'     \item{trans_dir}{Length == Nedge(tr).}
+#'   }
 #' @param genotype_transition_phyc List of lists. Length of list = number of
 #'  genotypes.
-#'  * $transition. Length == Nedge(tr).
-#'  * $trans_dir. Length == Nedge(tr).
+#'   \describe{
+#'     \item{transition}{Length == Nedge(tr).}
+#'     \item{trans_dir}{Length == Nedge(tr).}
+#'   }
 #' @param lookup Matrix. Characters. Nrow = number of unique genotype-group
 #'  pairings.
 #' @param uni_genes Character vector. Equivalent to unique(lookup[,2]).
 #'
-#' @return List of 6 objects.
-#'  * geno_recon_ordered_by_edges. List.
-#'  * geno_conf_ordered_by_edges. List.
-#'  * geno_trans_synchronous. List of two objects. $transition and $trans_dir.
-#'  * geno_trans_phyc. List of two objects. $transition and $trans_dir.
-#'  * no_convergence_genotypes. Character vector.
-#'  * genotype. Matrix.
+#' @return List of 6 objects:
+#'   \describe{
+#'     \item{geno_recon_ordered_by_edges.}{List.}
+#'     \item{geno_conf_ordered_by_edges.}{List.}
+#'     \item{geno_trans_synchronous.}{List of two objects. $transition and
+#'     $trans_dir.}
+#'     \item{geno_trans_phyc.}{List of two objects. $transition and $trans_dir.}
+#'     \item{no_convergence_genotypes.}{Character vector.}
+#'     \item{genotype.}{Matrix.}
+#'   }
 #'
 #' @noRd
-#'
 group_genotypes <- function(tr,
                             geno,
                             geno_reconstruction_and_conf,
@@ -569,4 +590,4 @@ group_genotypes <- function(tr,
       "no_convergence_genotypes" = simplified_genotype$dropped_genotype_names,
       "genotype" = geno)
   return(results)
-} # end group_genotypes()
+}
