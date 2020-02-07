@@ -16,7 +16,6 @@
 #'  (genotypes not to be processed downstream).
 #'
 #' @noRd
-#'
 get_dropped_genotypes <- function(geno, keepers){
   # Check input ----------------------------------------------------------------
   check_if_binary_matrix(geno)
@@ -34,7 +33,7 @@ get_dropped_genotypes <- function(geno, keepers){
 
   # Return output --------------------------------------------------------------
   return(dropped_genotype_names)
-} # end get_dropped_genotypes()
+}
 
 #' Remove rare or common genotypes from genotype matrix
 #'
@@ -53,7 +52,6 @@ get_dropped_genotypes <- function(geno, keepers){
 #'     \item{dropped_genotype_names}{Character vector.}
 #'   }
 #' @noRd
-#'
 remove_rare_or_common_geno <- function(mat, tr){
   # Check inputs ---------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
@@ -72,4 +70,4 @@ remove_rare_or_common_geno <- function(mat, tr){
   results <- list("mat" = mat,
                   "dropped_genotype_names" = dropped_genotype_names)
   return(results)
-} # end remove_rare_or_common_geno()
+}
