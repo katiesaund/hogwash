@@ -556,7 +556,7 @@ check_class <- function(obj, cls){
   check_is_string(cls)
 
   # Function -----------------------------------------------------------------
-  if (class(obj) != cls) {
+  if (!methods::is(obj, cls)) {
     stop("Object does not have expected class.")
   }
 } # end check_class()
