@@ -502,7 +502,7 @@ plot_phyc_results <- function(tr,
   } # Don't change to check_dimensions because input is dataframe, not matrix.
   check_equal(length(p_recon_edges), ape::Nedge(tr))
   if (!is.null(snp_in_gene)) {
-    if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
+    if (!is_this_class(snp_in_gene, "table") | typeof(snp_in_gene) != "integer") {
       stop("snp_in_gene should be a table of integers")
     }
   }
@@ -765,7 +765,7 @@ plot_synchronous_results  <- function(tr,
     stop("Dimensions of hit p-values dataframe are incorrect.")
   }
   if (!is.null(snp_in_gene)) {
-    if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
+    if (!is_this_class(snp_in_gene, "table")  | typeof(snp_in_gene) != "integer") {
       stop("snp_in_gene should be a table of integers")
     }
   }
@@ -1093,7 +1093,7 @@ plot_continuous_results <- function(disc_cont,
   check_equal(length(tr_and_pheno_hi_conf), ncol(geno))
   check_class(group_logical, "logical")
   if (!is.null(snp_in_gene)) {
-    if (class(snp_in_gene) != "table" | typeof(snp_in_gene) != "integer") {
+    if (!is_this_class(snp_in_gene, "table")  | typeof(snp_in_gene) != "integer") {
       stop("snp_in_gene should be a table of integers")
     }
   }

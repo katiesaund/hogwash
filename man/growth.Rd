@@ -4,7 +4,8 @@
 \name{growth}
 \alias{growth}
 \title{Continuous phenotype}
-\format{A matrix with 7 rows and 1 columns. Each row name corresponds to a tree tip.
+\format{A matrix with 7 rows and 1 columns. Each row name corresponds to a
+  tree tip.
 \describe{
   \item{growth}{Dummy growth rates}
  }}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/hogwash.R
 \name{hogwash}
 \alias{hogwash}
-\title{hogwash}
+\title{Run bacterial GWAS}
 \usage{
 hogwash(pheno, geno, tree, file_name = Sys.Date(), dir = ".",
   perm = 10000, fdr = 0.15, bootstrap = 0.7,
@@ -20,15 +20,19 @@ input.}
 \item{tree}{Phylo object. If unrooted, will be rooted using
 phytools::midpoint.root() method. Required input.}
 
-\item{file_name}{Character. Suffix for output files. Default value is the current date: YYYY-MM-DD.}
+\item{file_name}{Character. Suffix for output files. Default value is the
+current date: YYYY-MM-DD.}
 
-\item{dir}{Character. Path to output directory. Default value is current directory: "."}
+\item{dir}{Character. Path to output directory. Default value is current
+directory: "."}
 
 \item{perm}{Integer. Number of permutations to run. Default value is: 10,000.}
 
-\item{fdr}{Numeric. False discovery rate. Between 0 and 1. Default value is: 0.15.}
+\item{fdr}{Numeric. False discovery rate. Between 0 and 1. Default value is:
+0.15.}
 
-\item{bootstrap}{Numeric. Confidence threshold for tree bootstrap values. Default value is: 0.70.}
+\item{bootstrap}{Numeric. Confidence threshold for tree bootstrap values.
+Default value is: 0.70.}
 
 \item{group_genotype_key}{Matrix. Dimenions: nrow = number of unique
 genotypes, ncol = 2. Optional input.}
@@ -40,36 +44,36 @@ This function runs a bacterial genome-wide association test. It
 }
 \details{
 Overview: hogwash reads in one phenotype (either continuous or
- binary), a matrix of binary genotypes, and a phylogenetic tree. Given these
- inputs it performs an ancestral reconstruction of that phenotype and each
- genotype. The ancestral reconstructions are used to perform one of several
- tests to associate the the genotypes with the phenotype:
- \enumerate{
-  \item Continuous Test
-  \item Synchronous Test
-  \item PhyC Test (Farhat et al.)
-}
- Once a test finishes running it returns (i) p-values for all genotypes
- tested, (ii) a manhattan plot of those p-values; if any of the genotypes
- tested were significant associated with the phenotype after FDR correction
- it also returns (iii) a list of significant hits and (iv) figures of the
- genotype & phenotype reconstructions on the tree.
+  binary), a matrix of binary genotypes, and a phylogenetic tree. Given these
+  inputs it performs an ancestral reconstruction of that phenotype and each
+  genotype. The ancestral reconstructions are used to perform one of several
+  tests to associate the the genotypes with the phenotype:
+  \enumerate{
+   \item Continuous Test
+   \item Synchronous Test
+   \item PhyC Test (Farhat et al.)
+  }
+  Once a test finishes running it returns (i) p-values for all genotypes
+  tested, (ii) a manhattan plot of those p-values; if any of the genotypes
+  tested were significant associated with the phenotype after FDR correction
+  it also returns (iii) a list of significant hits and (iv) figures of the
+  genotype & phenotype reconstructions on the tree.
 
- Grouping: A feature of hogwash is the ability to organize genotypes into
- biologically meaningful groups. Testing for an association between an
- individual SNP and a phenotype is quite stringent, but patterns may emerge
- when grouping together biologically related genotypes. For example,
- grouping together all variants (insertions, deletions and SNPs) within a
- gene or promoter region could allow the user to identify a particular gene
- as being associated with a phenotype while any individual variant within
- that gene may not have deep penetrance in the isolates being tested.
- Grouped genotypes could have increased power to identify convergent
- evolution because they captures larger trends in functional impact at the
- group level and reduce the multiple testing correction burden. Use cases
- for this method could be to group SNPs into genes, kmers or genes into
- pathways, etc... Each of the three tests can be run on disaggregated data
- or aggregated data with the inclusion of a grouping key which is
- described later on the inputs page.
+  Grouping: A feature of hogwash is the ability to organize genotypes into
+  biologically meaningful groups. Testing for an association between an
+  individual SNP and a phenotype is quite stringent, but patterns may emerge
+  when grouping together biologically related genotypes. For example,
+  grouping together all variants (insertions, deletions and SNPs) within a
+  gene or promoter region could allow the user to identify a particular gene
+  as being associated with a phenotype while any individual variant within
+  that gene may not have deep penetrance in the isolates being tested.
+  Grouped genotypes could have increased power to identify convergent
+  evolution because they captures larger trends in functional impact at the
+  group level and reduce the multiple testing correction burden. Use cases
+  for this method could be to group SNPs into genes, kmers or genes into
+  pathways, etc... Each of the three tests can be run on disaggregated data
+  or aggregated data with the inclusion of a grouping key which is
+  described later on the inputs page.
 }
 \examples{
 \donttest{

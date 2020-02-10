@@ -4,7 +4,8 @@
 \name{snp_genotype}
 \alias{snp_genotype}
 \title{Binary genotype}
-\format{A matrix with 7 rows and 8 columns. Rows correspond to isolates and tree tips. Columns correspond to genotypes.
+\format{A matrix with 7 rows and 8 columns. Rows correspond to isolates and
+  tree tips. Columns correspond to genotypes.
 \describe{
   \item{SNP1}{SNP1 present encoded as 1, absent encoded as 0}
  }}

@@ -27,7 +27,7 @@ check_dimensions <- function(mat,
     check_is_number(exact_cols)
   }
   check_is_number(min_cols)
-  if (class(mat) != "matrix") {
+  if (!is_this_class(mat, "matrix")) {
     stop("input must be a matrix")
   }
 
@@ -143,7 +143,7 @@ check_if_vector <- function(vector){
 #' @noRd
 check_for_NA_and_inf <- function(mat){
   # Check input & function -----------------------------------------------------
-  if (class(mat) != "matrix") {
+  if (!is_this_class(mat, "matrix")) {
     stop("Input should be a matrix.")
   }
   if (sum(is.na(mat)) > 0) {
@@ -169,7 +169,7 @@ check_for_NA_and_inf <- function(mat){
 #' @noRd
 check_for_root_and_bootstrap <- function(tr){
   # Check input & function -----------------------------------------------------
-  if (class(tr) != "phylo") {
+  if (!is_this_class(tr, "phylo")) {
     stop("Tree must be phylo object")
   }
   if (!ape::is.rooted(tr)) {
@@ -203,8 +203,8 @@ check_if_binary_vector <- function(vec) {
   if (sum(!(vec %in% c(0, 1))) > 0) {
     stop("Vector should be only 1s and 0s")
   }
-  if (class(vec) != "integer") {
-    if (class(vec) != "numeric") {
+  if (!is_this_class(vec, "integer")) {
+    if (!is_this_class(vec, "numeric")) {
       stop("Vector should be only 1s and 0s")
     }
   }
@@ -219,7 +219,7 @@ check_if_binary_vector <- function(vec) {
 #' @noRd
 check_if_binary_vector_numeric <- function(vec) {
   # Check input & function -----------------------------------------------------
-  if (sum(!(vec %in% c(0, 1))) > 0 | class(vec) != "numeric") {
+  if (sum(!(vec %in% c(0, 1))) > 0 | !is_this_class(vec, "numeric")) {
     stop("Vector should be only 1s and 0s")
   }
 }
@@ -237,7 +237,7 @@ check_if_binary_matrix <- function(mat) {
   if (is.null(dim(mat))) {
     stop("Must be a matrix")
   }
-  if (sum(!(mat %in% c(0, 1))) > 0 | class(mat) != "matrix") {
+  if (sum(!(mat %in% c(0, 1))) > 0 | !is_this_class(mat, "matrix")) {
     stop("Genotype matrix should be only 1s and 0s")
   }
   if (nrow(mat) == 0 | ncol(mat) == 0) {
@@ -270,7 +270,7 @@ check_file_exists <- function(file_name) {
 #' @noRd
 check_rownames <- function(mat, tr){
   # Check input ----------------------------------------------------------------
-  if (class(mat) != "matrix" | class(tr) != "phylo") {
+  if (!is_this_class(mat, "matrix") | !is_this_class(tr, "phylo")) {
     stop("Inputs are incorrectly formatted.")
   }
   check_dimensions(mat,
@@ -354,7 +354,7 @@ check_node_is_in_tree <- function(node_val, tr){
 #' @noRd
 check_tree_is_valid <- function(tr){
   # Check input & function -----------------------------------------------------
-  if (class(tr) != "phylo") {
+  if (!is_this_class(tr, "phylo")) {
     stop("Input must be a phylogenetic tree (object with class phylo)")
   }
 
@@ -443,8 +443,8 @@ is_tip <- function(node_num, tr){
 #' @noRd
 check_if_g_mat_can_be_plotted <- function(geno_matrix){
   # Check input & function -----------------------------------------------------
-  if (sum(class(geno_matrix) != "data.frame",
-          class(geno_matrix) != "matrix") == 2) {
+  if (sum(!is_this_class(geno_matrix, "data.frame"),
+          !is_this_class(geno_matrix, "matrix")) == 2) {
     # Neither matrix nor dataframe
     plot_logical <- FALSE
   } else {
@@ -575,4 +575,22 @@ check_str_is_test_name <- function(test_name){
   if (!(test_name %in% valid_names)) {
     stop("Test name must be either continuous, synchronous, or phyc")
   }
+}
+
+#' Tests if an input object has the specified class.
+#'
+#' @param obj Any R object.
+#' @param current_class String. Name of the expected class of the R object.
+#'
+#' @return is_this_class: Logical.
+#' @noRd
+is_this_class <- function(obj, current_class){
+  if (length(current_class) != 1) {
+    stop("Current_class must have a length of 1")
+  }
+  if (!methods::is(current_class, "character")) {
+    stop("Current_class is expected to be a string describing a class")
+  }
+  is_this_class <- methods::is(obj, current_class)
+  return(is_this_class)
 }

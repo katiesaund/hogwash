@@ -68,7 +68,7 @@ test_that("ancestral_reconstruction_by_ML with continuous input works.", {
 
   expected_rows <- nrow(temp_tree$edge)
   expected_columns <- ncol(temp_tree$edge)
-  expect_identical(class(dummy_pheno1$recon_edge_mat), "matrix")
+  expect_silent(check_class(dummy_pheno1$recon_edge_mat, "matrix"))
   expect_identical(nrow(dummy_pheno1$recon_edge_mat), expected_rows)
   expect_identical(ncol(dummy_pheno1$recon_edge_mat), expected_columns)
 })
@@ -295,7 +295,7 @@ test_that("discrete_ancestral_reconstruction gives results of expected size", {
   expect_identical(length(dummy_geno$ML_anc_rec), expected_length)
 
   expect_type(dummy_pheno$reconstruction, "list")
-  expect_identical(class(dummy_pheno$reconstruction), "ace")
+  expect_silent(check_class(dummy_pheno$reconstruction, "ace"))
 
   expect_identical(nrow(dummy_pheno$reconstruction$lik.anc),
                    ape::Nnode(temp_tree))
