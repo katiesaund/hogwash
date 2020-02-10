@@ -1,8 +1,8 @@
 New submission.
 
 ## Test environments
-* macOS Mojave 10.14.6, R 3.6.2
-* win-devel x86_64-w64-mingw32
+* local macOS Mojave 10.14.6, R 3.6.2
+* win, R 3.6.2 & R devel 
 
 ## R CMD check results for OS X:
 There were no ERRORs, WARNINGs, or NOTEs.
@@ -19,8 +19,3 @@ Possibly mis-spelled words in DESCRIPTION:
 ```
 The NOTE is spurious because these words are all correctly spelled technical 
 terms, names, or Latin.
-
-## Downstream dependencies
-There are currently no downstream dependences for this package.
-
-
