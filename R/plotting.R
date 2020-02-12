@@ -347,13 +347,6 @@ make_manhattan_plot <- function(geno_pheno_name,
 
   graphics::abline(h = fdr,
                    col = "red")
-  if (nrow(sig_temp) > 0) {
-    graphics::text(x = sig_temp[, 1],
-                   y = sig_temp[, 2],
-                   labels = row.names(sig_temp),
-                   pos = 1,
-                   cex = manhattan_cex / 2)
-  }
   graphics::legend("topright",
          bty = "n",
          legend = "Significance Threshold",
