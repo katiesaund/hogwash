@@ -623,7 +623,6 @@ plot_phyc_results <- function(tr,
       annotation_col = column_annot_ordered_by_p_val,
       annotation_row = phenotype_annotation,
       annotation_colors = ann_colors,
-      show_colnames = TRUE,
       fontsize = 8,
       cellwidth = cell_width_value)
   }
@@ -884,7 +883,6 @@ plot_synchronous_results  <- function(tr,
       annotation_row = phenotype_annotation,
       annotation_colors = ann_colors,
       fontsize = 8,
-      show_colnames = TRUE,
       cellwidth = cell_width_value)
   }
 
@@ -1213,7 +1211,6 @@ plot_continuous_results <- function(disc_cont,
     annotation_col = column_annot_ordered_by_p_val,
     annotation_row = p_trans_mat,
     annotation_colors = ann_colors,
-    show_colnames = TRUE,
     fontsize = 8,
     cellwidth = cell_width_value)
 
