@@ -116,7 +116,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
 
   graphics::hist(raw_non_trans_delta,
        main = "Raw Delta Phenotype",
-       breaks = ape::Nedge(tr) / 4,
+       # breaks = ape::Nedge(tr) / 4,
        col = non_trans_color,
        border = FALSE,
        xlim = c(min(raw_trans_delta, raw_non_trans_delta),
@@ -130,7 +130,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
        cex.axis = hist_cex_size)
 
   graphics::hist(raw_trans_delta,
-       breaks = ape::Nedge(tr) / 4,
+       # breaks = ape::Nedge(tr) / 4,
        col = trans_color,
        border = trans_color,
        add = TRUE)
@@ -184,7 +184,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
   hist_cex_size <- 1
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::hist(all_trans$observed_pheno_non_trans_delta[[index]],
-       breaks = ape::Nedge(tr) / 4,
+       # breaks = ape::Nedge(tr) / 4,
        col = non_trans_color,
        border = FALSE,
        ylab = "Count",
@@ -201,7 +201,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
        cex.axis = hist_cex_size)
 
   graphics::hist(all_trans$observed_pheno_trans_delta[[index]],
-       breaks = ape::Nedge(tr) / 4,
+       # breaks = ape::Nedge(tr) / 4,
        col = trans_color,
        border = trans_color,
        add = TRUE)
@@ -260,7 +260,7 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
     length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
   delta_phenotype_on_all_edges <- as.numeric(unlist(p_trans_mat))
   graphics::hist(delta_phenotype_on_all_edges,
-       breaks = ape::Nedge(tr) / 4,
+       # breaks = ape::Nedge(tr) / 4,
        col = transparent_blue,
        border = FALSE,
        ylab = "Count",
@@ -276,7 +276,7 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
     as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
   graphics::hist(delta_pheno_on_hi_conf_edges,
   # plot phenotype transition only high confidence edges for this genotype
-       breaks = ape::Nedge(tr) / 4,
+       # breaks = ape::Nedge(tr) / 4,
        col = transparent_purple,
        border = FALSE,
        ylab = "Count",
@@ -674,11 +674,10 @@ plot_phyc_results <- function(tr,
       # Plot Null Distribution Histogram
       max_x <- 1.2 * max(recon_perm_obs_results$permuted_count[[j]],
                    recon_perm_obs_results$observed_overlap[j])
-      max_y <- 0.85 * length(recon_perm_obs_results$permuted_count[[j]])
+      # max_y <- 0.85 * length(recon_perm_obs_results$permuted_count[[j]])
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
-                     breaks = num_perm / 10,
                      xlim = c(0, max_x),
-                     ylim = c(0, max_y),
+                     # ylim = c(0, max_y),
                      col = "grey",
                      border = FALSE,
                      ylab = "Count",
@@ -937,9 +936,9 @@ plot_synchronous_results  <- function(tr,
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
                    trans_perm_obs_results$observed_overlap[j])
       graphics::hist(trans_perm_obs_results$permuted_count[[j]],
-           breaks = num_perm / 10,
+           # breaks = num_perm / 10,
            xlim = c(0, max_x),
-           ylim = c(0, .85 * length(trans_perm_obs_results$permuted_count[[j]])),
+           # ylim = c(0, .85 * length(trans_perm_obs_results$permuted_count[[j]])),
            col = "grey",
            border = FALSE,
            ylab = "Count",
@@ -1283,7 +1282,7 @@ plot_continuous_results <- function(disc_cont,
                                    transparent_red)
       # Plot Null Distribution of KS Test Statistics
       graphics::hist(log(results_all_trans$ks_statistics[[j]]),
-                     breaks = perm / 10,
+                     # breaks = perm / 10,
                      col = "grey",
                      border = FALSE,
                      main =
@@ -1297,7 +1296,7 @@ plot_continuous_results <- function(disc_cont,
                      cex.axis = hist_cex_size,
                      ylab = "Count",
                      xlab = "ln(KS Test Statistic)",
-                     ylim = c(0, 0.6 * length(results_all_trans$ks_statistics[[j]])),
+                     # ylim = c(0, 0.6 * length(results_all_trans$ks_statistics[[j]])),
                      xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])),
                                   log(results_all_trans$ks_statistics[[j]])), 0))
       graphics::abline(v =
