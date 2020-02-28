@@ -176,44 +176,42 @@ calculate_continuous_gamma <- function(pheno_recon_mat,
   geno_non_trans_index_list <- high_conf_index_list <- rep(list(0), num_geno)
   for (i in 1:num_geno) {
     geno_non_trans_index_list[[i]] <-
-      which(geno_trans_edge_list[[i]]$transition == 0 &
-              high_conf_edge_list[[i]] == 1 &
-              high_conf$tr_and_pheno_hi_conf == 1)
+      which(geno_trans_edge_list[[i]]$transition == 0)
     high_conf_index_list[[i]] <-
       which(high_conf_edge_list[[i]] == 1 & high_conf$tr_and_pheno_hi_conf == 1)
   }
 
-  # Get phenotype delta for all high confidence edges and specifically for high
-  # confidence genotype transition edges
+  # Get phenotype delta for all edges and specifically for genotype transition
+  #   edges
 
-  pheno_delta_hi_conf <-
-    pheno_delta_hi_conf_geno_non_trans <-
-    rep(list(0), num_geno)
+  pheno_delta <- pheno_delta_geno_non_trans <- rep(list(0), num_geno)
+  num_tree_edge <- nrow(pheno_recon_mat)
 
   for (i in 1:num_geno) {
-    pheno_delta_hi_conf[[i]] <-
-      calculate_phenotype_change_on_edge(high_conf_index_list[[i]],
+    pheno_delta[[i]] <-
+      calculate_phenotype_change_on_edge(1:num_tree_edge,
                                          pheno_recon_mat)
-    pheno_delta_hi_conf_geno_non_trans[[i]] <-
+    pheno_delta_geno_non_trans[[i]] <-
       calculate_phenotype_change_on_edge(geno_non_trans_index_list[[i]],
                                          pheno_recon_mat)
   }
 
-  median_pheno_delta_hi_conf_geno_non_trans <- pheno_beta <-
+  median_pheno_delta_geno_non_trans <- pheno_beta <-
     epsilon <- geno_beta <- gamma_count <- gamma_percent <- rep(0, num_geno)
 
   for (i in 1:num_geno) {
-    median_pheno_delta_hi_conf_geno_non_trans[i] <-
-      stats::median(pheno_delta_hi_conf_geno_non_trans[[i]])
+    median_pheno_delta_geno_non_trans[i] <-
+      stats::median(pheno_delta_geno_non_trans[[i]])
   }
 
   for (i in 1:num_geno) {
-    pheno_beta[i] <- sum(pheno_delta_hi_conf[[i]] >
-                           median_pheno_delta_hi_conf_geno_non_trans[i])
+    pheno_beta[i] <- sum(pheno_delta[[i]] >
+                           median_pheno_delta_geno_non_trans[i] &
+                           high_conf_edge_list[[i]] == 1)
     geno_beta[i] <- sum(geno_trans_edge_list[[i]]$transition == 1 &
                           high_conf_edge_list[[i]] == 1)
-    gamma_count[i] <- sum(pheno_delta_hi_conf[[i]] >
-                            median_pheno_delta_hi_conf_geno_non_trans[i] &
+    gamma_count[i] <- sum(pheno_delta[[i]] >
+                            median_pheno_delta_geno_non_trans[i] &
                             geno_trans_edge_list[[i]]$transition == 1 &
                             high_conf_edge_list[[i]] == 1)
     gamma_percent[i] <- gamma_count[i] / sum(high_conf_edge_list[[i]])
