@@ -1051,7 +1051,7 @@ plot_continuous_results <- function(disc_cont,
                                     geno_reconstruction,
                                     geno_confidence,
                                     geno_transition,
-                                    geno,
+                                    geno_mat,
                                     pheno_recon_ordered_by_edges,
                                     tr_and_pheno_hi_conf,
                                     all_trans_sig_hits,
@@ -1067,19 +1067,19 @@ plot_continuous_results <- function(disc_cont,
   check_class(pval_all_transition$hit_pvals, "data.frame")
   check_equal(length(pheno_vector), ape::Ntip(tr))
   check_if_permutation_num_valid(perm)
-  check_equal(length(results_all_trans$ks_statistics), ncol(geno))
+  check_equal(length(results_all_trans$null_gamma), ncol(geno_mat))
   check_equal(length(pheno_anc_rec), ape::Nnode(tr))
-  check_equal(length(geno_reconstruction), ncol(geno))
+  check_equal(length(geno_reconstruction), ncol(geno_mat))
   check_equal(length(geno_reconstruction[[1]]), ape::Nedge(tr))
-  check_equal(length(geno_confidence), ncol(geno))
+  check_equal(length(geno_confidence), ncol(geno_mat))
   check_equal(length(geno_transition[[1]]$transition), ape::Nedge(tr))
-  check_if_binary_matrix(geno)
+  check_if_binary_matrix(geno_mat)
   check_dimensions(pheno_recon_ordered_by_edges,
                    ape::Nedge(tr),
                    ape::Nedge(tr),
                    2,
                    2)
-  check_equal(length(tr_and_pheno_hi_conf), ncol(geno))
+  check_equal(length(tr_and_pheno_hi_conf), ncol(geno_mat))
   check_class(group_logical, "logical")
   if (!is.null(snp_in_gene)) {
     if (!is_this_class(snp_in_gene, "table")  | typeof(snp_in_gene) != "integer") {
@@ -1098,7 +1098,7 @@ plot_continuous_results <- function(disc_cont,
   for (i in 1:length(geno_transition)) {
     trans_edge_mat <- cbind(trans_edge_mat, geno_transition[[i]]$transition)
   }
-  colnames(trans_edge_mat) <- colnames(geno)
+  colnames(trans_edge_mat) <- colnames(geno_mat)
 
   for (c in 1:ncol(trans_edge_mat)) {
     trans_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
@@ -1116,14 +1116,7 @@ plot_continuous_results <- function(disc_cont,
                                           ncol(trans_edge_mat)),
                stringsAsFactors = FALSE)
   row.names(significant_loci) <- colnames(trans_edge_mat)
-  significant_loci[row.names(significant_loci) %in%
-                     row.names(all_trans_sig_hits), ] <- "Significant & Large |Delta Phenotype|"
-
-  signif_but_wrong_direction <-
-    row.names(pval_all_transition$hit_pvals)[pval_all_transition$hit_pvals[ , 1] > fdr][!row.names(pval_all_transition$hit_pvals) %in% row.names(all_trans_sig_hits)]
-
-  significant_loci[row.names(significant_loci) %in% signif_but_wrong_direction, ] <- "Significant & Small |Delta Phenotype|"
-
+  significant_loci$Locus.Significance[pval_all_transition$hit_pvals[ , 1] > fdr] <- "Significant"
   log_p_value <- data.frame(pval_all_transition$hit_pvals)
 
   if (!is.null(snp_in_gene)) {
@@ -1141,8 +1134,7 @@ plot_continuous_results <- function(disc_cont,
 
   ann_colors <- list(
     `Locus Significance` = c(`Not Significant` = "white",
-                             `Significant & Small |Delta Phenotype|` = "light blue",
-                             `Significant & Large |Delta Phenotype|` = "blue"),
+                             `Significant` = "blue"),
     `Genotype Edge` = c(`Low Confidence` = "grey", `Non-Transition` = "white", `Transition` = "black")
   )
 
@@ -1276,13 +1268,13 @@ plot_continuous_results <- function(disc_cont,
                                    j,
                                    transparent_grey,
                                    transparent_red)
-      # Plot Null Distribution of KS Test Statistics
-      graphics::hist(log(results_all_trans$ks_statistics[[j]]),
+      # Plot Null Distribution of gamma
+      graphics::hist(log(results_all_trans$null_gamma[[j]]),
                      # breaks = perm / 10,
                      col = "grey",
                      border = FALSE,
                      main =
-                       paste("KS Test Statistic Null Distribution\n-ln(FDR Corrected P-value) = ",
+                       paste("Beta(phenotype) Beta(genotype) Intersection Null Distribution\n-ln(FDR Corrected P-value) = ",
                              formatC(pval_all_transition$hit_pvals[j, 1],format = "e", digits = 1),
                              " P-value rank = ",
                              rank(1 / rank_mat, na.last = TRUE)[j],
@@ -1291,17 +1283,17 @@ plot_continuous_results <- function(disc_cont,
                      cex.lab = hist_cex_size,
                      cex.axis = hist_cex_size,
                      ylab = "Count",
-                     xlab = "ln(KS Test Statistic)",
-                     # ylim = c(0, 0.6 * length(results_all_trans$ks_statistics[[j]])),
-                     xlim = c(min(log(as.numeric(results_all_trans$observed_ks_stat[j])),
-                                  log(results_all_trans$ks_statistics[[j]])), 0))
-      graphics::abline(v =
-                         log(as.numeric(results_all_trans$observed_ks_stat[j])),
+                     xlab = "Beta(phenotype) intersection with Beta(genotype)",
+                     xlim = c(min(as.numeric(results_all_trans$null_gamma[[j]]),
+                                  results_all_trans$observed_gamma[[j]]),
+                              max(as.numeric(results_all_trans$null_gamma[[j]]),
+                                  results_all_trans$observed_gamma[[j]])))
+      graphics::abline(v = as.numeric(results_all_trans$observed_gamma[j]),
                        col = grDevices::rgb(1, 0, 0, 0.25),
                        lwd = 4)
 
-      graphics::legend("topleft",
-             title = "KS Test Statistics",
+      graphics::legend("top",
+             title = "Beta(phenotype) intersection with Beta(genotype)",
              legend = c("Null", "Observed"),
              col = c("grey", grDevices::rgb(1, 0, 0, 0.25)),
              pch = 15,
@@ -1321,7 +1313,7 @@ plot_continuous_results <- function(disc_cont,
                                 geno_transition[[i]]$trans_dir)
   }
 
-  colnames(trans_dir_edge_mat) <- colnames(geno)
+  colnames(trans_dir_edge_mat) <- colnames(geno_mat)
 
   for (c in 1:ncol(trans_dir_edge_mat)) {
     trans_dir_edge_mat[(1:ape::Nedge(tr))[geno_confidence[[c]] == 0], c] <- NA
@@ -1343,7 +1335,7 @@ plot_continuous_results <- function(disc_cont,
       sum(p_trans_mat[which(trans_dir_edge_mat[, i] == 0),  1], na.rm = TRUE)
     all_tables[[i]] <- temp_table
   }
-  names(all_tables) <- colnames(geno)
+  names(all_tables) <- colnames(geno_mat)
   delta_pheno_table <- all_tables
   delta_pheno_list <- rep(list(0), 3)
   names(delta_pheno_list) <- c("geno_parent_0_child_1",

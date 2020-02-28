@@ -97,7 +97,7 @@ run_continuous <- function(args){
                             geno_reconstruction = hi_conf$geno_recon_edge,
                             geno_confidence = hi_conf$high_conf_ordered_by_edges,
                             geno_transition = hi_conf$genotype_transition,
-                            geno = hi_conf$genotype,
+                            geno_mat = hi_conf$genotype,
                             pheno_recon_ordered_by_edges = AR$pheno_recon_and_conf$recon_edge_mat,
                             tr_and_pheno_hi_conf = hi_conf$high_conf_ordered_by_edges,
                             all_trans_sig_hits = corrected_pvals_all_trans$hit_pvals,

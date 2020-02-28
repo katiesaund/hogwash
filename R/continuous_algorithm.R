@@ -36,8 +36,6 @@ continuous_permutation <- function(geno_no_tran_index_list,
   check_is_number(perm)
   check_if_permutation_num_valid(perm)
   check_is_number(num_i)
-  check_equal(length(geno_no_tran_index_list), length(hi_conf_index_list))
-  check_equal(length(pheno_delta_list), length(hi_conf_index_list))
   check_equal(length(pheno_delta_list[[1]]), ape::Nedge(tr))
 
   # Function -------------------------------------------------------------------
@@ -51,8 +49,7 @@ continuous_permutation <- function(geno_no_tran_index_list,
   curr_delta_pheno <- pheno_delta_list[[num_i]]
   curr_hi_conf_geno_pheno_tr <- hi_conf_index_list[[num_i]]
   curr_geno_no_tran_index <- geno_no_tran_index_list[[num_i]]
-  num_hi_conf_edges        <- length(curr_hi_conf_geno_pheno_tr)
-
+  num_hi_conf_edges <- length(curr_hi_conf_geno_pheno_tr)
 
   # Subset delta phenotypes, non-trans indices, and trans indices to just those
   #   with hi conf for geno, pheno, and tr
@@ -63,7 +60,6 @@ continuous_permutation <- function(geno_no_tran_index_list,
   check_equal(sum(length(hi_conf_geno_yes_tran_index), length(hi_conf_geno_no_tran_index)), num_hi_conf_edges)
 
   num_trans_edges <- length(hi_conf_geno_yes_tran_index)
-  permuted_trans_edge_index <- rep(NA, num_trans_edges)
   set.seed(1) # for reproducability of the sample() function
   # do the permutation part
   # create a random sample of the tr
@@ -77,8 +73,8 @@ continuous_permutation <- function(geno_no_tran_index_list,
                sum(tr$edge.length[curr_hi_conf_geno_pheno_tr]))
 
     permuted_non_trans_edge_index <- curr_hi_conf_geno_pheno_tr[!curr_hi_conf_geno_pheno_tr %in% permuted_trans_edge_index]
-    permuted_trans_delta_pheno <- hi_conf_delta_pheno[permuted_trans_edge_index]
-    permuted_non_trans_delta_pheno <- hi_conf_delta_pheno[permuted_non_trans_edge_index]
+    permuted_trans_delta_pheno <- curr_delta_pheno[permuted_trans_edge_index]
+    permuted_non_trans_delta_pheno <- curr_delta_pheno[permuted_non_trans_edge_index]
     check_equal(sum(length(permuted_trans_delta_pheno), length(permuted_non_trans_delta_pheno)), length(hi_conf_delta_pheno))
 
     median_non_trans_delta_pheno <- median(permuted_non_trans_delta_pheno)
@@ -136,7 +132,7 @@ continuous_permutation <- function(geno_no_tran_index_list,
 #'   }
 #'
 #' @noRd
-calc_sig <- function(hi_conf_list,
+calc_sig <- function(high_conf_list,
                      permutations,
                      tr,
                      pheno_recon_edge_mat){
@@ -171,11 +167,14 @@ calc_sig <- function(hi_conf_list,
   names(pvals) <- colnames(geno_mat)
   null_gamma_list <- observed_pheno_trans_delta <- geno_non_trans_index_list <-
     high_conf_index_list <- observed_pheno_non_trans_delta <-
-    observed_pheno_delta_list <- rep(list(0), num_genotypes)
+    geno_trans_index_list <- observed_pheno_delta_list <-
+    rep(list(0), num_genotypes)
 
   for (i in 1:num_genotypes) {
     geno_non_trans_index_list[[i]] <-
       which(genotype_transition_list[[i]]$transition == 0)
+    geno_trans_index_list[[i]] <-
+      which(genotype_transition_list[[i]]$transition == 1)
     high_conf_index_list[[i]] <-
       which(genotype_confidence[[i]] == 1 & tr_pheno_confidence == 1)
   }
@@ -186,6 +185,9 @@ calc_sig <- function(hi_conf_list,
                                          pheno_recon_edge_mat)
     observed_pheno_non_trans_delta[[i]] <-
       calculate_phenotype_change_on_edge(geno_non_trans_index_list[[i]],
+                                         pheno_recon_edge_mat)
+    observed_pheno_trans_delta[[i]] <-
+      calculate_phenotype_change_on_edge(geno_trans_index_list[[i]],
                                          pheno_recon_edge_mat)
   }
 
@@ -203,7 +205,8 @@ calc_sig <- function(hi_conf_list,
     observed_gamma_value[i] <-
       sum(observed_pheno_delta_list[[i]] > non_trans_median[i] &
             genotype_transition_list[[i]]$transition == 1 &
-            high_conf_index_list == 1)
+            tr_pheno_confidence[[i]] == 1 &
+            genotype_confidence[[i]] == 1)
   }
 
   for (i in 1:num_genotypes) {
