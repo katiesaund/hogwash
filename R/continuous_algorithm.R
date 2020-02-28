@@ -64,10 +64,10 @@ run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
   return(results)
 }
 
-#' Get the indices of high and low confidence transition edges
+#' Get the indices of high confidence transition edges and non-transition edges
 #'
 #' @description Returns a list of the indices of each high confidence transition
-#'   tree edge and a list of the indicies that are low confidence,
+#'   tree edge and a list of the indices that are high confidence, but
 #'   non-transition tree edges.
 #'
 #' @param geno_tran List of lists. Length(genotype_transition_list) == number of
