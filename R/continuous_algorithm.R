@@ -1,123 +1,3 @@
-#' Run KS Test
-#'
-#' @description Run a Kolmogorov-Smirnov test on the continuous phenotype. The
-#'   phenotype is divided into two groups: transition edges and non-transition
-#'   edges.
-#' @param t_index Vector. Each number is the index phenotype transition edges on
-#'   the tree.
-#' @param non_t_index Vector. Each number is the index phenotype transition
-#'   edges on the tree.
-#' @param phenotype_by_edges Numeric matrix. Phenotype values are each node
-#'   stored in a matrix. Each row corresponds to an edge. 1st column is parent
-#'   node. 2nd column is daughter node.
-#'
-#' @return A list of 4 elements:
-#'   \describe{
-#'     \item{pval.}{Numeric. KS Test p-value.}
-#'     \item{statistic.}{Numeric. KS Test statistic.}
-#'     \item{pheno_trans_delta.}{Numeric vector. The value of the delta of the
-#'     phenotype on transition edges.}
-#'     \item{pheno_non_trans_delta.}{Numeric vector. The value of the delta of
-#'     the phenotype on all non-transition edges.}
-#'   }
-#'
-#' @noRd
-run_ks_test <- function(t_index, non_t_index, phenotype_by_edges){
-  # Check inputs ---------------------------------------------------------------
-  if (length(t_index) < 1 | length(non_t_index) < 1) {
-    stop("Not enough high confidence transition edges to use for KS test.")
-  }
-  if (!is.vector(t_index)) {
-    stop("Transition index must be a vector")
-  }
-  check_is_number(t_index[1])
-  if (max(t_index) > nrow(phenotype_by_edges)) {
-    stop("Transition index must represent a tree edge")
-  }
-  if (!is.vector(non_t_index)) {
-    stop("Non-transition index must be a vector")
-  }
-  check_is_number(non_t_index[1])
-  if (max(non_t_index) > nrow(phenotype_by_edges)) {
-    stop("Non-transition index must represent a tree edge")
-  }
-
-  # Function -------------------------------------------------------------------
-  p_trans_delta <-
-    calculate_phenotype_change_on_edge(t_index, phenotype_by_edges)
-  p_non_trans_delta <-
-    calculate_phenotype_change_on_edge(non_t_index, phenotype_by_edges)
-
-  set.seed(1)
-  ks_results <-  withCallingHandlers(stats::ks.test(p_trans_delta,
-                                                    p_non_trans_delta),
-                      warning = function(w) {
-                        if (grepl("cannot compute exact p-value with ties",
-                                  w$message))
-                          invokeRestart("muffleWarning")
-                      })
-  # Return output --------------------------------------------------------------
-  results <- list("pval"      = round(ks_results$p.value, digits = 20),
-                  "statistic" = round(ks_results$statistic, digits = 20),
-                  "pheno_trans_delta"     = p_trans_delta,
-                  "pheno_non_trans_delta" = p_non_trans_delta)
-  return(results)
-}
-
-#' Get the indices of high confidence transition edges and non-transition edges
-#'
-#' @description Returns a list of the indices of each high confidence transition
-#'   tree edge and a list of the indices that are high confidence, but
-#'   non-transition tree edges.
-#'
-#' @param geno_tran List of lists. Length(genotype_transition_list) == number of
-#'   genotypes. For each genotype there are two lists: $transition and
-#'   $trans_dir. Length($transition) == length($trans_dir) == Nedge(tr). Each of
-#'   these are either 0, 1, or -1.
-#' @param geno_conf List. Length(list) = ncol(mat) == number of genotypes. Each
-#'   entry is a vector with length == Nedge(tr). All entries are 0 (low
-#'   confidence) or 1 (high confidence).
-#' @param index Number. Just i from the loop outside of this function.
-#' @param tr Phylo.
-#'
-#' @return results. List of 2.
-#'   \describe{
-#'     \item{trans_index}{Vector of numbers. Each number corresponds to an edge
-#'     that is both a transition and high confidence.}
-#'     \item{non_trans_index}{hi_conf_non_trans_index. Vector of numbers. Each
-#'     number corresponds to an edge that is both a not a transition and high
-#'     confidence.}
-#'   }
-#' @noRd
-#'
-get_hi_conf_tran_indices <- function(geno_tran, geno_conf, index, tr){
-  # Check input ----------------------------------------------------------------
-  check_equal(length(geno_tran), length(geno_conf))
-  check_is_number(index)
-  if (index > length(geno_tran) | index < 1) {
-    stop("Index is a counter from 1:number of genomes.")
-  }
-  check_tree_is_valid(tr)
-  check_for_root_and_bootstrap(tr)
-
-  # Function -------------------------------------------------------------------
-  # GRAB THE IDS OF THE TRANSITION EDGES
-  trans_index <- c(1:ape::Nedge(tr))[as.logical(geno_tran[[index]]$transition)]
-  non_trans_index <- c(1:ape::Nedge(tr))[!geno_tran[[index]]$transition]
-  # [1] EX:  8 12 13 16 19 26 27 31 37 44 52 56 64 67 68 76 77 80 89 92 97 98
-  # THESE EDGES ARE DEFINED BY THE NODES IN THE CORRESPONDING ROWS OF tr$edge
-
-  # SUBSET TRANSITION / NON-TRANSITION EDGES TO ONLY HIGH CONFIDENCE ONES
-  hi_conf_trans_index <-
-    trans_index[as.logical(geno_conf[[index]][trans_index])]
-  hi_conf_non_trans_index <-
-    non_trans_index[as.logical(geno_conf[[index]][non_trans_index])]
-
-  # Return output --------------------------------------------------------------
-  return(list("trans_index" = hi_conf_trans_index,
-              "non_trans_index" = hi_conf_non_trans_index))
-}
-
 #' Perform permutation for continuous data
 #'
 #' @description Perform permutation of which genotype edges are considered high
@@ -206,54 +86,6 @@ continuous_permutation <- function(geno_no_tran_index_list,
   }
   # Return output --------------------------------------------------------------
   return(null_gamma_values)
-}
-
-#' Calculate empirical delta phenotype
-#'
-#' @description Return Kolmogorov-Smirnov test statistic on the permuted
-#'   (empirical) phenotype deltas per tree edge.
-#'
-#' @param perm Number. Number of permutations.
-#' @param permuted_trans_mat Matrix. Nrow = number of permutations. Ncol =
-#'   Number of transition edges. Each entry is an edge number.
-#' @param hi_conf_edge_nums Vector of edge numbers. Corresponds to edges in tree
-#'   with high confidence.
-#' @param pheno_by_edges Matrix. Nrow = Nedge(tr). Ncol = 2. Values are the
-#'   phenotype reconstruction at each node, as ordered by edges. It's the same
-#'   organization as tr$edge.
-#'
-#' @return empirical_ks_stat
-#'
-#' @noRd
-calculate_empirical_pheno_delta <- function(perm,
-                                            permuted_trans_mat,
-                                            hi_conf_edge_nums,
-                                            pheno_by_edges){
-  # Check input ----------------------------------------------------------------
-  check_if_permutation_num_valid(perm)
-  check_dimensions(permuted_trans_mat,
-                   exact_rows = perm,
-                   min_rows = perm,
-                   exact_cols = NULL,
-                   min_cols = 1)
-  check_is_number(hi_conf_edge_nums[1])
-  check_class(pheno_by_edges, "matrix")
-  check_is_number(pheno_by_edges[1, 1])
-
-  # Function -------------------------------------------------------------------
-  empirical_ks_stat <- rep(NA, perm)
-  for (k in 1:perm) {
-    permuted_trans_index <- unique(permuted_trans_mat[k, ])
-    permuted_non_trans_index <-
-      c(1:length(hi_conf_edge_nums))[!(c(1:length(hi_conf_edge_nums))
-                                       %in% unique(permuted_trans_mat[k, ]))]
-    empirical_results <- run_ks_test(permuted_trans_index,
-                                     permuted_non_trans_index,
-                                     pheno_by_edges)
-    empirical_ks_stat[k] <- empirical_results$statistic
-  }
-  # Check and return output ----------------------------------------------------
-  return(empirical_ks_stat)
 }
 
 #' Calculate significance for continuous data
@@ -374,10 +206,7 @@ calc_sig <- function(hi_conf_list,
             high_conf_index_list == 1)
   }
 
-   # LEFT OFF HERE
   for (i in 1:num_genotypes) {
-    # Create permuted transition index matrix and get edge numbers of the high
-    #  confidence edges
     null_gamma_distribution <- continuous_permutation(geno_non_trans_index_list,
                                                       tr,
                                                       high_conf_index_list,
