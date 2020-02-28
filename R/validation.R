@@ -454,8 +454,7 @@ check_if_g_mat_can_be_plotted <- function(geno_matrix){
       plot_logical <- FALSE
     } else {
       # Matrix/dataframe is big enough for heatmap to plot
-      if (sum(as.vector(geno_matrix)[!is.na(as.vector(geno_matrix))] %% 1 != 0)
-          != 0) {
+      if (sum(!unique(as.vector(as.matrix(geno_matrix))) %in% c(0, 1, NA)) > 0) {
         # Matrix/dataframe contains invalid values
         stop("Joint genotype matrix + phenotype must contain only 1, 0, or NA.
              (For discrete heatmap plot).")

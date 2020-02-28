@@ -518,7 +518,6 @@ plot_phyc_results <- function(tr,
   # Set default values
   image_width <- 250
   hist_cex_size <- 1
-
   # File name
   if (grouped_logical) {
     fname <- paste0(dir, "/hogwash_", prefix, "_grouped_", name, ".pdf")
@@ -561,7 +560,6 @@ plot_phyc_results <- function(tr,
   row.names(significant_loci) <- row.names(recon_hit_vals)
   log_p_value <- data.frame(recon_hit_vals)
   significant_loci[log_p_value > fdr] <- "Significant"
-
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
     colnames(snp_in_gene) <- "Variants in Group"
@@ -626,7 +624,6 @@ plot_phyc_results <- function(tr,
       fontsize = 8,
       cellwidth = cell_width_value)
   }
-
   # Plot Phenotype Presence/Absence on Tree
   pheno_as_list <- list(p_recon_edges)
   pheno_conf_as_list <- list(tr_and_pheno_hi_conf)
@@ -648,7 +645,6 @@ plot_phyc_results <- function(tr,
   # Prep data to report p-value rank
   rank_mat <- recon_hit_vals
   rank_mat[rank_mat == 0] <- NA
-
   # Loop through significant hits:
   for (j in 1:nrow(recon_hit_vals)) {
     if (recon_hit_vals[j, 1] > fdr) {

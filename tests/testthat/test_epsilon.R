@@ -1,3 +1,4 @@
+context("Epsilon") #-----------------------------------------------------------#
 test_that("calculate_continuous_gamma gives expected results for valid continuous input", {
   # Set up
   set.seed(1)
