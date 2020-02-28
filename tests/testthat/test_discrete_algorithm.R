@@ -163,7 +163,7 @@ test_that("discrete_permutation returns expected results given this dummy
 
   edges_selected_other_way <- sample(1:num_edge,
                                      size = length(edges_selected),
-                                     replace = TRUE,
+                                     replace = FALSE,
                                      prob = edge_probability)
   ks_results <-
     withCallingHandlers(stats::ks.test(edges_selected_other_way,

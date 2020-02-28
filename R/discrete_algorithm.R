@@ -303,7 +303,7 @@ discrete_permutation <- function(tr,
     permuted_geno_trans_mat[j, ] <-
       sample(1:number_hi_conf_edges[index],
              size = number_edges_with_geno_trans[index],
-             replace = TRUE,
+             replace = FALSE,
              prob = tr$edge.length[high_conf_edges[[index]]] /
                sum(tr$edge.length[high_conf_edges[[index]]]))
   }

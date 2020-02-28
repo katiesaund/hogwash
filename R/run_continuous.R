@@ -68,27 +68,17 @@ run_continuous <- function(args){
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   results_all_transitions <-
-    calc_sig(hi_conf$genotype,
+    calc_sig(hi_conf,
              args$perm,
-             hi_conf$genotype_transition,
              args$tree,
-             AR$pheno_recon_and_conf$recon_edge_mat,
-             hi_conf$high_conf_ordered_by_edges)
+             AR$pheno_recon_and_conf$recon_edge_mat)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_all_trans <-
     get_sig_hit_and_mult_test_corr(results_all_transitions$pvals, args$fdr)
 
-  # SUBSET SIGNIFICANT HITS SO MEDIAN(DELTA PHENOTYPE) ON
-  #  TRANSITION EDGES > MEDIAN(DELTA PHENOTYPE) ALL EDGES #
-  all_transitions_sig_hits <-
-    keep_hits_with_more_change_on_trans_edges(results_all_transitions,
-                                              corrected_pvals_all_trans,
-                                              args$fdr)
-
   corrected_pvals_all_trans$hit_pvals <- -log(corrected_pvals_all_trans$hit_pvals)
   corrected_pvals_all_trans$sig_pvals <- -log(corrected_pvals_all_trans$sig_pvals)
-  all_transitions_sig_hits <- -log(all_transitions_sig_hits)
 
   # SAVE AND PLOT RESULTS -----------------------------------------------------#
   phenotype_vector <-
@@ -110,7 +100,7 @@ run_continuous <- function(args){
                             geno = hi_conf$genotype,
                             pheno_recon_ordered_by_edges = AR$pheno_recon_and_conf$recon_edge_mat,
                             tr_and_pheno_hi_conf = hi_conf$high_conf_ordered_by_edges,
-                            all_trans_sig_hits = all_transitions_sig_hits,
+                            all_trans_sig_hits = corrected_pvals_all_trans$hit_pvals,
                             group_logical = args$group_genotype,
                             snp_in_gene = geno$snps_per_gene)
   results_object$hi_confidence_transition_edge <-
@@ -127,7 +117,7 @@ run_continuous <- function(args){
     trans_mat_results$delta_pheno_table
   results_object$delta_pheno_list <- trans_mat_results$delta_pheno_list
   results_object$hit_pvals <- corrected_pvals_all_trans$hit_pvals
-  results_object$sig_hits <- all_transitions_sig_hits
+  results_object$sig_hits <- corrected_pvals_all_trans$sig_pvals
   results_object$gamma <- gamma
   save_results_as_r_object(args$output_dir,
                            args$output_name,
