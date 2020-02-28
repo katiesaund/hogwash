@@ -610,7 +610,7 @@ plot_phyc_results <- function(tr,
 
     pheatmap::pheatmap(
       ordered_by_p_val,
-      main = bquote(paste0("PhyC Test: ", beta[phenotype], " and ", beta[genotype], " by Tree Edge")),
+      main = "PhyC Test: Phenotype and Genotype by Tree Edge",
       cluster_cols  = TRUE,
       legend = FALSE,
       na_col = "grey",
@@ -867,7 +867,7 @@ plot_synchronous_results  <- function(tr,
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
       legend = FALSE,
-      main = bquote(paste0("Synchronous Test: ", beta[phenotype], " and ", beta[genotype], " by Tree Edge")),
+      main = "Synchronous Test Phenotype and Genotype by Tree Edge",
       cluster_cols = TRUE,
       na_col = "grey",
       cluster_rows  = FALSE,
