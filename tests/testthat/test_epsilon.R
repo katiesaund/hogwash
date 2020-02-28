@@ -12,8 +12,8 @@ test_that("calculate_continuous_gamma gives expected results for valid continuou
   num_edge <- ape::Nedge(tree)
   num_geno <- 5
   high_conf$tr_and_pheno_hi_conf <- rep(TRUE, num_edge)
-  high_conf$genotype_transition <-
-    high_conf$high_conf_ordered_by_edges <- rep(list(0), 5)
+  high_conf$genotype_transition <- rep(list(list(0)), num_geno)
+  high_conf$high_conf_ordered_by_edges <- rep(list(0), num_geno)
 
   for (i in 1:num_geno) {
     high_conf$genotype_transition[[i]]$transition <- rep(c(0, 1), num_edge / 2)

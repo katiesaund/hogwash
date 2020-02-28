@@ -23,7 +23,7 @@ test_that("select_test_type doesn't throw error when given valid continuous
   } else {
     args$gene_snp_lookup <- NULL
   }
-
+  args$test <- "both"
   # Test
   expect_error(select_test_type(args), NA)
 })
@@ -45,6 +45,8 @@ test_that("select_test_type doesn't throw error given valid discrete input", {
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- FALSE
   args$gene_snp_lookup <- NULL
+  args$test <- "both"
+
   # Test
   expect_error(select_test_type(args), NA)
 })
