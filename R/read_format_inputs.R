@@ -29,7 +29,8 @@ check_input_format <- function(pheno,
                                perm,
                                fdr,
                                bootstrap,
-                               group_genotype_key){
+                               group_genotype_key,
+                               test){
   # Check input ----------------------------------------------------------------
   check_dimensions(geno, ape::Ntip(tr), 2, NULL, 2)
   check_dimensions(pheno, ape::Ntip(tr), 2, 1, 1)
@@ -57,7 +58,10 @@ check_input_format <- function(pheno,
   if (ape::Ntip(tr) < 7) {
     stop("Tree must have at least 7 tips")
   }
-
+  check_is_string(test)
+  if (!test %in% c("both", "phyc", "synchronous")) {
+    stop("If providing a binary test choice select either: both, phyc, or synchronous")
+  }
 
   # Function -------------------------------------------------------------------
   discrete_or_continuous <- assign_pheno_type(pheno)

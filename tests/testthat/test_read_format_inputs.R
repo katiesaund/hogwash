@@ -11,6 +11,7 @@ test_that("check_input_format works for valid inputs", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test
   expect_equal(check_input_format(temp_pheno,
@@ -21,7 +22,8 @@ test_that("check_input_format works for valid inputs", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key), "continuous")
+                                  temp_group_genotype_key,
+                                  temp_test), "continuous")
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -34,6 +36,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - Bad phenotype
   expect_error(check_input_format(temp_pheno,
@@ -44,7 +47,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -57,6 +61,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - bad tree
   expect_error(check_input_format(temp_pheno,
@@ -67,7 +72,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -80,6 +86,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - bad genotype
   expect_error(check_input_format(temp_pheno,
@@ -90,7 +97,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -103,6 +111,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - bad name
   expect_error(check_input_format(temp_pheno,
@@ -113,7 +122,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -126,6 +136,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - bad directory
   expect_error(check_input_format(temp_pheno,
@@ -136,7 +147,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -149,6 +161,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - bad permutations
   expect_error(check_input_format(temp_pheno,
@@ -159,7 +172,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -172,6 +186,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - bad FDR
   expect_error(check_input_format(temp_pheno,
@@ -182,7 +197,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -195,6 +211,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 0.10
   temp_bootstrap <- 10
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - Bad bootstrap
   expect_error(check_input_format(temp_pheno,
@@ -205,7 +222,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -218,6 +236,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- letters[1:10]
+  temp_test <- "both"
 
   # Test - Bad group genotype key
   expect_error(check_input_format(temp_pheno,
@@ -228,7 +247,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 
@@ -243,6 +263,7 @@ test_that("check_input_format gives error when phenotype has NA", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - NA in phenotype
   expect_error(check_input_format(temp_pheno,
@@ -253,7 +274,8 @@ test_that("check_input_format gives error when phenotype has NA", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error when genotype has NA", {
@@ -267,6 +289,7 @@ test_that("check_input_format gives error when genotype has NA", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - NA in genotype
   expect_error(check_input_format(temp_pheno,
@@ -277,7 +300,8 @@ test_that("check_input_format gives error when genotype has NA", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 
@@ -292,7 +316,7 @@ test_that("check_input_format gives error when group_genotype_key has NA", {
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_group_genotype_key[1, 1] <- NA
-
+  temp_test <- "both"
 
   # Test - NA in group_genotype_key
   expect_error(check_input_format(temp_pheno,
@@ -303,7 +327,8 @@ test_that("check_input_format gives error when group_genotype_key has NA", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error when tree has too few tips", {
@@ -319,6 +344,7 @@ test_that("check_input_format gives error when tree has too few tips", {
   temp_fdr <- 0.10
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
+  temp_test <- "both"
 
   # Test - NA in group_genotype_key
   expect_error(check_input_format(temp_pheno,
@@ -329,7 +355,8 @@ test_that("check_input_format gives error when tree has too few tips", {
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })
 
 test_that("check_input_format gives error when group_genotype_key doesn't have a row for each variant in the genotype matrix", {
@@ -343,7 +370,7 @@ test_that("check_input_format gives error when group_genotype_key doesn't have a
   temp_bootstrap <- 0.875
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_group_genotype_key <- temp_group_genotype_key[1:4, , drop = FALSE]
-
+  temp_test <- "both"
 
   # Test - NA in group_genotype_key
   expect_error(check_input_format(temp_pheno,
@@ -354,5 +381,6 @@ test_that("check_input_format gives error when group_genotype_key doesn't have a
                                   temp_perm,
                                   temp_fdr,
                                   temp_bootstrap,
-                                  temp_group_genotype_key))
+                                  temp_group_genotype_key,
+                                  temp_test))
 })

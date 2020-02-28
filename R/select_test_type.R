@@ -14,7 +14,15 @@ select_test_type <- function(args){
   if (args$discrete_or_continuous == "continuous") {
     run_continuous(args)
   } else {
-    run_synchronous(args)
-    run_phyc(args)
+    if (args$test == "both") {
+      run_synchronous(args)
+      run_phyc(args)
+    }
+    else if (args$test == "phyc") {
+      run_phyc(args)
+    }
+    else if (args$test == "synchronous") {
+      run_synchronous(args)
+    }
   }
 }
