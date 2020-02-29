@@ -199,13 +199,13 @@ calc_sig <- function(high_conf_list,
   for (i in 1:num_genotypes) {
     pheno_beta[i] <- sum(observed_pheno_delta_list[[i]] >
                            non_trans_median[i] &
-                           tr_pheno_confidence[[i]] == 1)
+                           tr_pheno_confidence == 1)
     geno_beta[i] <- sum(genotype_transition_list[[i]]$transition == 1 &
                           genotype_confidence[[i]] == 1)
     observed_gamma_value[i] <-
       sum(observed_pheno_delta_list[[i]] > non_trans_median[i] &
             genotype_transition_list[[i]]$transition == 1 &
-            tr_pheno_confidence[[i]] == 1 &
+            tr_pheno_confidence == 1 &
             genotype_confidence[[i]] == 1)
   }
 
