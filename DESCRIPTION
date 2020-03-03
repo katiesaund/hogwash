@@ -25,7 +25,8 @@ Imports:
     phytools,
     stats,
     utils,
-    methods
+    methods,
+    caper
 Suggests: 
     testthat, knitr, rmarkdown
 VignetteBuilder: knitr
