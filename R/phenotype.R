@@ -132,7 +132,7 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
   check_str_is_discrete_or_continuous(continuous_or_discrete)
 
   # Function -------------------------------------------------------------------
-  msg <- "Consider making phenotype normal so ancestral reconstruction
+  msg <- "Consider transforming the phenotype normal so ancestral reconstruction
   assumptions are not violated."
   if (continuous_or_discrete == "continuous") {
     if (length(unique(pheno)) == 1) {
@@ -143,5 +143,212 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
     if (result$p < alpha) {
       print(msg)
     }
+  }
+}
+
+
+#' Check if the phenotype is normally distributed
+#'
+#' @description Given a continuous phenotype, check if the phenotype follows a
+#'   normal distribution. The Brownian Motional model of ancestral
+#'   reconstruction, which this library uses, assumes a normal distribution of
+#'   the phenotype.
+#'
+#' @param pheno Matrix. A one column numeric matrix.
+#'
+#' @export
+check_phenotype_normality <- function(pheno){
+  # Check input ----------------------------------------------------------------
+  check_dimensions(pheno, NULL, 1, 1, 1)
+  if (!typeof(pheno) %in% c("double", "integer", "numeric")) {
+    stop("Must be a numeric matrix")
+  }
+
+  # Function -------------------------------------------------------------------
+  result <- stats::shapiro.test(unlist(pheno))
+  alpha <- 0.05
+  msg <- "Phenotype is normally distributed."
+  if (result$p < alpha) {
+      msg <- "Phenotype is not normally distributed. Please consider transforming the data."
+  }
+  print(msg)
+}
+
+
+#' Report best fitting model for the phenotype and tree
+#'
+#' @param pheno Matrix. One column matrix. Row.names correspond to tree$tip.labels.
+#' @param tree Phylo.
+#' @param root Logical. Default = TRUE If TRUE, midpoint roots the tree.
+#'
+#' @export
+fit_phenotype_model <- function(pheno, tree, root = TRUE){
+
+  # Checks here are written out explicitly so that user sees specific, helpful
+  # error messages.
+  if (!methods::is(pheno, "matrix")) {
+    stop("Provide a phenotype matrix.")
+  }
+  if (!methods::is(tree, "phylo")) {
+    stop("Provide a tree in a phylo object")
+  }
+  if (nrow(pheno) != ape::Ntip(tree)) {
+    stop("Provide a tree with tips that correspond to the phenotype rows.")
+  }
+  if (sum(row.names(pheno) != tree$tip.labels) > 0) {
+    stop("Provide a phenotype matrix where row.names match tree$tip.labels.")
+  }
+  if (ncol(pheno) != 1) {
+    stop("Provide a phenotype matrix with exactly 1 column of data.")
+  }
+#TODO unit tests
+  cont_or_disc <- assign_pheno_type(pheno)
+
+  if (root) {
+    tree <- phytools::midpoint.root(tree)
+    # TODO reorder phenotype by tree tips
+  }
+
+  if (cont_or_disc == "continuous") {
+    lambda <- calculate_lambda(pheno, tree)
+    report_lambda(lambda)
+  } else {
+    d_stat <- calculate_d(pheno, tree)
+    report_d(d_stat)
+  }
+}
+
+# TODO add documentation and unit tests
+calculate_lambda <- function(pheno, tree) {
+  # Checks here are written out explicitly so that user sees specific, helpful
+  # error messages.
+  if (!methods::is(pheno, "matrix")) {
+    stop("Provide a phenotype matrix.")
+  }
+  if (!methods::is(tree, "phylo")) {
+    stop("Provide a tree in a phylo object")
+  }
+  if (nrow(pheno) != ape::Ntip(tree)) {
+    stop("Provide a tree with tips that correspond to the phenotype rows.")
+  }
+  if (sum(row.names(pheno) != tree$tip.labels) > 0) {
+    stop("Provide a phenotype matrix where row.names match tree$tip.labels.")
+  }
+  if (ncol(pheno) != 1) {
+    stop("Provide a phenotype matrix with exactly 1 column of data.")
+  }
+
+  # Function
+  lambda_out <-
+    phytools::phylosig(tree, pheno, method = "lambda", test = TRUE)
+  lambda <- lambda_out$lambda
+
+  return(lambda)
+}
+
+report_lambda <- function(lambda) {
+  msg <- "The phenotype is more conserved (clumpy) than expected by Brownian Motion; Pagel's lambda = "
+  if (lambda < 1.05 & lambda > 0.95) {
+    msg <- "The phenotype is modeled well by Brownian Motion; Pagel's lambda = "
+  } else if (lambda < 0.05 & lambda > -0.05) {
+    msg <- "The phenotype is modeled well by White Noise (Random); Pagel's lambda = "
+  } else if (lambda < 0.95 & lambda > 0.05) {
+    msg <- "The phenotype is in-between a Brownian Motion and White Noise model; Pagel's lambda = "
+  } else if (lambda < -0.05) {
+    msg <- "The phenotype is negatively correlated among closely related species; Pagel's lambda = "
+  }
+  print(paste0(msg, lambda))
+}
+
+calculate_d <- function(pheno, tree) {
+  #TODO add unit tests and documentation
+  # Checks here are written out explicitly so that user sees specific, helpful
+  # error messages.
+  if (!methods::is(pheno, "matrix")) {
+    stop("Provide a phenotype matrix.")
+  }
+  if (!methods::is(tree, "phylo")) {
+    stop("Provide a tree in a phylo object")
+  }
+  if (nrow(pheno) != ape::Ntip(tree)) {
+    stop("Provide a tree with tips that correspond to the phenotype rows.")
+  }
+  if (sum(row.names(pheno) != tree$tip.labels) > 0) {
+    stop("Provide a phenotype matrix where row.names match tree$tip.labels.")
+  }
+  if (ncol(pheno) != 1) {
+    stop("Provide a phenotype matrix with exactly 1 column of data.")
+  }
+  if (sum(sort(unique(pheno)) != c(0, 1)) > 0) {
+    stop("Provide a binary phenotype (0/1)")
+  }
+  # Function
+  tree$node.label <- NULL
+  temp_trait <- pheno[, 1, drop = FALSE]
+  temp_trait <- convert_trait_vec_to_df(temp_trait, tree)
+  compar_data_obj <-
+    caper::comparative.data(data = temp_trait,
+                            phy = tree,
+                            names.col =  ID)
+  d_stat_results <- caper::phylo.d(data = compar_data_obj,
+                                   names.col = ID,
+                                   binvar = trait,
+                                   phy = tree)
+  d_stat <- d_stat_results$DEstimate
+  return(d_stat)
+}
+
+report_d <- function(d_stat){
+  msg <- "The phenotype is negatively correlated among closely related species; D = "
+  if (d_stat < 1.05 & d_stat > 0.95) { # 1
+    msg <- "The phenotype is modeled well by White Noise (Random); D = "
+  } else if (d_stat < 0.05 & d_stat > -0.05) { #0
+    msg <- "The phenotype is modeled well by Brownian Motion; D = "
+  } else if (d_stat < 0.95 & d_stat > 0.05) {
+    msg <- "The phenotype is in-between a Brownian Motion and White Noise model; D = "
+  } else if (d_stat < -0.05) { # <0
+    msg <- "The phenotype is more clumpy than expected by Brownian Motion; D = "
+  }
+  print(paste0(msg, d_stat))
+}
+
+convert_trait_vec_to_df <- function(trait_vec, tree){
+  #TODO Add unit tests
+  trait_df <- as.data.frame(trait_vec)
+  trait_df <- cbind(tree$tip.label, trait_df)
+  colnames(trait_df) <- c("ID", "trait")
+  row.names(trait_df) <- NULL
+  return(trait_df)
+}
+
+ #' Report best fitting model for the phenotype and tree
+#'
+#' @param pheno Matrix. One column matrix. Row.names correspond to tree$tip.labels.
+#' @param tree Phylo.
+#'
+#' @export
+internal_report_phylogenetic_signal <- function(pheno, tree){
+# TODO incorporate this function within hogwash carefully!
+  check_class(pheno, "matrix")
+  check_class(tree, "phylo")
+  check_equal(nrow(pheno), ape::Ntip(tree))
+  if (sum(row.names(pheno) != tree$tip.labels) > 0) {
+    stop("Provide a phenotype matrix where row.names match tree$tip.labels.")
+  }
+  check_dimensions(pheno, exact_cols = 1, min_rows = 1, min_cols = 1)
+  #TODO unit tests
+  cont_or_disc <- assign_pheno_type(pheno)
+
+  # if (root) { ?? include this?
+  #   tree <- phytools::midpoint.root(tree)
+  #   # TODO reorder phenotype by tree tips
+  # }
+
+  if (cont_or_disc == "continuous") {
+    lambda <- calculate_lambda(pheno, tree)
+    report_lambda(lambda)
+  } else {
+    d_stat <- calculate_d(pheno, tree)
+    report_d(d_stat)
   }
 }
