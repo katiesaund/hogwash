@@ -147,33 +147,10 @@ test_that("discrete_permutation returns expected results given this dummy
                                           m)
     expect_equal(nrow(permuted_geno), temp_perm)
     expect_equal(ncol(permuted_geno), num_edge)
+    expect_equal(ncol(unique(permuted_geno)), ncol(permuted_geno))
     expect_lt(max(rowSums(permuted_geno)),
               temp_num_edges_with_geno_trans[m] + 1)
   }
-
-  edges_selected <- NULL
-  for (r in 1:nrow(permuted_geno)) {
-    temp <-   c(1:10)[permuted_geno[r, ] == 1]
-    edges_selected <- c(edges_selected, temp)
-  }
-
-  edge_probability <- temp_tree$edge.length / sum(temp_tree$edge.length)
-  # high confidence is one for all genotypes, so can do just one calculation for
-  #  all genotypes in this case.
-
-  edges_selected_other_way <- sample(1:num_edge,
-                                     size = length(edges_selected),
-                                     replace = FALSE,
-                                     prob = edge_probability)
-  ks_results <-
-    withCallingHandlers(stats::ks.test(edges_selected_other_way,
-                                       edges_selected),
-                        warning = function(w) {
-                          if (grepl("cannot compute exact p-value with ties",
-                                    w$message))
-                            invokeRestart("muffleWarning")
-                          } )
-  expect_true(ks_results$p.value > 0.05)
 })
 
 # test count_empirical_both_present
