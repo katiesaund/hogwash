@@ -116,7 +116,7 @@ calc_raw_diff <- function(edge_list, phenotype_by_edges){
 #'   normal distribution. The Brownian Motional model of ancestral
 #'   reconstruction, which this library uses, assumes a normal distribution of
 #'   the phenotype. If it doesn't print a statement, but continue with
-#'   hogwash().
+#'   hogwash(). This is the internal hogwash function.
 #'
 #' @param pheno Matrix. A one column numeric matrix.
 #' @param continuous_or_discrete String. Either 'continuous' or 'discrete.'
@@ -132,8 +132,7 @@ check_if_phenotype_normal <- function(pheno, continuous_or_discrete){
   check_str_is_discrete_or_continuous(continuous_or_discrete)
 
   # Function -------------------------------------------------------------------
-  msg <- "Consider transforming the phenotype normal so ancestral reconstruction
-  assumptions are not violated."
+  msg <- "Consider transforming the phenotype normal so ancestral reconstruction assumptions are not violated."
   if (continuous_or_discrete == "continuous") {
     if (length(unique(pheno)) == 1) {
       stop("phenotype must have some variability")
@@ -182,7 +181,7 @@ check_phenotype_normality <- function(pheno){
 #' @param root Logical. Default = TRUE If TRUE, midpoint roots the tree.
 #'
 #' @export
-fit_phenotype_model <- function(pheno, tree, root = TRUE){
+report_phylogenetic_signal <- function(pheno, tree, root = TRUE){
 
   # Checks here are written out explicitly so that user sees specific, helpful
   # error messages.

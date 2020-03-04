@@ -86,6 +86,7 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   check_if_phenotype_normal(pheno, disc_cont)
   pheno_vector <- convert_matrix_to_vector(pheno)
   check_convergence_possible(pheno_vector, disc_cont)
+  internal_report_phylogenetic_signal(pheno, tr)
 
   # Check and return output ----------------------------------------------------
   check_equal(length(pheno_vector), ape::Ntip(tr))
