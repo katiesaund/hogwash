@@ -62,8 +62,7 @@ convert_matrix_to_vector <- function(mat){
 #' Convert phenotype matrix to vector
 #'
 #' @description Prepare phenotype for downstream analyses. Convert phenotype
-#'   matrix to phenotype vector. Check if the continuous phenotype is normally
-#'   distributed.
+#'   matrix to phenotype vector.
 #'
 #' @param pheno Matrix with 1 column.
 #' @param disc_cont String. Either "discrete" or "continuous."
@@ -83,7 +82,6 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   check_str_is_discrete_or_continuous(disc_cont)
 
   # Function -------------------------------------------------------------------
-  check_if_phenotype_normal(pheno, disc_cont)
   pheno_vector <- convert_matrix_to_vector(pheno)
   check_convergence_possible(pheno_vector, disc_cont)
   internal_report_phylogenetic_signal(pheno, tr)

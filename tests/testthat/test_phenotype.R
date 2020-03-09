@@ -124,37 +124,6 @@ test_that("calc_raw_diff gives error for invalid input", {
   expect_error(calc_raw_diff(matrix(c(1, 1, 1)), temp_pheno))
 })
 
-# test check_if_phenotype_normal
-test_that("check_if_phenotype_normal prints a statement that the data is not
-          normal when the input is 1:100", {
-  phenotype <- matrix(1:100, ncol = 1)
-  expect_output(check_if_phenotype_normal(phenotype, "continuous"))
-})
-
-test_that("check_if_phenotype_normal prints a statement when the input is all
-          the same number", {
-  phenotype <- matrix(10, ncol = 1)
-  expect_error(check_if_phenotype_normal(phenotype, "continuous"))
-})
-
-test_that("check_if_phenotype_normal doesn't give any message when phenotype is
-          from a normal distribution", {
-  set.seed(1)
-  phenotype <- matrix(rnorm(n = 100), ncol = 1)
-  expect_silent(check_if_phenotype_normal(phenotype, "continuous"))
-})
-
-test_that("check_if_phenotype_normal does nothing when phenotype is
-          discrete", {
-  phenotype <- matrix(c(1, 0, 1, 1, 1, 1, 1, 0), ncol = 1)
-  expect_silent(check_if_phenotype_normal(phenotype, "discrete"))
-})
-
-test_that("check_if_phenotype_normal gives error for invalid input", {
-  phenotype <- matrix(c(letters[1:10]), ncol = 1)
-  expect_error(check_if_phenotype_normal(phenotype, "discrete"))
-})
-
 # # test check_if_convergence_occurs
 # # check_if_convergence_occurs <- function(pheno, tree, continuous_or_discrete){
 #

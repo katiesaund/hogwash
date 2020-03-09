@@ -181,7 +181,6 @@ Continuous phenotype:
 | sample_2 | 1.20 |   
 | sample_3 | 0.05 |  
 | sample_4 | 2.70 |    
-Ideally, continuous phenotype data would be normally distributed. If your data are not normal, please consider transforming them (e.g. log transform) prior to running hogwash. 
 
 ### Genotype
 The required structure of the genotype data object is a matrix. The rows correspond to samples and should be ordered to match the tips of the phylogenetic tree. The columns correspond to individual genotypes. The matrix should have both row names and column names. The row names must exactly match the tree’s tip labels. Genotypes can be SNPs (core genome), genes (accessory genome) or other types (indels, pathways, etc...). Genotypes must be coded a binary (0/1).  
