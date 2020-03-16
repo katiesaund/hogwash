@@ -128,11 +128,10 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
 #' Calculate gamma within continuous test
 #'
 #' @description Given phenotype and genotype information, calculate a summary
-#'   statistic that describes the number of high confidences edges on the tree
-#'   where the phenotype change is large (delta phenotype > median(delta
-#'   phenotype on genotype non-transition edges)) and the genotype transitions
-#'   (0 to 1 or 1 to 0). This summary stat will be used to evaluate the
-#'   appropriateness / effectiveness of hogwash on this dataset.
+#'   statistic that describes the elementwise intersection of genotype
+#'   transition edges and phenotype delta  divided by their union. Delta
+#'   phenotype is scaled from 0 to 1.This summary stat will be used to evaluate
+#'   the appropriateness / effectiveness of hogwash on this dataset.
 #' @param geno_trans_edge_list List of lists. Each entry has two named lists:
 #'   $transition and $transition_dir. Number of sub-lists = number of genotypes.
 #'   Length(each sublist) == Nedge(tree). Binary.
@@ -196,26 +195,24 @@ calculate_continuous_gamma <- function(pheno_recon_mat,
                                          pheno_recon_mat)
   }
 
-  median_pheno_delta_geno_non_trans <- pheno_beta <-
+  pheno_beta <-
     epsilon <- geno_beta <- gamma_count <- gamma_percent <- rep(0, num_geno)
 
   for (i in 1:num_geno) {
-    median_pheno_delta_geno_non_trans[i] <-
-      stats::median(pheno_delta_geno_non_trans[[i]])
-  }
+    scaled_pheno <- rescale(pheno_delta[[i]], to = c(0, 1))
 
-  for (i in 1:num_geno) {
-    pheno_beta[i] <- sum(pheno_delta[[i]] >
-                           median_pheno_delta_geno_non_trans[i] &
-                           high_conf_edge_list[[i]] == 1)
+    pheno_beta[i] <- sum(scaled_pheno * (1 * (high_conf_edge_list[[i]] == 1)))
+
     geno_beta[i] <- sum(geno_trans_edge_list[[i]]$transition == 1 &
                           high_conf_edge_list[[i]] == 1)
-    gamma_count[i] <- sum(pheno_delta[[i]] >
-                            median_pheno_delta_geno_non_trans[i] &
-                            geno_trans_edge_list[[i]]$transition == 1 &
-                            high_conf_edge_list[[i]] == 1)
+    gamma_count[i] <-
+      sum(
+        (scaled_pheno * (1 * (high_conf_edge_list[[i]] == 1))) *
+          (geno_trans_edge_list[[i]]$transition == 1 &
+             high_conf_edge_list[[i]] == 1))
     gamma_percent[i] <- gamma_count[i] / sum(high_conf_edge_list[[i]])
-    epsilon[i] <- (2 * gamma_count[i]) / (geno_beta[i] + pheno_beta[i])
+    epsilon[i] <-
+      gamma_count[i] / (geno_beta[i] + pheno_beta[i] - gamma_count[i])
   }
   gamma_avg <- mean(gamma_percent)
   num_hi_conf_edges <- unlist(lapply(high_conf_edge_list, sum))
