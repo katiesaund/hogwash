@@ -192,7 +192,7 @@ report_lambda <- function(lambda) {
   } else if (lambda < -0.05) {
     msg <- "The phenotype is negatively correlated among closely related species; Pagel's lambda = "
   }
-  print(paste0(msg, lambda))
+  print(paste0(msg, round(lambda, 5)))
 }
 
 calculate_d <- function(pheno, tree) {

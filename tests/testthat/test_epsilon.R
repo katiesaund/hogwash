@@ -6,7 +6,12 @@ test_that("calculate_continuous_gamma gives expected results for valid continuou
   tree <- ape::rcoal(num_tip)
   tree$node.label <- rep(100, ape::Nnode(tree))
   cont_pheno <- rnorm(num_tip, mean = 0, sd = 2)
-  tree_recon <- ape::ace(x = cont_pheno, phy = tree, type = "continuous", method = "REML", model = "BM", marginal = FALSE)
+  tree_recon <-  suppressWarnings(ape::ace(x = cont_pheno,
+                                           phy = tree,
+                                           type = "continuous",
+                                           method = "REML",
+                                           model = "BM",
+                                           marginal = FALSE))
   tree_recon_tip_and_node <- c(cont_pheno, tree_recon$ace)
   pheno_recon_mat <- convert_to_edge_mat(tr = tree, tree_recon_tip_and_node)
   high_conf <- NULL

@@ -127,12 +127,12 @@ continuous_ancestral_reconstruction <- function(tr,
 
   # Function -------------------------------------------------------------------
   set.seed(1)
-  reconstruction <- ape::ace(mat[, num, drop = TRUE],
-                        tr,
-                        model = "BM",
-                        type = disc_cont,
-                        method = recon_method,
-                        marginal = FALSE)
+  reconstruction <- suppressWarnings(ape::ace(mat[, num, drop = TRUE],
+                                              tr,
+                                              model = "BM",
+                                              type = disc_cont,
+                                              method = recon_method,
+                                              marginal = FALSE))
 
   # Vector containing reconstruction data for all internal nodes N+ where tips
   # are 1-N.
@@ -382,12 +382,12 @@ build_better_reconstruction <- function(mat, tr, disc_cont, num, recon_method){
   # http://blog.phytools.org/2017/07/comparing-fitted-discrete-character.html
   # Test ER vs ARD
   set.seed(1)
-  ERreconstruction  <- ape::ace(mat[, num, drop = TRUE],
-                           tr,
-                           type = disc_cont,
-                           method = recon_method,
-                           marginal = FALSE,
-                           model = "ER")
+  ERreconstruction  <- suppressWarnings(ape::ace(mat[, num, drop = TRUE],
+                                        tr,
+                                        type = disc_cont,
+                                        method = recon_method,
+                                        marginal = FALSE,
+                                        model = "ER"))
 
   # Some ARD models don't work well with the data and given a warning message
   # like:  "In sqrt(diag(solve(h))) : NaNs produced".  To ensure the ER model is
