@@ -988,28 +988,24 @@ plot_synchronous_results  <- function(tr,
 #'   }
 #' @param pheno_vector Vector. Length = Ntip(tr).
 #' @param perm Number.
-#' @param results_all_trans List of 8.
+#' @param results_all_trans List of 6:
 #'   \describe{
 #'     \item{pvals}{Named numeric vector. Length == number of genotypes. Values
 #'     between 1 and 0. Names are genotype names.}
-#'     \item{ks_statistics}{List of numeric vectors. Length of list == number
+#'     \item{null_gammas}{List of numeric vectors. Length of list == number
 #'     of genotypes. Each vector has length == number of permutations. Values
-#'     between 1 and 0.}
-#'     \item{observed_pheno_trans_delta}{List of numeric vectors. Length of list
-#'     == number of genotypes. Vectors are of variable length because length is
-#'     the number of transition edges for that particular genotype. Vectors are
-#'     numeric.}
+#'     are integers}
+#'     \item{observed_pheno_trans_delta}{List of numeric vectors. Length of
+#'     list == number of genotypes. Vectors are of variable length because
+#'     length is the number of transition edges for that particular genotype.
+#'     Vectors are numeric.}
 #'     \item{observed_pheno_non_trans_delta}{List of numeric vectors. Length of
 #'     list == number of genotypes. Vectors are of variable length because
 #'     length is the number of non-transition edges for that particular
 #'     genotype. Vectors are numeric.}
-#'     \item{trans_median}{Numberic. Vector. Length = number of genotypes.
-#'     Describes median delta phenotype on all transition edges.}
-#'     \item{all_edges_median}{Numeric vector. Length = number of genotypes.
-#'     Describes median delta phenotype on all edges.}
 #'     \item{num_genotypes}{Integer. The number of genotypes.}
-#'     \item{observed_ks_stat.}{Numeric Vector. Length = number of genotypes.
-#'     Values between 1 and 0.}
+#'     \item{observed_gamma}{Numeric Vector. Length = number of genotypes.
+#'     Integers.}
 #'   }
 #' @param pheno_anc_rec Vector. The values of the ancestral reconstruction of
 #'   the phenotype at each internal node. Length = Nnode(tr).
@@ -1028,10 +1024,9 @@ plot_synchronous_results  <- function(tr,
 #'   genotypes. Each entry is a vector with length == Nedge(tr). All entries are
 #'   0 (low confidence) or 1 (high confidence).
 #' @param all_trans_sig_hits Data.frame. 1 column. Colnum names =
-#'   "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are (1)
-#'   significant after multiple test correction and (2) have higher median delta
-#'   phenotype on transition edges than on all edges. Values are between 1 and
-#'   0. Rownames are genotypes.
+#'   "fdr_corrected_pvals". Nrow = variable. Number of genotypes that are
+#'   significant after multiple test correction. Values are between 1 and 0.
+#'   Rownames are genotypes.
 #' @param group_logical Logical. Inidicates whether or not genotypes were
 #'   grouped.
 #' @param snp_in_gene Either NULL or table of integers where each entry

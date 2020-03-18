@@ -90,7 +90,7 @@ knitr::include_graphics("continuous_algorithm_demo.png")
 
 Left panel: the delta phenotype is noticeably higher on transition edges (purple), suggesting an association between a change in the genotype and a change in the phenotype. Right panel: the two delta phenotype distributions are nearly identical, suggesting the genotype transitions are not associated with phenotype changes.    
 
-The two phenotype distributions are compared using a two-sample Kolmogorov–Smirnov (KS) test. The test's output, the KS test statistic, is recorded. Then a permutation test is performed wherein the classification of each edge as a genotype transition or non-transition edge is randomized. The KS test is repeated on the permuted data. An empirical p-value is calculated based on the observed vs. permuted KS test statistics. 
+fThe two phenotype distributions are compared using a two-sample Kolmogorov–Smirnov (KS) test. The test's output, the KS test statistic, is recorded. Then a permutation test is performed wherein the classification of each edge as a genotype transition or non-transition edge is randomized. The KS test is repeated on the permuted data. An empirical p-value is calculated based on the observed vs. permuted KS test statistics. 
 
 ## 2. Synchronous test (input: binary phenotype)
 ### Do genotype transitions occur more often than expected by chance on phenotype transition edges than on phenotype non-transition edges?

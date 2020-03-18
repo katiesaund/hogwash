@@ -133,8 +133,6 @@ test_that("calc_sig returns a non-significant p-value when phenotype change is
   alpha <- 0.01
   expect_true(results$pvals[1] > alpha)
 
-  expect_equal(results$non_trans_median[[1]],
-               median(abs(temp_pheno[4:6, 1] - temp_pheno[4:6, 2])))
   expect_equal(results$observed_pheno_non_trans_delta[[1]],
                abs(temp_pheno[1:3, 1] - temp_pheno[1:3, 2]))
   expect_equal(round(results$observed_pheno_trans_delta[[1]], 3),

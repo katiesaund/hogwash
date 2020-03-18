@@ -136,8 +136,6 @@ continuous_permutation <- function(geno_no_tran_index_list,
 #'     list == number of genotypes. Vectors are of variable length because
 #'     length is the number of non-transition edges for that particular
 #'     genotype. Vectors are numeric.}
-#'     \item{non_trans_median}{Numberic. Vector. Length = number of genotypes.
-#'     Describes median delta phenotype on all genotype non-transition edges.}
 #'     \item{num_genotypes}{Integer. The number of genotypes.}
 #'     \item{observed_gamma}{Numeric Vector. Length = number of genotypes.
 #'     Integers.}
@@ -174,7 +172,7 @@ calc_sig <- function(high_conf_list,
   # Function -------------------------------------------------------------------
   num_genotypes <- ncol(geno_mat)
   num_tree_edge <- nrow(pheno_recon_edge_mat)
-  pvals <- non_trans_median <- observed_gamma_value <- pheno_beta <-
+  pvals <- observed_gamma_value <- pheno_beta <-
     geno_beta <- rep(NA, num_genotypes)
   names(pvals) <- colnames(geno_mat)
   null_gamma_list <- observed_pheno_trans_delta <- geno_non_trans_index_list <-

@@ -124,24 +124,6 @@ test_that("keep_two_plus_hi_conf_tran_ed gives error for invalid input", {
   expect_error(keep_two_plus_hi_conf_tran_ed(temp_results, fake_confidence))
 })
 
-# test keep_hits_with_more_change_on_trans_edges
-test_that("keep_hits_with_more_change_on_trans_edges does X given Y", {
-  num_genotypes <- 5
-  temp_fdr <- 0.05
-  temp_results <- temp_pvals <- NULL
-  temp_results$trans_median <- rep(10, num_genotypes)
-  temp_results$all_edges_median <- c(8:12)
-  temp_pvals$hit_pvals <- as.data.frame(matrix(0.01,
-                                               ncol = 1,
-                                               nrow = num_genotypes))
-  colnames(temp_pvals$hit_pvals) <- "fdr_corrected_pvals"
-  row.names(temp_pvals$hit_pvals) <- letters[1:num_genotypes]
-  results <- keep_hits_with_more_change_on_trans_edges(temp_results,
-                                                       temp_pvals,
-                                                       temp_fdr)
-  expect_equivalent(row.names(results), c("a", "b"))
-})
-
 # test prep_geno_trans_for_phyc
 test_that("prep_geno_trans_for_phyc returns a $transition vector that
           corresponds only to positive values in $trans_dir", {
