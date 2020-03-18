@@ -200,9 +200,7 @@ calculate_continuous_gamma <- function(pheno_recon_mat,
 
   for (i in 1:num_geno) {
     scaled_pheno <- scales::rescale(pheno_delta[[i]], to = c(0, 1))
-
     pheno_beta[i] <- sum(scaled_pheno * (1 * (high_conf_edge_list[[i]] == 1)))
-
     geno_beta[i] <- sum(geno_trans_edge_list[[i]]$transition == 1 &
                           high_conf_edge_list[[i]] == 1)
     gamma_count[i] <-

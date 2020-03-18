@@ -22,11 +22,17 @@ test_that("calculate_continuous_gamma gives expected results for valid continuou
   }
 
   output <- calculate_continuous_gamma(pheno_recon_mat, high_conf)
-  # Test
-  gamma <- 1
-  beta_pheno <- 3
+  delta_pheno <- abs(pheno_recon_mat[, 1] - pheno_recon_mat[, 2])
+  scaled_delta_pheno <- scales::rescale(delta_pheno)
+
+  # What I expect
+  beta_pheno <- sum(scaled_delta_pheno) # all are high confidence
   beta_geno <- 4
-  epsilon <- 2 * gamma / (beta_pheno + beta_geno)
+  gamma <- sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition) # all are high confidence
+  union <- beta_pheno + beta_geno - gamma
+  epsilon <- gamma / union
+
+  # Test
   expect_equal(output$num_hi_conf_edges, rep(num_edge, num_geno))
   expect_equal(output$gamma_count, rep(gamma, num_geno))
   expect_equal(output$pheno_beta, rep(beta_pheno, num_geno))
@@ -42,10 +48,15 @@ test_that("calculate_continuous_gamma gives expected results for valid continuou
     high_conf$genotype_transition[[i]]$transition <- c(1, 1, 0, 0, 0, 0, 1, 1)
   }
   new_output <- calculate_continuous_gamma(pheno_recon_mat, high_conf)
-  gamma <- 4
-  beta_pheno <- 6
+
+  # What I expect
+  beta_pheno <- sum(scaled_delta_pheno) # all are high confidence
   beta_geno <- 4
-  epsilon <- 2 * gamma / (beta_pheno + beta_geno)
+  gamma <- sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition) # all are high confidence
+  union <- beta_pheno + beta_geno - gamma
+  epsilon <- gamma / union
+
+  # Test
   expect_equal(new_output$num_hi_conf_edges, rep(num_edge, num_geno))
   expect_equal(new_output$gamma_count, rep(gamma, num_geno))
   expect_equal(new_output$pheno_beta, rep(beta_pheno, num_geno))
