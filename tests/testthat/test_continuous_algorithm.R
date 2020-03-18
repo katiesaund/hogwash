@@ -139,40 +139,6 @@ test_that("calc_sig returns a non-significant p-value when phenotype change is
                abs(temp_pheno[4:6, 1] - temp_pheno[4:6, 2]))
 })
 
-test_that("calc_sig returns an error when the only confident edges are
-          transition edges. (All non-transition edges are low confidence)", {
-  num_isolates <- 4
-  num_loci <- 2
-  set.seed(1)
-  temp_tree <- ape::rtree(num_isolates)
-  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
-  temp_geno <- matrix(c(0, 1), nrow = num_isolates, ncol = num_loci)
-  temp_perm <- 100
-  temp_geno_trans <- temp_conf <- rep(list(NULL), num_loci)
-  for (i in 1:num_loci) {
-    temp_geno_trans[[i]]$transition <- c(0, 0, 0, 1, 1, 1)
-    temp_geno_trans[[i]]$trans_dir  <- c(1, 1, 1, 1, 1, 1)
-    temp_conf[[i]]                  <- c(0, 0, 0, 1, 1, 1)
-  }
-  set.seed(1)
-  temp_pheno <- matrix(c(-15, -15, 10, 0, 10, 10, -10, 0, 7, 5, 25, 7),
-                       ncol = 2,
-                       nrow = ape::Nedge(temp_tree))
-
-  hi_conf_list <- NULL
-  hi_conf_list$genotype <- temp_geno
-  hi_conf_list$high_conf_ordered_by_edges <- temp_conf
-  hi_conf_list$genotype_transition <- temp_geno_trans
-  hi_conf_list$tr_and_pheno_hi_conf <- rep(1, ape::Nedge(temp_tree))
-  # Transition edges deltas: 5 15 3
-  # Non-transition edge deltas: 5 15 3
-  expect_error(calc_sig(hi_conf_list,
-                        temp_perm,
-                        temp_tree,
-                        temp_pheno))
-})
-
-
 # test continuous_permutation
 test_that("continuous_permutation gives valid results", {
   num_isolates <- 40
