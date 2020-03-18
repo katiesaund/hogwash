@@ -1077,7 +1077,8 @@ plot_continuous_results <- function(disc_cont,
   check_equal(length(tr_and_pheno_hi_conf), ncol(geno_mat))
   check_class(group_logical, "logical")
   if (!is.null(snp_in_gene)) {
-    if (!is_this_class(snp_in_gene, "table")  | typeof(snp_in_gene) != "integer") {
+    if (!is_this_class(snp_in_gene, "table") |
+        typeof(snp_in_gene) != "integer") {
       stop("snp_in_gene should be a table of integers")
     }
   }
@@ -1111,7 +1112,8 @@ plot_continuous_results <- function(disc_cont,
                                           ncol(trans_edge_mat)),
                stringsAsFactors = FALSE)
   row.names(significant_loci) <- colnames(trans_edge_mat)
-  significant_loci$Locus.Significance[pval_all_transition$hit_pvals[ , 1] > fdr] <- "Significant"
+  significant_loci$Locus.Significance[
+    pval_all_transition$hit_pvals[ , 1] > fdr] <- "Significant"
   log_p_value <- data.frame(pval_all_transition$hit_pvals)
 
   if (!is.null(snp_in_gene)) {
@@ -1130,7 +1132,9 @@ plot_continuous_results <- function(disc_cont,
   ann_colors <- list(
     `Locus Significance` = c(`Not Significant` = "white",
                              `Significant` = "blue"),
-    `Genotype Edge` = c(`Low Confidence` = "grey", `Non-Transition` = "white", `Transition` = "black")
+    `Genotype Edge` = c(`Low Confidence` = "grey",
+                        `Non-Transition` = "white",
+                        `Transition` = "black")
   )
 
   sorted_trans_edge_mat <-
@@ -1270,7 +1274,9 @@ plot_continuous_results <- function(disc_cont,
                      border = FALSE,
                      main =
                        paste("Beta(phenotype) Beta(genotype) Intersection Null Distribution\n-ln(FDR Corrected P-value) = ",
-                             formatC(pval_all_transition$hit_pvals[j, 1],format = "e", digits = 1),
+                             formatC(pval_all_transition$hit_pvals[j, 1],
+                                     format = "e",
+                                     digits = 1),
                              " P-value rank = ",
                              rank(1 / rank_mat, na.last = TRUE)[j],
                              sep = ""),
