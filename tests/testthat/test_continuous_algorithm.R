@@ -191,8 +191,12 @@ test_that("continuous_permutation gives valid results", {
 
   num <- 1
   perm <- 100
-  results <- continuous_permutation(non_trans_index, temp_tree, temp_conf_index, perm, num, pheno_delta_list)
-  odd_numbers <- seq(from = 1, to = 77, by = 2)
+  results <- continuous_permutation(non_trans_index,
+                                    temp_tree,
+                                    temp_conf_index,
+                                    perm,
+                                    num,
+                                    pheno_delta_list)
   expect_equal(length(results), perm)
   expect_true(max(results) <= ape::Nedge(temp_tree))
   expect_true(min(results) >= 1)
