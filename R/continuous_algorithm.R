@@ -192,21 +192,17 @@ calc_sig <- function(high_conf_list,
   }
 
   for (i in 1:num_genotypes) {
-    non_trans_median[i] <-
-      stats::median(observed_pheno_non_trans_delta[[i]])
-  }
+    scaled_pheno <- scales::rescale(observed_pheno_delta_list[[i]] , to = c(0, 1))
 
-  for (i in 1:num_genotypes) {
-    pheno_beta[i] <- sum(observed_pheno_delta_list[[i]] >
-                           non_trans_median[i] &
-                           tr_pheno_confidence == 1)
+    pheno_beta[i] <- sum(scaled_pheno * (1 * (tr_pheno_confidence == 1)))
+
     geno_beta[i] <- sum(genotype_transition_list[[i]]$transition == 1 &
                           genotype_confidence[[i]] == 1)
     observed_gamma_value[i] <-
-      sum(observed_pheno_delta_list[[i]] > non_trans_median[i] &
-            genotype_transition_list[[i]]$transition == 1 &
-            tr_pheno_confidence == 1 &
-            genotype_confidence[[i]] == 1)
+      sum(
+        (scaled_pheno * (1 * (tr_pheno_confidence == 1))) *
+          (genotype_transition_list[[i]]$transition == 1 &
+             genotype_confidence[[i]] == 1))
   }
 
   for (i in 1:num_genotypes) {
@@ -235,7 +231,6 @@ calc_sig <- function(high_conf_list,
          "null_gamma" = null_gamma_list,
          "observed_pheno_trans_delta" = observed_pheno_trans_delta,
          "observed_pheno_non_trans_delta" = observed_pheno_non_trans_delta,
-         "non_trans_median" = non_trans_median,
          "num_genotypes" = num_genotypes)
   return(results)
 }
