@@ -137,7 +137,7 @@ test_that("continuous_ancestral_reconstruction works given valid inputs", {
                      ncol = num_col)
   test_pheno_mat_1 <- test_mat[, 1, drop = FALSE]
   test_pheno_mat_2 <- test_mat[, 2, drop = FALSE]
-  reconstruction_method <- "ML"
+  reconstruction_method <- "REML"
   data_type <- "continuous"
   index <- 1
   dummy_pheno1 <- continuous_ancestral_reconstruction(temp_tree,
@@ -330,7 +330,7 @@ test_that("discrete_ancestral_reconstruction gives error for invalid input", {
   test_mat <- matrix(rep(c(1, 0), num_cells),
                      nrow = ape::Ntip(temp_tree),
                      ncol = num_col)
-  reconstruction_method <- "ML"
+  reconstruction_method <- "REML"
   expect_error(discrete_ancestral_reconstruction(temp_tree,
                                                  test_mat,
                                                  1,
@@ -415,7 +415,7 @@ test_that("build_better_reconstruction gives an error given invalid input", {
   test_mat <- matrix(1:num_cells, nrow = ape::Ntip(tree), ncol = num_col)
   discrete_or_continuous <- "continuous"
   index <- 1
-  reconstruction_method <- "ML"
+  reconstruction_method <- "REML"
 
   # Test
   expect_error(build_better_reconstruction(test_mat,
@@ -434,7 +434,7 @@ test_that("build_better_reconstruction gives an error given invalid input", {
   test_mat <- matrix(0, nrow = ape::Ntip(tree), ncol = num_col)
   discrete_or_continuous <- "continuous"
   index <- 1
-  reconstruction_method <- "ML"
+  reconstruction_method <- "REML"
 
   # Test
   expect_error(build_better_reconstruction(test_mat,

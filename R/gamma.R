@@ -199,7 +199,7 @@ calculate_continuous_gamma <- function(pheno_recon_mat,
     epsilon <- geno_beta <- gamma_count <- gamma_percent <- rep(0, num_geno)
 
   for (i in 1:num_geno) {
-    scaled_pheno <- rescale(pheno_delta[[i]], to = c(0, 1))
+    scaled_pheno <- scales::rescale(pheno_delta[[i]], to = c(0, 1))
 
     pheno_beta[i] <- sum(scaled_pheno * (1 * (high_conf_edge_list[[i]] == 1)))
 

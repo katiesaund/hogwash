@@ -41,13 +41,14 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
 
   # Function -------------------------------------------------------------------
   # Compute ancestral reconstruction
-  recon_method <- "ML" # ML == Maximum Likelihood.
   ML_significance_threshold <- .875 # ML literature suggests that a ratio of 7:1
                                     # suggests a high confidence ancestral
                                     # reconstruction per node .875/.125 = 7.
 
   if (disc_cont == "continuous") {
     # RECONSTRUCTION
+    recon_method <- "REML" # REML as per ape::ace documentation recommendations
+
     cont_results <- continuous_ancestral_reconstruction(tr,
                                                         mat,
                                                         num,
@@ -63,6 +64,8 @@ ancestral_reconstruction_by_ML <- function(tr, mat, num, disc_cont){
   } else {
     # This is always the choice for genotypes and discrete phenotypes
     # RECONSTRUCTION
+    recon_method <- "ML" # ML as per ape::ace documentation recommendations
+
     discrete_results <-
       discrete_ancestral_reconstruction(tr, mat, num, disc_cont, recon_method)
     ML_anc_rec <- discrete_results$ML_anc_rec

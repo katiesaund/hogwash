@@ -7,7 +7,7 @@ test_that("plot_continuous_phenotype works for valid inputs", {
   temp_vec <- rnorm(ntip, mean = 0, sd = 10)
   names(temp_vec) <- temp_tree$tip.label
   temp_anc_rec <-
-    ape::ace(x = temp_vec, phy = temp_tree, type = "continuous", method = "ML")
+    ape::ace(x = temp_vec, phy = temp_tree, type = "continuous", method = "REML")
   temp_anc_rec_at_node <- temp_anc_rec$ace
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
@@ -21,7 +21,7 @@ test_that("plot_continuous_phenotype works gives error for invalid inputs
   temp_tree <- ape::rtree(ntip)
   temp_vec <- rnorm(ntip, mean = 0, sd = 10)
   temp_anc_rec <-
-    ape::ace(x = temp_vec, phy = temp_tree, type = "continuous", method = "ML")
+    ape::ace(x = temp_vec, phy = temp_tree, type = "continuous", method = "REML")
   temp_anc_rec_at_node <- temp_anc_rec$ace
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
@@ -34,7 +34,7 @@ test_that("plot_continuous_phenotype gives error for invalid inputs", {
   temp_vec <- rnorm(ntip, mean = 0, sd = 10)
   names(temp_vec) <- temp_tree$tip.label
   temp_anc_rec <-
-    ape::ace(x = temp_vec, phy = temp_tree, type = "continuous", method = "ML")
+    ape::ace(x = temp_vec, phy = temp_tree, type = "continuous", method = "REML")
   temp_anc_rec_at_node <- temp_anc_rec$ace[1:3]
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
@@ -47,7 +47,7 @@ test_that("plot_continuous_phenotype gives error for invalid inputs", {
   temp_vec <- rnorm(ntip, mean = 0, sd = 10)
   names(temp_vec) <- temp_tree$tip.label
   temp_anc_rec <-
-    ape::ace(x = temp_vec, phy = temp_tree, type = "continuous", method = "ML")
+    ape::ace(x = temp_vec, phy = temp_tree, type = "continuous", method = "REML")
   temp_anc_rec_at_node <- temp_anc_rec$ace
   temp_vec <- temp_vec[1:5]
   expect_error(plot_continuous_phenotype(temp_tree,

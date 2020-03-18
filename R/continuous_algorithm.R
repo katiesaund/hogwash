@@ -121,7 +121,7 @@ continuous_permutation <- function(geno_no_tran_index_list,
 #'   Values are the phenotype reconstruction at each node, as ordered by edges.
 #'   It's the same organization as tr$edge.
 #'
-#' @return List of 8:
+#' @return List of 6:
 #'   \describe{
 #'     \item{pvals}{Named numeric vector. Length == number of genotypes. Values
 #'     between 1 and 0. Names are genotype names.}

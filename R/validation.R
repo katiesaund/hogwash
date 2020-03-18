@@ -520,9 +520,7 @@ check_equal <- function(first_number, second_number){
 #'
 #' @description Check that the reconstruction method that is being fed to
 #'   ape::ace() is one of the four acceptable methods. The four methods are:
-#'   "ML", "REML", "pic", and "GLS." For the intial implementation of this
-#'   package the default (hard-coded) option is always maximum likelihood
-#'   ("ML").
+#'   "ML", "REML", "pic", and "GLS."
 #' @param input String. Either "ML", "REML", "pic", or "GLS."
 #'
 #' @noRd
