@@ -86,9 +86,9 @@ continuous_permutation <- function(geno_no_tran_index_list,
 
     null_gamma_values[j] <-
       sum(
-        (scaled_pheno * (1 * (curr_hi_conf_geno_pheno_tr == 1))) *
-          (permuted_trans_edge_index %in% 1:ape::Nedge(tr) &
-             curr_hi_conf_geno_pheno_tr == 1))
+        (scaled_pheno * (1 * (1:ape::Nedge(tr) %in% curr_hi_conf_geno_pheno_tr))) *
+          (1 * (1:ape::Nedge(tr) %in% permuted_trans_edge_index  &
+             (1:ape::Nedge(tr) %in% curr_hi_conf_geno_pheno_tr))))
     # null_epsilon[j] <-
     #   null_gamma_values[j] / (geno_beta + pheno_beta - null_gamma_values[j])
   }
