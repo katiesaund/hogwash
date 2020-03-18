@@ -53,10 +53,8 @@ continuous_permutation <- function(geno_no_tran_index_list,
 
   # Subset delta phenotypes, non-trans indices, and trans indices to just those
   #   with hi conf for geno, pheno, and tr
-  hi_conf_delta_pheno <- curr_delta_pheno[curr_hi_conf_geno_pheno_tr]
   hi_conf_geno_no_tran_index <- curr_geno_no_tran_index[curr_geno_no_tran_index %in% curr_hi_conf_geno_pheno_tr]
   hi_conf_geno_yes_tran_index <- curr_hi_conf_geno_pheno_tr[!curr_hi_conf_geno_pheno_tr %in% hi_conf_geno_no_tran_index]
-  check_equal(length(hi_conf_delta_pheno), num_hi_conf_edges)
   check_equal(sum(length(hi_conf_geno_yes_tran_index), length(hi_conf_geno_no_tran_index)), num_hi_conf_edges)
 
   num_trans_edges <- length(hi_conf_geno_yes_tran_index)
@@ -72,25 +70,13 @@ continuous_permutation <- function(geno_no_tran_index_list,
              prob = tr$edge.length[curr_hi_conf_geno_pheno_tr] /
                sum(tr$edge.length[curr_hi_conf_geno_pheno_tr]))
 
-    permuted_non_trans_edge_index <- curr_hi_conf_geno_pheno_tr[!curr_hi_conf_geno_pheno_tr %in% permuted_trans_edge_index]
-    permuted_trans_delta_pheno <- curr_delta_pheno[permuted_trans_edge_index]
-    permuted_non_trans_delta_pheno <- curr_delta_pheno[permuted_non_trans_edge_index]
-    check_equal(sum(length(permuted_trans_delta_pheno), length(permuted_non_trans_delta_pheno)), length(hi_conf_delta_pheno))
-
-
-    # Change everything below this!
-    scaled_pheno <- scales::rescale(hi_conf_delta_pheno, to = c(0, 1))
-
-    # pheno_beta <- sum(scaled_pheno * (1 * (curr_hi_conf_geno_pheno_tr == 1)))
-    # geno_beta <- num_trans_edges
+    scaled_pheno <- scales::rescale(curr_delta_pheno, to = c(0, 1))
 
     null_gamma_values[j] <-
       sum(
         (scaled_pheno * (1 * (1:ape::Nedge(tr) %in% curr_hi_conf_geno_pheno_tr))) *
           (1 * (1:ape::Nedge(tr) %in% permuted_trans_edge_index  &
              (1:ape::Nedge(tr) %in% curr_hi_conf_geno_pheno_tr))))
-    # null_epsilon[j] <-
-    #   null_gamma_values[j] / (geno_beta + pheno_beta - null_gamma_values[j])
   }
   # Return output --------------------------------------------------------------
   return(null_gamma_values)
