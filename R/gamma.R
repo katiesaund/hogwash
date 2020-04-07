@@ -81,7 +81,7 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
 #'     Nedge(tree). Individual vectors are binary.}
 #'   }
 #'
-#' @return results. List of three objects:
+#' @return results. List of seven objects:
 #'   \describe{
 #'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
 #'     value.}
@@ -89,6 +89,17 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
 #'     Length == number of genotypes.}
 #'     \item{gamma_count}{Numeric vector. Raw gamma value for each genotype.
 #'     Length == number of genotypes.}
+#'     \item{num_hi_conf_edges}{Numeric vector. Number of high confidence
+#'     edges per genotype. Length == number of genotypes.}
+#'     \item{pheno_beta}{Number. Count of how many tree edges are phenotype
+#'     transitions and the phenotype ancestral reconstruction and tree edge are
+#'     high confidence. Length == 1.}
+#'     \item{geno_beta}{Numeric vector. count of how many tree edges are
+#'     gentoype transitions and the genotype ancestral reconstruction and tree
+#'     edge are high confidence. Length == number of genotypes.}
+#'     \item{epsilon}{Numeric vector. 2 x (edges with both high confidence
+#'     genotype AND phenotype transition) / sum(edges with high confidence
+#'     gentoype and/or phenotype transitions). Length == number of genotypes.}
 #'   }
 #' @noRd
 calculate_synchronous_gamma <- function(geno_trans_edge_list,

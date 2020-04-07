@@ -97,7 +97,8 @@ run_phyc <- function(args){
                              hi_conf$genotype,
                              args$perm,
                              args$fdr,
-                             hi_conf$high_conf_ordered_by_edges)
+                             hi_conf$high_conf_ordered_by_edges,
+                             gamma)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_recon <-

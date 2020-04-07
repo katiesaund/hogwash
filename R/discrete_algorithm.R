@@ -92,14 +92,14 @@ count_hits_on_edges <- function(genotype_transition_edges,
 
 #' Run GWAS and calculate P-value for a discrete trait
 #'
-#' @description discrete_calculate_pvals is the "meat" of the phyC algorithm. It
-#'   returns the empirical p-value for each observed genotype.
+#' @description discrete_calculate_pvals is the "meat" of the discrete
+#'  algorithm. It returns the empirical p-value for each observed genotype.
 #'
 #' @details Algorithm overview:
 #'   * Subset tree edges to those with high confidence (as determined by
 #'       phenotype & genotype reconstructions as well as tree bootstrap values).
 #'   * For each genotype from the genotype_matrix:
-#'   *  Exclude any edges on which the genotype is not present
+#'   * Exclude any edges on which the genotype is not present
 #'   * Create a matrix where each row is a random sampling of the high
 #'       confidence edges of the tree where probability of choosing edges is
 #'       proportional to length of edge. Number of edges selected for the
@@ -109,6 +109,9 @@ count_hits_on_edges <- function(genotype_transition_edges,
 #'       confidence phenotype (these values create the null distribution for the
 #'       permuted genotypes)
 #'   * Calculate empirical p-values.
+#'   * Genotypes for which no convergence is possible (<2 transition edges or
+#'       overlap between genotype and phenotype <2) are given a p-value of 1 and
+#'       the permutation test is skipped.
 #'
 #' @param genotype_transition_edges List of vectors.
 #'   Length(genotype_transition_list) == number of genotypes. Length(each
@@ -123,6 +126,26 @@ count_hits_on_edges <- function(genotype_transition_edges,
 #' @param high_confidence_edges List. Length(list) = ncol(mat) == number of
 #'   genotypes. Each entry is a vector with length == Nedge(tr). All entries are
 #'   either 0 (low confidence) or 1 (high confidence).
+#' @param gamma List of seven objects:
+#'   \describe{
+#'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
+#'     value.}
+#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
+#'     Length == number of genotypes.}
+#'     \item{gamma_count}{Numeric vector. Raw gamma value for each genotype.
+#'     Length == number of genotypes.}
+#'     \item{num_hi_conf_edges}{Numeric vector. Number of high confidence
+#'     edges per genotype. Length == number of genotypes.}
+#'     \item{pheno_beta}{Number. Count of how many tree edges are phenotype
+#'     transitions and the phenotype ancestral reconstruction and tree edge are
+#'     high confidence. Length == 1.}
+#'     \item{geno_beta}{Numeric vector. count of how many tree edges are
+#'     gentoype transitions and the genotype ancestral reconstruction and tree
+#'     edge are high confidence. Length == number of genotypes.}
+#'     \item{epsilon}{Numeric vector. 2 x (edges with both high confidence
+#'     genotype AND phenotype transition) / sum(edges with high confidence
+#'     gentoype and/or phenotype transitions). Length == number of genotypes.}
+#'   }
 #'
 #' @return List of three objects:
 #'   \describe{
@@ -145,7 +168,8 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
                                      mat,
                                      permutations,
                                      fdr,
-                                     high_confidence_edges){
+                                     high_confidence_edges,
+                                     gamma){
   # Check input ----------------------------------------------------------------
   check_equal(ncol(mat), length(genotype_transition_edges))
   check_equal(length(genotype_transition_edges[[1]]), ape::Nedge(tr))
@@ -155,6 +179,8 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
   check_num_between_0_and_1(fdr)
   check_equal(ncol(mat), length(high_confidence_edges))
   check_equal(length(high_confidence_edges[[1]]), ape::Nedge(tr))
+  check_equal(length(gamma$gamma_count), ncol(mat))
+  check_is_number(gamma$gamma_count[1])
 
   # Function -------------------------------------------------------------------
   # Calculate observed values
@@ -187,7 +213,8 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
   }
 
   # For each genotype from the genotype_matrix:
-  record_redistrib_both_present <- rep(list(0), num_genotypes)
+  record_redistrib_both_present <- rep(list(rep(NA, permutations)),
+                                       num_genotypes)
   # looping over each genotype in the genotype_mat
   for (i in 1:num_genotypes) {
     if (num_edges_with_geno_trans[i] > num_hi_conf_edges[i]) {
@@ -204,6 +231,11 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
       hit_pvals[i] <- 1.0
       # This should never get triggered because we should be filtering the
       #   genotype before this step, but it's being kept in as a fail safe.
+    } else if (gamma$gamma_count[i] < 2) {
+      # If there is no ovlerap in BOTH the phenotype (presence/transition)
+      #   and genotype transition we CANNOT detect convergence. In these cases
+      #   we should skip to the next genotype to run the permutation test.
+      hit_pvals[i] <- 1.0
     } else {
       permuted_geno_trans_edges <-
         discrete_permutation(tr,
@@ -237,8 +269,8 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
     }
   }
   names(hit_pvals) <- colnames(mat)
-
-  # Return output --------------------------------------------------------------
+  storage.mode(hit_pvals) <- "character"
+    # Return output --------------------------------------------------------------
   results <- list("hit_pvals" = hit_pvals,
                   "permuted_count" = record_redistrib_both_present,
                   "observed_overlap" = both_present)

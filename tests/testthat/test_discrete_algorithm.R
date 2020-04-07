@@ -81,7 +81,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy
     temp_geno_trans[[k]] <- c(0, 0, 0, 1, 0, 0, 0, 1, 0, 0)
     temp_hi_conf_edges[[k]] <- rep(1, num_edge)
   }
-  temp_geno_trans[[15]] <- c(0, 0, 1, 1, 0, 0, 0, 1, 0, 0)
+  temp_geno_trans[[num_genotypes]] <- c(0, 0, 1, 1, 0, 0, 0, 1, 0, 0)
   temp_pheno_trans <- c(1, 1, 1, 1, 0, 0, 0, 0, 0, 0)
 
   temp_geno <- matrix(1, ncol = num_genotypes, nrow = ape::Ntip(temp_tree))
@@ -90,13 +90,19 @@ test_that("discrete_calculate_pvals returns expected results given this dummy
   temp_perm <- 8
   temp_fdr <- 0.25
 
+  temp_gamma <- NULL
+  temp_gamma$gamma_count <-
+    c(rep(sum(temp_pheno_trans + temp_geno_trans[[1]] > 1), num_genotypes - 1),
+      sum(temp_pheno_trans + temp_geno_trans[[15]] > 1))
+
   expect_error(discrete_calculate_pvals(temp_geno_trans,
                                         temp_pheno_trans,
                                         temp_tree,
                                         temp_geno,
                                         temp_perm,
                                         temp_fdr,
-                                        temp_hi_conf_edges),
+                                        temp_hi_conf_edges,
+                                        temp_gamma),
                NA)
 
   disc_trans_results <- discrete_calculate_pvals(temp_geno_trans,
@@ -105,9 +111,11 @@ test_that("discrete_calculate_pvals returns expected results given this dummy
                                                  temp_geno,
                                                  temp_perm,
                                                  temp_fdr,
-                                                 temp_hi_conf_edges)
+                                                 temp_hi_conf_edges,
+                                                 temp_gamma)
 
-  expect_equal(round(as.numeric(disc_trans_results$hit_pvals[1]), 3), 0.444)
+  expect_equal(round(as.numeric(disc_trans_results$hit_pvals[1]), 3), 1)
+  expect_equal(round(as.numeric(disc_trans_results$hit_pvals[15]), 3), 0.444)
   expect_equal(disc_trans_results$observed_overlap[1], 1)
   expect_equal(length(disc_trans_results$permuted_count[[1]]), temp_perm)
 })

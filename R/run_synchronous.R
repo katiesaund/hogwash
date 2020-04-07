@@ -83,6 +83,7 @@ run_synchronous <- function(args){
                                        pheno_trans,
                                        hi_conf)
 
+  print(gamma)
   # RUN PERMUTATION TEST ------------------------------------------------------#
   disc_trans_results <-
     discrete_calculate_pvals(genotype_transition_edges,
@@ -91,7 +92,8 @@ run_synchronous <- function(args){
                              hi_conf$genotype,
                              args$perm,
                              args$fdr,
-                             hi_conf$high_conf_ordered_by_edges)
+                             hi_conf$high_conf_ordered_by_edges,
+                             gamma)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_trans <-
