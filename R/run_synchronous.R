@@ -83,7 +83,6 @@ run_synchronous <- function(args){
                                        pheno_trans,
                                        hi_conf)
 
-  print(gamma)
   # RUN PERMUTATION TEST ------------------------------------------------------#
   disc_trans_results <-
     discrete_calculate_pvals(genotype_transition_edges,
