@@ -702,7 +702,6 @@ plot_phyc_results <- function(tr,
                        lwd = 4)
       graphics::mtext(title_line_two, side = 3)
       graphics::legend("topleft",
-                       title = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
                        legend = c("Null", "Observed"),
                        col = c( transparent_teal, transparent_red),
                        pch = 15,
@@ -969,7 +968,6 @@ plot_synchronous_results  <- function(tr,
                        lwd = 4)
       graphics::mtext(title_line_two, side = 3)
       graphics::legend("topright",
-             title = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
              legend = c("Null", "Observed"),
              col = c(transparent_teal, transparent_red),
              pch = 15,
@@ -1332,7 +1330,6 @@ plot_continuous_results <- function(disc_cont,
                        col = transparent_red,
                        lwd = 4)
       graphics::legend("topright",
-             title = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
              legend = c("Null", "Observed"),
              col = c(transparent_teal, transparent_red),
              pch = 15,
