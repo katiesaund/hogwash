@@ -170,6 +170,12 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
                                          trans_color){
   # Check inputs ---------------------------------------------------------------
   check_is_number(index)
+  print("index")
+  print(index)
+  print("all_trans")
+  print(all_trans)
+  print("length(all_trans)")
+  print(length(all_trans))
   if (index > length(all_trans)) {
     stop("Index must correspond to one of the genotypes")
   }
@@ -1271,6 +1277,16 @@ plot_continuous_results <- function(disc_cont,
                                      j)
       # Histogram of the |delta phenotype| for only high conf. edges, colored by
       #   genotype non-transition vs transition edges
+
+      print("j")
+      print(j)
+      print("pval_all_transition$hit_pvals[j, ]")
+      print(pval_all_transition$hit_pvals[j, ])
+      print("results_all_trans")
+      print(results_all_trans)
+      print("length(results_all_trans)")
+      print(length(results_all_trans))
+
       hist_abs_hi_conf_delta_pheno(results_all_trans,
                                    tr,
                                    j,
