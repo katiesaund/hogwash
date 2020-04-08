@@ -101,6 +101,9 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
 
   # Function -------------------------------------------------------------------
   hist_cex_size <- 1
+  transparent_grey <- grDevices::rgb(0, 0, 0, 0.25)
+  transparent_red <- grDevices::rgb(1, 0, 0, 0.25)
+  legend_grey <- grDevices::rgb(0, 0, 0, 0.05)
 
   trans_index <-
     c(1:ape::Nedge(tr))[as.logical(geno_transition[[index]]$transition)]
@@ -115,24 +118,21 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
                                        pheno_recon_ordered_by_edges)
 
   graphics::hist(raw_non_trans_delta,
-       main = "Raw Delta Phenotype",
-       # breaks = ape::Nedge(tr) / 4,
+                 font = 1,
+       xlab = expression(paste(Delta, " Phenotype")),
+       main = expression(paste(Delta, " Phenotype")),
        col = non_trans_color,
-       border = FALSE,
        xlim = c(min(raw_trans_delta, raw_non_trans_delta),
                 1.2 * max(raw_trans_delta, raw_non_trans_delta)),
        ylim = c(0, 0.75 * sum(length(raw_non_trans_delta),
                               length(raw_trans_delta))),
        ylab = "Count",
-       xlab = "Raw Delta Phenotype",
        cex.main = hist_cex_size,
        cex.lab = hist_cex_size,
        cex.axis = hist_cex_size)
 
   graphics::hist(raw_trans_delta,
-       # breaks = ape::Nedge(tr) / 4,
        col = trans_color,
-       border = trans_color,
        add = TRUE)
 
   graphics::legend("topright",
@@ -141,7 +141,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
          col = c(trans_color, non_trans_color),
          pch = 15,
          cex = hist_cex_size,
-         bg = grDevices::rgb(0, 0, 0, 0.01))
+         bg = legend_grey)
 }
 
 #' Draw histogram of the absolute value of phenotype change on each high
@@ -182,17 +182,18 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
 
   # Function -------------------------------------------------------------------
   hist_cex_size <- 1
+  legend_grey <- grDevices::rgb(0, 0, 0, 0.05)
+
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::hist(all_trans$observed_pheno_non_trans_delta[[index]],
-       # breaks = ape::Nedge(tr) / 4,
+                 font = 1,
        col = non_trans_color,
-       border = FALSE,
        ylab = "Count",
-       xlab = "|Delta Phenotype|",
+       xlab = expression(paste("|", Delta, "| Phenotype")),
+       main = expression(paste("|", Delta, "| Phenotype")),
        xlim = c(0,
                 1.2 * max(all_trans$observed_pheno_trans_delta[[index]],
                           all_trans$observed_pheno_non_trans_delta[[index]])),
-       main = "|Delta Phenotype|",
        ylim = c(0,
                 0.75 * sum(length(all_trans$observed_pheno_trans_delta[[index]]),
                            length(all_trans$observed_pheno_non_trans_delta[[index]]))),
@@ -203,7 +204,6 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
   graphics::hist(all_trans$observed_pheno_trans_delta[[index]],
        # breaks = ape::Nedge(tr) / 4,
        col = trans_color,
-       border = trans_color,
        add = TRUE)
 
   graphics::legend("topright",
@@ -212,7 +212,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
          col = c(trans_color, non_trans_color),
          pch = 15,
          cex = hist_cex_size,
-         bg = grDevices::rgb(0, 0, 0, 0.01))
+         bg = legend_grey)
 }
 
 #' Draw histogram of the absolute value of the phenotype change on each edge
@@ -252,20 +252,20 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
 
   # Function -------------------------------------------------------------------
   hist_cex_size <- 1
-  transparent_purple <- grDevices::rgb(1, 0, 1, 0.25)
-  transparent_blue <- grDevices::rgb(0, 0, 1, 0.25)
+  transparent_orange <- grDevices::rgb(1, .04, 0, 0.25)
+  transparent_blue <- grDevices::rgb(0, 1, 1, 0.25)
+  legend_grey <- grDevices::rgb(0, 0, 0, 0.05)
 
   edge_num <- length(unlist(p_trans_mat))
   hi_edge_num <-
     length(unlist(p_trans_mat)[as.logical(geno_confidence[[index]])])
   delta_phenotype_on_all_edges <- as.numeric(unlist(p_trans_mat))
   graphics::hist(delta_phenotype_on_all_edges,
-       # breaks = ape::Nedge(tr) / 4,
+                 font = 1,
        col = transparent_blue,
-       border = FALSE,
        ylab = "Count",
-       xlab = "|Delta Phenotype|",
-       main = "|Delta Phenotype|",
+       xlab = expression(paste("|", Delta, "| Phenotype")),
+       main = expression(paste("|", Delta, "| Phenotype")),
        cex.main = hist_cex_size,
        cex.lab = hist_cex_size,
        cex.axis = hist_cex_size,
@@ -276,19 +276,17 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
     as.numeric(unlist(p_trans_mat))[as.logical(geno_confidence[[index]])]
   graphics::hist(delta_pheno_on_hi_conf_edges,
   # plot phenotype transition only high confidence edges for this genotype
-       # breaks = ape::Nedge(tr) / 4,
-       col = transparent_purple,
-       border = FALSE,
+       col = transparent_orange,
        ylab = "Count",
        add = TRUE)
 
   graphics::legend("topright",
          title = "Edge Type",
-         legend = c("Hi Confidence", "Any"),
-         col = c(transparent_purple, transparent_blue),
+         legend = c("Hi. Confidence", "Low or Hi. Conf."),
+         col = c(transparent_orange, transparent_blue),
          pch = 15,
          cex = hist_cex_size,
-         bg = grDevices::rgb(0, 0, 0, 0.01))
+         bg = legend_grey)
 }
 
 #' Draw Manhattan Plot
@@ -313,6 +311,7 @@ make_manhattan_plot <- function(geno_pheno_name,
   check_str_is_test_name(test_name)
 
   # Function -------------------------------------------------------------------
+  transparent_grey <- grDevices::rgb(0, 0, 0, 0.25)
 
   # Make test names prettier
   if (test_name == "continuous") {
@@ -338,7 +337,7 @@ make_manhattan_plot <- function(geno_pheno_name,
             cex.lab = manhattan_cex,
             cex.axis = manhattan_cex,
             main = paste(test_name, geno_pheno_name, sep = " "),
-            col = grDevices::rgb(0, 0, 0, 0.3),
+            col = transparent_grey,
             pch = 19,
             xaxt = 'n',
             xlab = "Genetic loci",
@@ -525,6 +524,10 @@ plot_phyc_results <- function(tr,
     fname <- paste0(dir, "/hogwash_", prefix, "_", name, ".pdf")
   }
 
+  transparent_grey <- grDevices::rgb(0, 0, 0, 0.25)
+  transparent_red <- grDevices::rgb(1, 0, 0, 0.25)
+  transparent_teal <- grDevices::rgb(0.4, 0.6, 1, alpha = 0.5, )
+
   # Manhattan Plot
   grDevices::pdf(fname, width = 8.5, height = 11)
   graphics::par(mfrow = c(1, 1), mar = c(5, 5, 5, 5))
@@ -670,12 +673,9 @@ plot_phyc_results <- function(tr,
       # Plot Null Distribution Histogram
       max_x <- 1.2 * max(recon_perm_obs_results$permuted_count[[j]],
                    recon_perm_obs_results$observed_overlap[j])
-      # max_y <- 0.85 * length(recon_perm_obs_results$permuted_count[[j]])
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
                      xlim = c(0, max_x),
-                     # ylim = c(0, max_y),
-                     col = "grey",
-                     border = FALSE,
+                     col = transparent_teal,
                      ylab = "Count",
                      xlab =
                        "Genotype Transition & Phenotype Presence Co-occurrence",
@@ -686,12 +686,12 @@ plot_phyc_results <- function(tr,
                        rank(1 / rank_mat, na.last = TRUE)[j],
                        sep = ""))
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
-                       col = grDevices::rgb(1, 0, 0, 0.25),
+                       col = transparent_red,
                        lwd = 4)
       graphics::legend("topleft",
                        title = "Co-occurence",
                        legend = c("Null", "Observed"),
-                       col = c( "grey", grDevices::rgb(1, 0, 0, 0.25)),
+                       col = c( transparent_teal, transparent_red),
                        pch = 15,
                        cex = hist_cex_size)
     }
@@ -775,6 +775,9 @@ plot_synchronous_results  <- function(tr,
   # Set default values
   image_width <- 250
   hist_cex_size <- 1
+  transparent_grey <- grDevices::rgb(0, 0, 0, 0.25)
+  transparent_red <- grDevices::rgb(1, 0, 0, 0.25)
+  transparent_teal <- grDevices::rgb(0.4, 0.6, 1, alpha = 0.5, )
 
   # File name
   if (grouped_logical) {
@@ -932,11 +935,8 @@ plot_synchronous_results  <- function(tr,
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
                    trans_perm_obs_results$observed_overlap[j])
       graphics::hist(trans_perm_obs_results$permuted_count[[j]],
-           # breaks = num_perm / 10,
            xlim = c(0, max_x),
-           # ylim = c(0, .85 * length(trans_perm_obs_results$permuted_count[[j]])),
-           col = "grey",
-           border = FALSE,
+           col = transparent_teal,
            ylab = "Count",
            xlab = "Genotype & Phenotype Transition Edge Co-occurrence",
            main = paste0("Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
@@ -945,15 +945,15 @@ plot_synchronous_results  <- function(tr,
                          rank(1 / rank_mat, na.last = TRUE)[j],
                          sep = ""))
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
-                       col = grDevices::rgb(1, 0, 0, 0.25),
+                       col = transparent_red,
                        lwd = 4)
       graphics::legend("topleft",
              title = "Co-occurence",
              legend = c("Null", "Observed"),
-             col = c("grey", grDevices::rgb(1, 0, 0, 0.25)),
+             col = c(transparent_teal, transparent_red),
              pch = 15,
              cex = hist_cex_size,
-             bg = grDevices::rgb(0, 0, 0, 0.01))
+             bg = transparent_grey)
     }
   }
   grDevices::dev.off()
@@ -1186,7 +1186,7 @@ plot_continuous_results <- function(disc_cont,
   # Plot Genotype vs Tree Edge Heatmap
   pheatmap::pheatmap(
     ordered_by_p_val,
-    main = "Continuous Test: Phenotype and Genotype by Tree Edge",
+    main = "Continuous Test: Rows=Tree Edges, Columns=Genotypes",
     cluster_cols = TRUE,
     na_col = "grey",
     cluster_rows = FALSE,
@@ -1197,6 +1197,7 @@ plot_continuous_results <- function(disc_cont,
     annotation_col = column_annot_ordered_by_p_val,
     annotation_row = p_trans_mat,
     annotation_colors = ann_colors,
+    angle_col = 45,
     fontsize = 8,
     cellwidth = cell_width_value)
 
@@ -1213,7 +1214,9 @@ plot_continuous_results <- function(disc_cont,
   rank_mat <- pval_all_transition$hit_pvals
   rank_mat[rank_mat == 0] <- NA
   transparent_grey <- grDevices::rgb(0, 0, 0, 0.25)
+  legend_grey <- grDevices::rgb(0, 0, 0, 0.05)
   transparent_red <- grDevices::rgb(1, 0, 0, 0.25)
+  transparent_teal <- grDevices::rgb(0.4, 0.6, 1, alpha = 0.5, )
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] > fdr) {
       graphics::par(mfrow = c(3, 2),
@@ -1268,38 +1271,42 @@ plot_continuous_results <- function(disc_cont,
                                    transparent_grey,
                                    transparent_red)
       # Plot Null Distribution of gamma
+      p_val_formated <- formatC(pval_all_transition$hit_pvals[j, 1],
+                                format = "e",
+                                digits = 1)
+      p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
+      title_line_one <- expression(paste(beta ["phenotype"],
+                                         intersect(beta ["genotype"]),
+                                         " Null Distribution"))
+      x_min <- min(as.numeric(results_all_trans$null_gamma[[j]]),
+                   results_all_trans$observed_gamma[[j]])
+      x_max <- max(as.numeric(results_all_trans$null_gamma[[j]]),
+                   results_all_trans$observed_gamma[[j]])
+      text_x_coor <- mean(x_min, x_max)
+      title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
+                                     .(p_val_formated),
+                                     " P-value rank = ",
+                                     .(p_val_rank_formated)))
       graphics::hist(log(results_all_trans$null_gamma[[j]]),
-                     # breaks = perm / 10,
-                     col = "grey",
-                     border = FALSE,
-                     main =
-                       paste("Beta(phenotype) Beta(genotype) Intersection Null Distribution\n-ln(FDR Corrected P-value) = ",
-                             formatC(pval_all_transition$hit_pvals[j, 1],
-                                     format = "e",
-                                     digits = 1),
-                             " P-value rank = ",
-                             rank(1 / rank_mat, na.last = TRUE)[j],
-                             sep = ""),
+                     col = transparent_teal,
+                     main = title_line_one,
                      cex.main = hist_cex_size,
                      cex.lab = hist_cex_size,
                      cex.axis = hist_cex_size,
                      ylab = "Count",
-                     xlab = "Beta(phenotype) intersection with Beta(genotype)",
-                     xlim = c(min(as.numeric(results_all_trans$null_gamma[[j]]),
-                                  results_all_trans$observed_gamma[[j]]),
-                              max(as.numeric(results_all_trans$null_gamma[[j]]),
-                                  results_all_trans$observed_gamma[[j]])))
+                     xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
+                     xlim = c(x_min, x_max))
+      graphics::mtext(title_line_two, side = 3)
       graphics::abline(v = as.numeric(results_all_trans$observed_gamma[j]),
-                       col = grDevices::rgb(1, 0, 0, 0.25),
+                       col = transparent_red,
                        lwd = 4)
-
-      graphics::legend("top",
-             title = "Beta(phenotype) intersection with Beta(genotype)",
+      graphics::legend("topright",
+             title = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
              legend = c("Null", "Observed"),
-             col = c("grey", grDevices::rgb(1, 0, 0, 0.25)),
+             col = c(transparent_teal, transparent_red),
              pch = 15,
              cex = hist_cex_size,
-             bg = grDevices::rgb(0, 0, 0, 0.01))
+             bg = legend_grey)
 
     }
   }
