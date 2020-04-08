@@ -140,8 +140,7 @@ hist_raw_hi_conf_delta_pheno <- function(geno_transition,
          legend = c("Transition", "Non-transition"),
          col = c(trans_color, non_trans_color),
          pch = 15,
-         cex = hist_cex_size,
-         bg = legend_grey)
+         cex = hist_cex_size)
 }
 
 #' Draw histogram of the absolute value of phenotype change on each high
@@ -217,8 +216,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
          legend = c("Transition", "Non-transition"),
          col = c(trans_color, non_trans_color),
          pch = 15,
-         cex = hist_cex_size,
-         bg = legend_grey)
+         cex = hist_cex_size)
 }
 
 #' Draw histogram of the absolute value of the phenotype change on each edge
@@ -291,8 +289,7 @@ hist_abs_delta_pheno_all_edges <- function(p_trans_mat,
          legend = c("Hi. Confidence", "Low or Hi. Conf."),
          col = c(transparent_orange, transparent_blue),
          pch = 15,
-         cex = hist_cex_size,
-         bg = legend_grey)
+         cex = hist_cex_size)
 }
 
 #' Draw Manhattan Plot
@@ -703,7 +700,7 @@ plot_phyc_results <- function(tr,
       graphics::mtext(title_line_two, side = 3)
       graphics::legend("topleft",
                        legend = c("Null", "Observed"),
-                       col = c( transparent_teal, transparent_red),
+                       col = c(transparent_teal, transparent_red),
                        pch = 15,
                        cex = hist_cex_size)
     }
@@ -971,8 +968,7 @@ plot_synchronous_results  <- function(tr,
              legend = c("Null", "Observed"),
              col = c(transparent_teal, transparent_red),
              pch = 15,
-             cex = hist_cex_size,
-             bg = transparent_grey)
+             cex = hist_cex_size)
     }
   }
   grDevices::dev.off()
@@ -1333,8 +1329,7 @@ plot_continuous_results <- function(disc_cont,
              legend = c("Null", "Observed"),
              col = c(transparent_teal, transparent_red),
              pch = 15,
-             cex = hist_cex_size,
-             bg = legend_grey)
+             cex = hist_cex_size)
 
     }
   }
