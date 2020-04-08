@@ -119,6 +119,7 @@ run_continuous <- function(args){
   results_object$hit_pvals <- corrected_pvals_all_trans$hit_pvals
   results_object$sig_hits <- corrected_pvals_all_trans$sig_pvals
   results_object$gamma <- gamma
+  results_object$non_FDR_hit_pvals <- results_all_transitions$pvals
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,
