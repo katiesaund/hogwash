@@ -613,7 +613,7 @@ plot_phyc_results <- function(tr,
 
     pheatmap::pheatmap(
       ordered_by_p_val,
-      main = "PhyC Test: Phenotype and Genotype by Tree Edge",
+      main = "PhyC Test: Rows=Tree Edges, Columns=Genotypes",
       cluster_cols  = TRUE,
       legend = FALSE,
       na_col = "grey",
@@ -621,6 +621,7 @@ plot_phyc_results <- function(tr,
       show_rownames = FALSE,
       show_colnames = FALSE,
       color = c("white", "black"),
+      angle_col = 45,
       annotation_col = column_annot_ordered_by_p_val,
       annotation_row = phenotype_annotation,
       annotation_colors = ann_colors,
@@ -673,23 +674,29 @@ plot_phyc_results <- function(tr,
       # Plot Null Distribution Histogram
       max_x <- 1.2 * max(recon_perm_obs_results$permuted_count[[j]],
                    recon_perm_obs_results$observed_overlap[j])
+
+      p_val_formated <- formatC(recon_hit_vals[j, 1], format = "e", digits = 1)
+      p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
+      title_line_one <- expression(paste(beta ["phenotype"],
+                                         intersect(beta ["genotype"]),
+                                         " Null Distribution"))
+      title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
+                                    .(p_val_formated),
+                                    " P-value rank = ",
+                                    .(p_val_rank_formated)))
+
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
                      xlim = c(0, max_x),
                      col = transparent_teal,
                      ylab = "Count",
-                     xlab =
-                       "Genotype Transition & Phenotype Presence Co-occurrence",
-                     main = paste0(
-                       "Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
-                       formatC(recon_hit_vals[j, 1], format = "e", digits = 1),
-                       "\nP-value rank = ",
-                       rank(1 / rank_mat, na.last = TRUE)[j],
-                       sep = ""))
+                     xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
+                     main = title_line_one)
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
                        col = transparent_red,
                        lwd = 4)
+      graphics::mtext(title_line_two, side = 3)
       graphics::legend("topleft",
-                       title = "Co-occurence",
+                       title = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
                        legend = c("Null", "Observed"),
                        col = c( transparent_teal, transparent_red),
                        pch = 15,
@@ -870,7 +877,7 @@ plot_synchronous_results  <- function(tr,
     pheatmap::pheatmap( # Plot the heatmap
       ordered_by_p_val,
       legend = FALSE,
-      main = "Synchronous Test Phenotype and Genotype by Tree Edge",
+      main = "Synchronous Test: Rows=Tree Edges, Columns=Genotypes",
       cluster_cols = TRUE,
       na_col = "grey",
       cluster_rows  = FALSE,
@@ -881,6 +888,7 @@ plot_synchronous_results  <- function(tr,
       annotation_row = phenotype_annotation,
       annotation_colors = ann_colors,
       fontsize = 8,
+      angle_col = 45,
       cellwidth = cell_width_value)
   }
 
@@ -932,23 +940,30 @@ plot_synchronous_results  <- function(tr,
       blank_plot() # Blank plot maintains correct layout
 
       # Plot Null Distribution Histogram
+      p_val_formated <- formatC(trans_hit_vals[j, 1], format = "e", digits = 1)
+      p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
+      title_line_one <- expression(paste(beta ["phenotype"],
+                                        intersect(beta ["genotype"]),
+                                        " Null Distribution"))
+      title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
+                                    .(p_val_formated),
+                                    " P-value rank = ",
+                                    .(p_val_rank_formated)))
+
       max_x <- max(trans_perm_obs_results$permuted_count[[j]],
                    trans_perm_obs_results$observed_overlap[j])
       graphics::hist(trans_perm_obs_results$permuted_count[[j]],
            xlim = c(0, max_x),
            col = transparent_teal,
            ylab = "Count",
-           xlab = "Genotype & Phenotype Transition Edge Co-occurrence",
-           main = paste0("Co-occurence Null Distribution\n -ln(FDR Corrected P-value) = ",
-                         formatC(trans_hit_vals[j, 1], format = "e", digits = 1),
-                         "\nP-value rank = ",
-                         rank(1 / rank_mat, na.last = TRUE)[j],
-                         sep = ""))
+           xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
+           main = title_line_one)
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
                        col = transparent_red,
                        lwd = 4)
-      graphics::legend("topleft",
-             title = "Co-occurence",
+      graphics::mtext(title_line_two, side = 3)
+      graphics::legend("topright",
+             title = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
              legend = c("Null", "Observed"),
              col = c(transparent_teal, transparent_red),
              pch = 15,
@@ -1278,15 +1293,15 @@ plot_continuous_results <- function(disc_cont,
       title_line_one <- expression(paste(beta ["phenotype"],
                                          intersect(beta ["genotype"]),
                                          " Null Distribution"))
-      x_min <- min(as.numeric(results_all_trans$null_gamma[[j]]),
-                   results_all_trans$observed_gamma[[j]])
-      x_max <- max(as.numeric(results_all_trans$null_gamma[[j]]),
-                   results_all_trans$observed_gamma[[j]])
-      text_x_coor <- mean(x_min, x_max)
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
                                      .(p_val_formated),
                                      " P-value rank = ",
                                      .(p_val_rank_formated)))
+      x_min <- min(as.numeric(results_all_trans$null_gamma[[j]]),
+                   results_all_trans$observed_gamma[[j]])
+      x_max <- max(as.numeric(results_all_trans$null_gamma[[j]]),
+                   results_all_trans$observed_gamma[[j]])
+
       graphics::hist(log(results_all_trans$null_gamma[[j]]),
                      col = transparent_teal,
                      main = title_line_one,
