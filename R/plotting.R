@@ -176,7 +176,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
   print(all_trans)
   print("length(all_trans)")
   print(length(all_trans))
-  if (index > length(all_trans)) {
+  if (index > all_trans$num_genotypes) {
     stop("Index must correspond to one of the genotypes")
   }
   check_for_root_and_bootstrap(tr)
