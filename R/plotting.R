@@ -170,10 +170,6 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
                                          trans_color){
   # Check inputs ---------------------------------------------------------------
   check_is_number(index)
-  print("inside function index")
-  print(index)
-  print("all_trans$num_genotypes")
-  print(all_trans$num_genotypes)
   if (index > all_trans$num_genotypes) {
     stop("Index must correspond to one of the genotypes")
   }
@@ -698,7 +694,7 @@ plot_phyc_results <- function(tr,
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
                        col = transparent_red,
                        lwd = 4)
-      graphics::mtext(title_line_two, side = 3)
+      graphics::mtext(title_line_two, side = 3, cex = hist_cex_size)
       graphics::legend("topleft",
                        legend = c("Null", "Observed"),
                        col = c(transparent_teal, transparent_red),
@@ -965,7 +961,7 @@ plot_synchronous_results  <- function(tr,
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
                        col = transparent_red,
                        lwd = 4)
-      graphics::mtext(title_line_two, side = 3)
+      graphics::mtext(title_line_two, side = 3, cex = hist_cex_size)
       graphics::legend("topright",
              legend = c("Null", "Observed"),
              col = c(transparent_teal, transparent_red),
@@ -1237,7 +1233,7 @@ plot_continuous_results <- function(disc_cont,
   transparent_teal <- grDevices::rgb(0.4, 0.6, 1, alpha = 0.5, )
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] > fdr) {
-      graphics::par(mfrow = c(3, 2),
+      graphics::par(mfrow = c(2, 2),
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4),
@@ -1267,23 +1263,13 @@ plot_continuous_results <- function(disc_cont,
                             "Transition")
       # Histogram of the |delta phenotype| by edge, colored by all edges vs high
       #   conf. edges
-      mat_p_trans_mat <- as.matrix(p_trans_mat)
-      hist_abs_delta_pheno_all_edges(mat_p_trans_mat,
-                                     geno_confidence,
-                                     tr,
-                                     j)
+      # mat_p_trans_mat <- as.matrix(p_trans_mat)
+      # hist_abs_delta_pheno_all_edges(mat_p_trans_mat,
+      #                                geno_confidence,
+      #                                tr,
+      #                                j)
       # Histogram of the |delta phenotype| for only high conf. edges, colored by
-      #   genotype non-transition vs transition edges
-
-      print("j outside function")
-      print(j)
-      print("pval_all_transition$hit_pvals[j, ]")
-      print(pval_all_transition$hit_pvals[j, ])
-      print("str(results_all_trans)")
-      print(str(results_all_trans))
-      print("results_all_trans$num_genotypes")
-      print(results_all_trans$num_genotypes)
-
+      #   genotype non-transition vs transition edges.
       hist_abs_hi_conf_delta_pheno(results_all_trans,
                                    tr,
                                    j,
@@ -1291,13 +1277,13 @@ plot_continuous_results <- function(disc_cont,
                                    transparent_red)
       # Histogram of the raw delta phenotype for only high conf. edges, colored
       #   by genotype non-transition vs transition edges
-      hist_raw_hi_conf_delta_pheno(geno_transition,
-                                   geno_confidence,
-                                   pheno_recon_ordered_by_edges,
-                                   tr,
-                                   j,
-                                   transparent_grey,
-                                   transparent_red)
+      # hist_raw_hi_conf_delta_pheno(geno_transition,
+      #                              geno_confidence,
+      #                              pheno_recon_ordered_by_edges,
+      #                              tr,
+      #                              j,
+      #                              transparent_grey,
+      #                              transparent_red)
       # Plot Null Distribution of gamma
       p_val_formated <- formatC(pval_all_transition$hit_pvals[j, 1],
                                 format = "e",
@@ -1310,8 +1296,7 @@ plot_continuous_results <- function(disc_cont,
                                      .(p_val_formated),
                                      " P-value rank = ",
                                      .(p_val_rank_formated)))
-      x_min <- min(as.numeric(results_all_trans$null_gamma[[j]]),
-                   results_all_trans$observed_gamma[[j]])
+      x_min <- 0
       x_max <- max(as.numeric(results_all_trans$null_gamma[[j]]),
                    results_all_trans$observed_gamma[[j]])
 
@@ -1324,7 +1309,7 @@ plot_continuous_results <- function(disc_cont,
                      ylab = "Count",
                      xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
                      xlim = c(x_min, x_max))
-      graphics::mtext(title_line_two, side = 3)
+      graphics::mtext(title_line_two, side = 3, cex = hist_cex_size)
       graphics::abline(v = as.numeric(results_all_trans$observed_gamma[j]),
                        col = transparent_red,
                        lwd = 4)
