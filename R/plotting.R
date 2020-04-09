@@ -694,7 +694,7 @@ plot_phyc_results <- function(tr,
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
                        col = transparent_red,
                        lwd = 4)
-      graphics::mtext(title_line_two, side = 3, cex = hist_cex_size)
+      graphics::mtext(title_line_two, side = 3, cex = .6 * hist_cex_size)
       graphics::legend("topleft",
                        legend = c("Null", "Observed"),
                        col = c(transparent_teal, transparent_red),
@@ -961,7 +961,7 @@ plot_synchronous_results  <- function(tr,
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
                        col = transparent_red,
                        lwd = 4)
-      graphics::mtext(title_line_two, side = 3, cex = hist_cex_size)
+      graphics::mtext(title_line_two, side = 3, cex = .6 * hist_cex_size)
       graphics::legend("topright",
              legend = c("Null", "Observed"),
              col = c(transparent_teal, transparent_red),
@@ -1309,7 +1309,7 @@ plot_continuous_results <- function(disc_cont,
                      ylab = "Count",
                      xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
                      xlim = c(x_min, x_max))
-      graphics::mtext(title_line_two, side = 3, cex = hist_cex_size)
+      graphics::mtext(title_line_two, side = 3, cex = .6 * hist_cex_size)
       graphics::abline(v = as.numeric(results_all_trans$observed_gamma[j]),
                        col = transparent_red,
                        lwd = 4)
