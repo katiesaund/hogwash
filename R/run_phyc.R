@@ -10,7 +10,11 @@ run_phyc <- function(args){
   # FORMAT INPUTS -------------------------------------------------------------#
   results_object <- NULL
   results_object$log <- utils::capture.output(utils::sessionInfo())
+
   args$tree <- format_tree(args$tree)
+  args$phenotype <- match_order_to_tree_tips(args$tree, args$phenotype)
+  args$genotype <- match_order_to_tree_tips(args$tree, args$genotype)
+
   geno <- prepare_genotype(args$group_genotype,
                            args$genotype,
                            args$tree,
