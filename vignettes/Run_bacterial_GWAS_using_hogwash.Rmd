@@ -195,7 +195,38 @@ Genotype:
    
 
 ### Phylogenetic tree
-The phylogenetic tree should be rooted, but if not the tree will be rooted using the midpoint method. The tree must be fully bifurcating. I recommend building your phylogenetic tree with an outgroup, root using the outgroup, and then remove the outgroup prior to running hogwash. 
+The phylogenetic tree should be rooted. You can check if your tree is rooted by running: 
+```{r}
+ape::is.rooted(tree)
+```
+This will return a logical (TRUE OR FALSE).  
+
+If the tree is not rooted, either:  
+
+* root the tree either to an outgroup and then remove the outgroup from the tree, phenotype, and genotype (in this example assume tip t4 is the outgroup)  
+* or use the midpoint rooting method and reorder your phenotype and genotype to the new order.   
+```{r}
+# Outgroup method
+tree_og_rooted <- ape::root.phylo(tree, outgroup = "t4")
+tree_og_rooted <- ape::drop.tip(tree, tip = "t4")
+
+growth_phenotype_no_og <- growth_phenotype[row.names(growth_phenotype) %in% tree_og_rooted$tip.label, , drop = FALSE]
+growth_phenotype_no_og <- growth_phenotype_no_og[match(row.names(growth_phenotype_no_og), tree_og_rooted$tip.label), , drop = FALSE]
+
+snp_genotype_no_og <- snp_genotype[row.names(snp_genotype) %in% tree_og_rooted$tip.label, , drop = FALSE]
+snp_genotype_no_og <- snp_genotype_no_og[match(row.names(snp_genotype_no_og), tree_og_rooted$tip.label), , drop = FALSE]
+
+# Midpoint root method
+tree_midpoint <- phytools::midpoint.root(tree)
+growth_phenotype_midpoint <- growth_phenotype[row.names(growth_phenotype) %in% tree_midpoint$tip.label, , drop = FALSE]
+growth_phenotype_midpoint <- growth_phenotype_midpoint[match(row.names(growth_phenotype_midpoint), tree_midpoint$tip.label), , drop = FALSE]
+
+snp_genotype_midpoint <- snp_genotype[row.names(snp_genotype) %in% tree_midpoint$tip.label, , drop = FALSE]
+snp_genotype_midpoint <- snp_genotype_midpoint[match(row.names(snp_genotype_midpoint), tree_midpoint$tip.label), , drop = FALSE]
+```
+
+The tree must be fully bifurcating. I recommend building your phylogenetic tree with an outgroup, root using the outgroup, and then remove the outgroup prior to running hogwash. 
+
 
 ```{r, echo = FALSE, out.width = "700px", }
 knitr::include_graphics("tree_with_nomenclature_for_wiki.png")
