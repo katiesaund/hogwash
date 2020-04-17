@@ -103,7 +103,6 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   return(pheno_vector)
 }
 
-
 #' Order the phenotype or genotype matrices to match the order of tree tips
 #'
 #' @param tree Phylo
