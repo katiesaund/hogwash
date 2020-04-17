@@ -3,7 +3,9 @@
 #' @description For a phylogenetic tree convert all bootstrap support values to
 #'   numeric (from character). Typically, a tree's root doesn't have a value but
 #'   this adds a zero to that location (if necessary) because functions later in
-#'   hogwash require that all nodes have numeric values.
+#'   hogwash require that all nodes have numeric values. This function also
+#'   makes sure that the tree$tip.label are in the same order as they are listed
+#'   in tree$edge.
 #'
 #' @param tr Phylo.
 #'
@@ -19,6 +21,16 @@ format_tree <- function(tr){
   if (!ape::is.rooted(tr)) {
     tr <- phytools::midpoint.root(tr)
   }
+
+  # Make sure that the tr$tip.label is organized in the same order as the tips
+  # as linsed in tr$edge these things sometimes don't agree. I have found that
+  # this happenes when the tree gets unrooted or rooted. This is not included in
+  # the above if statement because the user may supply a rooted tree where the
+  # tip.label != the edges because they rooted it prior to supplying it as an
+  # input.
+  tip_log <- tr$edge[, 2] <= ape::Ntip(tr)
+  ordered_tips <- tr$edge[tip_log, 2]
+  tr$tip.label <- tr$tip.label[ordered_tips]
 
   # Function -------------------------------------------------------------------
   for (i in 1:ape::Nnode(tr)) {
@@ -89,4 +101,26 @@ prepare_phenotype <- function(pheno, disc_cont, tr){
   # Check and return output ----------------------------------------------------
   check_equal(length(pheno_vector), ape::Ntip(tr))
   return(pheno_vector)
+}
+
+
+#' Order the phenotype or genotype matrices to match the order of tree tips
+#'
+#' @param tree Phylo
+#' @param mat Phenotype or genotype matrix
+#'
+#' @return matrix
+#' @noRd
+match_order_to_tree_tips <- function(tree, mat) {
+  check_for_root_and_bootstrap(tree)
+
+    # Function -------------------------------------------------------------------
+  mat <- mat[row.names(mat) %in% tree$tip.label, , drop = FALSE]
+  mat <- mat[match(tree$tip.label, row.names(mat)), , drop = FALSE]
+
+  # Check and return output ----------------------------------------------------
+  if (!setequal(tree$tip.label, row.names(mat))) {
+    stop("Tree and variant matrix sample names do not match.")
+  }
+  return(mat)
 }
