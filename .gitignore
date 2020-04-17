@@ -9,3 +9,4 @@ Meta
 *dummy*.rda
 *.Rcheck
 test/*/*.rda
+.DS_Store
