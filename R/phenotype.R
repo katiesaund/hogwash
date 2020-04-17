@@ -141,7 +141,8 @@ report_phylogenetic_signal <- function(pheno, tree, root = TRUE){
 
   if (root) {
     tree <- phytools::midpoint.root(tree)
-    # TODO reorder phenotype by tree tips
+    pheno <- pheno[row.names(pheno) %in% tree$tip.label, , drop = FALSE]
+    pheno <- pheno[match(row.names(growth_phenotype_midpoint), tree$tip.label), , drop = FALSE]
   }
 
   if (cont_or_disc == "continuous") {
