@@ -158,14 +158,21 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
 #'   }
 #' @return results. List of three objects:
 #'   \describe{
-#'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
-#'     value.}
-#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
-#'     Length == number of genotypes.}
+#'     \item{gamma_avg}{Numeric. Average of gamma_percent value of all
+#'     genotypes. A single value.}
+#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype
+#'     divided by the number of high confidence edges. Length == number of
+#'     genotypes.}
 #'     \item{gamma_count}{Numeric vector. Raw gamma value for each genotype.
 #'     Length == number of genotypes.}
+#'     \item{num_hi_conf_edges}{Number of high confidence edges.}
+#'     \item{pheno_beta}{Numeric vector. Beta(phenotype). Length == number of
+#'     genotypes.}
+#'     \item{geno_beta}{Numeric vector. Beta(genotype). Length == number of
+#'     genotypes.}
+#'     \item{epsilon}{Numeric vector. Epsilon value for each genotype. Length ==
+#'     number of genotypes.}
 #'   }
-#'   # TODO add more return descriptions
 #' @noRd
 calculate_continuous_gamma <- function(pheno_recon_mat,
                                        high_conf){
