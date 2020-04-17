@@ -12,11 +12,11 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(hogwash)
 ```
 
-Bacterial GWAS are the application of the GWAS method, pioneered in humans since the mid-2000s, to bacterial genomes. Bacterial genomes present different pros and cons that human genomes when applying GWAS methods. Bacteria have clonal populations, so it's easy to identify false positives when associating genetic loci with phenotypes therefore it's critical to control for population structure during association testing.
+Bacterial GWAS are the application of the GWAS method, pioneered in humans since the 2000s, to bacterial genomes. Bacterial genomes present different pros and cons that human genomes when applying GWAS methods. Bacteria have clonal populations, so it's easy to identify false positives when associating genetic loci with phenotypes. It is critical to control for population structure during association testing.
 
 The hogwash package makes it straight forward to test for associations between the presence of genetic viarants and a binary or continuous phenotype. 
 
-This document introduces you to the hogwash methods and shows you how to run the code on your computer. 
+This document introduces you to the three hogwash methods and shows you how to run the code on your computer. 
 
 # How hogwash works   
 This package reads in one phenotype (either continuous or binary), a matrix of binary genotypes, and a phylogenetic tree. Given these inputs it performs an ancestral reconstruction of that phenotype and each genotype. The ancestral reconstructions are used to perform one of several tests to associate the the genotypes with the phenotype: 
@@ -25,10 +25,10 @@ This package reads in one phenotype (either continuous or binary), a matrix of b
 2. Synchronous Test
 3. PhyC 
   
-Once a test finishes running it returns (i) p-values for all genotypes tested, (ii) a manhattan plot of those p-values; if any of the genotypes tested were significant associated with the phenotype after FDR correction it also returns (iii) a list of significant hits and (iv) figures of the genotype & phenotype reconstructions on the tree.  
+Once a test finishes running it returns data to summarize the results, including a P-value for each tested genotype, and plots of the data.
 
 ### Grouping 
-A unique feature of hogwash is the ability to organize genotypes into biologically meaningful groups. Testing for an association between an individual SNP and a phenotype is quite stringent, but patterns may emerge when grouping together biologically related genotypes. For example, grouping together all variants (insertions, deletions and SNPs) within a gene or promoter region could allow the user to identify a particular gene as being associated with a phenotype while any individual variant within that gene may not have deep penetrance in the isolates being tested. Grouped genotypes could have increased power to identify convergent evolution because they captures larger trends in functional impact at the group level and reduce the multiple testing correction burden. Use cases for this method could be to group SNPs into genes, kmers or genes into pathways, etc... Each of the three tests can be run on disaggregated data or aggregated data with the inclusion of a grouping key which is described later on the inputs page. 
+A unique feature of hogwash is the ability to organize genotypes into biologically meaningful groups. Testing for an association between an individual SNP and a phenotype is quite stringent, but patterns may emerge when grouping together biologically related genotypes. For example, grouping together all variants (insertions, deletions and SNPs) within a gene or promoter region could allow the user to identify a particular gene as being associated with a phenotype while any individual variant within that gene may not have deep penetrance in the isolates being tested. Grouped genotypes could have increased power to identify convergent evolution because they captures larger trends in functional impact at the group level and reduce the multiple testing correction burden. Use cases for this method could be to group SNPs into genes, kmers or genes into pathways, etc... Each of the three tests can be run on disaggregated data or aggregated data with the inclusion of a grouping key which is described later. 
 
 ### A note on nomenclature: 
 #### Talking about phylogenetic trees: 
@@ -42,7 +42,7 @@ knitr::include_graphics("tree_with_nomenclature_for_wiki.png")
 ```
 
 #### Convergent evolution vs parallel evolution:
-While convergent evolution and parallel evolution have specific meanings, those definitions are often confused and hard to disentangle. I’ve found that the nuanced differences between convergent and parallel evolution are frequently lost in conversation. For the purposes of this software package, I prefer to call all episodes of independent evolution of a trait "convergence." 
+While convergent evolution and parallel evolution have specific meanings, those definitions are often interchanged. For the purposes of this software package, I prefer to call all episodes of independent evolution of a trait "convergence." 
 
 ## All tests start with ancestral reconstruction & confidence
 ### Ancestral reconstruction
@@ -53,7 +53,7 @@ Binary phenotype:
 knitr::include_graphics("ancestral_reconstruction.png")
 ```
 
-From the ancestral reconstruction above we infer that antibiotic resistance evolved three separate times: 
+From the ancestral reconstruction above we may infer that antibiotic resistance evolved three separate times: 
 
 1. Ancestor to t1 & t9
 2. Ancestor to t7
@@ -90,11 +90,11 @@ knitr::include_graphics("continuous_algorithm_demo.png")
 
 Left panel: the delta phenotype is noticeably higher on transition edges (purple), suggesting an association between a change in the genotype and a change in the phenotype. Right panel: the two delta phenotype distributions are nearly identical, suggesting the genotype transitions are not associated with phenotype changes.    
 
-fThe two phenotype distributions are compared using a two-sample Kolmogorov–Smirnov (KS) test. The test's output, the KS test statistic, is recorded. Then a permutation test is performed wherein the classification of each edge as a genotype transition or non-transition edge is randomized. The KS test is repeated on the permuted data. An empirical p-value is calculated based on the observed vs. permuted KS test statistics. 
+The sum of delta phenotype on only genotype transition edges calculated. Then a permutation test is performed wherein the classification of each edge as a genotype transition or non-transition edge is randomized. The new sum of delta phenotype on the permuted genotype transition edges is calculated. An empirical p-value is calculated based on the observed vs. permuted sums.
 
 ## 2. Synchronous test (input: binary phenotype)
 ### Do genotype transitions occur more often than expected by chance on phenotype transition edges than on phenotype non-transition edges?
-This test is an extension of PhyC (see below), but with the goal of decreasing false positive by requiring more stringent association between the genotype and phenotype. The number of edges on the tree where both a genotype transition and phenotype transition occurs is calculated. Then a permutation test is run where the classification of edges as genotype transition edges are randomized on the tree. The number of edges where the permuted genotype transitions coincide with the phenotype transition is recorded for each permutation, creating a null distribution. An empirical p-value is calculated based on the observed number of edges as compared to the null distribution. 
+This test is an extension of PhyC (see below), but with the goal of requiring a more stringent association between the genotype and phenotype. The number of edges on the tree where both a genotype transition and phenotype transition occurs is calculated. Then a permutation test is run where the classification of edges as genotype transition edges are randomized on the tree. The number of edges where the permuted genotype transitions coincide with the phenotype transition is recorded for each permutation, creating a null distribution. An empirical p-value is calculated based on the observed number of edges as compared to the null distribution. 
 
 Transition edges are defined as in (1.) but phenotypes, which are now binary, are also classified in this way:
 
@@ -133,7 +133,12 @@ Edges definitions are as follows:
 | Present| mutant (1) |  
 | Absent | wild type (0) |  
 
-*Note: PhyC was originally implemented with Bonferroni multiple test correction, but this implementation uses False Discovery Rate. 
+*Note: Our implementation of PhyC has some changes from the original: 
+* PhyC was originally implemented with Bonferroni multiple test correction, but this implementation uses False Discovery Rate.
+* Hogwash reduces the multiple testing burden by testing only those genotype-phenotype pairs for which convergence is detectable; genotypes fewer than 2 transition edges are excluded and genotype-phenotype pairs with fewer than 2 edges where the genotype transition overlaps with phenotype presence are assigned a P-value of 1. 
+* Ancestral reconstruction for genotypes and phenotypes was performed using only maximum likelihood (the original PhyC used multiple approaches). 
+* Users only supply one phylogenetic tree to hogwash instead of three. 
+Largely, these changes were implemented to make hogwash fast and easy to use. 
 
 ## Comparing the three tests: 
 
@@ -183,7 +188,7 @@ Continuous phenotype:
 | sample_4 | 2.70 |    
 
 ### Genotype
-The required structure of the genotype data object is a matrix. The rows correspond to samples and should be ordered to match the tips of the phylogenetic tree. The columns correspond to individual genotypes. The matrix should have both row names and column names. The row names must exactly match the tree’s tip labels. Genotypes can be SNPs (core genome), genes (accessory genome) or other types (indels, pathways, etc...). Genotypes must be coded a binary (0/1).  
+The required structure of the genotype data object is a matrix. The rows correspond to samples and should be ordered to match the tips of the phylogenetic tree. The columns correspond to individual genotypes. The matrix should have both row names and column names. The row names must exactly match the tree’s tip labels. Genotypes can be SNPs (core genome), genes (accessory genome) or other types (indels, pathways, etc...). Genotypes must be coded in binary (0/1).  
 Genotype:  
 
 |                  | SNP_1 | SNP_2 | SNP_3 | SNP_4 | SNP_5 |         
@@ -204,26 +209,8 @@ This will return a logical (TRUE OR FALSE).
 If the tree is not rooted, either:  
 
 * root the tree either to an outgroup and then remove the outgroup from the tree, phenotype, and genotype (in this example assume tip t4 is the outgroup)  
-* or use the midpoint rooting method and reorder your phenotype and genotype to the new order.   
-```{r}
-# Outgroup method
-tree_og_rooted <- ape::root.phylo(tree, outgroup = "t4")
-tree_og_rooted <- ape::drop.tip(tree, tip = "t4")
-
-growth_phenotype_no_og <- growth_phenotype[row.names(growth_phenotype) %in% tree_og_rooted$tip.label, , drop = FALSE]
-growth_phenotype_no_og <- growth_phenotype_no_og[match(row.names(growth_phenotype_no_og), tree_og_rooted$tip.label), , drop = FALSE]
-
-snp_genotype_no_og <- snp_genotype[row.names(snp_genotype) %in% tree_og_rooted$tip.label, , drop = FALSE]
-snp_genotype_no_og <- snp_genotype_no_og[match(row.names(snp_genotype_no_og), tree_og_rooted$tip.label), , drop = FALSE]
-
-# Midpoint root method
-tree_midpoint <- phytools::midpoint.root(tree)
-growth_phenotype_midpoint <- growth_phenotype[row.names(growth_phenotype) %in% tree_midpoint$tip.label, , drop = FALSE]
-growth_phenotype_midpoint <- growth_phenotype_midpoint[match(row.names(growth_phenotype_midpoint), tree_midpoint$tip.label), , drop = FALSE]
-
-snp_genotype_midpoint <- snp_genotype[row.names(snp_genotype) %in% tree_midpoint$tip.label, , drop = FALSE]
-snp_genotype_midpoint <- snp_genotype_midpoint[match(row.names(snp_genotype_midpoint), tree_midpoint$tip.label), , drop = FALSE]
-```
+* use the midpoint rooting method and reorder your phenotype and genotype to the new order
+* or supply it to hogwash and the function will midpoint root the tree automatically. 
 
 The tree must be fully bifurcating. I recommend building your phylogenetic tree with an outgroup, root using the outgroup, and then remove the outgroup prior to running hogwash. 
 
@@ -238,20 +225,21 @@ hogwash allows the user to create ancestral reconstructions for individual genot
 
 Requiring that an individual SNP occur in multiple lineages may be too stringent, but instead if all relevant SNPs from a gene are grouped together the power to identify convergent evolution will be increased because this grouping method could capture larger trends in functional impact at the gene level and a reduce the multiple testing correction burden. Use cases for this method could be to group SNPs into genes or genes into pathways. 
 
-The required structure of the grouping genotypes key data object is a matrix. Each row corresponds to one genotype. The first column must have the names of every genotype included in the genotype matrix. The second column must have a name for a group to which the item in the first column belongs. Row names are not required. The column names are used in output plots and therefore must be included. 
+The required structure of the grouping genotypes key data object is a matrix. Each row corresponds to a genotype. The first column must have the name of a genotype included in the genotype matrix. The second column must have a name for a group to which the item in the first column belongs. Row names are not required. The column names are used in output plots and therefore must be included. 
   
-|  SNP   | GENE     |           
+|  SNP   | GROUP     |           
 |----------|--------------|      
-|SNP_1 | GENE_A |    
+|SNP_1 | GENE_A |   
+|SNP_1 | PATH_A | 
 |SNP_2 | GENE_A |  
 |SNP_3 | GENE_B |  
 |SNP_4 | GENE_C |   
 |SNP_5 | GENE_A |   
 |SNP_6 | GENE_D |   
-|SNP_7 | GENE_D |   
-  
+|SNP_6 | PATH_A |   
+
 ### Permutation number  
-The default value is 10,000. Larger values may take prohibitively long to run.  
+The default value is 10,000.
   
 ### False discovery rate  
 The default value is 0.15.   
@@ -292,7 +280,8 @@ Run the Synchronous Test & PhyC
 ```{r, eval=FALSE}
 hogwash(pheno = antibiotic_phenotype, 
         geno = snp_genotype,  
-        tree = tree)
+        tree = tree, 
+        test = "both)
 ```
 The results of running the  Synchronous Test & PhyC are now saved in four documents: 
 
@@ -309,7 +298,8 @@ Run the Synchronous Test & PhyC but group SNPs from the same gene together.
 hogwash(pheno = antibiotic_phenotype, 
         geno = snp_genotype,  
         tree = tree, 
-        group_genotype_key = key)
+        group_genotype_key = key, 
+        test = "both)
 
 ```
 The results of running the  Synchronous Test & PhyC with grouped genotypes are now saved in four documents: 
@@ -321,13 +311,15 @@ The results of running the  Synchronous Test & PhyC with grouped genotypes are n
 
 * hogwash_phyc_grouped_TODAYS_DATE.rda
 
+You can run just one of the two discrete tests by change the `test = "both"` to either `test = "phyc"` or `test = "synchronous"`. 
+
 ## Interpreting the results
 The pdf file contains all of the plots while the rda file contains all of the statistics, results, and tables. 
 
 # Plots
 
 ## All three tests: 
-Each test will return a .pdf with at least a manhattan plot of the genetic loci (x-axis) vs. the -ln(p-value) (y-axis). The horizontal red line is the threshold for significance, with significant loci appearing above the line. Only significant loci will be labeled.  
+Each test will return a .pdf with at least a Manhattan plot of the genetic loci (x-axis) vs. the -ln(p-value) (y-axis). The horizontal red line is the threshold for significance provided by the user (default FDR = 0.15), with significant loci appearing above the line.
   
   
 ```{r, echo = FALSE, out.width = "700px", }
