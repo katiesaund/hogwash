@@ -1,4 +1,295 @@
 context("Phenotype") #---------------------------------------------------------#
+# test internal_report_phylogenetic_signal
+test_that("internal_report_phylogenetic_signal gives no errors for correct inputs",  {
+  # Discrete, random
+  num_tip <- 25
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  row.names(pheno) <- tree$tip.label
+  expect_error(internal_report_phylogenetic_signal(pheno, tree), NA)
+
+  # discrete, BM
+  set.seed(210)
+  pheno <- as.matrix(ape::rTraitDisc(tree, model = "ER", k = 2), nrow = num_tip, ncol = 1)
+  pheno[pheno == "A", ] <- 0
+  pheno[pheno == "B", ] <- 1
+  storage.mode(pheno) <- "numeric"
+  expect_error(internal_report_phylogenetic_signal(pheno, tree), NA)
+
+  # continuous, random
+  set.seed(1)
+  pheno <- matrix(rnorm(n = num_tip, mean = 1, sd = 0.6))
+  row.names(pheno) <- tree$tip.label
+  expect_error(internal_report_phylogenetic_signal(pheno, tree), NA)
+
+  # continuous, BM
+  set.seed(1)
+  pheno <- as.matrix(ape::rTraitCont(tree, model = "BM"), nrow = num_tip, ncol = 1)
+  expect_error(internal_report_phylogenetic_signal(pheno, tree), NA)
+})
+
+test_that("internal_report_phylogenetic_signal gives errors for incorrect inputs",  {
+  # no tree
+  num_tip <- 25
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  set.seed(1)
+  tree <- "foo"
+  expect_error(internal_report_phylogenetic_signal(pheno, tree))
+
+  # dataframe instead of matrix
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  set.seed(210)
+  pheno <- as.matrix(ape::rTraitDisc(tree, model = "ER", k = 2),
+                     nrow = num_tip,
+                     ncol = 1)
+  pheno[pheno == "A", ] <- 0
+  pheno[pheno == "B", ] <- 1
+  storage.mode(pheno) <- "numeric"
+  pheno <- as.data.frame(pheno)
+  expect_error(internal_report_phylogenetic_signal(pheno, tree))
+
+  # characters instead of numerics
+  set.seed(210)
+  pheno <- as.matrix(ape::rTraitDisc(tree, model = "ER", k = 2), nrow = num_tip, ncol = 1)
+  expect_error(internal_report_phylogenetic_signal(pheno, tree))
+
+  # vector instead of matrix
+  set.seed(1)
+  pheno <- ape::rTraitCont(tree, model = "BM")
+  expect_error(internal_report_phylogenetic_signal(pheno, tree))
+})
+
+test_that("internal_report_phylogenetic_signal gives no errors for correct inputs, but not in the same order / unrooted",  {
+  # not in the same order
+  num_tip <- 25
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  row.names(pheno) <- paste0("t", 1:num_tip)
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  expect_error(internal_report_phylogenetic_signal(pheno, tree), NA)
+
+})
+
+
+
+## ------
+
+# test report_phylogenetic_signal()
+test_that("report_phylogenetic_signal gives no errors for correct inputs",  {
+  # Discrete, random
+  num_tip <- 25
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  row.names(pheno) <- tree$tip.label
+  expect_error(report_phylogenetic_signal(pheno, tree), NA)
+
+  # discrete, BM
+  set.seed(210)
+  pheno <- as.matrix(ape::rTraitDisc(tree, model = "ER", k = 2), nrow = num_tip, ncol = 1)
+  pheno[pheno == "A", ] <- 0
+  pheno[pheno == "B", ] <- 1
+  storage.mode(pheno) <- "numeric"
+  expect_error(report_phylogenetic_signal(pheno, tree), NA)
+
+  # continuous, random
+  set.seed(1)
+  pheno <- matrix(rnorm(n = num_tip, mean = 1, sd = 0.6))
+  row.names(pheno) <- tree$tip.label
+  expect_error(report_phylogenetic_signal(pheno, tree), NA)
+
+  # continuous, BM
+  set.seed(1)
+  pheno <- as.matrix(ape::rTraitCont(tree, model = "BM"), nrow = num_tip, ncol = 1)
+  expect_error(report_phylogenetic_signal(pheno, tree), NA)
+})
+
+test_that("report_phylogenetic_signal gives errors for incorrect inputs",  {
+  # no tree
+  num_tip <- 25
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  set.seed(1)
+  tree <- "foo"
+  expect_error(report_phylogenetic_signal(pheno, tree))
+
+  # dataframe instead of matrix
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  set.seed(210)
+  pheno <- as.matrix(ape::rTraitDisc(tree, model = "ER", k = 2),
+                     nrow = num_tip,
+                     ncol = 1)
+  pheno[pheno == "A", ] <- 0
+  pheno[pheno == "B", ] <- 1
+  storage.mode(pheno) <- "numeric"
+  pheno <- as.data.frame(pheno)
+  expect_error(report_phylogenetic_signal(pheno, tree))
+
+  # characters instead of numerics
+  set.seed(210)
+  pheno <- as.matrix(ape::rTraitDisc(tree, model = "ER", k = 2), nrow = num_tip, ncol = 1)
+  expect_error(report_phylogenetic_signal(pheno, tree))
+
+  # vector instead of matrix
+  set.seed(1)
+  pheno <- ape::rTraitCont(tree, model = "BM")
+  expect_error(report_phylogenetic_signal(pheno, tree))
+})
+
+test_that("report_phylogenetic_signal gives no errors for correct inputs, but not in the same order / unrooted",  {
+  # not in the same order
+  num_tip <- 25
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  row.names(pheno) <- paste0("t", 1:num_tip)
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  expect_error(report_phylogenetic_signal(pheno, tree), NA)
+
+  # unrooted
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  row.names(pheno) <- paste0("t", 1:num_tip)
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  tree <- ape::unroot(tree)
+  expect_error(report_phylogenetic_signal(pheno, tree), NA)
+})
+
+
+# calculate_lambda
+test_that("calculate_lambda gives a lambda value for good data", {
+  num_tip <- 25
+
+  # continuous, random
+  set.seed(1)
+  pheno <- matrix(rnorm(n = num_tip, mean = 1, sd = 0.6))
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  row.names(pheno) <- tree$tip.label
+  expect_error(calculate_lambda(pheno, tree), NA)
+  expect_equal(round(calculate_lambda(pheno, tree), 5), .00007)
+
+  # continuous, BM
+  set.seed(1)
+  pheno <- as.matrix(ape::rTraitCont(tree, model = "BM"), nrow = num_tip, ncol = 1)
+  expect_error(calculate_lambda(pheno, tree), NA)
+  expect_equal(round(calculate_lambda(pheno, tree), 5), 1.00064)
+})
+
+test_that("calculate_lambda gives error for bad data", {
+  num_tip <- 25
+
+  # phenotype / tree tips don't match
+  set.seed(1)
+  pheno <- matrix(rnorm(n = num_tip, mean = 1, sd = 0.6))
+  row.names(pheno) <- paste0("t", 1:25)
+  expect_error(calculate_lambda(pheno, tree))
+})
+
+# report_lambda
+test_that("Each case of report_lambda is covered", {
+  lambda <- -10
+  expect_error(report_lambda(lambda), NA)
+
+  lamdba <- 0
+  expect_error(report_lambda(lambda), NA)
+
+  lambda <- 0.5
+  expect_error(report_lambda(lambda), NA)
+
+  lambda <- 1
+  expect_error(report_lambda(lambda), NA)
+
+  lambda <- 10
+  expect_error(report_lambda(lambda), NA)
+})
+
+test_that("Error message if not given a number", {
+  lambda <- "foo"
+  expect_error(report_lambda(lambda))
+
+  lamdba <- matrix(0, 1, 1)
+  expect_error(report_lambda(lambda))
+})
+
+# test calculate_d
+test_that("calculate_d gives no errors when running on valid inputs", {
+  # Discrete, random
+  num_tip <- 25
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  row.names(pheno) <- tree$tip.label
+  expect_error(calculate_d(pheno, tree), NA)
+  set.seed(1)
+  out <- round(calculate_d(pheno, tree), 2) # ~1.35
+  expect_true(out < 1.5)
+  expect_true(out > 1.2)
+
+  # discrete, BM
+  set.seed(210)
+  pheno <- as.matrix(ape::rTraitDisc(tree, model = "ER", k = 2), nrow = num_tip, ncol = 1)
+  pheno[pheno == "A", ] <- 0
+  pheno[pheno == "B", ] <- 1
+  storage.mode(pheno) <- "numeric"
+  expect_error(calculate_d(pheno, tree), NA)
+  set.seed(1)
+  out <- round(calculate_d(pheno, tree), 2) # ~1.01
+  expect_true(out < -.85)
+  expect_true(out > -1.15)
+})
+
+test_that("calculate_d gives errors when running on invalid inputs", {
+  # bad tree
+  num_tip <- 25
+  set.seed(1)
+  pheno <- matrix(rbinom(num_tip, 1, 0.6))
+  row.names(pheno) <- paste0("t", 1:num_tip)
+  tree <- "foo"
+  expect_error(calculate_d(pheno, tree))
+
+  # bad pheno
+  set.seed(1)
+  tree <- ape::rcoal(n = num_tip)
+  pheno <- "foo"
+  expect_error(calculate_d(pheno, tree))
+})
+
+
+# report_d
+test_that("Each case of report_d is covered", {
+  dstat <- -10
+  expect_error(report_d(dstat), NA)
+
+  dstat <- 0
+  expect_error(report_d(dstat), NA)
+
+  dstat <- 0.5
+  expect_error(report_d(dstat), NA)
+
+  dstat <- 1
+  expect_error(report_d(dstat), NA)
+
+  dstat <- 10
+  expect_error(report_d(dstat), NA)
+})
+
+test_that("Error message if not given a number", {
+  dstat <- "foo"
+  expect_error(report_d(dstat))
+
+  dstat <- matrix(0, 1, 1)
+  expect_error(report_d(dstat))
+})
 
 # test assign_pheno_type()
 test_that("assign_pheno_type returns discrete for a discrete phenotype
