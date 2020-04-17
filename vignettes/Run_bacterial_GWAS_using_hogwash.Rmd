@@ -25,7 +25,7 @@ This package reads in one phenotype (either continuous or binary), a matrix of b
 2. Synchronous Test
 3. PhyC 
   
-Once a test finishes running it returns data to summarize the results, including a P-value for each tested genotype, and plots of the data.
+Once a test finishes running it returns data to summarize the results, including a _P_-value for each tested genotype, and plots of the data.
 
 ### Grouping 
 A unique feature of hogwash is the ability to organize genotypes into biologically meaningful groups. Testing for an association between an individual SNP and a phenotype is quite stringent, but patterns may emerge when grouping together biologically related genotypes. For example, grouping together all variants (insertions, deletions and SNPs) within a gene or promoter region could allow the user to identify a particular gene as being associated with a phenotype while any individual variant within that gene may not have deep penetrance in the isolates being tested. Grouped genotypes could have increased power to identify convergent evolution because they captures larger trends in functional impact at the group level and reduce the multiple testing correction burden. Use cases for this method could be to group SNPs into genes, kmers or genes into pathways, etc... Each of the three tests can be run on disaggregated data or aggregated data with the inclusion of a grouping key which is described later. 
@@ -82,19 +82,19 @@ Genotype transitions are defined as any edge where the parent node and child nod
 knitr::include_graphics("both_transition_edges.png")
 ```
 
-The absolute value of the phenotype change on each edge is measured. Then the distributions of the delta phenotype on genotype transition edges versus non-transition edges are compared.  
+The absolute value of the phenotype change on each edge is measured. Then the distributions of the |$\Delta$| phenotype on genotype transition edges versus non-transition edges are compared.  
 
 ```{r, echo = FALSE, out.width = "700px", }
 knitr::include_graphics("continuous_algorithm_demo.png")
 ```
 
-Left panel: the delta phenotype is noticeably higher on transition edges (purple), suggesting an association between a change in the genotype and a change in the phenotype. Right panel: the two delta phenotype distributions are nearly identical, suggesting the genotype transitions are not associated with phenotype changes.    
+Left panel: the |$\Delta$| phenotype is noticeably higher on transition edges (purple), suggesting an association between a change in the genotype and a change in the phenotype. Right panel: the two |$\Delta$| phenotype distributions are nearly identical, suggesting the genotype transitions are not associated with phenotype changes.    
 
-The sum of delta phenotype on only genotype transition edges calculated. Then a permutation test is performed wherein the classification of each edge as a genotype transition or non-transition edge is randomized. The new sum of delta phenotype on the permuted genotype transition edges is calculated. An empirical p-value is calculated based on the observed vs. permuted sums.
+The sum of |$\Delta$| phenotype on only genotype transition edges calculated. Then a permutation test is performed wherein the classification of each edge as a genotype transition or non-transition edge is randomized. The new sum of |$\Delta$| phenotype on the permuted genotype transition edges is calculated. An empirical _P_-value is calculated based on the observed vs. permuted sums.
 
 ## 2. Synchronous test (input: binary phenotype)
 ### Do genotype transitions occur more often than expected by chance on phenotype transition edges than on phenotype non-transition edges?
-This test is an extension of PhyC (see below), but with the goal of requiring a more stringent association between the genotype and phenotype. The number of edges on the tree where both a genotype transition and phenotype transition occurs is calculated. Then a permutation test is run where the classification of edges as genotype transition edges are randomized on the tree. The number of edges where the permuted genotype transitions coincide with the phenotype transition is recorded for each permutation, creating a null distribution. An empirical p-value is calculated based on the observed number of edges as compared to the null distribution. 
+This test is an extension of PhyC (see below), but with the goal of requiring a more stringent association between the genotype and phenotype. The number of edges on the tree where both a genotype transition and phenotype transition occurs is calculated. Then a permutation test is run where the classification of edges as genotype transition edges are randomized on the tree. The number of edges where the permuted genotype transitions coincide with the phenotype transition is recorded for each permutation, creating a null distribution. An empirical _P_-value is calculated based on the observed number of edges as compared to the null distribution. 
 
 Transition edges are defined as in (1.) but phenotypes, which are now binary, are also classified in this way:
 
@@ -114,28 +114,30 @@ knitr::include_graphics("both_transition_edges.png")
 ### Does the genotype transition from wild type to mutant more often than expected by chance on edges where the phenotype is present than where the phenotype is absent?  
 This test is my implementation of the PhyC algorithm* as described in [Farhat et al.’s 2013 Nature Genetics paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3887553/). If a genotype mutates more often on edges with the phenotypic trait of interest, there is a positive correlation between the genotype mutation and the phenotype. This approach controls for population structure by requiring the overlap of the phenotype with the genotype transition, rather than the overlap of the phenotype presence with genotype presence. 
 
-The number of edges on the tree where both a genotype mutates (0 -> 1) and the phenotype is present occurs is calculated. Then a permutation test is run where the genotype mutations (0 -> 1) are randomized on the tree. The number of edges where the permuted genotype mutation (0 -> 1) coincides with the phenotype transition is recorded for each permutation, creating a null distribution. An empirical p-value is calculated based on the observed number of edges as compared to the null distribution. 
+The number of edges on the tree where both a genotype mutates (0 &rightarrow; 1) and the phenotype is present occurs is calculated. Then a permutation test is run where the genotype mutations (0 &rightarrow; 1) are randomized on the tree. The number of edges where the permuted genotype mutation (0 &rightarrow; 1) coincides with the phenotype transition is recorded for each permutation, creating a null distribution. An empirical _P_-value is calculated based on the observed number of edges as compared to the null distribution. 
 
 Edges definitions are as follows: 
+
 * Genotype: the only genotype edges of interest are edges where a mutation appears. 
 * Phenotype: rather than consider changes in the phenotype, only consider the presence or absence of the phenotype on each edge. 
 
 | Genotype edge type | parent node value | child node value |   
 |-|-|-|
 | Transition | wild type (0) | mutant (1) |  
-| Other | mutant (1) | wild type (0) |  
-| Other | wild type (0) | wild type (0) |  
-| Other | mutant (1) | mutant (1) | 
+| Non-transition | mutant (1) | wild type (0) |  
+| Non-transition | wild type (0) | wild type (0) |  
+| Non-transition | mutant (1) | mutant (1) | 
 
 
-| Phenotype edge type | Phenotype **edge** value |   
+| Phenotype edge type | Phenotype edge value |   
 |-|-|
 | Present| mutant (1) |  
 | Absent | wild type (0) |  
 
-*Note: Our implementation of PhyC has some changes from the original: 
+\*Note: Our implementation of PhyC has some changes from the original: 
+
 * PhyC was originally implemented with Bonferroni multiple test correction, but this implementation uses False Discovery Rate.
-* Hogwash reduces the multiple testing burden by testing only those genotype-phenotype pairs for which convergence is detectable; genotypes fewer than 2 transition edges are excluded and genotype-phenotype pairs with fewer than 2 edges where the genotype transition overlaps with phenotype presence are assigned a P-value of 1. 
+* Hogwash reduces the multiple testing burden by testing only those genotype-phenotype pairs for which convergence is detectable; genotypes fewer than 2 transition edges are excluded and genotype-phenotype pairs with fewer than 2 edges where the genotype transition overlaps with phenotype presence are assigned a _P_-value of 1. 
 * Ancestral reconstruction for genotypes and phenotypes was performed using only maximum likelihood (the original PhyC used multiple approaches). 
 * Users only supply one phylogenetic tree to hogwash instead of three. 
 Largely, these changes were implemented to make hogwash fast and easy to use. 
@@ -200,13 +202,7 @@ Genotype:
    
 
 ### Phylogenetic tree
-The phylogenetic tree should be rooted. You can check if your tree is rooted by running: 
-```{r}
-ape::is.rooted(tree)
-```
-This will return a logical (TRUE OR FALSE).  
-
-If the tree is not rooted, either:  
+The phylogenetic tree should be rooted. If the tree is not rooted, either:  
 
 * root the tree either to an outgroup and then remove the outgroup from the tree, phenotype, and genotype (in this example assume tip t4 is the outgroup)  
 * use the midpoint rooting method and reorder your phenotype and genotype to the new order
@@ -281,7 +277,7 @@ Run the Synchronous Test & PhyC
 hogwash(pheno = antibiotic_phenotype, 
         geno = snp_genotype,  
         tree = tree, 
-        test = "both)
+        test = "both")
 ```
 The results of running the  Synchronous Test & PhyC are now saved in four documents: 
 
@@ -299,7 +295,7 @@ hogwash(pheno = antibiotic_phenotype,
         geno = snp_genotype,  
         tree = tree, 
         group_genotype_key = key, 
-        test = "both)
+        test = "both")
 
 ```
 The results of running the  Synchronous Test & PhyC with grouped genotypes are now saved in four documents: 
@@ -318,14 +314,14 @@ The pdf file contains all of the plots while the rda file contains all of the st
 
 # Plots
 
-Each test will return a .pdf with a Manhattan plot of the genetic loci (x-axis) vs. the -ln(p-value) (y-axis). The horizontal red line is the threshold for significance provided by the user, with significant loci appearing above the line.
+Each test will return a .pdf with a Manhattan plot of the genetic loci (x-axis) vs. the -ln(_P_-value) (y-axis). The horizontal red line is the threshold for significance provided by the user, with significant loci appearing above the line.
   
   
 ```{r, echo = FALSE, out.width = "700px", }
 knitr::include_graphics("hogwash_phyc_phyc_discrete_pheno_BM_tree_1_pheno_1_manhattan.png")
 ```
 
-Each test will may return a heatmap to show the relationship between the genotype transition edges and the phenotype (either presence, transitions, or delta). The heatmap is only generated if at least two loci were significant. Each column is a genotype. Each row corresponds to an edge on the tree.  
+Each test will may return a heatmap to show the relationship between the genotype transition edges and the phenotype (either presence, transitions, or |$\Delta$|). The heatmap is only generated if at least two loci were significant. Each column is a genotype. Each row corresponds to an edge on the tree.  
 
 The heat map describes the genotype by edge: 
 
@@ -335,8 +331,8 @@ The heat map describes the genotype by edge:
 
 Column annotations:  
 
-- -ln(FDR Corrected P-value) (green)
-- Locus Signifiance: whether or not the P-value is significant after multiple test correction. (Not significant in white, significant in blue)
+- -ln(FDR Corrected _P_-value) (green)
+- Locus Signifiance: whether or not the _P_-value is significant after multiple test correction. (Not significant in white, significant in blue)
 - Optional: Number of genetic loci included in the group (only appears when genotype is grouped according to a user provided key)
 
 Row annotations: 
@@ -366,12 +362,35 @@ knitr::include_graphics("hogwash_phyc_phyc_discrete_pheno_BM_tree_1_pheno_1_geno
 ```
 
 # .rda file
-This rdata file contains multiple types of data objects. 
+This R data file contains multiple types of data objects. 
+
+## Binary phenotype output (both Synchronous & PhyC) 
+The prefix will be either hogwash_synchronous or hogwash_phyc, as appropriate. 
+
+- `$log` A description of your R environment  
+- `$no_convergence_genotypes` A character vector with the names of genotypes excluded from both ancestral reconstruction and testing. These genotypes were excluded because either the genotype was absent in all or all but 1 samples or was present in all or all but 1 sample. 
+- `$contingency_table` A list of matrices. Each tested genotype has a corresponding contingency table.  
+  - Synchronous: Relationship between the genotype not/transition and phenotype not/transition on each tree edge.   
+  - Continuous: Relationship between the genotype not/transition and phenotype presence/absence on each tree edge.   
+- `$hit_pvals` The FDR corrected _P_-value for each genotype tested.   
+- `$sig_pvals` The FDR corrected _P_-value for only genotypes significantly associated with the genotype.  
+- `$hi_confidence_transition_edge` A list of numeric vectors. Each vector corresponds to the a tested genotype. The vectors are ordered by tree edges. High confidence genotype transition edges are indicated by 1, low confidence by 0.  
+- `$num_hi_conf_transition_edge` Named numeric vector with the total number of high confidence genotype transition edges for the respective genotype.  
+- `$dropped_genotypes` A character vector with the names of genotypes removed from testing because they did not have at least two high confidence genotype transition edges.  
+- `$convergence`
+  - `$epsilon` The $\varepsilon$ value for each genotype-phenotype pair.  
+  - `$pheno_beta` $\beta_{phenotype}$
+  - `$geno_beta` $\beta_{genotype}$ for each genotype tested.
+  - `$num_hi_conf_edges` Number of high confidence edges for each genotype-phenotype pair.
+  - `$intersection` $\beta_{phenotype} \cap  \beta_{phenotype}$ for each genotype-phenotype pair.
+
 ## Continuous phenotype output (Continuous Test) 
 - `hogwash_continuous$log` A description of your R environment  
-- `hogwash_continuous$no_convergence_genotypes` A character vector with the names of genotypes excluded from both ancestral reconstruction and testing. These genotypes were excluded because either the genotype was absent in all or all but 1 samples or was present in all or all but 1 sample.  
-- `hogwash_continuous$hit_pvals` The FDR corrected p-value for each genotype tested.   
-- `hogwash_continuous$sig_pvals` The FDR corrected p-value for only genotypes significantly associated with the genotype.  
+- `hogwash_continuous$no_convergence_genotypes` A character vector with the names of genotypes excluded from both ancestral reconstruction and testing. These genotypes were excluded because either the genotype was absent in all or all but 1 samples or was present in all or all but 1 sample.
+- `hogwash_continuous$dropped_genotypes` A character vector with the names of genotypes removed from testing because they did not have at least two high confidence genotype transition edges. 
+- `hogwash_continuous$hit_pvals` The FDR corrected _P_-value for each genotype tested.   
+- `hogwash_continuous$sig_pvals` The FDR corrected _P_-value for only genotypes significantly associated with the genotype. 
+- `hogwash_continuous$non_FDR_hit_pvals`  The _P_-value for each genotype tested prior to FDR correction. 
 - `hogwash_continuous$hi_confidence_transition_edge` A list of numeric vectors. Each vector corresponds to the a tested genotype. The vectors are ordered by tree edges. High confidence genotype transition edges are indicated by 1, low confidence by 0.  
 - `hogwash_continuous$num_hi_conf_transition_edge` Named numeric vector with the total number of high confidence genotype transition edges for the respective genotype.  
 - `hogwash_continuous$dropped_genotypes` A character vector with the names of genotypes removed from testing because they did not have at least two high confidence genotype transition edges.  
@@ -384,25 +403,16 @@ This rdata file contains multiple types of data objects.
 - `hogwash_continuous$delta_pheno_table` A list of names matrices. Each tested genotype has a matrix that describes the sum of the absolute value in phenotype change on each of the following types of tree edges: genotype 0 &rightarrow; 1, genotype 1 &rightarrow; 0, and no change in genotype (either 0 &rightarrow; 0 or 1 &rightarrow; 1).  
 Example:  
  
-| | sum(\|delta phenotype\|) |
+| | sum(\|$\Delta$\| phenotype\) |
 | - | - |
 |geno_parent_0_child_1  |                 0.88|
 |geno_parent_1_child_0  |                 0.00|
 |geno_no_change |                        80.08|
-
-
+ 
 - `hogwash_continuous$delta_pheno_list` A list of named lists. Each sublist corresponds to one tested genotype. The sublist has three numeric vectors: `$geno_parent_0_child_1`, `$geno_parent_1_child_0`, and `hogwash_continuous$geno_no_change.` Each value in the vector the is absolute value of phenotype change for an edge of that category. The edge values are not in any particular order. 
-
-## Binary phenotype output (both Synchronous & PhyC) 
-The prefix will be either hogwash_synchronous or hogwash_phyc, as appropriate. 
-
-- `$log` A description of your R environment  
-- `$no_convergence_genotypes` A character vector with the names of genotypes excluded from both ancestral reconstruction and testing. These genotypes were excluded because either the genotype was absent in all or all but 1 samples or was present in all or all but 1 sample.  
-- `$contingency_table` A list of matrices. Each tested genotype has a corresponding contingency table.  
-  - Synchronous: Relationship between the genotype not/transition and phenotype not/transition on each tree edge.   
-  - Continuous: Relationship between the genotype not/transition and phenotype presence/absence on each tree edge.   
-- `$hit_pvals` The FDR corrected p-value for each genotype tested.   
-- `$sig_pvals` The FDR corrected p-value for only genotypes significantly associated with the genotype.  
-- `$hi_confidence_transition_edge` A list of numeric vectors. Each vector corresponds to the a tested genotype. The vectors are ordered by tree edges. High confidence genotype transition edges are indicated by 1, low confidence by 0.  
-- `$num_hi_conf_transition_edge` Named numeric vector with the total number of high confidence genotype transition edges for the respective genotype.  
-- `$dropped_genotypes` A character vector with the names of genotypes removed from testing because they did not have at least two high confidence genotype transition edges.  
+- `$convergence`
+  - `$epsilon` The $\varepsilon$ for each genotype-phenotype pair.  
+  - `$pheno_beta` $\beta_{phenotype}$ for each genotype-phenotype pair.
+  - `$geno_beta` $\beta_{genotype}$ for each genotype tested.
+  - `$num_hi_conf_edges` Number of high confidence edges for each genotype-phenotype pair.
+  - `$intersection` $\beta_{phenotype} \cap  \beta_{phenotype}$ for each genotype-phenotype pair.
