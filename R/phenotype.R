@@ -114,10 +114,9 @@ calc_raw_diff <- function(edge_list, phenotype_by_edges){
 #'
 #' @param pheno Matrix. One column matrix. Row.names correspond to tree$tip.labels.
 #' @param tree Phylo.
-#' @param root Logical. Default = TRUE If TRUE, midpoint roots the tree.
 #'
 #' @export
-report_phylogenetic_signal <- function(pheno, tree, root = TRUE){
+report_phylogenetic_signal <- function(pheno, tree){
 
   # Checks here are written out explicitly so that user sees specific, helpful
   # error messages.
@@ -130,19 +129,23 @@ report_phylogenetic_signal <- function(pheno, tree, root = TRUE){
   if (nrow(pheno) != ape::Ntip(tree)) {
     stop("Provide a tree with tips that correspond to the phenotype rows.")
   }
-  if (sum(row.names(pheno) != tree$tip.labels) > 0) {
-    stop("Provide a phenotype matrix where row.names match tree$tip.labels.")
-  }
   if (ncol(pheno) != 1) {
     stop("Provide a phenotype matrix with exactly 1 column of data.")
   }
-#TODO unit tests
   cont_or_disc <- assign_pheno_type(pheno)
 
-  if (root) {
+  if (!ape::is.rooted(tree)) {
     tree <- phytools::midpoint.root(tree)
-    pheno <- pheno[row.names(pheno) %in% tree$tip.label, , drop = FALSE]
-    pheno <- pheno[match(row.names(growth_phenotype_midpoint), tree$tip.label), , drop = FALSE]
+  }
+
+  tip_log <- tree$edge[, 2] <= ape::Ntip(tree)
+  ordered_tips <- tree$edge[tip_log, 2]
+  tree$tip.label <- tree$tip.label[ordered_tips]
+  pheno <- pheno[row.names(pheno) %in% tree$tip.label, , drop = FALSE]
+  pheno <- pheno[match(tree$tip.label, row.names(pheno)), , drop = FALSE]
+
+  if (!setequal(tree$tip.label, row.names(pheno))) {
+    stop("Tree and variant matrix sample names do not match.")
   }
 
   if (cont_or_disc == "continuous") {
@@ -154,10 +157,17 @@ report_phylogenetic_signal <- function(pheno, tree, root = TRUE){
   }
 }
 
-# TODO add documentation and unit tests
+#' Calculate phylogenetic signal (Pagel's lambda) for a continuous phenotype
+#'
+#' @param pheno Matrix
+#' @param tree phylo
+#'
+#' @return lambda value (number)
+#' @noRd
 calculate_lambda <- function(pheno, tree) {
-  # Checks here are written out explicitly so that user sees specific, helpful
-  # error messages.
+  # The checks here are written out explicitly so that user sees specific,
+  # helpful error messages (instead of using the more terse interal check
+  # functions used within the rest of hogwash).
   if (!methods::is(pheno, "matrix")) {
     stop("Provide a phenotype matrix.")
   }
@@ -182,7 +192,16 @@ calculate_lambda <- function(pheno, tree) {
   return(lambda)
 }
 
+#' Print message to user with Pagel's lambda value and context for what that
+#' value means
+#'
+#' @param lambda Number
+#'
+#' @noRd
 report_lambda <- function(lambda) {
+  if (!methods::is(lambda, "numeric")) {
+    stop("Lambda must be a number")
+  }
   msg <- "The phenotype is more conserved (clumpy) than expected by Brownian Motion; Pagel's lambda = "
   if (lambda < 1.05 & lambda > 0.95) {
     msg <- "The phenotype is modeled well by Brownian Motion; Pagel's lambda = "
@@ -196,8 +215,14 @@ report_lambda <- function(lambda) {
   print(paste0(msg, round(lambda, 5)))
 }
 
+#' Calculate the phylogenetic signal, D, for a discrete phenotype
+#'
+#' @param pheno Matrix.
+#' @param tree Phylo.
+#'
+#' @return Number. D-statistic.
+#' @noRd
 calculate_d <- function(pheno, tree) {
-  #TODO add unit tests and documentation
   # Checks here are written out explicitly so that user sees specific, helpful
   # error messages.
   if (!methods::is(pheno, "matrix")) {
@@ -234,7 +259,16 @@ calculate_d <- function(pheno, tree) {
   return(d_stat)
 }
 
+#' Print message to user with D-statistic value and context for what that
+#' value means
+#'
+#' @param d_stat Number
+#'
+#' @noRd
 report_d <- function(d_stat){
+  if (!methods::is(d_stat, "numeric")) {
+    stop("D-statistic must be a number")
+  }
   msg <- "The phenotype is negatively correlated among closely related species; D = "
   if (d_stat < 1.05 & d_stat > 0.95) { # 1
     msg <- "The phenotype is modeled well by White Noise (Random); D = "
@@ -248,8 +282,16 @@ report_d <- function(d_stat){
   print(paste0(msg, d_stat))
 }
 
+#' Convert a trait vector into a dataframe
+#'
+#' @description This is necessary for caper functions.
+#'
+#' @param trait_vec Vector.
+#' @param tree Phylo
+#'
+#' @return dataframe
+#' @noRd
 convert_trait_vec_to_df <- function(trait_vec, tree){
-  #TODO Add unit tests
   trait_df <- as.data.frame(trait_vec)
   trait_df <- cbind(tree$tip.label, trait_df)
   colnames(trait_df) <- c("ID", "trait")
@@ -264,7 +306,6 @@ convert_trait_vec_to_df <- function(trait_vec, tree){
 #'
 #' @export
 internal_report_phylogenetic_signal <- function(pheno, tree){
-# TODO incorporate this function within hogwash carefully!
   check_class(pheno, "matrix")
   check_class(tree, "phylo")
   check_equal(nrow(pheno), ape::Ntip(tree))
@@ -272,13 +313,17 @@ internal_report_phylogenetic_signal <- function(pheno, tree){
     stop("Provide a phenotype matrix where row.names match tree$tip.labels.")
   }
   check_dimensions(pheno, exact_cols = 1, min_rows = 1, min_cols = 1)
-  #TODO unit tests
   cont_or_disc <- assign_pheno_type(pheno)
 
-  # if (root) { ?? include this?
-  #   tree <- phytools::midpoint.root(tree)
-  #   # TODO reorder phenotype by tree tips
-  # }
+  tip_log <- tree$edge[, 2] <= ape::Ntip(tree)
+  ordered_tips <- tree$edge[tip_log, 2]
+  tree$tip.label <- tree$tip.label[ordered_tips]
+  pheno <- pheno[row.names(pheno) %in% tree$tip.label, , drop = FALSE]
+  pheno <- pheno[match(tree$tip.label, row.names(pheno)), , drop = FALSE]
+
+  if (!setequal(tree$tip.label, row.names(pheno))) {
+    stop("Tree and variant matrix sample names do not match.")
+  }
 
   if (cont_or_disc == "continuous") {
     lambda <- calculate_lambda(pheno, tree)
