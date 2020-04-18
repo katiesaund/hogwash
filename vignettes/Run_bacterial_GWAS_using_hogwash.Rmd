@@ -37,7 +37,7 @@ A unique feature of hogwash is the ability to organize genotypes into biological
 * Tips: termini  
 * Edges: the line defined by two adjacent nodes or a tip and the nearest node
 
-```{r, echo = FALSE, out.width = "700px"}
+```{r, echo = FALSE, out.width = "400px"}
 knitr::include_graphics("tree_with_nomenclature_for_wiki.png")
 ```
 
@@ -49,7 +49,7 @@ While convergent evolution and parallel evolution have specific meanings, those 
 Given a phylogenetic tree and trait for each tree tip an ancestral reconstruction is created wherein the value of the trait at each internal node is predicted. To learn more about the ancestral reconstruction tool please read the [ape::ace() documentation](https://www.rdocumentation.org/packages/ape/versions/5.3/topics/ace). Ancestral reconstruction for binary characters is performed with maximum likelihood and either an equal rates or all rates different model (the best model is chosen for each reconstruction).  
   
 Binary phenotype: 
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("ancestral_reconstruction.png")
 ```
 
@@ -78,13 +78,13 @@ Genotype transitions are defined as any edge where the parent node and child nod
 | Non-transition | wild type (0) | wild type (0) |  
 | Non-transition | mutant (1) | mutant (1) |  
 
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("both_transition_edges.png")
 ```
 
 The absolute value of the phenotype change on each edge is measured. Then the distributions of the |$\Delta$| phenotype on genotype transition edges versus non-transition edges are compared.  
 
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("continuous_algorithm_demo.png")
 ```
 
@@ -106,7 +106,7 @@ Transition edges are defined as in (1.) but phenotypes, which are now binary, ar
 | Non-transition | mutant (1) | mutant (1) |  
 
 
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("both_transition_edges.png")
 ```
 
@@ -211,7 +211,7 @@ The phylogenetic tree should be rooted. If the tree is not rooted, either:
 The tree must be fully bifurcating. I recommend building your phylogenetic tree with an outgroup, root using the outgroup, and then remove the outgroup prior to running hogwash. 
 
 
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("tree_with_nomenclature_for_wiki.png")
 ```
 
@@ -317,7 +317,7 @@ The pdf file contains all of the plots while the rda file contains all of the st
 Each test will return a .pdf with a Manhattan plot of the genetic loci (x-axis) vs. the -ln(_P_-value) (y-axis). The horizontal red line is the threshold for significance provided by the user, with significant loci appearing above the line.
   
   
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("hogwash_phyc_phyc_discrete_pheno_BM_tree_1_pheno_1_manhattan.png")
 ```
 
@@ -342,13 +342,13 @@ Row annotations:
     - Absent (white)  
     - Low confidence (grey)
 
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("hogwash_phyc_phyc_discrete_pheno_BM_tree_1_pheno_1_heatmap.png")
 ```
 
 Each test returns the phenotype on the tree. PhyC plots the phenotype reconstruction. 
 
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("hogwash_phyc_phyc_discrete_pheno_BM_tree_1_pheno_1_phenotype.png")
 ```
 
@@ -357,7 +357,7 @@ Hogwash will return a page in the pdf for each genotype found to be significant.
 
 The ancestral reconstruction of the continuous phenotype. 
 
-```{r, echo = FALSE, out.width = "700px", }
+```{r, echo = FALSE, out.width = "400px", }
 knitr::include_graphics("hogwash_phyc_phyc_discrete_pheno_BM_tree_1_pheno_1_genotype.png")
 ```
 
