@@ -91,7 +91,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy
   temp_fdr <- 0.25
 
   temp_gamma <- NULL
-  temp_gamma$gamma_count <-
+  temp_gamma$intersection <-
     c(rep(sum(temp_pheno_trans + temp_geno_trans[[1]] > 1), num_genotypes - 1),
       sum(temp_pheno_trans + temp_geno_trans[[15]] > 1))
 

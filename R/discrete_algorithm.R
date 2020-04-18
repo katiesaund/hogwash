@@ -132,7 +132,7 @@ count_hits_on_edges <- function(genotype_transition_edges,
 #'     value.}
 #'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
 #'     Length == number of genotypes.}
-#'     \item{gamma_count}{Numeric vector. Raw gamma value for each genotype.
+#'     \item{intersection}{Numeric vector. Raw gamma value for each genotype.
 #'     Length == number of genotypes.}
 #'     \item{num_hi_conf_edges}{Numeric vector. Number of high confidence
 #'     edges per genotype. Length == number of genotypes.}
@@ -179,8 +179,8 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
   check_num_between_0_and_1(fdr)
   check_equal(ncol(mat), length(high_confidence_edges))
   check_equal(length(high_confidence_edges[[1]]), ape::Nedge(tr))
-  check_equal(length(gamma$gamma_count), ncol(mat))
-  check_is_number(gamma$gamma_count[1])
+  check_equal(length(gamma$intersection), ncol(mat))
+  check_is_number(gamma$intersection[1])
 
   # Function -------------------------------------------------------------------
   # Calculate observed values
@@ -231,7 +231,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
       hit_pvals[i] <- 1.0
       # This should never get triggered because we should be filtering the
       #   genotype before this step, but it's being kept in as a fail safe.
-    } else if (gamma$gamma_count[i] < 2) {
+    } else if (gamma$intersection[i] < 2) {
       # If there is no ovlerap in BOTH the phenotype (presence/transition)
       #   and genotype transition we CANNOT detect convergence. In these cases
       #   we should skip to the next genotype to run the permutation test.
