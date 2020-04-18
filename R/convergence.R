@@ -34,7 +34,7 @@
 #'      number of genotypes.}
 #'   }
 #' @noRd
-calculate_phyc_gamma <- function(geno_trans_edge_list,
+calculate_phyc_convergence <- function(geno_trans_edge_list,
                                  pheno_recon_vec,
                                  high_conf){
   high_conf_edge_list <- high_conf$high_conf_ordered_by_edges

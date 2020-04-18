@@ -68,3 +68,4 @@ test_that("calculate_continuous_convergence gives expected results for valid con
   expect_equal(new_output$geno_beta, rep(beta_geno, num_geno))
   expect_equal(new_output$epsilon, rep(epsilon, num_geno))
 })
+#TODO add unit tests for phyc and sync
