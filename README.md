@@ -7,6 +7,6 @@ The hogwash R package is a phylogenetically-informed, convergence-based method f
 `library(hogwash)`
   
 # Getting started
-[Please check out the wiki](https://github.com/katiesaund/hogwash/wiki) for a brief primer on bacterial GWAS, detailed descriptions of the algorithms, and example data with results.  
+[Please check out the wiki](https://github.com/katiesaund/hogwash/wiki) or vignette for a brief primer on bacterial GWAS, detailed descriptions of the algorithms, and example data with results.  
 
 
