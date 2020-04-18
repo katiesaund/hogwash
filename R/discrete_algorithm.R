@@ -126,14 +126,10 @@ count_hits_on_edges <- function(genotype_transition_edges,
 #' @param high_confidence_edges List. Length(list) = ncol(mat) == number of
 #'   genotypes. Each entry is a vector with length == Nedge(tr). All entries are
 #'   either 0 (low confidence) or 1 (high confidence).
-#' @param gamma List of seven objects:
+#' @param convergence List of five objects:
 #'   \describe{
-#'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
-#'     value.}
-#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
-#'     Length == number of genotypes.}
-#'     \item{intersection}{Numeric vector. Raw gamma value for each genotype.
-#'     Length == number of genotypes.}
+#'     \item{intersection}{Numeric vector. Intersection of the geno_beta and
+#'      pheno_beta  for each genotype. Length == number of genotypes.}
 #'     \item{num_hi_conf_edges}{Numeric vector. Number of high confidence
 #'     edges per genotype. Length == number of genotypes.}
 #'     \item{pheno_beta}{Number. Count of how many tree edges are phenotype
@@ -169,7 +165,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
                                      permutations,
                                      fdr,
                                      high_confidence_edges,
-                                     gamma){
+                                     convergence){
   # Check input ----------------------------------------------------------------
   check_equal(ncol(mat), length(genotype_transition_edges))
   check_equal(length(genotype_transition_edges[[1]]), ape::Nedge(tr))
@@ -179,8 +175,8 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
   check_num_between_0_and_1(fdr)
   check_equal(ncol(mat), length(high_confidence_edges))
   check_equal(length(high_confidence_edges[[1]]), ape::Nedge(tr))
-  check_equal(length(gamma$intersection), ncol(mat))
-  check_is_number(gamma$intersection[1])
+  check_equal(length(convergence$intersection), ncol(mat))
+  check_is_number(convergence$intersection[1])
 
   # Function -------------------------------------------------------------------
   # Calculate observed values
@@ -231,7 +227,7 @@ discrete_calculate_pvals <- function(genotype_transition_edges,
       hit_pvals[i] <- 1.0
       # This should never get triggered because we should be filtering the
       #   genotype before this step, but it's being kept in as a fail safe.
-    } else if (gamma$intersection[i] < 2) {
+    } else if (convergence$intersection[i] < 2) {
       # If there is no ovlerap in BOTH the phenotype (presence/transition)
       #   and genotype transition we CANNOT detect convergence. In these cases
       #   we should skip to the next genotype to run the permutation test.

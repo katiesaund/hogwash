@@ -1,5 +1,8 @@
-#' Calculate gamma within PhyC test
-#'
+#' Calculate convergence (epsilon, beta genotype, and beta phenotype) within
+#'   PhyC test
+#' @description Given phenotype and genotype information, calculate summary
+#'   statistics that describe the number of edges on the tree where the
+#'   phenotype is present and the genotype transitions as well as their overlap.
 #' @param geno_trans_edge_list A list of genotypes. Length == number of
 #'   genotypes. Length of individual vectors within == Nedge(tree). Individual
 #'   vectors are binary.
@@ -13,14 +16,22 @@
 #'     of list == number of genotypes. Length of individual vectors within ==
 #'     Nedge(tree). Individual vectors are binary.}
 #'   }
-#' @return results. List of three objects:
+#' @return results. List of five objects:
 #'   \describe{
-#'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
-#'     value.}
-#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
-#'     Length == number of genotypes.}
-#'    \item{intersection}{Numeric vector. Raw gamma value for each genotype.
-#'    Length == number of genotypes.}
+#'     \item{intersection}{Numeric vector. Intersection of the geno_beta and
+#'      pheno_beta  for each genotype. Length == number of genotypes.}
+#'     \item{num_hi_conf_edges}{Numeric vector. Number of high confidence
+#'     edges per genotype. Length == number of genotypes.}
+#'     \item{pheno_beta}{Number. Count of how many tree edges are phenotype
+#'     transitions and the phenotype ancestral reconstruction and tree edge are
+#'     high confidence. Length == 1.}
+#'     \item{geno_beta}{Numeric vector. count of how many tree edges are
+#'     gentoype transitions and the genotype ancestral reconstruction and tree
+#'     edge are high confidence. Length == number of genotypes.}
+#'     \item{epsilon}{Numeric vector. 2 x (edges with both high confidence
+#'      genotype transition and phenotype presence) / sum(edges with high
+#'      confidence gentoype transition and/or phenotype presence). Length ==
+#'      number of genotypes.}
 #'   }
 #' @noRd
 calculate_phyc_gamma <- function(geno_trans_edge_list,
@@ -31,8 +42,7 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
   check_equal(length(geno_trans_edge_list), length(high_conf_edge_list))
   check_equal(length(geno_trans_edge_list[[1]]), length(high_conf_edge_list[[1]]))
   check_equal(length(geno_trans_edge_list[[1]]), length(pheno_recon_vec))
-  epsilon <- geno_beta <- intersection <- gamma_percent <-
-    rep(0, length(geno_trans_edge_list))
+  epsilon <- geno_beta <- intersection <- rep(0, length(geno_trans_edge_list))
   pheno_beta <- sum(pheno_recon_vec == 1 & high_conf$tr_and_pheno_hi_conf == 1)
 
   for (i in 1:length(geno_trans_edge_list)) {
@@ -41,16 +51,12 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
             geno_trans_edge_list[[i]] == 1 &
             high_conf_edge_list[[i]] == 1)
     intersection[i] <- pheno_1_geno_0_to_1
-    gamma_percent[i] <- intersection[i] / sum(high_conf_edge_list[[i]])
     geno_beta[i] <- sum(geno_trans_edge_list[[i]] == 1 &
                           high_conf_edge_list[[i]] == 1)
     epsilon[i] <- (2 * intersection[i]) / (pheno_beta + geno_beta[i])
   }
-  gamma_avg <- mean(gamma_percent)
   num_hi_conf_edges <- unlist(lapply(high_conf_edge_list, sum))
-  results <- list("gamma_avg" = gamma_avg,
-                  "gamma_percent" = gamma_percent,
-                  "intersection" = intersection,
+  results <- list("intersection" = intersection,
                   "num_hi_conf_edges" = num_hi_conf_edges,
                   "pheno_beta" = pheno_beta,
                   "geno_beta" = geno_beta,
@@ -58,13 +64,13 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
   return(results)
 }
 
-#' Calculate gamma within synchronous test
+#' Calculate convergence (epsilon, beta genotype, and beta phenotype) within the
+#'   Synchronous test
 #'
-#' @description Given phenotype and genotype information, calculate a summary
-#'   statistic that describes the number of edges on the tree where the
-#'   phenotype and the genotype transitions (0 to 1 or 1 to 0). This summary
-#'   stat will be used to evaluate the appropriateness / effectiveness of
-#'   hogwash on this dataset.
+#' @description Given phenotype and genotype information, calculate summary
+#'   statistics that describe the number of edges on the tree where the
+#'   phenotype and the genotype transitions (0 to 1 or 1 to 0) as well as their
+#'   overlap.
 #' @param geno_trans_edge_list A list of genotypes. Length == number of
 #'   genotypes. Length of individual vectors within == Nedge(tree). Individual
 #'   vectors are binary.
@@ -81,14 +87,10 @@ calculate_phyc_gamma <- function(geno_trans_edge_list,
 #'     Nedge(tree). Individual vectors are binary.}
 #'   }
 #'
-#' @return results. List of seven objects:
+#' @return results. List of five objects:
 #'   \describe{
-#'     \item{gamma_avg}{Numeric. Average gamma value of all genotypes. A single
-#'     value.}
-#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype.
-#'     Length == number of genotypes.}
-#'     \item{intersection}{Numeric vector. Raw gamma value for each genotype.
-#'     Length == number of genotypes.}
+#'     \item{intersection}{Numeric vector. Intersection of the geno_beta and
+#'      pheno_beta for each genotype. Length == number of genotypes.}
 #'     \item{num_hi_conf_edges}{Numeric vector. Number of high confidence
 #'     edges per genotype. Length == number of genotypes.}
 #'     \item{pheno_beta}{Number. Count of how many tree edges are phenotype
@@ -109,8 +111,7 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
   check_equal(length(geno_trans_edge_list), length(high_conf_edge_list))
   check_equal(length(geno_trans_edge_list[[1]]), length(high_conf_edge_list[[1]]))
   check_equal(length(geno_trans_edge_list[[1]]), length(pheno_trans_vec$transition))
-  epsilon <- geno_beta <- intersection <- gamma_percent <-
-    rep(0, length(geno_trans_edge_list))
+  epsilon <- geno_beta <- intersection <- rep(0, length(geno_trans_edge_list))
   pheno_beta <-
     sum(pheno_trans_vec$transition == 1 & high_conf$tr_and_pheno_hi_conf == 1)
   for (i in 1:length(geno_trans_edge_list)) {
@@ -119,16 +120,12 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
             geno_trans_edge_list[[i]] == 1 &
             high_conf_edge_list[[i]] == 1)
     intersection[i] <- pheno_trans_and_geno_trans
-    gamma_percent[i] <- intersection[i] / sum(high_conf_edge_list[[i]])
     geno_beta[i] <- sum(geno_trans_edge_list[[i]] == 1 &
                           high_conf_edge_list[[i]] == 1)
     epsilon[i] <- (2 * intersection[i]) / (pheno_beta + geno_beta[i])
   }
-  gamma_avg <- mean(gamma_percent)
   num_hi_conf_edges <- unlist(lapply(high_conf_edge_list, sum))
-  results <- list("gamma_avg" = gamma_avg,
-                  "gamma_percent" = gamma_percent,
-                  "intersection" = intersection,
+  results <- list("intersection" = intersection,
                   "num_hi_conf_edges" = num_hi_conf_edges,
                   "pheno_beta" = pheno_beta,
                   "geno_beta" = geno_beta,
@@ -136,13 +133,13 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
   return(results)
 }
 
-#' Calculate gamma within continuous test
+#' Calculate convergence (epsilon, beta genotype, and beta phenotype) within the
+#'   Continuous test
 #'
-#' @description Given phenotype and genotype information, calculate a summary
-#'   statistic that describes the elementwise intersection of genotype
-#'   transition edges and phenotype delta  divided by their union. Delta
-#'   phenotype is scaled from 0 to 1.This summary stat will be used to evaluate
-#'   the appropriateness / effectiveness of hogwash on this dataset.
+#' @description Given phenotype and genotype information, calculate summary
+#'   statistics that describes the elementwise intersection of genotype
+#'   transition edges and phenotype delta divided by their union. Delta
+#'   phenotype is scaled from 0 to 1.
 #' @param geno_trans_edge_list List of lists. Each entry has two named lists:
 #'   $transition and $transition_dir. Number of sub-lists = number of genotypes.
 #'   Length(each sublist) == Nedge(tree). Binary.
@@ -156,15 +153,10 @@ calculate_synchronous_gamma <- function(geno_trans_edge_list,
 #'    of list == number of genotypes. Length of individual vectors within ==
 #'    Nedge(tree). Individual vectors are binary.}
 #'   }
-#' @return results. List of three objects:
+#' @return results. List of five objects:
 #'   \describe{
-#'     \item{gamma_avg}{Numeric. Average of gamma_percent value of all
-#'     genotypes. A single value.}
-#'     \item{gamma_percent}{Numeric vector. Gamma value for each genotype
-#'     divided by the number of high confidence edges. Length == number of
-#'     genotypes.}
-#'     \item{intersection}{Numeric vector. Raw gamma value for each genotype.
-#'     Length == number of genotypes.}
+#'     \item{intersection}{Numeric vector. Intersection of the geno_beta and
+#'      pheno_beta for each genotype. Length == number of genotypes.}
 #'     \item{num_hi_conf_edges}{Number of high confidence edges.}
 #'     \item{pheno_beta}{Numeric vector. Beta(phenotype). Length == number of
 #'     genotypes.}
@@ -213,8 +205,7 @@ calculate_continuous_gamma <- function(pheno_recon_mat,
                                          pheno_recon_mat)
   }
 
-  pheno_beta <-
-    epsilon <- geno_beta <- intersection <- gamma_percent <- rep(0, num_geno)
+  pheno_beta <- epsilon <- geno_beta <- intersection <- rep(0, num_geno)
 
   for (i in 1:num_geno) {
     scaled_pheno <- scales::rescale(pheno_delta[[i]], to = c(0, 1))
@@ -226,15 +217,11 @@ calculate_continuous_gamma <- function(pheno_recon_mat,
         (scaled_pheno * (1 * (high_conf_edge_list[[i]] == 1))) *
           (geno_trans_edge_list[[i]]$transition == 1 &
              high_conf_edge_list[[i]] == 1))
-    gamma_percent[i] <- intersection[i] / sum(high_conf_edge_list[[i]])
     epsilon[i] <-
       intersection[i] / (geno_beta[i] + pheno_beta[i] - intersection[i])
   }
-  gamma_avg <- mean(gamma_percent)
   num_hi_conf_edges <- unlist(lapply(high_conf_edge_list, sum))
-  results <- list("gamma_avg" = gamma_avg,
-                  "gamma_percent" = gamma_percent,
-                  "intersection" = intersection,
+  results <- list("intersection" = intersection,
                   "num_hi_conf_edges" = num_hi_conf_edges,
                   "pheno_beta" = pheno_beta,
                   "geno_beta" = geno_beta,
