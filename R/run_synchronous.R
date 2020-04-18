@@ -83,9 +83,9 @@ run_synchronous <- function(args){
                                            args$discrete_or_continuous)
 
   # CALCULATE GAMMA -----------------------------------------------------------#
-  gamma <- calculate_synchronous_gamma(genotype_transition_edges,
-                                       pheno_trans,
-                                       hi_conf)
+  gamma <- calculate_synchronous_convergence(genotype_transition_edges,
+                                             pheno_trans,
+                                             hi_conf)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   disc_trans_results <-

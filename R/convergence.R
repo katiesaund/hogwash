@@ -104,7 +104,7 @@ calculate_phyc_convergence <- function(geno_trans_edge_list,
 #'     gentoype and/or phenotype transitions). Length == number of genotypes.}
 #'   }
 #' @noRd
-calculate_synchronous_gamma <- function(geno_trans_edge_list,
+calculate_synchronous_convergence <- function(geno_trans_edge_list,
                                         pheno_trans_vec,
                                         high_conf){
   high_conf_edge_list <- high_conf$high_conf_ordered_by_edges
