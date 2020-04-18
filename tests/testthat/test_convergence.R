@@ -1,5 +1,5 @@
 context("Convergence") #---------------------------------------------------#
-test_that("calculate_continuous_gamma gives expected results for valid continuous input", {
+test_that("calculate_continuous_convergence gives expected results for valid continuous input", {
   # Set up
   set.seed(1)
   num_tip <- 5
@@ -26,7 +26,7 @@ test_that("calculate_continuous_gamma gives expected results for valid continuou
     high_conf$high_conf_ordered_by_edges[[i]] <- rep(1, num_edge)
   }
 
-  output <- calculate_continuous_gamma(pheno_recon_mat, high_conf)
+  output <- calculate_continuous_convergence(pheno_recon_mat, high_conf)
   delta_pheno <- abs(pheno_recon_mat[, 1] - pheno_recon_mat[, 2])
   scaled_delta_pheno <- scales::rescale(delta_pheno)
 
@@ -52,7 +52,7 @@ test_that("calculate_continuous_gamma gives expected results for valid continuou
   for (i in 1:num_geno) {
     high_conf$genotype_transition[[i]]$transition <- c(1, 1, 0, 0, 0, 0, 1, 1)
   }
-  new_output <- calculate_continuous_gamma(pheno_recon_mat, high_conf)
+  new_output <- calculate_continuous_convergence(pheno_recon_mat, high_conf)
 
   # What I expect
   beta_pheno <- sum(scaled_delta_pheno) # all are high confidence
