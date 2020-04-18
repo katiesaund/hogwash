@@ -831,9 +831,9 @@ plot_synchronous_results  <- function(tr,
 #'   \describe{
 #'     \item{pvals}{Named numeric vector. Length == number of genotypes. Values
 #'     between 1 and 0. Names are genotype names.}
-#'     \item{null_gammas}{List of numeric vectors. Length of list == number
-#'     of genotypes. Each vector has length == number of permutations. Values
-#'     are integers}
+#'     \item{null_intersection}{List of numeric vectors. Length of list ==
+#'     number of genotypes. Each vector has length == number of permutations.
+#'     Values are integers}
 #'     \item{observed_pheno_trans_delta}{List of numeric vectors. Length of
 #'     list == number of genotypes. Vectors are of variable length because
 #'     length is the number of transition edges for that particular genotype.
@@ -843,8 +843,8 @@ plot_synchronous_results  <- function(tr,
 #'     length is the number of non-transition edges for that particular
 #'     genotype. Vectors are numeric.}
 #'     \item{num_genotypes}{Integer. The number of genotypes.}
-#'     \item{observed_gamma}{Numeric Vector. Length = number of genotypes.
-#'     Integers.}
+#'     \item{observed_intersection}{Numeric Vector. Length = number of
+#'      genotypes. Integers.}
 #'   }
 #' @param pheno_anc_rec Vector. The values of the ancestral reconstruction of
 #'   the phenotype at each internal node. Length = Nnode(tr).
@@ -901,7 +901,7 @@ plot_continuous_results <- function(disc_cont,
   check_class(pval_all_transition$hit_pvals, "data.frame")
   check_equal(length(pheno_vector), ape::Ntip(tr))
   check_if_permutation_num_valid(perm)
-  check_equal(length(results_all_trans$null_gamma), ncol(geno_mat))
+  check_equal(length(results_all_trans$null_intersection), ncol(geno_mat))
   check_equal(length(pheno_anc_rec), ape::Nnode(tr))
   check_equal(length(geno_reconstruction), ncol(geno_mat))
   check_equal(length(geno_reconstruction[[1]]), ape::Nedge(tr))
@@ -1093,7 +1093,7 @@ plot_continuous_results <- function(disc_cont,
                                    j,
                                    transparent_grey,
                                    transparent_red)
-      # Plot Null Distribution of gamma
+      # Plot Null Distribution of intersection
       p_val_formated <- formatC(pval_all_transition$hit_pvals[j, 1],
                                 format = "e",
                                 digits = 1)
@@ -1106,10 +1106,10 @@ plot_continuous_results <- function(disc_cont,
                                      " P-value rank = ",
                                      .(p_val_rank_formated)))
       x_min <- 0
-      x_max <- max(as.numeric(results_all_trans$null_gamma[[j]]),
-                   results_all_trans$observed_gamma[[j]])
+      x_max <- max(as.numeric(results_all_trans$null_intersection[[j]]),
+                   results_all_trans$observed_intersection[[j]])
 
-      graphics::hist(log(results_all_trans$null_gamma[[j]]),
+      graphics::hist(log(results_all_trans$null_intersection[[j]]),
                      col = transparent_teal,
                      main = title_line_one,
                      cex.main = hist_cex_size,
@@ -1119,7 +1119,8 @@ plot_continuous_results <- function(disc_cont,
                      xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
                      xlim = c(x_min, x_max))
       graphics::mtext(title_line_two, side = 3, cex = .6 * hist_cex_size)
-      graphics::abline(v = as.numeric(results_all_trans$observed_gamma[j]),
+      graphics::abline(v =
+                         as.numeric(results_all_trans$observed_intersection[j]),
                        col = transparent_red,
                        lwd = 4)
       graphics::legend("topright",
