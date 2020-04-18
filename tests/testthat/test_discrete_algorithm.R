@@ -90,8 +90,8 @@ test_that("discrete_calculate_pvals returns expected results given this dummy
   temp_perm <- 8
   temp_fdr <- 0.25
 
-  temp_gamma <- NULL
-  temp_gamma$intersection <-
+  temp_convergence <- NULL
+  temp_convergence$intersection <-
     c(rep(sum(temp_pheno_trans + temp_geno_trans[[1]] > 1), num_genotypes - 1),
       sum(temp_pheno_trans + temp_geno_trans[[15]] > 1))
 
@@ -102,7 +102,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy
                                         temp_perm,
                                         temp_fdr,
                                         temp_hi_conf_edges,
-                                        temp_gamma),
+                                        temp_convergence),
                NA)
 
   disc_trans_results <- discrete_calculate_pvals(temp_geno_trans,
@@ -112,7 +112,7 @@ test_that("discrete_calculate_pvals returns expected results given this dummy
                                                  temp_perm,
                                                  temp_fdr,
                                                  temp_hi_conf_edges,
-                                                 temp_gamma)
+                                                 temp_convergence)
 
   expect_equal(round(as.numeric(disc_trans_results$hit_pvals[1]), 3), 1)
   expect_equal(round(as.numeric(disc_trans_results$hit_pvals[15]), 3), 0.444)

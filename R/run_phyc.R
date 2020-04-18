@@ -88,10 +88,10 @@ run_phyc <- function(args){
     reorder_tip_and_node_to_edge(AR$pheno_recon_and_conf$tip_and_node_recon,
                                     args$tree)
 
-  # CALCULATE GAMMA -----------------------------------------------------------#
-  gamma <- calculate_phyc_convergence(genotype_transition_edges,
-                                      pheno_recon_ordered_by_edges,
-                                      hi_conf)
+  # CALCULATE CONVERGENCE -----------------------------------------------------#
+  convergence <- calculate_phyc_convergence(genotype_transition_edges,
+                                            pheno_recon_ordered_by_edges,
+                                            hi_conf)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   disc_recon_results <-
@@ -102,7 +102,7 @@ run_phyc <- function(args){
                              args$perm,
                              args$fdr,
                              hi_conf$high_conf_ordered_by_edges,
-                             gamma)
+                             convergence)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_recon <-
@@ -141,7 +141,7 @@ run_phyc <- function(args){
     hi_conf$num_high_conf_trans_edges
   results_object$dropped_genotypes <-
     hi_conf$dropped_genotypes
-  results_object$gamma <- gamma
+  results_object$convergence <- convergence
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,

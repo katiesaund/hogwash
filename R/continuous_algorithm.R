@@ -53,15 +53,20 @@ continuous_permutation <- function(geno_no_tran_index_list,
 
   # Subset delta phenotypes, non-trans indices, and trans indices to just those
   #   with hi conf for geno, pheno, and tr
-  hi_conf_geno_no_tran_index <- curr_geno_no_tran_index[curr_geno_no_tran_index %in% curr_hi_conf_geno_pheno_tr]
-  hi_conf_geno_yes_tran_index <- curr_hi_conf_geno_pheno_tr[!curr_hi_conf_geno_pheno_tr %in% hi_conf_geno_no_tran_index]
-  check_equal(sum(length(hi_conf_geno_yes_tran_index), length(hi_conf_geno_no_tran_index)), num_hi_conf_edges)
+  hi_conf_geno_no_tran_index <-
+    curr_geno_no_tran_index[
+      curr_geno_no_tran_index %in% curr_hi_conf_geno_pheno_tr]
+  hi_conf_geno_yes_tran_index <-
+    curr_hi_conf_geno_pheno_tr[
+      !curr_hi_conf_geno_pheno_tr %in% hi_conf_geno_no_tran_index]
+  check_equal(sum(length(hi_conf_geno_yes_tran_index),
+                  length(hi_conf_geno_no_tran_index)), num_hi_conf_edges)
 
   num_trans_edges <- length(hi_conf_geno_yes_tran_index)
   set.seed(1) # for reproducability of the sample() function
   # do the permutation part
   # create a random sample of the tr
-  null_gamma_values <- rep(NA, perm)
+  null_intersection_values <- rep(NA, perm)
   for (j in 1:perm) {
     permuted_trans_edge_index <-
       sample(curr_hi_conf_geno_pheno_tr,
@@ -72,14 +77,14 @@ continuous_permutation <- function(geno_no_tran_index_list,
 
     scaled_pheno <- scales::rescale(curr_delta_pheno, to = c(0, 1))
 
-    null_gamma_values[j] <-
+    null_intersection_values[j] <-
       sum(
         (scaled_pheno * (1 * (1:ape::Nedge(tr) %in% curr_hi_conf_geno_pheno_tr))) *
           (1 * (1:ape::Nedge(tr) %in% permuted_trans_edge_index  &
              (1:ape::Nedge(tr) %in% curr_hi_conf_geno_pheno_tr))))
   }
   # Return output --------------------------------------------------------------
-  return(null_gamma_values)
+  return(null_intersection_values)
 }
 
 #' Calculate significance for continuous data
@@ -111,9 +116,9 @@ continuous_permutation <- function(geno_no_tran_index_list,
 #'   \describe{
 #'     \item{pvals}{Named numeric vector. Length == number of genotypes. Values
 #'     between 1 and 0. Names are genotype names.}
-#'     \item{null_gammas}{List of numeric vectors. Length of list == number
-#'     of genotypes. Each vector has length == number of permutations. Values
-#'     are integers}
+#'     \item{null_intersection}{List of numeric vectors. Length of list ==
+#'     number of genotypes. Each vector has length == number of permutations.
+#'      Values are integers}
 #'     \item{observed_pheno_trans_delta}{List of numeric vectors. Length of
 #'     list == number of genotypes. Vectors are of variable length because
 #'     length is the number of transition edges for that particular genotype.
@@ -123,7 +128,7 @@ continuous_permutation <- function(geno_no_tran_index_list,
 #'     length is the number of non-transition edges for that particular
 #'     genotype. Vectors are numeric.}
 #'     \item{num_genotypes}{Integer. The number of genotypes.}
-#'     \item{observed_gamma}{Numeric Vector. Length = number of genotypes.
+#'     \item{observed_intersection}{Numeric Vector. Length = number of genotypes.
 #'     Integers.}
 #'   }
 #'
@@ -158,10 +163,11 @@ calc_sig <- function(high_conf_list,
   # Function -------------------------------------------------------------------
   num_genotypes <- ncol(geno_mat)
   num_tree_edge <- nrow(pheno_recon_edge_mat)
-  pvals <- observed_gamma_value <- pheno_beta <-
+  pvals <- observed_intersection_value <- pheno_beta <-
     geno_beta <- rep(NA, num_genotypes)
   names(pvals) <- colnames(geno_mat)
-  null_gamma_list <- observed_pheno_trans_delta <- geno_non_trans_index_list <-
+  null_intersection_list <- observed_pheno_trans_delta <-
+    geno_non_trans_index_list <-
     high_conf_index_list <- observed_pheno_non_trans_delta <-
     geno_trans_index_list <- observed_pheno_delta_list <-
     rep(list(0), num_genotypes)
@@ -188,13 +194,14 @@ calc_sig <- function(high_conf_list,
   }
 
   for (i in 1:num_genotypes) {
-    scaled_pheno <- scales::rescale(observed_pheno_delta_list[[i]] , to = c(0, 1))
+    scaled_pheno <- scales::rescale(observed_pheno_delta_list[[i]],
+                                    to = c(0, 1))
 
     pheno_beta[i] <- sum(scaled_pheno * (1 * (tr_pheno_confidence == 1)))
 
     geno_beta[i] <- sum(genotype_transition_list[[i]]$transition == 1 &
                           genotype_confidence[[i]] == 1)
-    observed_gamma_value[i] <-
+    observed_intersection_value[i] <-
       sum(
         (scaled_pheno * (1 * (tr_pheno_confidence == 1))) *
           (genotype_transition_list[[i]]$transition == 1 &
@@ -202,29 +209,31 @@ calc_sig <- function(high_conf_list,
   }
 
   for (i in 1:num_genotypes) {
-    null_gamma_distribution <- continuous_permutation(geno_non_trans_index_list,
-                                                      tr,
-                                                      high_conf_index_list,
-                                                      permutations,
-                                                      i,
-                                                      observed_pheno_delta_list)
+    null_intersection_distribution <-
+      continuous_permutation(geno_non_trans_index_list,
+                             tr,
+                             high_conf_index_list,
+                             permutations,
+                             i,
+                             observed_pheno_delta_list)
 
     # Nothing should have to change after this point
     # empirical p value calculation here:
     # (1 + more extreme observations) / (1 + permutations)
-    pvals[i] <- calculate_permutation_based_p_value(null_gamma_distribution,
-                                                    observed_gamma_value[i],
-                                                    permutations)
+    pvals[i] <-
+      calculate_permutation_based_p_value(null_intersection_distribution,
+                                          observed_intersection_value[i],
+                                          permutations)
 
     # Save these for reporting / plots
-    null_gamma_list[[i]] <- null_gamma_distribution
+    null_intersection_list[[i]] <- null_intersection_distribution
   } # end for (i)
 
   # Return output --------------------------------------------------------------
   results <-
     list("pvals" = pvals,
-         "observed_gamma" = observed_gamma_value,
-         "null_gamma" = null_gamma_list,
+         "observed_intersection" = observed_intersection_value,
+         "null_intersection" = null_intersection_list,
          "observed_pheno_trans_delta" = observed_pheno_trans_delta,
          "observed_pheno_non_trans_delta" = observed_pheno_non_trans_delta,
          "num_genotypes" = num_genotypes)

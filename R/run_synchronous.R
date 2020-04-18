@@ -82,10 +82,10 @@ run_synchronous <- function(args){
                                            AR$pheno_recon_and_conf$node_anc_rec,
                                            args$discrete_or_continuous)
 
-  # CALCULATE GAMMA -----------------------------------------------------------#
-  gamma <- calculate_synchronous_convergence(genotype_transition_edges,
-                                             pheno_trans,
-                                             hi_conf)
+  # CALCULATE CONVERGENCE -----------------------------------------------------#
+  convergence <- calculate_synchronous_convergence(genotype_transition_edges,
+                                                   pheno_trans,
+                                                   hi_conf)
 
   # RUN PERMUTATION TEST ------------------------------------------------------#
   disc_trans_results <-
@@ -96,7 +96,7 @@ run_synchronous <- function(args){
                              args$perm,
                              args$fdr,
                              hi_conf$high_conf_ordered_by_edges,
-                             gamma)
+                             convergence)
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_trans <-
@@ -133,7 +133,7 @@ run_synchronous <- function(args){
   results_object$num_hi_conf_transition_edge <-
     hi_conf$num_high_conf_trans_edges
   results_object$dropped_genotypes <- hi_conf$dropped_genotypes
-  results_object$gamma <- gamma
+  results_object$convergence <- convergence
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,

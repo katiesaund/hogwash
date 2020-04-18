@@ -65,8 +65,8 @@ run_continuous <- function(args){
     geno_recon_ordered_by_edges,
     geno$snps_per_gene)
 
-  # CALCULATE GAMMA -----------------------------------------------------------#
-  gamma <-
+  # CALCULATE CONVERGENCE -----------------------------------------------------#
+  convergence <-
     calculate_continuous_convergence(AR$pheno_recon_and_conf$recon_edge_mat,
                                       hi_conf)
 
@@ -122,7 +122,7 @@ run_continuous <- function(args){
   results_object$delta_pheno_list <- trans_mat_results$delta_pheno_list
   results_object$hit_pvals <- corrected_pvals_all_trans$hit_pvals
   results_object$sig_hits <- corrected_pvals_all_trans$sig_pvals
-  results_object$gamma <- gamma
+  results_object$convergence <- convergence
   results_object$non_FDR_hit_pvals <- -log(results_all_transitions$pvals)
   save_results_as_r_object(args$output_dir,
                            args$output_name,

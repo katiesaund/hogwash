@@ -33,13 +33,14 @@ test_that("calculate_continuous_convergence gives expected results for valid con
   # What I expect
   beta_pheno <- sum(scaled_delta_pheno) # all are high confidence
   beta_geno <- 4
-  gamma <- sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition) # all are high confidence
-  union <- beta_pheno + beta_geno - gamma
-  epsilon <- gamma / union
+  intersection <-
+    sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition) # all are high confidence
+  union <- beta_pheno + beta_geno - intersection
+  epsilon <- intersection / union
 
   # Test
   expect_equal(output$num_hi_conf_edges, rep(num_edge, num_geno))
-  expect_equal(output$intersection, rep(gamma, num_geno))
+  expect_equal(output$intersection, rep(intersection, num_geno))
   expect_equal(output$pheno_beta, rep(beta_pheno, num_geno))
   expect_equal(output$geno_beta, rep(beta_geno, num_geno))
   expect_equal(output$epsilon, rep(epsilon, num_geno))
@@ -57,13 +58,14 @@ test_that("calculate_continuous_convergence gives expected results for valid con
   # What I expect
   beta_pheno <- sum(scaled_delta_pheno) # all are high confidence
   beta_geno <- 4
-  gamma <- sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition) # all are high confidence
-  union <- beta_pheno + beta_geno - gamma
-  epsilon <- gamma / union
+  intersection <-
+    sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition) # all are high confidence
+  union <- beta_pheno + beta_geno - intersection
+  epsilon <- intersection / union
 
   # Test
   expect_equal(new_output$num_hi_conf_edges, rep(num_edge, num_geno))
-  expect_equal(new_output$intersection, rep(gamma, num_geno))
+  expect_equal(new_output$intersection, rep(intersection, num_geno))
   expect_equal(new_output$pheno_beta, rep(beta_pheno, num_geno))
   expect_equal(new_output$geno_beta, rep(beta_geno, num_geno))
   expect_equal(new_output$epsilon, rep(epsilon, num_geno))
