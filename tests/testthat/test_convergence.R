@@ -34,7 +34,9 @@ test_that("calculate_continuous_convergence gives expected results for valid con
   beta_pheno <- sum(scaled_delta_pheno) # all are high confidence
   beta_geno <- 4
   intersection <-
-    sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition) # all are high confidence
+    sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition)
+  # all are high confidence
+
   union <- beta_pheno + beta_geno - intersection
   epsilon <- intersection / union
 
@@ -59,7 +61,9 @@ test_that("calculate_continuous_convergence gives expected results for valid con
   beta_pheno <- sum(scaled_delta_pheno) # all are high confidence
   beta_geno <- 4
   intersection <-
-    sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition) # all are high confidence
+    sum(scaled_delta_pheno * high_conf$genotype_transition[[1]]$transition)
+  # all are high confidence
+
   union <- beta_pheno + beta_geno - intersection
   epsilon <- intersection / union
 
@@ -70,4 +74,95 @@ test_that("calculate_continuous_convergence gives expected results for valid con
   expect_equal(new_output$geno_beta, rep(beta_geno, num_geno))
   expect_equal(new_output$epsilon, rep(epsilon, num_geno))
 })
-#TODO add unit tests for phyc and sync
+
+test_that("calculate_phyc_convergence works as expected", {
+  # Set up
+  set.seed(1)
+  num_tip <- 5
+  tree <- ape::rcoal(num_tip)
+  tree$node.label <- rep(100, ape::Nnode(tree))
+  bin_pheno <- c(1, 0, 1, 0, 1)
+  tree_recon_tip_and_node <- c(bin_pheno, 1, 0, 1, 1)
+  pheno_recon_mat <- convert_to_edge_mat(tr = tree, tree_recon_tip_and_node)
+  high_conf <- geno_transition_list <- NULL
+  num_edge <- ape::Nedge(tree)
+  num_geno <- 5
+  high_conf$tr_and_pheno_hi_conf <- rep(TRUE, num_edge)
+  high_conf$genotype_transition <- rep(list(list(0)), num_geno)
+  high_conf$high_conf_ordered_by_edges <- rep(list(0), num_geno)
+
+  for (i in 1:num_geno) {
+    high_conf$genotype_transition[[i]]$transition <- rep(c(0, 1), num_edge / 2)
+    high_conf$high_conf_ordered_by_edges[[i]] <- rep(1, num_edge)
+    geno_transition_list[[i]] <- high_conf$genotype_transition[[i]]$transition
+  }
+
+  pheno_recon_vec <- c(1, 1, 0, 0, 0, 1, 1, 0)
+
+  output <-
+    calculate_phyc_convergence(geno_trans_edge_list = geno_transition_list,
+                               pheno_recon_vec = pheno_recon_vec,
+                               high_conf = high_conf)
+
+  # What I expect
+  beta_pheno <- sum(pheno_recon_vec) # all are high confidence
+  beta_geno <- sum(geno_transition_list[[1]])
+  intersection <- sum(geno_transition_list[[1]] == 1 & pheno_recon_vec == 1)
+  # all are high confidence
+  epsilon <- 2 * intersection / (beta_pheno + beta_geno)
+
+  # Test
+  expect_equal(output$num_hi_conf_edges, rep(num_edge, num_geno))
+  expect_equal(output$intersection, rep(intersection, num_geno))
+  expect_equal(output$pheno_beta, beta_pheno)
+  expect_equal(output$geno_beta, rep(beta_geno, num_geno))
+  expect_equal(output$epsilon, rep(epsilon, num_geno))
+})
+
+
+test_that("calculate_synchronous_convergence works as expected", {
+  # Set up
+  set.seed(1)
+  num_tip <- 5
+  tree <- ape::rcoal(num_tip)
+  tree$node.label <- rep(100, ape::Nnode(tree))
+  bin_pheno <- c(1, 0, 1, 0, 1)
+  tree_recon_tip_and_node <- c(bin_pheno, 1, 0, 1, 1)
+  pheno_recon_mat <- convert_to_edge_mat(tr = tree, tree_recon_tip_and_node)
+  high_conf <- geno_transition_list <- NULL
+  num_edge <- ape::Nedge(tree)
+  num_geno <- 5
+  high_conf$tr_and_pheno_hi_conf <- rep(TRUE, num_edge)
+  high_conf$genotype_transition <- rep(list(list(0)), num_geno)
+  high_conf$high_conf_ordered_by_edges <- rep(list(0), num_geno)
+
+  for (i in 1:num_geno) {
+    high_conf$genotype_transition[[i]]$transition <- rep(c(0, 1), num_edge / 2)
+    high_conf$high_conf_ordered_by_edges[[i]] <- rep(1, num_edge)
+    geno_transition_list[[i]] <- high_conf$genotype_transition[[i]]$transition
+  }
+
+  pheno_trans_vec <- NULL
+  pheno_trans_vec$transition <- c(1, 1, 0, 0, 0, 1, 1, 0)
+
+  output <-
+    calculate_synchronous_convergence(
+      geno_trans_edge_list = geno_transition_list,
+      pheno_trans_vec = pheno_trans_vec,
+      high_conf = high_conf)
+
+  # What I expect
+  beta_pheno <- sum(pheno_trans_vec$transition) # all are high confidence
+  beta_geno <- sum(geno_transition_list[[1]])
+  intersection <-
+    sum(geno_transition_list[[1]] == 1 & pheno_trans_vec$transition == 1)
+  # all are high confidence
+  epsilon <- 2 * intersection / (beta_pheno + beta_geno)
+
+  # Test
+  expect_equal(output$num_hi_conf_edges, rep(num_edge, num_geno))
+  expect_equal(output$intersection, rep(intersection, num_geno))
+  expect_equal(output$pheno_beta, beta_pheno)
+  expect_equal(output$geno_beta, rep(beta_geno, num_geno))
+  expect_equal(output$epsilon, rep(epsilon, num_geno))
+})
