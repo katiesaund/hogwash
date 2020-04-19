@@ -1,7 +1,7 @@
 Package: hogwash
 Type: Package
 Title: Three Bacterial Genome-Wide Association Study Methods
-Version: 0.1.0.9000
+Version: 1.0.0
 Author: Katie Saund <katiephd@umich.edu>
 Maintainer: Katie Saund <katiephd@umich.edu>
 Description: Three methods to identify genetic loci associated with either a 
