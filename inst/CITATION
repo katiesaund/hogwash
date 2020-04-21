@@ -1,0 +1,14 @@
+citHeader("To cite prewas in publications use:")
+
+citEntry(
+  entry    = "article",
+  title    = "hogwash: Three Methods for Genome-Wide Association Studies in Bacteria",
+  author   = as.person("Katie Saund* [aut], Evan S. Snitkin [aut]"),
+  journal  = "bioRxiv",
+  year     = "2020",
+  textVersion = paste(
+  "hogwash: Three Methods for Genome-Wide Association Studies in Bacteria",
+  "Katie Saund, Evan S Snitkin",
+  "bioRxiv 2020.04.19.048421v1; doi: https://doi.org/10.1101/2020.04.19.048421v1"
+  )
+)
