@@ -303,8 +303,7 @@ convert_trait_vec_to_df <- function(trait_vec, tree){
 #'
 #' @param pheno Matrix. One column matrix. Row.names correspond to tree$tip.labels.
 #' @param tree Phylo.
-#'
-#' @export
+#' @noRd
 internal_report_phylogenetic_signal <- function(pheno, tree){
   check_class(pheno, "matrix")
   check_class(tree, "phylo")
