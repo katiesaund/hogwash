@@ -6,7 +6,7 @@
 \usage{
 hogwash(pheno, geno, tree, file_name = Sys.Date(), dir = ".",
   perm = 10000, fdr = 0.15, bootstrap = 0.7,
-  group_genotype_key = NULL)
+  group_genotype_key = NULL, test = "both")
 }
 \arguments{
 \item{pheno}{Matrix. Dimensions: nrow = number of samples, ncol = 1. Either
@@ -36,11 +36,16 @@ Default value is: 0.70.}
 
 \item{group_genotype_key}{Matrix. Dimenions: nrow = number of unique
 genotypes, ncol = 2. Optional input.}
+
+\item{test}{Character. Default = "both". User can supply three options:
+"both", "phyc", or "synchronous". Determines which test is run for binary
+data.}
 }
 \description{
 This function runs a bacterial genome-wide association test. It
-  runs either the Continuous Test (when given continuous phenotype data) or
-  both the Synchronous Test and PhyC Test (when given binary phenotype data).
+  runs either the Continuous Test when given continuous phenotype data. When
+  given binary data the user may run either the Synchronous Test or PhyC or
+  both.
 }
 \details{
 Overview: hogwash reads in one phenotype (either continuous or
@@ -72,8 +77,7 @@ Overview: hogwash reads in one phenotype (either continuous or
   group level and reduce the multiple testing correction burden. Use cases
   for this method could be to group SNPs into genes, kmers or genes into
   pathways, etc... Each of the three tests can be run on disaggregated data
-  or aggregated data with the inclusion of a grouping key which is
-  described later on the inputs page.
+  or aggregated data with the inclusion of a grouping key.
 }
 \examples{
 \donttest{

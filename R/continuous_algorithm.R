@@ -106,6 +106,7 @@ continuous_permutation <- function(geno_no_tran_index_list,
 #'     \item{high_conf_ordered_by_edges}{List. Length(list) = ncol(mat) ==
 #'     number of genotypes. Each entry is a vector with length == Nedge(tr). All
 #'     entries are 0 (low confidence) or 1 (high confidence).}
+#'    }
 #' @param permutations Integer. Number of times to run the permutation test.
 #' @param tr Phylo.
 #' @param pheno_recon_edge_mat Matrix. Nrow = Nedge(tr). Ncol = 2.
