@@ -1,11 +1,6 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: R
-cache: packages
-
-install:
-  ## For installing all CRAN dependencies using rpack's DESCRIPTION
-  - ./travis-tool.sh install_deps
 
 env:
   global:
@@ -28,6 +23,10 @@ addons:
        - r-cran-rgdal
        - libfftw3-dev
        - cargo
+
+install:
+  ## For installing all CRAN dependencies using rpack's DESCRIPTION
+  - ./travis-tool.sh install_deps
 
 r_packages:
   - covr
