@@ -29,7 +29,10 @@ Imports:
     caper,
     scales
 Suggests: 
-    testthat, knitr, rmarkdown
+    testthat,
+    knitr,
+    rmarkdown,
+    covr
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 URL: https://github.com/katiesaund/hogwash/wiki

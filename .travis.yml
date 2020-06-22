@@ -2,3 +2,17 @@
 
 language: R
 cache: packages
+
+install:
+  ## For installing all CRAN dependencies using rpack's DESCRIPTION
+  - ./travis-tool.sh install_deps
+
+env:
+  global:
+    - R_CHECK_ARGS="--no-build-vignettes --no-manual"
+
+r_packages:
+  - covr
+
+after_success:
+  - Rscript -e 'covr::codecov()'
