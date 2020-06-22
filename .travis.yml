@@ -14,12 +14,18 @@ addons:
      packages:
        - libmagick++-dev
 
-install:
-  ## For installing all CRAN dependencies using rpack's DESCRIPTION
-  - ./travis-tool.sh install_deps
-
 r_packages:
   - covr
+  - ape
+  - graphics
+  - grDevices
+  - pheatmap
+  - phytools
+  - stats
+  - utils
+  - methods
+  - caper
+  - scales
 
 after_success:
   - Rscript -e 'covr::codecov()'
