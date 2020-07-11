@@ -1,63 +1,4 @@
 context("Group genotypes") #---------------------------------------------------#
-# test build_gene_trans_from_snp_trans
-test_that("build_gene_trans_from_snp_trans works for valid input", {
-  # Set up
-  set.seed(1)
-  temp_tree <- ape::rtree(7)
-  temp_tree$edge.length <-
-    rep(sum(temp_tree$edge.length) / ape::Nedge(temp_tree),
-        ape::Nedge(temp_tree))
-  temp_tree$node.label <- c(100, 100, 50, 100, 100, 100) # 1 low confidence edge
-
-  genotype1 <-
-    matrix(c(0, 1, 0, 1, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
-  genotype2 <-
-    matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
-  genotype5 <-
-    matrix(c(0, 1, 1, 1, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
-  genotype6 <-
-    matrix(c(0, 1, 1, 1, 1, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
-  genotype7 <-
-    matrix(c(0, 1, 0, 0, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
-  genotype8 <-
-    matrix(c(0, 0, 0, 1, 0, 0, 0), nrow = ape::Ntip(temp_tree), ncol = 1)
-  genotype <-
-    cbind(genotype1, genotype2, genotype5, genotype6, genotype7, genotype8)
-  row.names(genotype) <- temp_tree$tip.label
-  colnames(genotype) <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
-
-  set.seed(1)
-  continuous_phenotype <- as.matrix(phytools::fastBM(temp_tree))
-  row.names(continuous_phenotype) <- temp_tree$tip.label
-  colnames(continuous_phenotype) <- "growth"
-
-
-  snp_gene_key <- matrix(NA, nrow = ncol(genotype), ncol = 2)
-  colnames(snp_gene_key) <- c("SNP", "GENE")
-  snp_gene_key[, 1] <- c("SNP1", "SNP2", "SNP5", "SNP6", "SNP7", "SNP8")
-  snp_gene_key[, 2] <- c("GENE1", "GENE2", "GENE5", "GENE6", "GENE7", "GENE7")
-
-  AR <- prepare_ancestral_reconstructions(temp_tree,
-                                          continuous_phenotype,
-                                          genotype,
-                                          "continuous")
-
-  temp_results <- build_gene_trans_from_snp_trans(temp_tree,
-                                                  genotype,
-                                                  AR$geno_trans,
-                                                  snp_gene_key)
-
-  # Test
-  expect_true(length(temp_results) == length(unique(snp_gene_key[, 2])))
-  expect_equal(temp_results[[1]]$transition, AR$geno_trans[[1]]$transition)
-  expect_equal(temp_results[[2]]$transition, AR$geno_trans[[2]]$transition)
-  expect_equal(temp_results[[3]]$transition, AR$geno_trans[[3]]$transition)
-  expect_equal(temp_results[[4]]$transition, AR$geno_trans[[4]]$transition)
-  expect_equal(temp_results[[5]]$transition,
-               AR$geno_trans[[5]]$transition + AR$geno_trans[[6]]$transition)
-  expect_equal(length(temp_results[[1]]$transition), ape::Nedge(temp_tree))
-  expect_equal(length(temp_results[[1]]$trans_dir), ape::Nedge(temp_tree))
-})
 
 # test prepare_genotype --------------------------------------------------------
 test_that("prepare_genotype gives expected genotype for a grouped input", {
@@ -408,5 +349,3 @@ test_that("build_gene_genotype_from_snps gives error for invalid inputs", {
   # Test
   expect_error(build_gene_genotype_from_snps(temp_geno, temp_key))
 })
-
-
