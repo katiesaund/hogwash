@@ -25,6 +25,9 @@ run_synchronous <- function(args){
                                           args$phenotype,
                                           genotype,
                                           args$discrete_or_continuous)
+  print("Finish ancestral reconstruction")
+  print(Sys.time())
+
   # Include all transition edges (WT -> mutant and mutant -> WT). For
   #  synchronous and continuous tests.
   geno_trans_synchronous <- AR$geno_trans
@@ -78,6 +81,8 @@ run_synchronous <- function(args){
                              args$fdr,
                              hi_conf$high_conf_ordered_by_edges,
                              convergence)
+  print("Finish permutation test")
+  print(Sys.time())
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_trans <-
