@@ -128,6 +128,8 @@ run_phyc <- function(args){
   results_object$dropped_genotypes <-
     hi_conf$dropped_genotypes
   results_object$convergence <- convergence
+  results_object$phylogenetic_signal <- unname(calculate_d(args$phenotype,
+                                                           args$tree))
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,
