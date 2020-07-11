@@ -36,6 +36,7 @@ run_continuous <- function(args){
     geno_recon_ordered_by_edges[[k]] <- reorder_tip_and_node_to_edge(
       AR$geno_recon_and_conf[[k]]$tip_and_node_recon, args$tree)
   }
+
   hi_conf <- prepare_high_confidence_objects(
     geno_trans_synchronous,
     args$tree,
