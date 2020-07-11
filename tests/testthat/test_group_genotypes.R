@@ -53,9 +53,9 @@ test_that("prepare_genotype gives expected genotype for a grouped input", {
 
   # Test
   # Expected output matrix
-  expected_geno <- temp_geno[, c(1, 2, 5, 6, 7)]
-  expected_geno[, 5] <- rowSums(temp_geno[,7:8])
-  colnames(expected_geno) <- paste0("GENE", c(1, 2, 5, 6, 7))
+  expected_geno <- temp_geno[, c(1, 5, 6, 7)]
+  expected_geno[, 4] <- rowSums(temp_geno[, 7:8])
+  colnames(expected_geno) <- paste0("GENE", c(1, 5, 6, 7))
   expect_equal(temp_result$genotype, expected_geno)
   expect_equal(temp_result$gene_snp_lookup, temp_lookup[c(1, 2, 5, 6, 7, 8), ])
   expect_equal(as.numeric(unname(temp_result$snps_per_gene)), c(1, 1, 1, 1, 2))
@@ -211,12 +211,12 @@ test_that("prepare_grouped_genotype works for valid inputs", {
   temp_lookup[, 2] <-
     c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "GENE7", "GENE7")
 
-  temp_result <- prepare_grouped_genotype(temp_geno, temp_lookup)
+  temp_result <- prepare_grouped_genotype(temp_geno, temp_lookup, temp_tree)
 
   # Test
-  expected_geno <- temp_geno[, c(1, 2, 5, 6, 7)]
-  expected_geno[, 5] <- rowSums(temp_geno[,7:8])
-  colnames(expected_geno) <- paste0("GENE", c(1, 2, 5, 6, 7))
+  expected_geno <- temp_geno[, c(1, 5, 6, 7)]
+  expected_geno[, 4] <- rowSums(temp_geno[,7:8])
+  colnames(expected_geno) <- paste0("GENE", c(1, 5, 6, 7))
   expect_equal(temp_result$genotype, expected_geno)
   expect_equal(temp_result$gene_snp_lookup, temp_lookup[c(1, 2, 5, 6, 7, 8), ])
   expect_equal(as.numeric(unname(temp_result$snps_per_gene)), c(1, 1, 1, 1, 2))
@@ -227,22 +227,29 @@ test_that("prepare_grouped_genotype works for valid inputs", {
 # test build_gene_genotype_from_snps
 test_that("build_gene_genotype_from_snps works for valid inputs", {
   # Set up
+  ntip <- 4
   temp_geno <- matrix(c(0, 1),
                       ncol = 4,
-                      nrow = 3)
+                      nrow = ntip)
+  temp_geno[2, 1] <- temp_geno[2, 3] <- temp_geno[4, 2] <- 0
+  temp_geno[1, 3] <- 1
+
   colnames(temp_geno) <- c("a", "b", "d", "h")
-  row.names(temp_geno) <- c("sample1", "sample2", "sample3")
+  row.names(temp_geno) <- c("sample1", "sample2", "sample3", "sample4")
   temp_key <- matrix(c(letters[1:8],
                      c(rep("One", 3), rep("Two", 3), rep("Three", 2))),
                      ncol = 2,
                      nrow = 8)
   colnames(temp_key) <- c("snp", "gene")
   temp_key <- temp_key[temp_key[, 1] %in% colnames(temp_geno),, drop = FALSE]
-  results <- build_gene_genotype_from_snps(temp_geno, temp_key)
+  temp_tree <- ape::rcoal(ntip)
+  temp_tree$node.label <- c(100, 100, 100)
+  temp_tree$tip.label <- row.names(temp_geno)
+  results <- build_gene_genotype_from_snps(temp_geno, temp_key, temp_tree)
 
-  expected_results <- matrix(c(1, 1, 1, 0, 1, 0, 1, 0, 1), nrow = 3, ncol = 3)
+  expected_results <- temp_geno[ , c(1, 3:4)]
+  expected_results[2, 1] <- 1
   colnames(expected_results) <- c("One", "Two", "Three")
-  row.names(expected_results) <- c("sample1", "sample2", "sample3")
 
   # Test
   expect_identical(results, expected_results)

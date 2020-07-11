@@ -1,17 +1,19 @@
 #' Build grouped genotype
 #'
 #' @description Build presence/absence of the grouped genotypes (e.g. gene) from
-#'   the presence/absence of the ungrouped genotypes (e.g. snps).
+#'   the presence/absence of the ungrouped genotypes (e.g. snps). Remove columns
+#'   (genes) where the genotype is too rare or common (presence = 0, 1, N, N-1).
 #'
 #' @param geno Matrix. Columns are genotypes. Rows are isolates.
 #' @param gene_to_snp_lookup_table Matrix. 2 columns. 1st column are the
 #'   ungrouped genotypes 2nd column are the grouped genotypes. The table's 1st
 #'   column must contain only genotypes that are found in the row.names(geno).
+#' @param tr Phylogenetic tree.
 #'
 #' @return samples_by_genes. Matrix.
 #'
 #' @noRd
-build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
+build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table, tr){
   # Check input ----------------------------------------------------------------
   check_class(geno, "matrix")
   check_class(gene_to_snp_lookup_table, "matrix")
@@ -38,8 +40,10 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 
   samples_by_genes <- samples_by_genes > 0
   class(samples_by_genes) <- "numeric"
+
+  samples_by_genes <- remove_rare_or_common_geno(samples_by_genes, tr)
   # Return output --------------------------------------------------------------
-  return(samples_by_genes)
+  return(samples_by_genes$mat)
 }
 
 #' Remove rare and common genotypes from grouped genotypes
@@ -51,6 +55,7 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 #' @param geno Matrix. Binary. Nrow = Ntip(tr). Ncol = number of original
 #'   genotypes.
 #' @param lookup Matrix. Ncol = 2. Nrow = genotypes with group assignments.
+#' @param tr Tree.
 #'
 #' @return List of four objects:
 #'   \describe{
@@ -62,7 +67,7 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table){
 #'     \item{genotype.}{Matrix.}
 #'   }
 #' @noRd
-prepare_grouped_genotype <- function(geno, lookup){
+prepare_grouped_genotype <- function(geno, lookup, tr){
   # Check input ----------------------------------------------------------------
   check_dimensions(lookup, min_rows = 1, exact_cols = 2, min_cols = 2)
   check_dimensions(geno, min_cols = 1, min_rows = 1)
@@ -99,7 +104,7 @@ prepare_grouped_genotype <- function(geno, lookup){
   }
 
   # Do the grouping step ----
-  grouped_genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup)
+  grouped_genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup, tr)
 
   # Return output ----
   results <- list("snps_per_gene" = snps_per_gene,
@@ -186,7 +191,7 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
   #
   # Function -------------------------------------------------------------------
   if (group_logical) {
-    prepped_geno <- prepare_grouped_genotype(geno, lookup)
+    prepped_geno <- prepare_grouped_genotype(geno, lookup, tr)
   } else {
     prepped_geno <- prepare_ungrouped_genotype(geno, tr)
   }
