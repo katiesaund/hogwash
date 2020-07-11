@@ -185,6 +185,7 @@ calculate_lambda <- function(pheno, tree) {
   }
 
   # Function
+  set.seed(1)
   lambda_out <-
     phytools::phylosig(tree, pheno, method = "lambda", test = TRUE)
   lambda <- lambda_out$lambda
@@ -251,6 +252,7 @@ calculate_d <- function(pheno, tree) {
     caper::comparative.data(data = temp_trait,
                             phy = tree,
                             names.col =  ID)
+  set.seed(1)
   d_stat_results <- caper::phylo.d(data = compar_data_obj,
                                    names.col = ID,
                                    binvar = trait,
