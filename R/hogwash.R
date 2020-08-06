@@ -110,7 +110,7 @@
 hogwash <- function(pheno,
                     geno,
                     tree,
-                    file_name = Sys.Date(),
+                    file_name = "hogwash",
                     dir = ".",
                     perm = 10000,
                     fdr = 0.15,
