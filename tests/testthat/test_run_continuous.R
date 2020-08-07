@@ -3,7 +3,7 @@ context("Run continuous") #----------------------------------------------------#
 test_that("run_continuous() doesn't give any errors when given a continuous
           phenotype and snps (do not group into genes)", {
   args                        <- NULL
-  args$test                    <- FALSE
+  args$test                   <- FALSE
   args$phenotype              <- hogwash::growth
   args$tree                   <- hogwash::tree
   args$tree$node.label[1]     <- 0
@@ -17,6 +17,7 @@ test_that("run_continuous() doesn't give any errors when given a continuous
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- FALSE
   args$gene_snp_lookup        <- NULL
+  args$grouping_method        <- "post-ar"
   expect_error(run_continuous(args), NA)
 })
 
@@ -41,6 +42,7 @@ test_that("run_continuous() doesn't give any errors when given a continuous
   } else {
     args$gene_snp_lookup <- NULL
   }
+  args$grouping_method        <- "post-ar"
   expect_error(run_continuous(args), NA)
 })
 
@@ -61,7 +63,8 @@ test_that("run_continuous() results are the same if the genotype or phenotype ro
               args$discrete_or_continuous <- "continuous"
               args$bootstrap_cutoff       <- 0.7
               args$group_genotype         <- FALSE
-              args$gene_snp_lookup <- NULL
+              args$gene_snp_lookup        <- NULL
+              args$grouping_method        <- "post-ar"
 
               pheno_order <- run_continuous(args)
 
@@ -81,7 +84,9 @@ test_that("run_continuous() results are the same if the genotype or phenotype ro
               args$discrete_or_continuous <- "continuous"
               args$bootstrap_cutoff       <- 0.7
               args$group_genotype         <- FALSE
-              args$gene_snp_lookup <- NULL
+              args$gene_snp_lookup        <- NULL
+              args$grouping_method        <- "post-ar"
+
               geno_order <- run_continuous(args)
 
               args                        <- NULL
@@ -98,7 +103,9 @@ test_that("run_continuous() results are the same if the genotype or phenotype ro
               args$discrete_or_continuous <- "continuous"
               args$bootstrap_cutoff       <- 0.7
               args$group_genotype         <- FALSE
-              args$gene_snp_lookup <- NULL
+              args$gene_snp_lookup        <- NULL
+              args$grouping_method        <- "post-ar"
+
               orders_match <- run_continuous(args)
 
               expect_identical(geno_order, orders_match)
@@ -133,7 +140,9 @@ test_that("run_continuous() gives sames results for the tree, when the tree is
             args$discrete_or_continuous <- "continuous"
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
-            args$gene_snp_lookup <- NULL
+            args$gene_snp_lookup        <- NULL
+            args$grouping_method        <- "post-ar"
+
             unrooted_out <- run_continuous(args)
 
             args$tree <- phytools::midpoint.root(args$tree)
