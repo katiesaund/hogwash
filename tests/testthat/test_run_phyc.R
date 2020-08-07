@@ -21,6 +21,8 @@ test_that("run_phyc() doesn't give any errors when given a discrete phenotype
   } else {
     args$gene_snp_lookup <- NULL
   }
+  args$grouping_method        <- "post-ar"
+
   expect_error(run_phyc(args), NA)
 })
 
@@ -40,7 +42,9 @@ test_that("run_phyc() doesn't give any errors when given a discrete phenotype
   args$discrete_or_continuous <- "discrete"
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- FALSE
-  args$gene_snp_lookup <- NULL
+  args$gene_snp_lookup        <- NULL
+  args$grouping_method        <- "post-ar"
+
   expect_error(run_phyc(args), NA)
 })
 
@@ -70,7 +74,9 @@ test_that("run_phyc() doesn't give any errors when given a discrete phenotype
             args$discrete_or_continuous <- "discrete"
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
-            args$gene_snp_lookup <- NULL
+            args$gene_snp_lookup        <- NULL
+            args$grouping_method        <- "post-ar"
+
             expect_error(run_phyc(args), NA)
 })
 
@@ -93,7 +99,9 @@ test_that("run_phyc() doesn't give any errors when genotype matrix not originall
             args$discrete_or_continuous <- "discrete"
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
-            args$gene_snp_lookup <- NULL
+            args$gene_snp_lookup        <- NULL
+            args$grouping_method        <- "post-ar"
+
             expect_error(run_phyc(args), NA)
 })
 
@@ -115,7 +123,8 @@ test_that("run_phyc() doesn't give any errors when phenotype matrix not original
             args$discrete_or_continuous <- "discrete"
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
-            args$gene_snp_lookup <- NULL
+            args$grouping_method        <- "post-ar"
+            args$gene_snp_lookup        <- NULL
             expect_error(run_phyc(args), NA)
 })
 
@@ -136,7 +145,8 @@ test_that("run_phyc() results are the same if the genotype or phenotype rownames
             args$discrete_or_continuous <- "discrete"
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
-            args$gene_snp_lookup <- NULL
+            args$gene_snp_lookup        <- NULL
+            args$grouping_method        <- "post-ar"
 
             pheno_order <- run_phyc(args)
 
@@ -156,7 +166,9 @@ test_that("run_phyc() results are the same if the genotype or phenotype rownames
             args$discrete_or_continuous <- "discrete"
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
-            args$gene_snp_lookup <- NULL
+            args$gene_snp_lookup        <- NULL
+            args$grouping_method        <- "post-ar"
+
             geno_order <- run_phyc(args)
 
             args                        <- NULL
@@ -173,7 +185,9 @@ test_that("run_phyc() results are the same if the genotype or phenotype rownames
             args$discrete_or_continuous <- "discrete"
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
-            args$gene_snp_lookup <- NULL
+            args$gene_snp_lookup        <- NULL
+            args$grouping_method        <- "post-ar"
+
             orders_match <- run_phyc(args)
 
             expect_identical(geno_order, orders_match)
@@ -209,7 +223,8 @@ test_that("run_phyc() gives sames results for the tree, when the tree is
             args$discrete_or_continuous <- "discrete"
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
-            args$gene_snp_lookup <- NULL
+            args$gene_snp_lookup        <- NULL
+            args$grouping_method        <- "post-ar"
             unrooted_out <- run_phyc(args)
 
             args$tree <- phytools::midpoint.root(args$tree)
