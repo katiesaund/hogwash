@@ -49,7 +49,8 @@ test_that("prepare_genotype gives expected genotype for a grouped input", {
   temp_result <- prepare_genotype(temp_logical,
                                   temp_geno,
                                   temp_tree,
-                                  temp_lookup)
+                                  temp_lookup,
+                                  "pre-ar")
 
   # Test
   # Expected output matrix
@@ -110,7 +111,8 @@ test_that("prepare_genotype gives expected genotype for a not grouped input", {
   temp_result <- prepare_genotype(temp_logical,
                                   temp_geno,
                                   temp_tree,
-                                  temp_lookup)
+                                  temp_lookup,
+                                  "pre-ar")
 
   # Test
   expect_null(temp_result$snps_per_gene)
@@ -166,8 +168,8 @@ test_that("prepare_ungrouped_genotype works for valid input", {
                c("SNP2", "SNP3", "SNP4", "SNP7", "SNP8"))
 })
 
-# test prepare_grouped_genotype ------------------------------------------------
-test_that("prepare_grouped_genotype works for valid inputs", {
+# test prepare_grouped_genotype_pre_ar -----------------------------------------
+test_that("prepare_grouped_genotype_pre_ar works for valid inputs", {
   # Set up
   set.seed(1)
   temp_tree <- ape::rtree(7)
@@ -211,7 +213,8 @@ test_that("prepare_grouped_genotype works for valid inputs", {
   temp_lookup[, 2] <-
     c("GENE1", "GENE2", "GENE3", "GENE4", "GENE5", "GENE6", "GENE7", "GENE7")
 
-  temp_result <- prepare_grouped_genotype(temp_geno, temp_lookup, temp_tree)
+  temp_result <-
+    prepare_grouped_genotype_pre_ar(temp_geno, temp_lookup, temp_tree)
 
   # Test
   expected_geno <- temp_geno[, c(1, 5, 6, 7)]
@@ -224,8 +227,8 @@ test_that("prepare_grouped_genotype works for valid inputs", {
                c("GENE1", "GENE2", "GENE5", "GENE6", "GENE7"))
 })
 
-# test build_gene_genotype_from_snps
-test_that("build_gene_genotype_from_snps works for valid inputs", {
+# test build_gene_genotype_from_snps_pre_ar ------------------------------------
+test_that("build_gene_genotype_from_snps_pre_ar works for valid inputs", {
   # Set up
   ntip <- 4
   temp_geno <- matrix(c(0, 1),
@@ -245,9 +248,11 @@ test_that("build_gene_genotype_from_snps works for valid inputs", {
   temp_tree <- ape::rcoal(ntip)
   temp_tree$node.label <- c(100, 100, 100)
   temp_tree$tip.label <- row.names(temp_geno)
-  results <- build_gene_genotype_from_snps(temp_geno, temp_key, temp_tree)
+  results <- build_gene_genotype_from_snps_pre_ar(temp_geno,
+                                                  temp_key,
+                                                  temp_tree)
 
-  expected_results <- temp_geno[ , c(1, 3:4)]
+  expected_results <- temp_geno[, c(1, 3:4)]
   expected_results[2, 1] <- 1
   colnames(expected_results) <- c("One", "Two", "Three")
 
@@ -255,7 +260,7 @@ test_that("build_gene_genotype_from_snps works for valid inputs", {
   expect_identical(results, expected_results)
 })
 
-test_that("build_gene_genotype_from_snps gives error for invalid inputs", {
+test_that("build_gene_genotype_from_snps_pre_ar gives error for invalid inputs", {
   # Set up
   temp_geno <- matrix(c(0, 1),
                       ncol = 4,
@@ -269,5 +274,5 @@ test_that("build_gene_genotype_from_snps gives error for invalid inputs", {
   colnames(temp_key) <- c("snp", "gene")
 
   # Test
-  expect_error(build_gene_genotype_from_snps(temp_geno, temp_key))
+  expect_error(build_gene_genotype_from_snps_pre_ar(temp_geno, temp_key))
 })
