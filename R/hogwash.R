@@ -35,6 +35,8 @@
 #'   for this method could be to group SNPs into genes, kmers or genes into
 #'   pathways, etc... Each of the three tests can be run on disaggregated data
 #'   or aggregated data with the inclusion of a grouping key.
+#'   There are two grouping options: grouping prior to ancestral reconstruction
+#'   or grouping post ancestral reconstruction.
 #'
 #' @param pheno Matrix. Dimensions: nrow = number of samples, ncol = 1. Either
 #'   continuous or binary (0/1). Row.names() must match tree$tip.label. Required
@@ -55,6 +57,10 @@
 #'   Default value is: 0.70.
 #' @param group_genotype_key Matrix. Dimenions: nrow = number of unique
 #'   genotypes, ncol = 2. Optional input.
+#' @param grouping_method Character. Either "pre-ar" or "post-ar". Default =
+#'   "post_ar". Determines which grouping method is used if and only if a
+#'   group_genotype_key is provided; if no key is provided this argument is
+#'   ignored.
 #' @param test Character. Default = "both". User can supply three options:
 #'   "both", "phyc", or "synchronous". Determines which test is run for binary
 #'   data.
@@ -87,7 +93,8 @@
 #' hogwash(pheno = phenotype,
 #'         geno = genotype,
 #'         tree = tree,
-#'         group_genotype_key = key)
+#'         group_genotype_key = key,
+#'         grouping_method = "post-ar")
 #'
 #' # Both Synchronous Test & PhyC while grouping SNPs into genes
 #' phenotype <- hogwash::antibiotic_resistance
@@ -97,7 +104,8 @@
 #' hogwash(pheno = phenotype,
 #'         geno = genotype,
 #'         tree = tree,
-#'         group_genotype_key = key)
+#'         group_genotype_key = key,
+#'         grouping_method = "post-ar")
 #' }
 #'
 #' @author Katie Saund
@@ -116,6 +124,7 @@ hogwash <- function(pheno,
                     fdr = 0.15,
                     bootstrap = 0.70,
                     group_genotype_key = NULL,
+                    grouping_method = "post-ar",
                     test = "both"){
   args <- NULL
   args$phenotype <- pheno
@@ -131,6 +140,7 @@ hogwash <- function(pheno,
   if (!is.null(group_genotype_key)) {
     args$group_genotype <- TRUE
   }
+  args$grouping_method <- grouping_method
   args$test <- test
   args$discrete_or_continuous <-
     check_input_format(args$phenotype,
@@ -142,6 +152,7 @@ hogwash <- function(pheno,
                        args$fdr,
                        args$bootstrap_cutoff,
                        args$gene_snp_lookup,
+                       args$grouping_method,
                        args$test)
   select_test_type(args)
 }
