@@ -17,6 +17,13 @@
 #' @param bootstrap Number. Confidence threshold for tree bootstrap values.
 #' @param group_genotype_key Either NULL or a matrix. Dimenions: nrow = number
 #'   of unique genotypes, ncol = 2.
+#' @param grouping_method Character. Either "pre-ar" or "post-ar". Default =
+#'   "post_ar". Determines which grouping method is used if and only if a
+#'   group_genotype_key is provided; if no key is provided this argument is
+#'   ignored.
+#' @param test Character. Default = "both". User can supply three options:
+#'   "both", "phyc", or "synchronous". Determines which test is run for binary
+#'   data.
 #'
 #' @return discrete_or_continuous. Character. Either "discrete" or "continuous".
 #'   Describes the input phenotype.
