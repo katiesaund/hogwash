@@ -17,7 +17,8 @@ run_synchronous <- function(args){
   geno <- prepare_genotype(args$group_genotype,
                            args$genotype,
                            args$tree,
-                           args$gene_snp_lookup)
+                           args$gene_snp_lookup,
+                           args$grouping_method)
   genotype <- geno$genotype
   results_object$no_convergence_genotypes <- geno$no_convergence_genotypes
 
@@ -32,17 +33,35 @@ run_synchronous <- function(args){
   #  synchronous and continuous tests.
   geno_trans_synchronous <- AR$geno_trans
 
-  geno_conf_ordered_by_edges <-
-    geno_recon_ordered_by_edges <-
-    rep(list(0), ncol(genotype))
-  for (k in 1:ncol(genotype)) {
-    geno_conf_ordered_by_edges[[k]] <-
-      reorder_tip_and_node_to_edge(
-        AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
-    geno_recon_ordered_by_edges[[k]] <-
-      reorder_tip_and_node_to_edge(
-        AR$geno_recon_and_conf[[k]]$tip_and_node_recon, args$tree)
+  if (args$group_genotype == TRUE & args$grouping_method == "post-AR") {
+    geno_trans_phyc <- prep_geno_trans_for_phyc(genotype, AR$geno_trans)
+    grouped_geno <- group_genotypes_post_ar(args$tree,
+                                            genotype,
+                                            AR$geno_recon_and_conf,
+                                            geno_trans_synchronous,
+                                            geno_trans_phyc,
+                                            geno$gene_snp_lookup,
+                                            geno$unique_genes)
+    genotype <- grouped_geno$genotype
+    geno_recon_ordered_by_edges <- grouped_geno$geno_recon_ordered_by_edges
+    geno_conf_ordered_by_edges  <- grouped_geno$geno_conf_ordered_by_edges
+    geno_trans_synchronous <- grouped_geno$geno_trans_synchronous
+    results_object$no_convergence_genotypes <-
+      grouped_geno$no_convergence_genotypes
+  } else {
+    geno_conf_ordered_by_edges <-
+      geno_recon_ordered_by_edges <-
+      rep(list(0), ncol(genotype))
+    for (k in 1:ncol(genotype)) {
+      geno_conf_ordered_by_edges[[k]] <-
+        reorder_tip_and_node_to_edge(
+          AR$geno_recon_and_conf[[k]]$tip_and_node_rec_conf, args$tree)
+      geno_recon_ordered_by_edges[[k]] <-
+        reorder_tip_and_node_to_edge(
+          AR$geno_recon_and_conf[[k]]$tip_and_node_recon, args$tree)
+    }
   }
+
 
   hi_conf <- prepare_high_confidence_objects(
     geno_trans_synchronous,
