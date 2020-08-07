@@ -15,7 +15,7 @@
 #' @return samples_by_genes. Matrix.
 #'
 #' @noRd
-build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table, tr){
+build_gene_genotype_from_snps_pre_ar <- function(geno, gene_to_snp_lookup_table, tr){
   # Check input ----------------------------------------------------------------
   check_class(geno, "matrix")
   check_class(gene_to_snp_lookup_table, "matrix")
@@ -70,7 +70,7 @@ build_gene_genotype_from_snps <- function(geno, gene_to_snp_lookup_table, tr){
 #'     \item{genotype.}{Matrix.}
 #'   }
 #' @noRd
-prepare_grouped_genotype <- function(geno, lookup, tr){
+prepare_grouped_genotype_pre_ar <- function(geno, lookup, tr){
   # Check input ----------------------------------------------------------------
   check_dimensions(lookup, min_rows = 1, exact_cols = 2, min_cols = 2)
   check_dimensions(geno, min_cols = 1, min_rows = 1)
@@ -107,7 +107,7 @@ prepare_grouped_genotype <- function(geno, lookup, tr){
   }
 
   # Do the grouping step ----
-  grouped_genotype <- build_gene_genotype_from_snps(genotype, gene_snp_lookup, tr)
+  grouped_genotype <- build_gene_genotype_from_snps_pre_ar(genotype, gene_snp_lookup, tr)
 
   # Return output ----
   results <- list("snps_per_gene" = snps_per_gene,
