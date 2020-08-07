@@ -85,9 +85,9 @@ prepare_genotype <- function(group_logical, geno, tr, lookup, group_method){
 
   # Function -------------------------------------------------------------------
   if (group_logical) {
-    if (group_method == "post-AR") {
+    if (group_method == "post-ar") {
       prepped_geno <- prepare_grouped_genotype_post_ar(geno, lookup)
-    } else if (group_method == "pre-AR") {
+    } else if (group_method == "pre-ar") {
       prepped_geno <- prepare_grouped_genotype_pre_ar(geno, lookup, tr)
     } else {
       stop("Group method invalid")
