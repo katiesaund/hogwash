@@ -17,7 +17,8 @@ run_continuous <- function(args){
   geno <- prepare_genotype(args$group_genotype,
                            args$genotype,
                            args$tree,
-                           args$gene_snp_lookup)
+                           args$gene_snp_lookup,
+                           args$grouping_method)
   genotype <- geno$genotype
   results_object$no_convergence_genotypes <- geno$no_convergence_genotypes
   AR <- prepare_ancestral_reconstructions(args$tree,
