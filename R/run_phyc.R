@@ -37,7 +37,7 @@ run_phyc <- function(args){
 
   # Keep only WT -> mutant transitions.
   geno_trans_phyc <- prep_geno_trans_for_phyc(genotype, geno_trans_synchronous)
-  if (args$group_genotype == TRUE & args$grouping_method == "post-AR") {
+  if (args$group_genotype == TRUE & args$grouping_method == "post-ar") {
     grouped_geno <- group_genotypes_post_ar(args$tree,
                                             genotype,
                                             AR$geno_recon_and_conf,

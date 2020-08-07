@@ -31,7 +31,7 @@ run_continuous <- function(args){
   # Include all transition edges (WT -> mutant and mutant -> WT) for both
   #  synchronous and continuous tests.
   geno_trans_synchronous <- AR$geno_trans
-  if (args$group_genotype == TRUE & args$grouping_method == "post-AR") {
+  if (args$group_genotype == TRUE & args$grouping_method == "post-ar") {
     geno_trans_phyc <-
       prep_geno_trans_for_phyc(genotype, geno_trans_synchronous)
     grouped_geno <- group_genotypes_post_ar(args$tree,

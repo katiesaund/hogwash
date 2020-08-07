@@ -33,7 +33,7 @@ run_synchronous <- function(args){
   #  synchronous and continuous tests.
   geno_trans_synchronous <- AR$geno_trans
 
-  if (args$group_genotype == TRUE & args$grouping_method == "post-AR") {
+  if (args$group_genotype == TRUE & args$grouping_method == "post-ar") {
     geno_trans_phyc <- prep_geno_trans_for_phyc(genotype, AR$geno_trans)
     grouped_geno <- group_genotypes_post_ar(args$tree,
                                             genotype,
