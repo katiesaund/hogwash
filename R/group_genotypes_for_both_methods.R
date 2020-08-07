@@ -1,8 +1,3 @@
-# For functions that are used by both grouping methods -- either pre- or post-AR
-# In practice, these are the functions that were in the code back at the time
-# of the first arxiv submission and were unchanged when I rashly updated the
-# grouping algorithm in July.
-
 #' Remove common and rare ungrouped genotypes
 #'
 #' @description Remove genotypes that are too common or rare for ancestral
@@ -39,16 +34,18 @@ prepare_ungrouped_genotype <- function(geno, tr){
   return(results)
 }
 
-
 #' Prepare genotype, paying attention to (not) grouping
 #'
 #' @description Funnel the genotype to be prepared for downstream use. The
-#'   preparation depends on if the genotype is going to be grouped or not.
+#'   preparation depends on if the genotype is going to be grouped or not. The
+#'   preparation also depends on the grouping method chosen: pre- or
+#'   post-ancestral reconstruction.
 #' @param group_logical Logical.
 #' @param geno Genotype matrix. Binary. Nrow = Ntip(tr). Ncol = number of
 #'   ungrouped genotypes.
 #' @param tr Phylo.
 #' @param lookup Either NULL or a Matrix. Ncol = 2.
+#' @param group_method Character. Either "pre-ar" or "post-ar".
 #'
 #' @return  prepped_geno. List of multiple objects. Content depends on value of
 #'   group_logical. For grouped genotypes output includes:

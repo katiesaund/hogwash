@@ -1,10 +1,3 @@
-# I copied in all of the group_genotype functions from the arxiv submission version
-# and then removed the two functions that didn't change:
-# 1. prepare_ungrouped_genotype
-# 2. prepare_genotype
-
-# Added post_ar to all function names
-
 #' Build grouped ancestral reconstruction and confidence
 #'
 #' @param tr Phylo.

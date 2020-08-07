@@ -1,5 +1,3 @@
-# These are the functions for the grouping pre-ancestral reconstruction method
-
 #' Build grouped genotype
 #'
 #' @description Build presence/absence of the grouped genotypes (e.g. gene) from
@@ -49,7 +47,6 @@ build_gene_genotype_from_snps_pre_ar <- function(geno,
   # Return output --------------------------------------------------------------
   return(samples_by_genes$mat)
 }
-
 
 #' Remove rare and common genotypes from grouped genotypes
 #'
@@ -118,4 +115,3 @@ prepare_grouped_genotype_pre_ar <- function(geno, lookup, tr){
                   "genotype" = grouped_genotype)
   return(results)
 }
-
