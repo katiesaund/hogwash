@@ -30,6 +30,7 @@ check_input_format <- function(pheno,
                                fdr,
                                bootstrap,
                                group_genotype_key,
+                               group_method,
                                test){
   # Check input ----------------------------------------------------------------
   check_dimensions(geno, ape::Ntip(tr), 2, NULL, 2)
@@ -59,7 +60,10 @@ check_input_format <- function(pheno,
   if (!test %in% c("both", "phyc", "synchronous")) {
     stop("If providing a binary test choice select either: both, phyc, or synchronous")
   }
-
+  check_is_string(group_method)
+  if (!group_method %in% c("post-ar", "pre-ar")) {
+    stop("If grouping the genotype please select either: post-ar or pre-ar")
+  }
   # Function -------------------------------------------------------------------
   discrete_or_continuous <- assign_pheno_type(pheno)
 
