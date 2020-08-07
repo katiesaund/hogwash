@@ -70,7 +70,7 @@ prepare_ungrouped_genotype <- function(geno, tr){
 #'
 #'   }
 #' @noRd
-prepare_genotype <- function(group_logical, geno, tr, lookup){
+prepare_genotype <- function(group_logical, geno, tr, lookup, group_method){
   # Check input ----------------------------------------------------------------
   check_class(group_logical, "logical")
   check_for_root_and_bootstrap(tr)
@@ -78,13 +78,20 @@ prepare_genotype <- function(group_logical, geno, tr, lookup){
     check_dimensions(lookup, exact_cols = 2, min_cols = 2, min_rows = 1)
   }
   check_dimensions(geno, exact_rows = ape::Ntip(tr), min_rows = 1, min_cols = 1)
-  #
+  check_is_string(group_method)
+  if (!group_method %in% c("post-ar", "pre-ar")) {
+    stop("If grouping the genotype please select either: post-ar or pre-ar")
+  }
+
   # Function -------------------------------------------------------------------
   if (group_logical) {
-    # TODO add another if for the post-AR grouping: prepped_geno <- prepare_grouped_genotype(geno, lookup)
-
-    # This line is for pre-AR grouping
-    prepped_geno <- prepare_grouped_genotype(geno, lookup, tr)
+    if (group_method == "post-AR") {
+      prepped_geno <- prepare_grouped_genotype_post_ar(geno, lookup)
+    } else if (group_method == "pre-AR") {
+      prepped_geno <- prepare_grouped_genotype_pre_ar(geno, lookup, tr)
+    } else {
+      stop("Group method invalid")
+    }
   } else {
     prepped_geno <- prepare_ungrouped_genotype(geno, tr)
   }
