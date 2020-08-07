@@ -16,6 +16,7 @@ test_that("run_synchronous() doesn't give any errors when given a discrete
   args$discrete_or_continuous <- "discrete"
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- TRUE
+  args$grouping_method        <- "post-ar"
   if (args$group_genotype ) {
     args$gene_snp_lookup      <- hogwash::snp_gene_key
   } else {
@@ -41,6 +42,8 @@ test_that("run_synchronous() doesn't give any errors when given a discrete
   args$bootstrap_cutoff       <- 0.7
   args$group_genotype         <- FALSE
   args$gene_snp_lookup <- NULL
+  args$grouping_method        <- "post-ar"
+
   expect_error(run_synchronous(args), NA)
 })
 
@@ -61,6 +64,8 @@ test_that("run_synchronous() results are the same if the genotype or phenotype r
               args$discrete_or_continuous <- "discrete"
               args$bootstrap_cutoff       <- 0.7
               args$group_genotype         <- FALSE
+              args$grouping_method        <- "post-ar"
+
               args$gene_snp_lookup <- NULL
 
               pheno_order <- run_synchronous(args)
@@ -81,6 +86,7 @@ test_that("run_synchronous() results are the same if the genotype or phenotype r
               args$discrete_or_continuous <- "discrete"
               args$bootstrap_cutoff       <- 0.7
               args$group_genotype         <- FALSE
+              args$grouping_method        <- "post-ar"
               args$gene_snp_lookup <- NULL
               geno_order <- run_synchronous(args)
 
@@ -99,6 +105,8 @@ test_that("run_synchronous() results are the same if the genotype or phenotype r
               args$bootstrap_cutoff       <- 0.7
               args$group_genotype         <- FALSE
               args$gene_snp_lookup <- NULL
+              args$grouping_method        <- "post-ar"
+
               orders_match <- run_synchronous(args)
 
               expect_identical(geno_order, orders_match)
@@ -135,6 +143,8 @@ test_that("run_synchronous() gives sames results for the tree, when the tree is
             args$bootstrap_cutoff       <- 0.7
             args$group_genotype         <- FALSE
             args$gene_snp_lookup <- NULL
+            args$grouping_method        <- "post-ar"
+
             unrooted_out <- run_synchronous(args)
 
             args$tree <- phytools::midpoint.root(args$tree)
