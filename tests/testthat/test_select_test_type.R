@@ -24,6 +24,8 @@ test_that("select_test_type doesn't throw error when given valid continuous
     args$gene_snp_lookup <- NULL
   }
   args$test <- "both"
+  args$grouping_method        <- "post-ar"
+
   # Test
   expect_error(select_test_type(args), NA)
 })
@@ -46,6 +48,7 @@ test_that("select_test_type doesn't throw error given valid discrete input", {
   args$group_genotype         <- FALSE
   args$gene_snp_lookup <- NULL
   args$test <- "both"
+  args$grouping_method        <- "post-ar"
 
   # Test
   expect_error(select_test_type(args), NA)
