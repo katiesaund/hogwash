@@ -15,7 +15,9 @@
 #' @return samples_by_genes. Matrix.
 #'
 #' @noRd
-build_gene_genotype_from_snps_pre_ar <- function(geno, gene_to_snp_lookup_table, tr){
+build_gene_genotype_from_snps_pre_ar <- function(geno,
+                                                 gene_to_snp_lookup_table,
+                                                 tr){
   # Check input ----------------------------------------------------------------
   check_class(geno, "matrix")
   check_class(gene_to_snp_lookup_table, "matrix")
