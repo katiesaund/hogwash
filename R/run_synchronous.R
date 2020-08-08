@@ -139,6 +139,7 @@ run_synchronous <- function(args){
     hi_conf$num_high_conf_trans_edges
   results_object$dropped_genotypes <- hi_conf$dropped_genotypes
   results_object$convergence <- convergence
+  names(results_object$convergence)[1] <- "N"
   results_object$phylogenetic_signal <- unname(calculate_d(args$phenotype,
                                                            args$tree))
   save_results_as_r_object(args$output_dir,

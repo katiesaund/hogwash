@@ -128,6 +128,7 @@ run_continuous <- function(args){
   results_object$hit_pvals <- corrected_pvals_all_trans$hit_pvals
   results_object$sig_hits <- corrected_pvals_all_trans$sig_pvals
   results_object$convergence <- convergence
+  names(results_object$convergence)[1] <- "N"
   results_object$non_FDR_hit_pvals <- -log(results_all_transitions$pvals)
   results_object$phylogenetic_signal <- unname(calculate_lambda(args$phenotype,
                                                                 args$tree))
