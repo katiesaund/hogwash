@@ -503,8 +503,7 @@ plot_phyc_results <- function(tr,
 
       p_val_formated <- formatC(recon_hit_vals[j, 1], format = "e", digits = 1)
       p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
-      title_line_one <- expression(paste(beta ["phenotype"],
-                                         intersect(beta ["genotype"]),
+      title_line_one <- expression(paste("N"["PhyC"],
                                          " Null Distribution"))
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
                                     .(p_val_formated),
@@ -515,7 +514,7 @@ plot_phyc_results <- function(tr,
                      xlim = c(0, max_x),
                      col = transparent_teal,
                      ylab = "Count",
-                     xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
+                     xlab = expression("N"["PhyC"]),
                      main = title_line_one)
       graphics::abline(v = recon_perm_obs_results$observed_overlap[j],
                        col = transparent_red,
@@ -767,9 +766,8 @@ plot_synchronous_results  <- function(tr,
       # Plot Null Distribution Histogram
       p_val_formated <- formatC(trans_hit_vals[j, 1], format = "e", digits = 1)
       p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
-      title_line_one <- expression(paste(beta ["phenotype"],
-                                        intersect(beta ["genotype"]),
-                                        " Null Distribution"))
+      title_line_one <- expression(paste("N"["Synchronous"],
+                                         " Null Distribution"))
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
                                     .(p_val_formated),
                                     " P-value rank = ",
@@ -781,7 +779,7 @@ plot_synchronous_results  <- function(tr,
            xlim = c(0, max_x),
            col = transparent_teal,
            ylab = "Count",
-           xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
+           xlab = expression("N"["Synchronous"]),
            main = title_line_one)
       graphics::abline(v = trans_perm_obs_results$observed_overlap[j],
                        col = transparent_red,
@@ -1098,8 +1096,7 @@ plot_continuous_results <- function(disc_cont,
                                 format = "e",
                                 digits = 1)
       p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
-      title_line_one <- expression(paste(beta ["phenotype"],
-                                         intersect(beta ["genotype"]),
+      title_line_one <- expression(paste("N"["Continuous"],
                                          " Null Distribution"))
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
                                      .(p_val_formated),
@@ -1116,7 +1113,7 @@ plot_continuous_results <- function(disc_cont,
                      cex.lab = hist_cex_size,
                      cex.axis = hist_cex_size,
                      ylab = "Count",
-                     xlab = expression(paste(beta ["phenotype"], intersect(beta ["genotype"]))),
+                     xlab = expression("N"["Continuous"]),
                      xlim = c(x_min, x_max))
       graphics::mtext(title_line_two, side = 3, cex = .6 * hist_cex_size)
       graphics::abline(v =
