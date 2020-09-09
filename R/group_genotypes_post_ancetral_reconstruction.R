@@ -475,7 +475,7 @@ group_genotypes_post_ar <- function(tr,
 
   # make new geno (just at the tips, from the snps)
   geno <- build_gene_genotype_from_snps_post_ar(geno, lookup)
-  simplified_genotype <- remove_rare_or_common_geno(geno, tr)
+  simplified_genotype <- remove_rare_geno(geno, tr)
   geno <- simplified_genotype$mat
   genes_to_keep_in_consideration <-
     !(uni_genes %in% simplified_genotype$dropped_genotype_names)
@@ -488,7 +488,7 @@ group_genotypes_post_ar <- function(tr,
   geno_recon_conf_tip_node_recon <-
     geno_recon_and_conf_tip_node$tip_node_recon[genes_to_keep_in_consideration]
   geno_rec_conf_tip_node_conf <-
-    geno_recon_and_conf_tip_node$tip_node_conf[ genes_to_keep_in_consideration]
+    geno_recon_and_conf_tip_node$tip_node_conf[genes_to_keep_in_consideration]
 
   geno_conf_ordered_by_edges <-
     geno_recon_ordered_by_edges <-
