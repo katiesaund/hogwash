@@ -10,3 +10,5 @@ Meta
 *.Rcheck
 test/*/*.rda
 .DS_Store
+*.rda
+
