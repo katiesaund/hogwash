@@ -129,9 +129,19 @@ run_continuous <- function(args){
   results_object$sig_hits <- corrected_pvals_all_trans$sig_pvals
   results_object$convergence <- convergence
   names(results_object$convergence)[1] <- "N"
-  results_object$non_FDR_hit_pvals <- -log(results_all_transitions$pvals)
+
   results_object$phylogenetic_signal <- unname(calculate_lambda(args$phenotype,
                                                                 args$tree))
+
+  results_object$raw_pvals <-
+    as.data.frame(as.matrix(results_all_transitions$pvals),
+                  stringsAsFactors = FALSE)
+  colnames(results_object$raw_pvals) <- "neg_log_unadjusted_pvals"
+  results_object$raw_pvals$neg_log_unadjusted_pvals <-
+    as.numeric(results_object$raw_pvals$neg_log_unadjusted_pvals)
+  results_object$raw_pvals$neg_log_unadjusted_pvals <-
+    -log(results_object$raw_pvals$neg_log_unadjusted_pvals)
+
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,

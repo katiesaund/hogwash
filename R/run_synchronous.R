@@ -142,6 +142,17 @@ run_synchronous <- function(args){
   names(results_object$convergence)[1] <- "N"
   results_object$phylogenetic_signal <- unname(calculate_d(args$phenotype,
                                                            args$tree))
+
+  results_object$raw_pvals <-
+    as.data.frame(as.matrix(disc_trans_results$hit_pvals),
+                  stringsAsFactors = FALSE)
+  colnames(results_object$raw_pvals) <- "neg_log_unadjusted_pvals"
+  results_object$raw_pvals$neg_log_unadjusted_pvals <-
+    as.numeric(results_object$raw_pvals$neg_log_unadjusted_pvals)
+  results_object$raw_pvals$neg_log_unadjusted_pvals <-
+    -log(results_object$raw_pvals$neg_log_unadjusted_pvals)
+
+
   save_results_as_r_object(args$output_dir,
                            args$output_name,
                            results_object,
