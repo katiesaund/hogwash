@@ -71,3 +71,37 @@ remove_rare_or_common_geno <- function(mat, tr){
                   "dropped_genotype_names" = dropped_genotype_names)
   return(results)
 }
+
+#' Remove rare genotypes from genotype matrix
+#'
+#' @description This function removes genotypes are too rare (only occur
+#'  once or never).
+#'
+#' @param mat Matrix. Columns correspond to genotypes. Rows correspond to tree
+#'  tips. Binary.
+#' @param tr Phylo. Tree.
+#'
+#' @return A list with the following items:
+#'   \describe{
+#'     \item{mat}{Matrix.}
+#'     \item{dropped_genotype_names}{Character vector.}
+#'   }
+#' @noRd
+remove_rare_geno <- function(mat, tr){
+  # Check inputs ---------------------------------------------------------------
+  check_for_root_and_bootstrap(tr)
+  check_if_binary_matrix(mat)
+
+  # Function -------------------------------------------------------------------
+  geno_to_drop <- rep(FALSE, ncol(mat))
+  geno_to_drop[colSums(mat) <= 1] <- TRUE
+  dropped_genotype_names <- colnames(mat)[geno_to_drop]
+  mat <- mat[, !geno_to_drop, drop = FALSE]
+
+  # Check and return output ----------------------------------------------------
+  check_if_binary_matrix(mat)
+  check_rownames(mat, tr)
+  results <- list("mat" = mat,
+                  "dropped_genotype_names" = dropped_genotype_names)
+  return(results)
+}
