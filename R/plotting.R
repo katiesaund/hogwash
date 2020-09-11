@@ -18,12 +18,14 @@ blank_plot <- function(){
 #' @param pheno_vector Vector. Length = Ntip(tr). Names(pheno_vector) ==
 #'   tr$tip.label.
 #' @param pheno_anc_rec Vector. Length = Nnode(tr).
+#' @param tr_type Characer. Default = "phylogram". User can supply either:
+#'   "phylogram" or "fan." Determines how the trees are plotted in the output.
 #'
 #' @return A tree plot where the tree edges are filled in with colors
 #'   corresponding to the phenotypic trait values.
 #'
 #' @noRd
-plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
+plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec, tr_type){
   # Check inputs ---------------------------------------------------------------
   check_tree_is_valid(tr)
   check_equal(length(pheno_vector), ape::Ntip(tr))
@@ -31,6 +33,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
   if (!identical(names(pheno_vector), tr$tip.label)) {
     stop("Phenotype vector must have same names as tree tips.")
   }
+  check_is_string(tr_type)
 
   # Function -------------------------------------------------------------------
   plot_p_recon <- phytools::contMap(tr,
@@ -38,14 +41,33 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec){
                                     method = "user",
                                     anc.states = pheno_anc_rec,
                                     plot = FALSE)
-  graphics::plot(plot_p_recon,
-       add = TRUE,
-       ylim = c(-1 / 25 * ape::Ntip(tr), ape::Ntip(tr)),
-       colors = plot_p_recon$cols,
-       lwd = 4,
-       ftype = "off",
-       offset = 1.7)
 
+  line_width <- 3
+  if (ape::Ntip(tr) > 200) {
+    line_width <- 1
+  }
+
+  if (tr_type == "phylogram") {
+    # phylogram version
+    graphics::plot(plot_p_recon,
+         add = TRUE,
+         ylim = c(-1 / 25 * ape::Ntip(tr), ape::Ntip(tr)),
+         colors = plot_p_recon$cols,
+         lwd = line_width,
+         ftype = "off",
+         type = "phylogram",
+         offset = 1.7,
+         outline = FALSE)
+  } else {
+    # fan version
+    graphics::plot(plot_p_recon,
+                   add = TRUE,
+                   colors = plot_p_recon$cols,
+                   lwd = 1,
+                   type = "fan",
+                   ftype = "off",
+                   outline = FALSE)
+  }
 }
 
 #' Draw histogram of the absolute value of phenotype change on each high
@@ -194,7 +216,8 @@ make_manhattan_plot <- function(geno_pheno_name,
 #' @param index Number.
 #' @param legend_baseline Character. Legend name for black lines.
 #' @param legend_highlighted Character. Legend name for highlighted lines.
-#'
+#' @param tr_type Characer. Default = "phylogram". User can supply either:
+#'   "phylogram" or "fan." Determines how the trees are plotted in the output.
 #' @return Plot of a tree with certain edges colored.
 plot_tr_w_color_edges <- function(tr,
                                   edges_to_highlight,
@@ -205,7 +228,8 @@ plot_tr_w_color_edges <- function(tr,
                                   trans_or_recon,
                                   index,
                                   legend_baseline,
-                                  legend_highlighted){
+                                  legend_highlighted,
+                                  tr_type){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_string(edge_color_na)
@@ -226,6 +250,7 @@ plot_tr_w_color_edges <- function(tr,
     stop("String must be trans or recon")
   }
   check_is_string(title)
+  check_is_string(tr_type)
 
   # Function -------------------------------------------------------------------
   tree_legend_cex <- 0.5
@@ -240,16 +265,30 @@ plot_tr_w_color_edges <- function(tr,
   }
   edge_color[geno_confidence[[index]] == 0] <- edge_color_na # grey out long
   # edges and low ML bootstrap support
+
+  edge_width <- 1
+  if (ape::Ntip(tr) > 200) {
+    edge_width <- 0.25
+  }
+
+  edge_length_log <- TRUE
+  if (tr_type == "phylogram") {
+    edge_length_log <- FALSE
+  }
+
   graphics::par(mar = c(4, 4, 4, 4))
   graphics::plot(tr,
+                 type = tr_type,
                  font = 1,
                  show.tip.label = FALSE,
                  edge.color = edge_color,
                  main = title,
-                 use.edge.length = FALSE,
+                 use.edge.length = edge_length_log,
                  label.offset = 0.25,
                  adj = 0,
-                 cex = tree_legend_cex)
+                 cex = tree_legend_cex,
+                 edge.width = edge_width)
+
   graphics::legend("topleft",
                    bty = "n",
                    legend = c(legend_baseline,
@@ -293,23 +332,26 @@ plot_tr_w_color_edges <- function(tr,
 #'   not transition marked as 0.
 #' @param snp_in_gene Either NULL or table of integers where each entry
 #'   corresponds to one genotype.
+#' @param tr_type Characer. Default = "phylogram". User can supply either:
+#'   "phylogram" or "fan." Determines how the trees are plotted in the output.
 #'
 #' @return  Plots printed into one pdf.
 plot_phyc_results <- function(tr,
-                               dir,
-                               name,
-                               fdr,
-                               num_perm,
-                               recon_hit_vals,
-                               p_recon_edges,
-                               recon_perm_obs_results,
-                               tr_and_pheno_hi_conf,
-                               geno_confidence,
-                               g_trans_edges,
-                               p_trans_edges,
-                               snp_in_gene,
-                               prefix,
-                               grouped_logical){
+                              dir,
+                              name,
+                              fdr,
+                              num_perm,
+                              recon_hit_vals,
+                              p_recon_edges,
+                              recon_perm_obs_results,
+                              tr_and_pheno_hi_conf,
+                              geno_confidence,
+                              g_trans_edges,
+                              p_trans_edges,
+                              snp_in_gene,
+                              prefix,
+                              grouped_logical,
+                              tr_type){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -338,6 +380,7 @@ plot_phyc_results <- function(tr,
   check_class(recon_perm_obs_results$observed_overlap, "integer")
   check_class(grouped_logical, "logical")
   check_str_is_test_name(prefix)
+  check_is_string(tr_type)
 
   # Function -------------------------------------------------------------------
 
@@ -470,7 +513,8 @@ plot_phyc_results <- function(tr,
                         "recon",
                         1,
                         "Wild type",
-                        "Variant")
+                        "Variant",
+                        tr_type)
 
   # Prep data to report p-value rank
   rank_mat <- recon_hit_vals
@@ -478,7 +522,7 @@ plot_phyc_results <- function(tr,
   # Loop through significant hits:
   for (j in 1:nrow(recon_hit_vals)) {
     if (recon_hit_vals[j, 1] > fdr) {
-      graphics::par(mfrow = c(2, 2),
+      graphics::par(mfrow = c(1, 1),
                     mgp = c(3, 1, 0),
                     oma = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4))
@@ -493,9 +537,8 @@ plot_phyc_results <- function(tr,
                             "recon",
                             j,
                             "No transition",
-                            "Transition")
-
-      blank_plot() # Blank plot to maintain correct plot location
+                            "Transition",
+                            tr_type)
 
       # Plot Null Distribution Histogram
       max_x <- 1.2 * max(recon_perm_obs_results$permuted_count[[j]],
@@ -503,13 +546,11 @@ plot_phyc_results <- function(tr,
 
       p_val_formated <- formatC(recon_hit_vals[j, 1], format = "e", digits = 1)
       p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
-      title_line_one <- expression(paste("N"["PhyC"],
-                                         " Null Distribution"))
+      title_line_one <- row.names(recon_hit_vals)[j]
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
                                     .(p_val_formated),
                                     " P-value rank = ",
                                     .(p_val_rank_formated)))
-
       graphics::hist(recon_perm_obs_results$permuted_count[[j]],
                      xlim = c(0, max_x),
                      col = transparent_teal,
@@ -559,8 +600,10 @@ plot_phyc_results <- function(tr,
 #'   not transition marked as 0.
 #' @param snp_in_gene Either NULL or Table of integers where each entry
 #'   corresponds to one genotype.
+#' @param tr_type Characer. Default = "phylogram". User can supply either:
+#'   "phylogram" or "fan." Determines how the trees are plotted in the output.
 #'
-#' @return  Plots printed into one pdf.
+#'  @return  Plots printed into one pdf.
 plot_synchronous_results  <- function(tr,
                                  dir,
                                  name,
@@ -574,7 +617,8 @@ plot_synchronous_results  <- function(tr,
                                  p_trans_edges,
                                  snp_in_gene,
                                  prefix,
-                                 grouped_logical){
+                                 grouped_logical,
+                                 tr_type){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -602,6 +646,7 @@ plot_synchronous_results  <- function(tr,
   check_class(trans_perm_obs_results$observed_overlap, "integer")
   check_str_is_test_name(prefix)
   check_class(grouped_logical, "logical")
+  check_is_string(tr_type)
 
   # Function -------------------------------------------------------------------
   # Set default values
@@ -733,7 +778,8 @@ plot_synchronous_results  <- function(tr,
                         "recon",
                         1,
                         "No transition",
-                        "Transition")
+                        "Transition",
+                        tr_type)
 
   # Prep data to report p-value rank
   rank_mat <- trans_hit_vals
@@ -742,7 +788,7 @@ plot_synchronous_results  <- function(tr,
   # Loop through significant hits:
   for (j in 1:nrow(trans_hit_vals)) {
     if (trans_hit_vals[j, 1] > fdr) {
-      graphics::par(mfrow = c(2, 2),
+      graphics::par(mfrow = c(1, 1),
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4),
@@ -759,15 +805,15 @@ plot_synchronous_results  <- function(tr,
                             "recon",
                             j,
                             "No transition",
-                            "Transition")
-
-      blank_plot() # Blank plot maintains correct layout
+                            "Transition",
+                            tr_type)
 
       # Plot Null Distribution Histogram
       p_val_formated <- formatC(trans_hit_vals[j, 1], format = "e", digits = 1)
       p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
-      title_line_one <- expression(paste("N"["Synchronous"],
-                                         " Null Distribution"))
+      title_line_one <- row.names(trans_hit_vals)[j]
+      # title_line_one <- expression(paste("N"["Synchronous"],
+      #                                    " Null Distribution"))
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
                                     .(p_val_formated),
                                     " P-value rank = ",
@@ -868,6 +914,8 @@ plot_synchronous_results  <- function(tr,
 #'   grouped.
 #' @param snp_in_gene Either NULL or table of integers where each entry
 #'   corresponds to one genotype.
+#' @param tr_type Characer. Default = "phylogram". User can supply either:
+#'   "phylogram" or "fan." Determines how the trees are plotted in the output.
 #'
 #' @return Plots continuous test results.
 plot_continuous_results <- function(disc_cont,
@@ -888,7 +936,8 @@ plot_continuous_results <- function(disc_cont,
                                     tr_and_pheno_hi_conf,
                                     all_trans_sig_hits,
                                     group_logical,
-                                    snp_in_gene){
+                                    snp_in_gene,
+                                    tr_type){
   # Check inputs ---------------------------------------------------------------
   check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
@@ -919,7 +968,7 @@ plot_continuous_results <- function(disc_cont,
       stop("snp_in_gene should be a table of integers")
     }
   }
-
+  check_is_string(tr_type)
   # Function -------------------------------------------------------------------
 
   # Set up variables
@@ -1044,7 +1093,7 @@ plot_continuous_results <- function(disc_cont,
                 oma = c(0, 0, 4, 0),
                 mar = c(4, 4, 4, 4),
                 xpd = FALSE)
-  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec)
+  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec, tr_type)
 
   # Only make the following plots for significant loci
   # Prep data to report p-value rank
@@ -1056,23 +1105,24 @@ plot_continuous_results <- function(disc_cont,
   transparent_teal <- grDevices::rgb(0.4, 0.6, 1, alpha = 0.5, )
   for (j in 1:nrow(pval_all_transition$hit_pvals)) {
     if (pval_all_transition$hit_pvals[j, 1] > fdr) {
-      graphics::par(mfrow = c(2, 2),
+      graphics::par(mfrow = c(1, 1),
                     mgp   = c(3, 1, 0),
                     oma   = c(0, 0, 4, 0),
                     mar = c(4, 4, 4, 4),
                     xpd = FALSE)
       # Plot Genotype Reconstruction on the Tree
-      plot_tr_w_color_edges(tr,
-                            geno_reconstruction,
-                            geno_confidence,
-                            "grey",
-                            "red",
-                            paste0(row.names(pval_all_transition$hit_pvals)[j],
-                                   "\n Genotype reconstruction"),
-                            "recon",
-                            j,
-                            "Wild type",
-                            "Variant")
+      # plot_tr_w_color_edges(tr,
+      #                       geno_reconstruction,
+      #                       geno_confidence,
+      #                       "grey",
+      #                       "red",
+      #                       paste0(row.names(pval_all_transition$hit_pvals)[j],
+      #                              "\n Genotype reconstruction"),
+      #                       "recon",
+      #                       j,
+      #                       "Wild type",
+      #                       "Variant",
+      #                       tr_type)
       # Plot Genotype Transitions on the Tree
       plot_tr_w_color_edges(tr,
                             geno_transition,
@@ -1083,7 +1133,8 @@ plot_continuous_results <- function(disc_cont,
                             "trans",
                             j,
                             "No transition",
-                            "Transition")
+                            "Transition",
+                            tr_type)
       # Histogram of the |delta phenotype| for only high conf. edges, colored by
       #   genotype non-transition vs transition edges.
       hist_abs_hi_conf_delta_pheno(results_all_trans,
@@ -1096,8 +1147,9 @@ plot_continuous_results <- function(disc_cont,
                                 format = "e",
                                 digits = 1)
       p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
-      title_line_one <- expression(paste("N"["Continuous"],
-                                         " Null Distribution"))
+      title_line_one <- row.names(pval_all_transition)[j]
+      # title_line_one <- expression(paste("N"["Continuous"],
+      #                                    " Null Distribution"))
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
                                      .(p_val_formated),
                                      " P-value rank = ",
