@@ -46,6 +46,8 @@
 #'   input.
 #' @param tree Phylo object. If unrooted, will be rooted using
 #'   phytools::midpoint.root() method. Required input.
+#' @param tree_type Characer. Default = "phylogram". User can supply either:
+#'   "phylogram" or "fan." Determines how the trees are plotted in the output.
 #' @param file_name Character. Suffix for output files. Default value is the
 #'   current date: YYYY-MM-DD.
 #' @param dir Character. Path to output directory. Default value is current
@@ -118,6 +120,7 @@
 hogwash <- function(pheno,
                     geno,
                     tree,
+                    tree_type = "phylogram",
                     file_name = "hogwash",
                     dir = ".",
                     perm = 10000,
@@ -130,6 +133,7 @@ hogwash <- function(pheno,
   args$phenotype <- pheno
   args$genotype <- geno
   args$tree <- tree
+  args$tree_type <- tree_type
   args$output_name <- file_name
   args$output_dir <- dir
   args$perm <- perm
@@ -153,6 +157,7 @@ hogwash <- function(pheno,
                        args$bootstrap_cutoff,
                        args$gene_snp_lookup,
                        args$grouping_method,
-                       args$test)
+                       args$test,
+                       args$tree_type)
   select_test_type(args)
 }
