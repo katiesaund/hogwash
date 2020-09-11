@@ -38,7 +38,8 @@ check_input_format <- function(pheno,
                                bootstrap,
                                group_genotype_key,
                                group_method,
-                               test){
+                               test,
+                               tr_type){
   # Check input ----------------------------------------------------------------
   check_dimensions(geno, ape::Ntip(tr), 2, NULL, 2)
   check_dimensions(pheno, ape::Ntip(tr), 2, 1, 1)
@@ -70,6 +71,10 @@ check_input_format <- function(pheno,
   check_is_string(group_method)
   if (!group_method %in% c("post-ar", "pre-ar")) {
     stop("If grouping the genotype please select either: post-ar or pre-ar")
+  }
+  check_is_string(tr_type)
+  if (!group_method %in% c("phylogram", "fan")) {
+    stop("Select either: phylogram or fan for tree_type")
   }
   # Function -------------------------------------------------------------------
   discrete_or_continuous <- assign_pheno_type(pheno)
