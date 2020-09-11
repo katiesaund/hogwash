@@ -129,7 +129,8 @@ run_phyc <- function(args){
     p_trans_edges = pheno_trans$transition,
     snp_in_gene = geno$snps_per_gene,
     prefix = "phyc",
-    grouped_logical = args$group_genotype)
+    grouped_logical = args$group_genotype,
+    tr_type = args$tree_type)
 
   results_object$contingency_table <-
     create_contingency_table(genotype_transition_edges,

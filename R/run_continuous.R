@@ -111,7 +111,8 @@ run_continuous <- function(args){
                             tr_and_pheno_hi_conf = hi_conf$high_conf_ordered_by_edges,
                             all_trans_sig_hits = corrected_pvals_all_trans$hit_pvals,
                             group_logical = args$group_genotype,
-                            snp_in_gene = geno$snps_per_gene)
+                            snp_in_gene = geno$snps_per_gene,
+                            tr_type = args$tree_type)
   results_object$hi_confidence_transition_edge <-
     hi_conf$hi_confidence_transition_edge
   results_object$num_hi_conf_transition_edge <-
