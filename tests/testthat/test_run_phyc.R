@@ -22,6 +22,7 @@ test_that("run_phyc() doesn't give any errors when given a discrete phenotype
     args$gene_snp_lookup <- NULL
   }
   args$grouping_method        <- "post-ar"
+  args$tree_type              <- "fan"
 
   expect_error(run_phyc(args), NA)
 })
@@ -44,6 +45,7 @@ test_that("run_phyc() doesn't give any errors when given a discrete phenotype
   args$group_genotype         <- FALSE
   args$gene_snp_lookup        <- NULL
   args$grouping_method        <- "post-ar"
+  args$tree_type              <- "fan"
 
   expect_error(run_phyc(args), NA)
 })
@@ -76,6 +78,7 @@ test_that("run_phyc() doesn't give any errors when given a discrete phenotype
             args$group_genotype         <- FALSE
             args$gene_snp_lookup        <- NULL
             args$grouping_method        <- "post-ar"
+            args$tree_type              <- "fan"
 
             expect_error(run_phyc(args), NA)
 })
@@ -101,6 +104,7 @@ test_that("run_phyc() doesn't give any errors when genotype matrix not originall
             args$group_genotype         <- FALSE
             args$gene_snp_lookup        <- NULL
             args$grouping_method        <- "post-ar"
+            args$tree_type              <- "fan"
 
             expect_error(run_phyc(args), NA)
 })
@@ -125,6 +129,8 @@ test_that("run_phyc() doesn't give any errors when phenotype matrix not original
             args$group_genotype         <- FALSE
             args$grouping_method        <- "post-ar"
             args$gene_snp_lookup        <- NULL
+            args$tree_type              <- "fan"
+
             expect_error(run_phyc(args), NA)
 })
 
@@ -147,6 +153,7 @@ test_that("run_phyc() results are the same if the genotype or phenotype rownames
             args$group_genotype         <- FALSE
             args$gene_snp_lookup        <- NULL
             args$grouping_method        <- "post-ar"
+            args$tree_type              <- "fan"
 
             pheno_order <- run_phyc(args)
 
@@ -168,6 +175,7 @@ test_that("run_phyc() results are the same if the genotype or phenotype rownames
             args$group_genotype         <- FALSE
             args$gene_snp_lookup        <- NULL
             args$grouping_method        <- "post-ar"
+            args$tree_type              <- "fan"
 
             geno_order <- run_phyc(args)
 
@@ -187,6 +195,7 @@ test_that("run_phyc() results are the same if the genotype or phenotype rownames
             args$group_genotype         <- FALSE
             args$gene_snp_lookup        <- NULL
             args$grouping_method        <- "post-ar"
+            args$tree_type              <- "fan"
 
             orders_match <- run_phyc(args)
 
@@ -225,6 +234,8 @@ test_that("run_phyc() gives sames results for the tree, when the tree is
             args$group_genotype         <- FALSE
             args$gene_snp_lookup        <- NULL
             args$grouping_method        <- "post-ar"
+            args$tree_type              <- "fan"
+
             unrooted_out <- run_phyc(args)
 
             args$tree <- phytools::midpoint.root(args$tree)

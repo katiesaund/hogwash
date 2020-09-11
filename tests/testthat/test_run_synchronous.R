@@ -22,6 +22,8 @@ test_that("run_synchronous() doesn't give any errors when given a discrete
   } else {
     args$gene_snp_lookup <- NULL
   }
+  args$tree_type              <- "fan"
+
   expect_error(run_synchronous(args), NA)
 })
 
@@ -43,6 +45,7 @@ test_that("run_synchronous() doesn't give any errors when given a discrete
   args$group_genotype         <- FALSE
   args$gene_snp_lookup <- NULL
   args$grouping_method        <- "post-ar"
+  args$tree_type              <- "fan"
 
   expect_error(run_synchronous(args), NA)
 })
@@ -65,6 +68,7 @@ test_that("run_synchronous() results are the same if the genotype or phenotype r
               args$bootstrap_cutoff       <- 0.7
               args$group_genotype         <- FALSE
               args$grouping_method        <- "post-ar"
+              args$tree_type              <- "fan"
 
               args$gene_snp_lookup <- NULL
 
@@ -88,6 +92,8 @@ test_that("run_synchronous() results are the same if the genotype or phenotype r
               args$group_genotype         <- FALSE
               args$grouping_method        <- "post-ar"
               args$gene_snp_lookup <- NULL
+              args$tree_type              <- "fan"
+
               geno_order <- run_synchronous(args)
 
               args                        <- NULL
@@ -106,6 +112,7 @@ test_that("run_synchronous() results are the same if the genotype or phenotype r
               args$group_genotype         <- FALSE
               args$gene_snp_lookup <- NULL
               args$grouping_method        <- "post-ar"
+              args$tree_type              <- "fan"
 
               orders_match <- run_synchronous(args)
 
@@ -144,6 +151,7 @@ test_that("run_synchronous() gives sames results for the tree, when the tree is
             args$group_genotype         <- FALSE
             args$gene_snp_lookup <- NULL
             args$grouping_method        <- "post-ar"
+            args$tree_type              <- "fan"
 
             unrooted_out <- run_synchronous(args)
 

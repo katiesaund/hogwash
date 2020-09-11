@@ -24,7 +24,8 @@
 #' @param test Character. Default = "both". User can supply three options:
 #'   "both", "phyc", or "synchronous". Determines which test is run for binary
 #'   data.
-#'
+#' @param tr_type Characer. Default = "phylogram". User can supply either:
+#'   "phylogram" or "fan." Determines how the trees are plotted in the output.
 #' @return discrete_or_continuous. Character. Either "discrete" or "continuous".
 #'   Describes the input phenotype.
 #' @noRd
@@ -73,7 +74,7 @@ check_input_format <- function(pheno,
     stop("If grouping the genotype please select either: post-ar or pre-ar")
   }
   check_is_string(tr_type)
-  if (!group_method %in% c("phylogram", "fan")) {
+  if (!tr_type %in% c("phylogram", "fan")) {
     stop("Select either: phylogram or fan for tree_type")
   }
   # Function -------------------------------------------------------------------

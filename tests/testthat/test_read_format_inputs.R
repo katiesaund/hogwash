@@ -13,6 +13,7 @@ test_that("check_input_format works for valid inputs", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_equal(check_input_format(temp_pheno,
@@ -25,7 +26,8 @@ test_that("check_input_format works for valid inputs", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test),
+                                  temp_test,
+                                  temp_tr_type),
                "continuous")
 })
 
@@ -41,6 +43,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
 
   # Test - Bad phenotype
@@ -54,7 +57,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -69,6 +73,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - bad tree
   expect_error(check_input_format(temp_pheno,
@@ -81,7 +86,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -96,6 +102,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - bad genotype
   expect_error(check_input_format(temp_pheno,
@@ -108,7 +115,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -123,6 +131,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - bad name
   expect_error(check_input_format(temp_pheno,
@@ -135,7 +144,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -150,6 +160,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - bad directory
   expect_error(check_input_format(temp_pheno,
@@ -162,7 +173,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -177,6 +189,8 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
+
   # Test - bad permutations
   expect_error(check_input_format(temp_pheno,
                                   temp_tree,
@@ -188,7 +202,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -203,6 +218,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - bad FDR
   expect_error(check_input_format(temp_pheno,
@@ -215,7 +231,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -230,6 +247,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - Bad bootstrap
   expect_error(check_input_format(temp_pheno,
@@ -242,7 +260,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -257,6 +276,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- letters[1:10]
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - Bad group genotype key
   expect_error(check_input_format(temp_pheno,
@@ -269,7 +289,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error for invalid input", {
@@ -284,6 +305,7 @@ test_that("check_input_format gives error for invalid input", {
   temp_group_genotype_key <- letters[1:10]
   temp_test <- "both"
   temp_group_method <- "AR"
+  temp_tr_type <- "phylogram"
 
   # Test - Bad group method
   expect_error(check_input_format(temp_pheno,
@@ -296,7 +318,8 @@ test_that("check_input_format gives error for invalid input", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 
@@ -313,7 +336,7 @@ test_that("check_input_format gives error when phenotype has NA", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
-
+  temp_tr_type <- "phylogram"
 
   # Test - NA in phenotype
   expect_error(check_input_format(temp_pheno,
@@ -326,7 +349,8 @@ test_that("check_input_format gives error when phenotype has NA", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error when genotype has NA", {
@@ -342,6 +366,7 @@ test_that("check_input_format gives error when genotype has NA", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - NA in genotype
   expect_error(check_input_format(temp_pheno,
@@ -354,9 +379,9 @@ test_that("check_input_format gives error when genotype has NA", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
-
 
 test_that("check_input_format gives error when group_genotype_key has NA", {
   temp_pheno <- hogwash::growth
@@ -371,6 +396,7 @@ test_that("check_input_format gives error when group_genotype_key has NA", {
   temp_group_genotype_key[1, 1] <- NA
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - NA in group_genotype_key
   expect_error(check_input_format(temp_pheno,
@@ -383,7 +409,8 @@ test_that("check_input_format gives error when group_genotype_key has NA", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })
 
 test_that("check_input_format gives error when tree has too few tips", {
@@ -401,6 +428,7 @@ test_that("check_input_format gives error when tree has too few tips", {
   temp_group_genotype_key <- hogwash::snp_gene_key
   temp_test <- "both"
   temp_group_method <- "pre-ar"
+  temp_tr_type <- "phylogram"
 
   # Test - NA in group_genotype_key
   expect_error(check_input_format(temp_pheno,
@@ -413,5 +441,6 @@ test_that("check_input_format gives error when tree has too few tips", {
                                   temp_bootstrap,
                                   temp_group_genotype_key,
                                   temp_group_method,
-                                  temp_test))
+                                  temp_test,
+                                  temp_tr_type))
 })

@@ -6,6 +6,7 @@ test_that("plot_continuous_phenotype works for valid inputs", {
   temp_tree <- ape::rtree(ntip)
   temp_vec <- rnorm(ntip, mean = 0, sd = 10)
   names(temp_vec) <- temp_tree$tip.label
+  temp_tr_type <- "phylogram"
   temp_anc_rec <-
     suppressWarnings(ape::ace(x = temp_vec,
                               phy = temp_tree,
@@ -14,7 +15,8 @@ test_that("plot_continuous_phenotype works for valid inputs", {
   temp_anc_rec_at_node <- temp_anc_rec$ace
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
-                                         temp_anc_rec_at_node),
+                                         temp_anc_rec_at_node,
+                                         temp_tr_type),
                NA)
 })
 
@@ -23,6 +25,7 @@ test_that("plot_continuous_phenotype works gives error for invalid inputs
   ntip <- 10
   temp_tree <- ape::rtree(ntip)
   temp_vec <- rnorm(ntip, mean = 0, sd = 10)
+  temp_tr_type <- "phylogram"
   temp_anc_rec <-
     suppressWarnings(ape::ace(x = temp_vec,
                               phy = temp_tree,
@@ -31,7 +34,8 @@ test_that("plot_continuous_phenotype works gives error for invalid inputs
   temp_anc_rec_at_node <- temp_anc_rec$ace
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
-                                         temp_anc_rec_at_node))
+                                         temp_anc_rec_at_node,
+                                         temp_tr_type))
 })
 
 test_that("plot_continuous_phenotype gives error for invalid inputs", {
@@ -45,9 +49,11 @@ test_that("plot_continuous_phenotype gives error for invalid inputs", {
                               type = "continuous",
                               method = "REML"))
   temp_anc_rec_at_node <- temp_anc_rec$ace[1:3]
+  temp_tr_type <- "phylogram"
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
-                                         temp_anc_rec_at_node))
+                                         temp_anc_rec_at_node,
+                                         temp_tr_type))
 })
 
 test_that("plot_continuous_phenotype gives error for invalid inputs", {
@@ -62,9 +68,12 @@ test_that("plot_continuous_phenotype gives error for invalid inputs", {
                               method = "REML"))
   temp_anc_rec_at_node <- temp_anc_rec$ace
   temp_vec <- temp_vec[1:5]
+  temp_tr_type <- "phylogram"
+
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
-                                         temp_anc_rec_at_node))
+                                         temp_anc_rec_at_node,
+                                         temp_tr_type))
 })
 
 # test hist_abs_hi_conf_delta_pheno
@@ -233,6 +242,7 @@ test_that("plot_tr_w_color_edges works for valid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -244,7 +254,8 @@ test_that("plot_tr_w_color_edges works for valid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other),
+                                     temp_legend_other,
+                                     temp_tr_type),
                NA)
 })
 
@@ -263,6 +274,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -274,7 +286,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -293,6 +306,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -304,7 +318,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -323,6 +338,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -334,7 +350,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -353,6 +370,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -364,7 +382,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -383,6 +402,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -394,7 +414,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -413,6 +434,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -424,7 +446,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -443,6 +466,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -454,7 +478,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -473,6 +498,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 10
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -484,7 +510,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -503,6 +530,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- c(1, 0, 1)
   temp_legend_other <- "hi conf presence"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -514,7 +542,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -533,6 +562,7 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
   temp_index <- 1
   temp_legend_base <- "hi conf absence"
   temp_legend_other <- matrix(0, 1, 1)
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -544,7 +574,8 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other))
+                                     temp_legend_other,
+                                     temp_tr_type))
 })
 
 test_that("plot_tr_w_color_edges works for valid inputs on trans", {
@@ -563,6 +594,7 @@ test_that("plot_tr_w_color_edges works for valid inputs on trans", {
   temp_index <- 1
   temp_legend_base <- "hi conf non-transition"
   temp_legend_other <- "hi conf transition"
+  temp_tr_type <- "phylogram"
 
   # Test
   expect_error(plot_tr_w_color_edges(temp_tree,
@@ -574,7 +606,8 @@ test_that("plot_tr_w_color_edges works for valid inputs on trans", {
                                      temp_type,
                                      temp_index,
                                      temp_legend_base,
-                                     temp_legend_other),
+                                     temp_legend_other,
+                                     temp_tr_type),
                NA)
 })
 
