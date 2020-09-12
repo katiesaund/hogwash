@@ -43,7 +43,7 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec, tr_type){
                                     plot = FALSE)
 
   line_width <- 3
-  if (ape::Ntip(tr) > 200) {
+  if (ape::Ntip(tr) >= 200) {
     line_width <- 1
   }
 
@@ -267,7 +267,7 @@ plot_tr_w_color_edges <- function(tr,
   # edges and low ML bootstrap support
 
   edge_width <- 1
-  if (ape::Ntip(tr) > 200) {
+  if (ape::Ntip(tr) >= 200) {
     edge_width <- 0.25
   }
 
@@ -1129,7 +1129,8 @@ plot_continuous_results <- function(disc_cont,
                             geno_confidence,
                             "grey",
                             "red",
-                            "Genotype transition",
+                            paste0(row.names(pval_all_transition$hit_pvals)[j],
+                                  "\n Genotype transition"),
                             "trans",
                             j,
                             "No transition",
@@ -1137,6 +1138,11 @@ plot_continuous_results <- function(disc_cont,
                             tr_type)
       # Histogram of the |delta phenotype| for only high conf. edges, colored by
       #   genotype non-transition vs transition edges.
+      graphics::par(mfrow = c(2, 2),
+                    mgp   = c(3, 1, 0),
+                    oma   = c(0, 0, 4, 0),
+                    mar = c(4, 4, 4, 4),
+                    xpd = FALSE)
       hist_abs_hi_conf_delta_pheno(results_all_trans,
                                    tr,
                                    j,
@@ -1147,7 +1153,7 @@ plot_continuous_results <- function(disc_cont,
                                 format = "e",
                                 digits = 1)
       p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
-      title_line_one <- row.names(pval_all_transition)[j]
+      title_line_one <- row.names(pval_all_transition$hit_pvals)[j]
       # title_line_one <- expression(paste("N"["Continuous"],
       #                                    " Null Distribution"))
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
