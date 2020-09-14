@@ -519,8 +519,10 @@ plot_phyc_results <- function(tr,
   # Prep data to report p-value rank
   rank_mat <- recon_hit_vals
   rank_mat[rank_mat == 0] <- NA
+  genotype_rank_order <- rank(1 / rank_mat[, 1], na.last = TRUE, ties.method = "first")
+
   # Loop through significant hits:
-  for (j in 1:nrow(recon_hit_vals)) {
+  for (j in genotype_rank_order) {
     if (recon_hit_vals[j, 1] > fdr) {
       graphics::par(mfrow = c(1, 1),
                     mgp = c(3, 1, 0),
@@ -545,7 +547,9 @@ plot_phyc_results <- function(tr,
                    recon_perm_obs_results$observed_overlap[j])
 
       p_val_formated <- formatC(recon_hit_vals[j, 1], format = "e", digits = 1)
-      p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
+      p_val_rank_formated <- rank(1 / rank_mat,
+                                  na.last = TRUE,
+                                  ties.method = "average")[j]
       title_line_one <- row.names(recon_hit_vals)[j]
       title_line_two <- bquote(paste("-ln(FDR Corrected P-value) = ",
                                     .(p_val_formated),
@@ -784,9 +788,12 @@ plot_synchronous_results  <- function(tr,
   # Prep data to report p-value rank
   rank_mat <- trans_hit_vals
   rank_mat[rank_mat == 0] <- NA
+  genotype_rank_order <- rank(1 / rank_mat[, 1],
+                              na.last = TRUE,
+                              ties.method = "first")
 
   # Loop through significant hits:
-  for (j in 1:nrow(trans_hit_vals)) {
+  for (j in genotype_rank_order) {
     if (trans_hit_vals[j, 1] > fdr) {
       graphics::par(mfrow = c(1, 1),
                     mgp   = c(3, 1, 0),
@@ -810,7 +817,9 @@ plot_synchronous_results  <- function(tr,
 
       # Plot Null Distribution Histogram
       p_val_formated <- formatC(trans_hit_vals[j, 1], format = "e", digits = 1)
-      p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
+      p_val_rank_formated <- rank(1 / rank_mat,
+                                  na.last = TRUE,
+                                  ties.method = "average")[j]
       title_line_one <- row.names(trans_hit_vals)[j]
       # title_line_one <- expression(paste("N"["Synchronous"],
       #                                    " Null Distribution"))
@@ -1103,7 +1112,12 @@ plot_continuous_results <- function(disc_cont,
   legend_grey <- grDevices::rgb(0, 0, 0, 0.05)
   transparent_red <- grDevices::rgb(1, 0, 0, 0.25)
   transparent_teal <- grDevices::rgb(0.4, 0.6, 1, alpha = 0.5, )
-  for (j in 1:nrow(pval_all_transition$hit_pvals)) {
+  genotype_rank_order <- rank(1 / rank_mat[, 1],
+                              na.last = TRUE,
+                              ties.method = "first")
+
+  # Loop through significant hits:
+  for (j in genotype_rank_order) {
     if (pval_all_transition$hit_pvals[j, 1] > fdr) {
       graphics::par(mfrow = c(1, 1),
                     mgp   = c(3, 1, 0),
@@ -1152,7 +1166,7 @@ plot_continuous_results <- function(disc_cont,
       p_val_formated <- formatC(pval_all_transition$hit_pvals[j, 1],
                                 format = "e",
                                 digits = 1)
-      p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE)[j]
+      p_val_rank_formated <- rank(1 / rank_mat, na.last = TRUE, ties.method = "average")[j]
       title_line_one <- row.names(pval_all_transition$hit_pvals)[j]
       # title_line_one <- expression(paste("N"["Continuous"],
       #                                    " Null Distribution"))
