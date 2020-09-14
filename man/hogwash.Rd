@@ -4,9 +4,20 @@
 \alias{hogwash}
 \title{Run bacterial GWAS}
 \usage{
-hogwash(pheno, geno, tree, file_name = Sys.Date(), dir = ".",
-  perm = 10000, fdr = 0.15, bootstrap = 0.7,
-  group_genotype_key = NULL, test = "both")
+hogwash(
+  pheno,
+  geno,
+  tree,
+  tree_type = "phylogram",
+  file_name = "hogwash",
+  dir = ".",
+  perm = 10000,
+  fdr = 0.15,
+  bootstrap = 0.7,
+  group_genotype_key = NULL,
+  grouping_method = "post-ar",
+  test = "both"
+)
 }
 \arguments{
 \item{pheno}{Matrix. Dimensions: nrow = number of samples, ncol = 1. Either
@@ -20,8 +31,10 @@ input.}
 \item{tree}{Phylo object. If unrooted, will be rooted using
 phytools::midpoint.root() method. Required input.}
 
-\item{file_name}{Character. Suffix for output files. Default value is the
-current date: YYYY-MM-DD.}
+\item{tree_type}{Characer. Default = "phylogram". User can supply either:
+"phylogram" or "fan." Determines how the trees are plotted in the output.}
+
+\item{file_name}{Character. Suffix for output files. Default value "hogwash".}
 
 \item{dir}{Character. Path to output directory. Default value is current
 directory: "."}
@@ -36,6 +49,11 @@ Default value is: 0.70.}
 
 \item{group_genotype_key}{Matrix. Dimenions: nrow = number of unique
 genotypes, ncol = 2. Optional input.}
+
+\item{grouping_method}{Character. Either "pre-ar" or "post-ar". Default =
+"post_ar". Determines which grouping method is used if and only if a
+group_genotype_key is provided; if no key is provided this argument is
+ignored.}
 
 \item{test}{Character. Default = "both". User can supply three options:
 "both", "phyc", or "synchronous". Determines which test is run for binary
@@ -78,6 +96,8 @@ Overview: hogwash reads in one phenotype (either continuous or
   for this method could be to group SNPs into genes, kmers or genes into
   pathways, etc... Each of the three tests can be run on disaggregated data
   or aggregated data with the inclusion of a grouping key.
+  There are two grouping options: grouping prior to ancestral reconstruction
+  or grouping post ancestral reconstruction.
 }
 \examples{
 \donttest{
@@ -105,7 +125,8 @@ key <- hogwash::snp_gene_key
 hogwash(pheno = phenotype,
         geno = genotype,
         tree = tree,
-        group_genotype_key = key)
+        group_genotype_key = key,
+        grouping_method = "post-ar")
 
 # Both Synchronous Test & PhyC while grouping SNPs into genes
 phenotype <- hogwash::antibiotic_resistance
@@ -115,7 +136,8 @@ key <- hogwash::snp_gene_key
 hogwash(pheno = phenotype,
         geno = genotype,
         tree = tree,
-        group_genotype_key = key)
+        group_genotype_key = key,
+        grouping_method = "post-ar")
 }
 
 }

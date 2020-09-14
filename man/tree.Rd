@@ -4,11 +4,13 @@
 \name{tree}
 \alias{tree}
 \title{Phylogenetic tree}
-\format{A rooted phylogenetic tree with 7 tips and 6 internal nodes.
+\format{
+A rooted phylogenetic tree with 7 tips and 6 internal nodes.
 \describe{
   \item{tip.labels}{Names of each tree tip}
   \item{node.lables}{Bootstrap values for each node}
- }}
+ }
+}
 \usage{
 tree
 }

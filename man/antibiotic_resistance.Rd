@@ -4,12 +4,14 @@
 \name{antibiotic_resistance}
 \alias{antibiotic_resistance}
 \title{Binary phenotype}
-\format{A matrix with 7 rows and 1 columns. Each row name corresponds to a
+\format{
+A matrix with 7 rows and 1 columns. Each row name corresponds to a
   tree tip.
 \describe{
   \item{resistance}{Antibiotic resistance encoded as 1; antibiotic
   susceptible encoded as 0}
- }}
+ }
+}
 \usage{
 antibiotic_resistance
 }
