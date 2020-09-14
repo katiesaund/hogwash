@@ -48,8 +48,7 @@
 #'   phytools::midpoint.root() method. Required input.
 #' @param tree_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
-#' @param file_name Character. Suffix for output files. Default value is the
-#'   current date: YYYY-MM-DD.
+#' @param file_name Character. Suffix for output files. Default value "hogwash".
 #' @param dir Character. Path to output directory. Default value is current
 #'   directory: "."
 #' @param perm Integer. Number of permutations to run. Default value is: 10,000.
