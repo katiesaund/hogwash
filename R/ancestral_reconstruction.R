@@ -375,7 +375,7 @@ build_better_reconstruction <- function(mat, tr, disc_cont, num, recon_method){
 
   # Cutoffs for comparing the ER and ARD:
   alpha <- 0.05 # For likelihood test
-  significant_difference_in_AIC <- 2
+  significant_difference_in_AIC <- 10
 
   # Reference for model testing:
   # https://www.r-phylo.org/wiki/HowTo/Ancestral_State_Reconstruction &
