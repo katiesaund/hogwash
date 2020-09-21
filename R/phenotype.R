@@ -134,13 +134,8 @@ report_phylogenetic_signal <- function(pheno, tree){
   }
   cont_or_disc <- assign_pheno_type(pheno)
 
-  if (!ape::is.rooted(tree)) {
-    tree <- phytools::midpoint.root(tree)
-  }
+  tree <- format_tree(tree)
 
-  tip_log <- tree$edge[, 2] <= ape::Ntip(tree)
-  ordered_tips <- tree$edge[tip_log, 2]
-  tree$tip.label <- tree$tip.label[ordered_tips]
   pheno <- pheno[row.names(pheno) %in% tree$tip.label, , drop = FALSE]
   pheno <- pheno[match(tree$tip.label, row.names(pheno)), , drop = FALSE]
 
