@@ -311,9 +311,8 @@ internal_report_phylogenetic_signal <- function(pheno, tree){
   check_dimensions(pheno, exact_cols = 1, min_rows = 1, min_cols = 1)
   cont_or_disc <- assign_pheno_type(pheno)
 
-  tip_log <- tree$edge[, 2] <= ape::Ntip(tree)
-  ordered_tips <- tree$edge[tip_log, 2]
-  tree$tip.label <- tree$tip.label[ordered_tips]
+  tree <- format_tree(tree)
+
   pheno <- pheno[row.names(pheno) %in% tree$tip.label, , drop = FALSE]
   pheno <- pheno[match(tree$tip.label, row.names(pheno)), , drop = FALSE]
 
