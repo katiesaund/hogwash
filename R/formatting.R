@@ -22,6 +22,8 @@ format_tree <- function(tr){
     tr <- phytools::midpoint.root(tr)
   }
 
+  tr <- ape::reorder.phylo(tr, order = "cladewise")
+
   # Make sure that the tr$tip.label is organized in the same order as the tips
   # as linsed in tr$edge these things sometimes don't agree. I have found that
   # this happenes when the tree gets unrooted or rooted. This is not included in
