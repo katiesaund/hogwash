@@ -1,5 +1,6 @@
 <!-- badges: start -->
-  [![Travis build status](https://travis-ci.com/katiesaund/hogwash.svg?branch=master)](https://travis-ci.com/katiesaund/hogwash)  
+  [![Travis build status](https://travis-ci.org/katiesaund/hogwash.svg?branch=master)](https://travis-ci.com/katiesaund/hogwash)  
+
   [![codecov](https://https://codecov.io/gh/katiesaund/hogwash/branch/master/graphs/badge.svg)](https://https://codecov.io/gh/katiesaund/hogwash) 
 <!-- badges: end -->
 
