@@ -511,7 +511,21 @@ prepare_ancestral_reconstructions <- function(tr, pheno, geno, disc_cont){
     geno_recon_and_conf[[k]] <-
       ancestral_reconstruction_by_ML(tr, geno, k, "discrete")
   }
+
+  twenty_five_percent_finished <- floor(ncol(geno) / 4)
+  fifty_percent_finished <- floor(ncol(geno) / 2)
+  seventy_five_percent_finished <- floor(ncol(geno) * 3 / 4)
+
   for (k in 1:ncol(geno)) {
+    if (k == twenty_five_percent_finished) {
+      print(paste0("Ancestral reconstruction 25% complete: ", Sys.time()))
+    }
+    if (k == fifty_percent_finished) {
+      print(paste0("Ancestral reconstruction 50% complete: ", Sys.time()))
+    }
+    if (k == seventy_five_percent_finished) {
+      print(paste0("Ancestral reconstruction 75% complete: ", Sys.time()))
+    }
     geno_trans[[k]] <-
       identify_transition_edges(tr,
                                 geno,
