@@ -28,8 +28,7 @@ run_phyc <- function(args){
                                           args$phenotype,
                                           genotype,
                                           args$discrete_or_continuous)
-  print("Finish ancestral reconstruction")
-  print(Sys.time())
+  print(paste0("Ancestral reconstruction complete: ", Sys.time()))
 
   # Include all transition edges (WT -> mutant and mutant -> WT). For discrete
   #  synchronous and continuous tests.
@@ -104,8 +103,7 @@ run_phyc <- function(args){
                              args$fdr,
                              hi_conf$high_conf_ordered_by_edges,
                              convergence)
-  print("Finish permutation test")
-  print(Sys.time())
+  print(paste0("Permutation test complete: ", Sys.time()))
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_recon <-

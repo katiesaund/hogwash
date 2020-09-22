@@ -25,8 +25,7 @@ run_continuous <- function(args){
                                           args$phenotype,
                                           genotype,
                                           args$discrete_or_continuous)
-  print("Finish ancestral reconstruction")
-  print(Sys.time())
+  print(paste0("Ancestral reconstruction complete: ", Sys.time()))
 
   # Include all transition edges (WT -> mutant and mutant -> WT) for both
   #  synchronous and continuous tests.
@@ -79,8 +78,7 @@ run_continuous <- function(args){
              args$perm,
              args$tree,
              AR$pheno_recon_and_conf$recon_edge_mat)
-  print("Finish permutation test:")
-  print(Sys.time())
+  print(paste0("Permutation test complete: ", Sys.time()))
 
   # IDENTIFY SIGNIFICANT HITS USING FDR CORRECTION ----------------------------#
   corrected_pvals_all_trans <-
