@@ -8,6 +8,7 @@ test_that("internal_report_phylogenetic_signal gives no errors for correct input
   set.seed(1)
   tree <- ape::rcoal(n = num_tip)
   row.names(pheno) <- tree$tip.label
+  tree$node.label <- rep(100, ape::Nnode(tree))
   expect_error(internal_report_phylogenetic_signal(pheno, tree), NA)
 
   # discrete, BM
@@ -71,6 +72,8 @@ test_that("internal_report_phylogenetic_signal gives no errors for correct input
   row.names(pheno) <- paste0("t", 1:num_tip)
   set.seed(1)
   tree <- ape::rcoal(n = num_tip)
+  tree$node.label <- rep(100, ape::Nnode(tree))
+
   expect_error(internal_report_phylogenetic_signal(pheno, tree), NA)
 
 })
@@ -88,6 +91,8 @@ test_that("report_phylogenetic_signal gives no errors for correct inputs",  {
   set.seed(1)
   tree <- ape::rcoal(n = num_tip)
   row.names(pheno) <- tree$tip.label
+  tree$node.label <- rep(100, ape::Nnode(tree))
+
   expect_error(report_phylogenetic_signal(pheno, tree), NA)
 
   # discrete, BM
@@ -151,6 +156,8 @@ test_that("report_phylogenetic_signal gives no errors for correct inputs, but no
   row.names(pheno) <- paste0("t", 1:num_tip)
   set.seed(1)
   tree <- ape::rcoal(n = num_tip)
+  tree$node.label <- rep(100, ape::Nnode(tree))
+
   expect_error(report_phylogenetic_signal(pheno, tree), NA)
 
   # unrooted
@@ -160,6 +167,8 @@ test_that("report_phylogenetic_signal gives no errors for correct inputs, but no
   set.seed(1)
   tree <- ape::rcoal(n = num_tip)
   tree <- ape::unroot(tree)
+  tree$node.label <- rep(100, ape::Nnode(tree))
+
   expect_error(report_phylogenetic_signal(pheno, tree), NA)
 })
 
@@ -173,6 +182,8 @@ test_that("calculate_lambda gives a lambda value for good data", {
   pheno <- matrix(rnorm(n = num_tip, mean = 1, sd = 0.6))
   set.seed(1)
   tree <- ape::rcoal(n = num_tip)
+  tree$node.label <- rep(100, ape::Nnode(tree))
+
   row.names(pheno) <- tree$tip.label
   expect_error(calculate_lambda(pheno, tree), NA)
   expect_equal(round(calculate_lambda(pheno, tree), 5), .00007)
@@ -228,6 +239,8 @@ test_that("calculate_d gives no errors when running on valid inputs", {
   pheno <- matrix(rbinom(num_tip, 1, 0.6))
   set.seed(1)
   tree <- ape::rcoal(n = num_tip)
+  tree$node.label <- rep(100, ape::Nnode(tree))
+
   row.names(pheno) <- tree$tip.label
   expect_error(calculate_d(pheno, tree), NA)
   set.seed(1)
