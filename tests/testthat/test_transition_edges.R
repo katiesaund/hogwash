@@ -27,6 +27,7 @@ test_that("identify_transition_edges returns correct transition vector and
   set.seed(1)
   temp_tree <- ape::rtree(5)
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
+  temp_tree <- format_tree(temp_tree)
   temp_geno <- cbind(c(1, 0, 1, 0, 1), c(1, 0, 0, 0, 0))
   row.names(temp_geno) <- temp_tree$tip.label
   temp_recon <- temp_results <- rep(list(0), ncol(temp_geno))
@@ -44,8 +45,8 @@ test_that("identify_transition_edges returns correct transition vector and
   }
   expect_equivalent(temp_results[[1]]$transition, c(0, 0, 0, 1, 1, 1, 0, 0))
   expect_equivalent(temp_results[[1]]$trans_dir,  c(0, 0, 0, -1, -1, 1, 0, 0))
-  expect_equivalent(temp_results[[2]]$transition, c(0, 1, 0, 0, 0, 0, 0, 0))
-  expect_equivalent(temp_results[[2]]$trans_dir,  c(0, -1, 0, 0, 0, 0, 0, 0))
+  expect_equivalent(temp_results[[2]]$transition, c(0, 0, 0, 1, 1, 0, 0, 1))
+  expect_equivalent(temp_results[[2]]$trans_dir,  c(0, 0, 0, -1, -1, 0, 0, -1))
 })
 
 
@@ -78,6 +79,7 @@ test_that("keep_two_plus_hi_conf_tran_ed returns a vector
   temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_geno <- cbind(c(1, 0, 1, 0, 1), c(1, 0, 0, 0, 0))
   row.names(temp_geno) <- temp_tree$tip.label
+  temp_tree <- format_tree(temp_tree)
   fake_confidence <- temp_recon <- temp_results <- rep(list(0), ncol(temp_geno))
   set.seed(1)
   for (i in 1:2) {
@@ -91,13 +93,13 @@ test_that("keep_two_plus_hi_conf_tran_ed returns a vector
     fake_confidence[[i]] <- rep(1, ape::Nedge(temp_tree))
   }
   expect_equivalent(keep_two_plus_hi_conf_tran_ed(temp_results,
-                                                            fake_confidence),
-                    c(TRUE, FALSE))
+                                                  fake_confidence),
+                    c(TRUE, TRUE))
   for (i in 1:2) {
     fake_confidence[[i]] <- rep(0, ape::Nedge(temp_tree))
   }
   expect_equivalent(keep_two_plus_hi_conf_tran_ed(temp_results,
-                                                            fake_confidence),
+                                                  fake_confidence),
                     c(FALSE, FALSE))
 })
 
