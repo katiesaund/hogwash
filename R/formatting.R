@@ -24,16 +24,6 @@ format_tree <- function(tr){
 
   tr <- ape::reorder.phylo(tr, order = "cladewise")
 
-  # Make sure that the tr$tip.label is organized in the same order as the tips
-  # as linsed in tr$edge these things sometimes don't agree. I have found that
-  # this happenes when the tree gets unrooted or rooted. This is not included in
-  # the above if statement because the user may supply a rooted tree where the
-  # tip.label != the edges because they rooted it prior to supplying it as an
-  # input.
-  tip_log <- tr$edge[, 2] <= ape::Ntip(tr)
-  ordered_tips <- tr$edge[tip_log, 2]
-  tr$tip.label <- tr$tip.label[ordered_tips]
-
   # Function -------------------------------------------------------------------
   for (i in 1:ape::Nnode(tr)) {
     if (tr$node.label[i] == "") {
