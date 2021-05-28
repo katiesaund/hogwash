@@ -20,12 +20,13 @@ blank_plot <- function(){
 #' @param pheno_anc_rec Vector. Length = Nnode(tr).
 #' @param tr_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
+#' @param strain_type Matrix.
 #'
 #' @return A tree plot where the tree edges are filled in with colors
 #'   corresponding to the phenotypic trait values.
 #'
 #' @noRd
-plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec, tr_type){
+plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec, tr_type, strain_type){
   # Check inputs ---------------------------------------------------------------
   check_tree_is_valid(tr)
   check_equal(length(pheno_vector), ape::Ntip(tr))
@@ -218,6 +219,7 @@ make_manhattan_plot <- function(geno_pheno_name,
 #' @param legend_highlighted Character. Legend name for highlighted lines.
 #' @param tr_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
+#' @param strain_type Matrix or NULL
 #' @return Plot of a tree with certain edges colored.
 plot_tr_w_color_edges <- function(tr,
                                   edges_to_highlight,
@@ -229,7 +231,8 @@ plot_tr_w_color_edges <- function(tr,
                                   index,
                                   legend_baseline,
                                   legend_highlighted,
-                                  tr_type){
+                                  tr_type,
+                                  strain_key){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_string(edge_color_na)
@@ -251,6 +254,12 @@ plot_tr_w_color_edges <- function(tr,
   }
   check_is_string(title)
   check_is_string(tr_type)
+  if (!is.null(strain_key)) {
+    check_dimensions(strain_key,
+                     min_rows = 1,
+                     exact_cols = 1,
+                     min_cols = 1)
+  }
 
   # Function -------------------------------------------------------------------
   tree_legend_cex <- 0.5
@@ -288,6 +297,14 @@ plot_tr_w_color_edges <- function(tr,
                  adj = 0,
                  cex = tree_legend_cex,
                  edge.width = edge_width)
+
+  if (!is.null(strain_key)) {
+    strain_color_key <- assign_colors_to_strain_types(tr, strain_key)
+    ape::tiplabels(tip = c(1:ape::Ntip(tr)),
+                   pch =  19, # circle
+                   cex = .55, # dot size
+                   col = unlist(strain_color_key[, 2]))
+  }
 
   graphics::legend("topleft",
                    bty = "n",
@@ -514,7 +531,8 @@ plot_phyc_results <- function(tr,
                         1,
                         "Wild type",
                         "Variant",
-                        tr_type)
+                        tr_type,
+                        strain_type)
 
   # Prep data to report p-value rank
   rank_mat <- recon_hit_vals
@@ -540,7 +558,8 @@ plot_phyc_results <- function(tr,
                             j,
                             "No transition",
                             "Transition",
-                            tr_type)
+                            tr_type,
+                            NULL)
 
       # Plot Null Distribution Histogram
       max_x <- 1.2 * max(recon_perm_obs_results$permuted_count[[j]],
@@ -606,6 +625,7 @@ plot_phyc_results <- function(tr,
 #'   corresponds to one genotype.
 #' @param tr_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
+#' @param strain_type Matrix.
 #'
 #'  @return  Plots printed into one pdf.
 plot_synchronous_results  <- function(tr,
@@ -622,7 +642,8 @@ plot_synchronous_results  <- function(tr,
                                  snp_in_gene,
                                  prefix,
                                  grouped_logical,
-                                 tr_type){
+                                 tr_type,
+                                 strain_type){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -783,7 +804,8 @@ plot_synchronous_results  <- function(tr,
                         1,
                         "No transition",
                         "Transition",
-                        tr_type)
+                        tr_type,
+                        strain_type)
 
   # Prep data to report p-value rank
   rank_mat <- trans_hit_vals
@@ -813,7 +835,8 @@ plot_synchronous_results  <- function(tr,
                             j,
                             "No transition",
                             "Transition",
-                            tr_type)
+                            tr_type,
+                            NULL)
 
       # Plot Null Distribution Histogram
       p_val_formated <- formatC(trans_hit_vals[j, 1], format = "e", digits = 1)
@@ -946,7 +969,8 @@ plot_continuous_results <- function(disc_cont,
                                     all_trans_sig_hits,
                                     group_logical,
                                     snp_in_gene,
-                                    tr_type){
+                                    tr_type,
+                                    strain_type){
   # Check inputs ---------------------------------------------------------------
   check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
@@ -1102,7 +1126,7 @@ plot_continuous_results <- function(disc_cont,
                 oma = c(0, 0, 4, 0),
                 mar = c(4, 4, 4, 4),
                 xpd = FALSE)
-  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec, tr_type)
+  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec, tr_type, strain_type)
 
   # Only make the following plots for significant loci
   # Prep data to report p-value rank
@@ -1125,18 +1149,7 @@ plot_continuous_results <- function(disc_cont,
                     mar = c(4, 4, 4, 4),
                     xpd = FALSE)
       # Plot Genotype Reconstruction on the Tree
-      # plot_tr_w_color_edges(tr,
-      #                       geno_reconstruction,
-      #                       geno_confidence,
-      #                       "grey",
-      #                       "red",
-      #                       paste0(row.names(pval_all_transition$hit_pvals)[j],
-      #                              "\n Genotype reconstruction"),
-      #                       "recon",
-      #                       j,
-      #                       "Wild type",
-      #                       "Variant",
-      #                       tr_type)
+
       # Plot Genotype Transitions on the Tree
       plot_tr_w_color_edges(tr,
                             geno_transition,
@@ -1256,4 +1269,29 @@ plot_continuous_results <- function(disc_cont,
                   "delta_pheno_table" = delta_pheno_table,
                   "delta_pheno_list" = delta_pheno_list )
   return(results)
+}
+
+#' Assign colors to each user supplied strain type
+#'
+#' @param strain_key Matrix. 1 column of user supplied characters describing strain type.
+#'
+#' @return strain_color_key. Matrix. 2 columns. 1st column = user supplied
+#'   characters describing strain type. 2nd column, "color_code" is hex code for plotting color.
+#' @noRd
+assign_colors_to_strain_types <- function(tree, strain_key){
+  unique_strain_names <- unique(strain_key[, 1])
+  color_hexcodes <- rainbow(n = length(unique_strain_names))
+  strain_key <- match_order_to_tree_tips(tree, strain_key)
+
+  # initialize a column that will hold color hex code
+  strain_color_key <- cbind(strain_key, rep(NA, nrow(strain_key)))
+  for (i in 1:nrow(strain_color_key)) {
+    for (j in 1:length(unique_strain_names)) {
+      if (strain_color_key[i, 1] == unique_strain_names[j]) {
+        strain_color_key[i, 2] <- color_hexcodes[j]
+      }
+    }
+  }
+  colnames(strain_color_key)[2] <- "color_code"
+  return(strain_color_key)
 }
