@@ -20,13 +20,17 @@ blank_plot <- function(){
 #' @param pheno_anc_rec Vector. Length = Nnode(tr).
 #' @param tr_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
-#' @param strain_type Matrix.
+#' @param strain_key Matrix. Default = NULL.
 #'
 #' @return A tree plot where the tree edges are filled in with colors
 #'   corresponding to the phenotypic trait values.
 #'
 #' @noRd
-plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec, tr_type, strain_type){
+plot_continuous_phenotype <- function(tr,
+                                      pheno_vector,
+                                      pheno_anc_rec,
+                                      tr_type,
+                                      strain_key = NULL){
   # Check inputs ---------------------------------------------------------------
   check_tree_is_valid(tr)
   check_equal(length(pheno_vector), ape::Ntip(tr))
@@ -69,7 +73,25 @@ plot_continuous_phenotype <- function(tr, pheno_vector, pheno_anc_rec, tr_type, 
                    ftype = "off",
                    outline = FALSE)
   }
+
+  if (!is.null(strain_key)) {
+    strain_color_key <- assign_colors_to_strain_types(tr, strain_key)
+    ape::tiplabels(tip = c(1:ape::Ntip(tr)),
+                   pch =  19, # circle
+                   cex = .55, # dot size
+                   col = unlist(strain_color_key[, 2]))
+
+    graphics::legend("left",
+                     bty = "o",
+                     legend = unique(strain_color_key[, 1]),
+                     col = unique(strain_color_key[, 2]),
+                     lty = 1,
+                     ncol = 1,
+                     lwd = 1)
+  }
+
 }
+
 
 #' Draw histogram of the absolute value of phenotype change on each high
 #' confidence tree edge
@@ -308,7 +330,7 @@ plot_tr_w_color_edges <- function(tr,
                    cex = .55, # dot size
                    col = unlist(strain_color_key[, 2]))
 
-    graphics::legend("bottomleft",
+    graphics::legend("left",
                      bty = "o",
                      legend = unique(strain_color_key[, 1]),
                      col = unique(strain_color_key[, 2]),
@@ -382,7 +404,7 @@ plot_phyc_results <- function(tr,
                               prefix,
                               grouped_logical,
                               tr_type,
-                              strain_key){
+                              strain_key = NULL){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -659,7 +681,7 @@ plot_synchronous_results  <- function(tr,
                                  prefix,
                                  grouped_logical,
                                  tr_type,
-                                 strain_key){
+                                 strain_key = NULL){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -988,7 +1010,7 @@ plot_continuous_results <- function(disc_cont,
                                     group_logical,
                                     snp_in_gene,
                                     tr_type,
-                                    strain_type){
+                                    strain_key){
   # Check inputs ---------------------------------------------------------------
   check_str_is_discrete_or_continuous(disc_cont)
   check_for_root_and_bootstrap(tr)
@@ -1144,7 +1166,7 @@ plot_continuous_results <- function(disc_cont,
                 oma = c(0, 0, 4, 0),
                 mar = c(4, 4, 4, 4),
                 xpd = FALSE)
-  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec, tr_type, strain_type)
+  plot_continuous_phenotype(tr, pheno_vector, pheno_anc_rec, tr_type, strain_key)
 
   # Only make the following plots for significant loci
   # Prep data to report p-value rank

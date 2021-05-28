@@ -14,6 +14,7 @@ test_that("check_input_format works for valid inputs", {
   temp_test <- "both"
   temp_group_method <- "pre-ar"
   temp_tr_type <- "phylogram"
+  temp_strain_key <- NULL
 
   # Test
   expect_equal(check_input_format(temp_pheno,
@@ -27,7 +28,8 @@ test_that("check_input_format works for valid inputs", {
                                   temp_group_genotype_key,
                                   temp_group_method,
                                   temp_test,
-                                  temp_tr_type),
+                                  temp_tr_type,
+                                  temp_strain_key),
                "continuous")
 })
 

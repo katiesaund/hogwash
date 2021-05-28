@@ -19,6 +19,7 @@ test_that("run_continuous() doesn't give any errors when given a continuous
   args$gene_snp_lookup        <- NULL
   args$grouping_method        <- "post-ar"
   args$tree_type              <- "fan"
+  args$strain_key             <- NULL
   expect_error(run_continuous(args), NA)
 })
 
@@ -45,6 +46,7 @@ test_that("run_continuous() doesn't give any errors when given a continuous
   }
   args$grouping_method        <- "post-ar"
   args$tree_type              <- "fan"
+  args$strain_key             <- NULL
 
   expect_error(run_continuous(args), NA)
 })
@@ -69,6 +71,7 @@ test_that("run_continuous() results are the same if the genotype or phenotype ro
               args$gene_snp_lookup        <- NULL
               args$grouping_method        <- "post-ar"
               args$tree_type              <- "fan"
+              args$strain_key             <- NULL
 
               pheno_order <- run_continuous(args)
 
@@ -91,6 +94,7 @@ test_that("run_continuous() results are the same if the genotype or phenotype ro
               args$gene_snp_lookup        <- NULL
               args$grouping_method        <- "post-ar"
               args$tree_type              <- "fan"
+              args$strain_key             <- NULL
 
               geno_order <- run_continuous(args)
 
@@ -111,6 +115,7 @@ test_that("run_continuous() results are the same if the genotype or phenotype ro
               args$gene_snp_lookup        <- NULL
               args$grouping_method        <- "post-ar"
               args$tree_type              <- "fan"
+              args$strain_key             <- NULL
 
               orders_match <- run_continuous(args)
 
@@ -149,6 +154,7 @@ test_that("run_continuous() gives sames results for the tree, when the tree is
             args$gene_snp_lookup        <- NULL
             args$grouping_method        <- "post-ar"
             args$tree_type              <- "fan"
+            args$strain_key             <- NULL
 
             unrooted_out <- run_continuous(args)
 

@@ -8,7 +8,8 @@ test_that("hogwash doesn't give errors when run on discrete data (grouping)", {
                        perm = 10,
                        fdr = 0.15,
                        bootstrap = 0.70,
-                       group_genotype_key = hogwash::snp_gene_key), NA)
+                       group_genotype_key = hogwash::snp_gene_key,
+                       strain_key = NULL), NA)
 })
 
 test_that("hogwash doesn't give errors when run on discrete data (no grouping)", {
@@ -20,7 +21,8 @@ test_that("hogwash doesn't give errors when run on discrete data (no grouping)",
                        perm = 10,
                        fdr = 0.15,
                        bootstrap = 0.70,
-                       group_genotype_key = NULL), NA)
+                       group_genotype_key = NULL,
+                       strain_key = NULL), NA)
 })
 
 test_that("hogwash doesn't give errors when run on continuous data (grouping)", {
@@ -32,7 +34,8 @@ test_that("hogwash doesn't give errors when run on continuous data (grouping)", 
                        perm = 10,
                        fdr = 0.15,
                        bootstrap = 0.70,
-                       group_genotype_key = hogwash::snp_gene_key), NA)
+                       group_genotype_key = hogwash::snp_gene_key,
+                       strain_key = NULL), NA)
 })
 
 test_that("hogwash doesn't give errors when run on continuous data (no grouping)", {
@@ -44,7 +47,8 @@ test_that("hogwash doesn't give errors when run on continuous data (no grouping)
                        perm = 10,
                        fdr = 0.15,
                        bootstrap = 0.70,
-                       group_genotype_key = NULL), NA)
+                       group_genotype_key = NULL,
+                       strain_key = NULL), NA)
 })
 
 

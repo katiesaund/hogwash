@@ -4,6 +4,7 @@ context("Plots") #----------------------------------------------#
 test_that("plot_continuous_phenotype works for valid inputs", {
   ntip <- 10
   temp_tree <- ape::rtree(ntip)
+  temp_tree$node.label <- rep(100, ape::Nnode(temp_tree))
   temp_vec <- rnorm(ntip, mean = 0, sd = 10)
   names(temp_vec) <- temp_tree$tip.label
   temp_tr_type <- "phylogram"
@@ -16,7 +17,21 @@ test_that("plot_continuous_phenotype works for valid inputs", {
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
                                          temp_anc_rec_at_node,
-                                         temp_tr_type),
+                                         temp_tr_type,
+                                         strain_key = NULL),
+               NA)
+
+
+  temp_strain_key <- matrix(c("one", "one", "two", "two", "three",
+                              "four", "four", "four", "four", "four"),
+                            nrow = ntip,
+                            ncol = 1)
+  row.names(temp_strain_key) <- temp_tree$tip.label
+  expect_error(plot_continuous_phenotype(temp_tree,
+                                         temp_vec,
+                                         temp_anc_rec_at_node,
+                                         temp_tr_type,
+                                         strain_key = temp_strain_key),
                NA)
 })
 
@@ -35,7 +50,8 @@ test_that("plot_continuous_phenotype works gives error for invalid inputs
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
                                          temp_anc_rec_at_node,
-                                         temp_tr_type))
+                                         temp_tr_type,
+                                         strain_key = NULL))
 })
 
 test_that("plot_continuous_phenotype gives error for invalid inputs", {
@@ -53,7 +69,8 @@ test_that("plot_continuous_phenotype gives error for invalid inputs", {
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
                                          temp_anc_rec_at_node,
-                                         temp_tr_type))
+                                         temp_tr_type,
+                                         strain_key = NULL))
 })
 
 test_that("plot_continuous_phenotype gives error for invalid inputs", {
@@ -73,7 +90,8 @@ test_that("plot_continuous_phenotype gives error for invalid inputs", {
   expect_error(plot_continuous_phenotype(temp_tree,
                                          temp_vec,
                                          temp_anc_rec_at_node,
-                                         temp_tr_type))
+                                         temp_tr_type,
+                                         strain_key = NULL))
 })
 
 # test hist_abs_hi_conf_delta_pheno
@@ -255,7 +273,9 @@ test_that("plot_tr_w_color_edges works for valid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type),
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE),
                NA)
 })
 
@@ -287,7 +307,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -319,7 +341,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -351,7 +375,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -383,7 +409,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -415,7 +443,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -447,7 +477,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -479,7 +511,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -511,7 +545,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -543,7 +579,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
@@ -575,7 +613,9 @@ test_that("plot_tr_w_color_edges gives error for invalid inputs on recon", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type))
+                                     temp_tr_type,
+                                     NULL,
+                                     FALSE))
 })
 
 test_that("plot_tr_w_color_edges works for valid inputs on trans", {

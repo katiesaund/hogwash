@@ -65,6 +65,11 @@
 #' @param test Character. Default = "both". User can supply three options:
 #'   "both", "phyc", or "synchronous". Determines which test is run for binary
 #'   data.
+#' @param strain_key Matrix. Default = NULL. nrow = number of samples. ncol = 1.
+#'   Used to plot colored tips in phylogenetic tree that indicate user defined
+#'    strain types (or other useful group ID). Samples should be ordered to
+#'    match tree tips. Stain names should be characters. Colors will be
+#'    generated programatically rather than supplied by the user.
 #'
 #' @export
 #'
@@ -127,7 +132,8 @@ hogwash <- function(pheno,
                     bootstrap = 0.70,
                     group_genotype_key = NULL,
                     grouping_method = "post-ar",
-                    test = "both"){
+                    test = "both",
+                    strain_key = NULL){
   args <- NULL
   args$phenotype <- pheno
   args$genotype <- geno
@@ -143,6 +149,7 @@ hogwash <- function(pheno,
   if (!is.null(group_genotype_key)) {
     args$group_genotype <- TRUE
   }
+  args$strain_key <- strain_key
   args$grouping_method <- grouping_method
   args$test <- test
   args$discrete_or_continuous <-
@@ -157,6 +164,7 @@ hogwash <- function(pheno,
                        args$gene_snp_lookup,
                        args$grouping_method,
                        args$test,
-                       args$tree_type)
+                       args$tree_type,
+                       args$strain_key)
   select_test_type(args)
 }

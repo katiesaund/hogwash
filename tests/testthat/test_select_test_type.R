@@ -26,6 +26,8 @@ test_that("select_test_type doesn't throw error when given valid continuous
   args$test <- "both"
   args$grouping_method        <- "post-ar"
   args$tree_type              <- "fan"
+  args$strain_key             <- NULL
+
   # Test
   expect_error(select_test_type(args), NA)
 })
@@ -50,6 +52,7 @@ test_that("select_test_type doesn't throw error given valid discrete input", {
   args$test <- "both"
   args$grouping_method        <- "post-ar"
   args$tree_type              <- "fan"
+  args$strain_key             <- NULL
 
   # Test
   expect_error(select_test_type(args), NA)
