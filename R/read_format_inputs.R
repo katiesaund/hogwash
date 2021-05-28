@@ -26,6 +26,10 @@
 #'   data.
 #' @param tr_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
+#' @param strain_key Matrix. Row names = samples in tree$tip order. 1 column.
+#'   Used in output tree plots to color code tree tips with user-supplied strain
+#'   names. Strain names (or whatever category schema user desires) are supplied
+#'   as character strings in matrix. Default = NULL.
 #' @return discrete_or_continuous. Character. Either "discrete" or "continuous".
 #'   Describes the input phenotype.
 #' @noRd
@@ -40,7 +44,8 @@ check_input_format <- function(pheno,
                                group_genotype_key,
                                group_method,
                                test,
-                               tr_type){
+                               tr_type,
+                               strain_key){
   # Check input ----------------------------------------------------------------
   check_dimensions(geno, ape::Ntip(tr), 2, NULL, 2)
   check_dimensions(pheno, ape::Ntip(tr), 2, 1, 1)
@@ -76,6 +81,14 @@ check_input_format <- function(pheno,
   check_is_string(tr_type)
   if (!tr_type %in% c("phylogram", "fan")) {
     stop("Select either: phylogram or fan for tree_type")
+  }
+  if (!is.null(strain_key)) {
+    check_class(strain_key, "matrix")
+    check_dimensions(strain_key,
+                     min_rows = 1,
+                     exact_cols = 1,
+                     min_cols = 1)
+    check_for_NA_and_inf(strain_key)
   }
   # Function -------------------------------------------------------------------
   discrete_or_continuous <- assign_pheno_type(pheno)
