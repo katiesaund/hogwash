@@ -220,6 +220,7 @@ make_manhattan_plot <- function(geno_pheno_name,
 #' @param tr_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
 #' @param strain_type Matrix or NULL
+#' @param tip_name_log Logical. TRUE == plot tree with tip names.
 #' @return Plot of a tree with certain edges colored.
 plot_tr_w_color_edges <- function(tr,
                                   edges_to_highlight,
@@ -232,7 +233,8 @@ plot_tr_w_color_edges <- function(tr,
                                   legend_baseline,
                                   legend_highlighted,
                                   tr_type,
-                                  strain_key){
+                                  strain_key,
+                                  tip_name_log){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_is_string(edge_color_na)
@@ -260,6 +262,7 @@ plot_tr_w_color_edges <- function(tr,
                      exact_cols = 1,
                      min_cols = 1)
   }
+  check_class(tip_name_log, "logical")
 
   # Function -------------------------------------------------------------------
   tree_legend_cex <- 0.5
@@ -289,7 +292,7 @@ plot_tr_w_color_edges <- function(tr,
   graphics::plot(tr,
                  type = tr_type,
                  font = 1,
-                 show.tip.label = FALSE,
+                 show.tip.label = tip_name_log,
                  edge.color = edge_color,
                  main = title,
                  use.edge.length = edge_length_log,
@@ -351,6 +354,7 @@ plot_tr_w_color_edges <- function(tr,
 #'   corresponds to one genotype.
 #' @param tr_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
+#' @param strain_key Matrix
 #'
 #' @return  Plots printed into one pdf.
 plot_phyc_results <- function(tr,
@@ -368,7 +372,8 @@ plot_phyc_results <- function(tr,
                               snp_in_gene,
                               prefix,
                               grouped_logical,
-                              tr_type){
+                              tr_type,
+                              strain_key){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -532,7 +537,8 @@ plot_phyc_results <- function(tr,
                         "Wild type",
                         "Variant",
                         tr_type,
-                        strain_type)
+                        strain_key = strain_key,
+                        tip_name_log = TRUE)
 
   # Prep data to report p-value rank
   rank_mat <- recon_hit_vals
@@ -559,7 +565,8 @@ plot_phyc_results <- function(tr,
                             "No transition",
                             "Transition",
                             tr_type,
-                            NULL)
+                            strain_key = NULL,
+                            tip_name_log = TRUE)
 
       # Plot Null Distribution Histogram
       max_x <- 1.2 * max(recon_perm_obs_results$permuted_count[[j]],
@@ -625,7 +632,7 @@ plot_phyc_results <- function(tr,
 #'   corresponds to one genotype.
 #' @param tr_type Characer. Default = "phylogram". User can supply either:
 #'   "phylogram" or "fan." Determines how the trees are plotted in the output.
-#' @param strain_type Matrix.
+#' @param strain_key Matrix.
 #'
 #'  @return  Plots printed into one pdf.
 plot_synchronous_results  <- function(tr,
@@ -643,7 +650,7 @@ plot_synchronous_results  <- function(tr,
                                  prefix,
                                  grouped_logical,
                                  tr_type,
-                                 strain_type){
+                                 strain_key){
   # Check input ----------------------------------------------------------------
   check_for_root_and_bootstrap(tr)
   check_if_dir_exists(dir)
@@ -805,7 +812,8 @@ plot_synchronous_results  <- function(tr,
                         "No transition",
                         "Transition",
                         tr_type,
-                        strain_type)
+                        strain_key = strain_key,
+                        tip_name_log = TRUE)
 
   # Prep data to report p-value rank
   rank_mat <- trans_hit_vals
@@ -836,7 +844,8 @@ plot_synchronous_results  <- function(tr,
                             "No transition",
                             "Transition",
                             tr_type,
-                            NULL)
+                            strain_key = NULL,
+                            tip_name_log = TRUE)
 
       # Plot Null Distribution Histogram
       p_val_formated <- formatC(trans_hit_vals[j, 1], format = "e", digits = 1)
@@ -1162,7 +1171,9 @@ plot_continuous_results <- function(disc_cont,
                             j,
                             "No transition",
                             "Transition",
-                            tr_type)
+                            tr_type,
+                            strain_key = NULL,
+                            tip_name_log = TRUE)
       # Histogram of the |delta phenotype| for only high conf. edges, colored by
       #   genotype non-transition vs transition edges.
       graphics::par(mfrow = c(2, 2),
