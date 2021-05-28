@@ -136,7 +136,7 @@ hist_abs_hi_conf_delta_pheno <- function(all_trans,
          legend = c("Transition", "Non-transition"),
          col = c(trans_color, non_trans_color),
          pch = 15,
-         bty = "n",
+         bty = "o",
          cex = hist_cex_size)
 }
 
@@ -307,10 +307,19 @@ plot_tr_w_color_edges <- function(tr,
                    pch =  19, # circle
                    cex = .55, # dot size
                    col = unlist(strain_color_key[, 2]))
+
+    graphics::legend("bottomleft",
+                     bty = "o",
+                     legend = unique(strain_color_key[, 1]),
+                     col = unique(strain_color_key[, 2]),
+                     lty = 1,
+                     ncol = 1,
+                     lwd = 1,
+                     cex = tree_legend_cex)
   }
 
   graphics::legend("topleft",
-                   bty = "n",
+                   bty = "o",
                    legend = c(legend_baseline,
                               legend_highlighted,
                               "Low confidence"),

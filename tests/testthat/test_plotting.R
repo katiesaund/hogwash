@@ -607,7 +607,30 @@ test_that("plot_tr_w_color_edges works for valid inputs on trans", {
                                      temp_index,
                                      temp_legend_base,
                                      temp_legend_other,
-                                     temp_tr_type),
+                                     temp_tr_type,
+                                     strain_key = NULL,
+                                     tip_name_log = TRUE),
+               NA)
+
+
+  temp_strain_key <- matrix(c("one", "one", "two", "two", "three"),
+                            nrow = 5,
+                            ncol = 1)
+  row.names(temp_strain_key) <- temp_tree$tip.label
+  # Test
+  expect_error(plot_tr_w_color_edges(temp_tree,
+                                     temp_edges_to_highlight,
+                                     temp_conf,
+                                     temp_low_conf_color,
+                                     temp_bright_color,
+                                     temp_title,
+                                     temp_type,
+                                     temp_index,
+                                     temp_legend_base,
+                                     temp_legend_other,
+                                     temp_tr_type,
+                                     strain_key = temp_strain_key,
+                                     tip_name_log = TRUE),
                NA)
 })
 
