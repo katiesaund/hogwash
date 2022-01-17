@@ -1077,6 +1077,12 @@ plot_continuous_results <- function(disc_cont,
 
   if (!is.null(snp_in_gene)) {
     snp_in_gene <- as.data.frame(snp_in_gene, row.names = 1)
+
+    if (ncol(snp_in_gene) == 2) { # Jelly's bug fix
+      row.names(snp_in_gene) <- snp_in_gene[, 1]
+      snp_in_gene <- snp_in_gene[, 2, drop = FALSE]
+    }
+
     colnames(snp_in_gene) <- "Variants in Group"
     snp_in_gene <-
       snp_in_gene[row.names(snp_in_gene) %in% row.names(log_p_value), ,
@@ -1143,10 +1149,17 @@ plot_continuous_results <- function(disc_cont,
                       "continuous")
 
   # Plot Genotype vs Tree Edge Heatmap
+
+  cluster_col_log <- TRUE
+  if (nrow(snp_in_gene) == 1) {
+    # Avoid clustering issue if only one group in heatmap
+    cluster_col_log <- FALSE
+  }
+
   pheatmap::pheatmap(
     ordered_by_p_val,
     main = "Continuous Test: Rows=Tree Edges, Columns=Genotypes",
-    cluster_cols = TRUE,
+    cluster_cols = cluster_col_log,
     na_col = "grey",
     cluster_rows = FALSE,
     legend = FALSE,
