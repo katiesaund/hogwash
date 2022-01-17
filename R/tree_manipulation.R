@@ -14,13 +14,17 @@ identify_short_edges <- function(tr){
 
   # Function -------------------------------------------------------------------
   short_edges <- rep(1, ape::Nedge(tr))
-  while (max(tr$edge.length[as.logical(short_edges)]) >=
-         (0.1 * sum(tr$edge.length[as.logical(short_edges)]))) {
-    short_edges[tr$edge.length ==
-                  max(tr$edge.length[as.logical(short_edges)])] <- 0
-    if (sum(short_edges) == 0) {
-      stop("Tree edge lengths are unreasonably long compared to the other
-           edges.")
+
+  small_num_samples <- 25 # potential bug fix for Nicola
+  if (ape::Ntip(tr) > small_num_samples) {
+    while (max(tr$edge.length[as.logical(short_edges)]) >=
+           (0.1 * sum(tr$edge.length[as.logical(short_edges)]))) {
+      short_edges[tr$edge.length ==
+                    max(tr$edge.length[as.logical(short_edges)])] <- 0
+      if (sum(short_edges) == 0) {
+        stop("Tree edge lengths are unreasonably long compared to the other
+             edges.")
+      }
     }
   }
 
